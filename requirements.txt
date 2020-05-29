@@ -1,3 +1,4 @@
+fastapi==0.55.1
 boto3==1.12.46
 pyproj==2.6.0
 alembic==1.4.2

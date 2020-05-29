@@ -1,7 +1,14 @@
+from fastapi import FastAPI
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_restful import Api
+
+# import apis
+from ml_enabler.api.ml import StatusCheckAPI, MLModelAPI, GetAllModels, \
+    PredictionAPI, PredictionUploadAPI, PredictionTileAPI, MLModelTilesAPI, \
+    MLModelTilesGeojsonAPI, GetAllPredictions, PredictionTileMVT, ImageryAPI, \
+    PredictionStackAPI, PredictionInfAPI, MapboxAPI, MetaAPI, PredictionExport
+
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -9,64 +16,124 @@ migrate = Migrate()
 # import models
 from ml_enabler.models import * # noqa
 
-def create_app(env=None, app_config='ml_enabler.config.EnvironmentConfig'):
-    # create and configure the app
-    app = Flask(__name__)
-    app.config.from_object(app_config)
+app = FastAPI(app)
 
-    db.init_app(app)
-    migrate.init_app(app, db)
+db.init_app(app)
+migrate.init_app(app, db)
 
-    init_routes(app)
-    return app
+@app.get("/")
+def get_status():
+    StatusCheckAPI.get()
 
+@app.get("/v1")
+def get_meta():
+    MetaAPI.get()
 
-def init_routes(app):
-    """ Initialize all API routes """
+@app.get("/v1/mapbox")
+def get_mapbox():
+    MapboxAPI.get()
 
-    api = Api(app)
+@app.get("/v1/model/all")
+def get_models():
+    GetAllModels.get()
 
-    # import apis
-    from ml_enabler.api.ml import StatusCheckAPI, MLModelAPI, GetAllModels, \
-        PredictionAPI, PredictionUploadAPI, PredictionTileAPI, MLModelTilesAPI, \
-        MLModelTilesGeojsonAPI, GetAllPredictions, PredictionTileMVT, ImageryAPI, \
-        PredictionStackAPI, PredictionInfAPI, MapboxAPI, MetaAPI, PredictionExport
-    from ml_enabler.api.swagger import SwaggerDocsAPI
+@app.post("/v1/model")
+def post_model():
+    MLModelAPI.post()
 
-    api.add_resource(StatusCheckAPI,            '/')
+@app.get("/v1/model/{model_id}")
+def get_model():
+    MLModelAPI.get()
 
-    api.add_resource(MetaAPI,                   '/v1', methods=['GET'])
+@app.put("/v1/model/{model_id}")
+def put_model():
+    MLModelAPI.put()
 
-    api.add_resource(SwaggerDocsAPI,            '/v1/docs')
+@app.delete("/v1/model/{model_id}")
+def delete_model():
+    MLModelAPI.delete()
 
-    api.add_resource(MapboxAPI,                 '/v1/mapbox', methods=['GET'])
+@app.get("/v1/model/{model_id}/tiles")
+def get_model_tiles():
+    MLModelTilesAPI.get()
 
-    api.add_resource(GetAllModels,              '/v1/model/all', methods=['GET'])
-    api.add_resource(MLModelAPI,                '/v1/model', endpoint="post", methods=['POST'])
+@app.post("/v1/model/{model_id}/tiles/geojson")
+def post_model_geojson():
+    MLModelTilesGeojsonAPI.post()
 
-    api.add_resource(MLModelAPI,                '/v1/model/<int:model_id>', methods=['DELETE', 'GET', 'PUT'])
+@app.post("/v1/model/{model_id}/imagery")
+def post_model_imagery():
+    ImageryAPI.post()
 
-    api.add_resource(MLModelTilesAPI,           '/v1/model/<int:model_id>/tiles', methods=['GET'])
-    api.add_resource(MLModelTilesGeojsonAPI,    '/v1/model/<int:model_id>/tiles/geojson', methods=['POST'])
+@app.get("/v1/model/{model_id}/imagery")
+def get_model_imagery():
+    ImageryAPI.get()
 
-    api.add_resource(ImageryAPI,                '/v1/model/<int:model_id>/imagery', methods=['POST', 'GET'])
-    api.add_resource(ImageryAPI,                '/v1/model/<int:model_id>/imagery/<int:imagery_id>', endpoint="ImageryAPI.patch", methods=['PATCH'])
-    api.add_resource(ImageryAPI,                '/v1/model/<int:model_id>/imagery/<int:imagery_id>', endpoint="ImageryAPI.delete", methods=['DELETE'])
+@app.patch("/v1/model/{model_id}/imagery/{imagery_id}")
+def patch_model_imagery():
+    ImageryAPI.patch()
 
-    api.add_resource(PredictionAPI,             '/v1/model/<int:model_id>/prediction', methods=['POST', 'GET'])
-    api.add_resource(GetAllPredictions,         '/v1/model/<int:model_id>/prediction/all', methods=['GET'])
-    api.add_resource(PredictionAPI,             '/v1/model/<int:model_id>/prediction/<int:prediction_id>', endpoint="patch", methods=['PATCH'])
-    api.add_resource(PredictionUploadAPI,       '/v1/model/<int:model_id>/prediction/<int:prediction_id>/upload', methods=['POST'])
-    api.add_resource(PredictionStackAPI,        '/v1/model/<int:model_id>/prediction/<int:prediction_id>/stack', methods=['GET', 'POST', 'DELETE'])
-    api.add_resource(PredictionInfAPI,          '/v1/model/<int:model_id>/prediction/<int:prediction_id>/stack/tiles', methods=['POST', 'GET', 'DELETE'])
+@app.delete("/v1/model/{model_id}/imagery/{imagery_id}")
+def delete_model_imagery():
+    ImageryAPI.delete()
 
-    api.add_resource(PredictionExport,          '/v1/model/<int:model_id>/prediction/<int:prediction_id>/export', methods=['GET'])
+@app.post("/v1/model/{model_id}/prediction")
+def post_prediction():
+    PredictionAPI.post()
 
-    api.add_resource(PredictionTileAPI,         '/v1/model/<int:model_id>/prediction/<int:prediction_id>/tiles', endpoint="get", methods=['GET'])
-    api.add_resource(PredictionTileMVT,         '/v1/model/<int:model_id>/prediction/<int:prediction_id>/tiles/<int:z>/<int:x>/<int:y>.mvt', methods=['GET'])
+@app.get("/v1/model/{model_id}/prediction")
+def get_prediction():
+    PredictionAPI.get()
 
-    api.add_resource(PredictionTileAPI,         '/v1/model/prediction/<int:prediction_id>/tiles', methods=['POST'])
+@app.get("/v1/model/{model_id}/prediction/all")
+def get_all_predictions():
+    GetAllPredictions.get()
 
-if __name__ == '__main__':
-    app = create_app()
-    app.run()
+@app.patch("/v1/model/{model_id}/prediction/{prediction_id}")
+def patch_prediction():
+    PredictionAPI.patch()
+
+@app.post("/v1/model/{model_id}/prediction/{prediction_id}/upload")
+def post_prediction_upload():
+    PredictionUploadAPI.post()
+
+@app.get("/v1/model/{model_id}/prediction/{prediction_id}/stack")
+def get_prediction_stack():
+    PredictionStackAPI.get()
+
+@app.post("/v1/model/{model_id}/prediction/{prediction_id}/stack")
+def post_prediction_stack():
+    PredictionStackAPI.post()
+
+@app.delete("/v1/model/{model_id}/prediction/{prediction_id}/stack")
+def delete_prediction_stack():
+    PredictionStackAPI.delete()
+
+@app.post("/v1/model/{model_id}/prediction/{prediction_id}/stack/tiles")
+def post_prediction_inf():
+    PredictionInfAPI.post()
+
+@app.get("/v1/model/{model_id}/prediction/{prediction_id}/stack/tiles")
+def get_prediction_inf():
+    PredictionInfAPI.get()
+
+@app.delete("/v1/model/{model_id}/prediction/{prediction_id}/stack/tiles")
+def delete_prediction_inf():
+    PredictionInfAPI.delete()
+
+@app.get("/v1/model/{model_id}/prediction/{prediction_id}/export")
+def get_prediction_export():
+    PredictionExport.get()
+
+@app.get("/v1/model/{model_id}/prediction/{prediction_id}/tiles")
+def get_prediction_tilejson():
+    PredictionTileAPI.get()
+
+@app.get("/v1/model/{model_id}/prediction/{prediction_id}/tiles/{z}/{x}/{y}.mvt")
+def get_prediction_tile():
+    PredictionTileMVT.get()
+
+@app.post("/v1/model/prediction/{prediction_id}/tiles")
+def post_prediction_tile():
+    PredictionTileAPI.post()
+
