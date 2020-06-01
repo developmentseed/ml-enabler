@@ -1,7 +1,10 @@
 from fastapi import FastAPI
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+from sqlalchemy import create_engine
+import ml_enabler.config as CONFIG
+
+db =  create_engine(
+    CONFIG.EnvironmentConfig.SQLALCHEMY_DATABASE_URI, connect_args={"check_same_thread": False}
+)
 
 # import apis
 from ml_enabler.api.ml import StatusCheckAPI, MLModelAPI, GetAllModels, \
@@ -9,17 +12,10 @@ from ml_enabler.api.ml import StatusCheckAPI, MLModelAPI, GetAllModels, \
     MLModelTilesGeojsonAPI, GetAllPredictions, PredictionTileMVT, ImageryAPI, \
     PredictionStackAPI, PredictionInfAPI, MapboxAPI, MetaAPI, PredictionExport
 
-
-db = SQLAlchemy()
-migrate = Migrate()
-
 # import models
 from ml_enabler.models import * # noqa
 
 app = FastAPI(app)
-
-db.init_app(app)
-migrate.init_app(app, db)
 
 @app.get("/")
 def get_status():
