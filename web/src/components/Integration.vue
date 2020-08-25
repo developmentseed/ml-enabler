@@ -2,15 +2,15 @@
     <div class="col col--12">
         <div class='col col--12 clearfix py6'>
             <h2 class='fl cursor-default'>
-                <span v-if='integrationid'>Update Integration</span>
+                <span v-if='$route.params.integrationid'>Update Integration</span>
                 <span v-else=''>Add Integration</span>
             </h2>
 
-            <button @click='close' class='btn fr round btn--stroke color-gray color-black-on-hover'>
+            <button @click='$router.go(-1)' class='btn fr round btn--stroke color-gray color-black-on-hover'>
                 <svg class='icon'><use href='#icon-close'/></svg>
             </button>
 
-            <button v-if='integrationid' @click='deleteIntegration' class='mr12 btn fr round btn--stroke color-gray color-red-on-hover'>
+            <button v-if='$route.params.integrationid' @click='deleteIntegration' class='mr12 btn fr round btn--stroke color-gray color-red-on-hover'>
                 <svg class='icon'><use href='#icon-trash'/></svg>
             </button>
         </div>
@@ -42,7 +42,7 @@
                 </div>
 
                 <div class='col col--12 py12'>
-                    <template v-if='integrationid'>
+                    <template v-if='$route.params.integrationid'>
                         <button @click='postIntegration' class='btn btn--stroke round fr color-blue-light color-green-on-hover'>Update Integration</button>
                     </template>
                     <template v-else>
@@ -58,11 +58,8 @@
 <script>
 export default {
     name: 'Integration',
-    props: ['modelid', 'integrationid'],
     mounted: function() {
-        this.integration.modelId = this.modelid;
-
-        if (this.integrationid) {
+        if (this.$route.params.integrationid) {
             this.getIntegration();
         }
     },
@@ -79,13 +76,9 @@ export default {
         };
     },
     methods: {
-        close: function() {
-            console.error('CLOSE');
-            this.$emit('close');
-        },
         getIntegration: async function() {
             try {
-                const res = await fetch(window.api + `/v1/model/${this.modelid}/integration/${this.integrationid}`, {
+                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/integration/${this.$route.params.integrationid}`, {
                     method: 'GET'
                 });
 
@@ -100,20 +93,20 @@ export default {
         },
         deleteIntegration: async function() {
             try {
-                const res = await fetch(window.api + `/v1/model/${this.modelid}/integration/${this.integrationid}`, {
+                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/integration/${this.$route.params.integrationid}`, {
                     method: 'DELETE'
                 });
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
-                this.close();
+                if (!res.ok) throw new Error('Failed to delete Integration');
+                this.$emit('refresh');
+                this.$router.go(-1);
             } catch (err) {
                 this.$emit('err', err);
             }
         },
         postIntegration: async function() {
             try {
-                const res = await fetch(window.api + `/v1/model/${this.modelid}/integration${this.integrationid ? '/' + this.integrationid : ''}`, {
-                    method: this.integrationid ? 'PATCH' : 'POST',
+                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/integration${this.$route.params.integrationid ? '/' + this.$route.params.integrationid : ''}`, {
+                    method: this.$route.params.integrationid ? 'PATCH' : 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -129,7 +122,8 @@ export default {
                 const body = await res.json();
                 if (!res.ok) throw new Error(body.message);
                 this.integration.integrationId = body.integrationId;
-                this.close();
+                this.$emit('refresh');
+                this.$router.go(-1);
             } catch (err) {
                 this.$emit('err', err);
             }

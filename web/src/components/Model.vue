@@ -32,7 +32,7 @@
                     <div class='col col--12 border-b border--gray-light clearfix'>
                         <h3 class='fl mt6 cursor-default'>Predictions &amp; Data:</h3>
 
-                        <button @click='' class='dropdown btn fr h24 mr6 mb6 round btn--stroke color-gray color-green-on-hover'>
+                        <button class='dropdown btn fr h24 mr6 mb6 round btn--stroke color-gray color-green-on-hover'>
                             <svg class='icon fl'><use href='#icon-plus'/></svg>
                             <svg class='icon fl'><use href='#icon-chevron-down'/></svg>
 
@@ -92,7 +92,7 @@
                     <div class='col col--12 border-b border--gray-light clearfix pt24'>
                         <h3 class='fl mt6 cursor-default'>Imagery:</h3>
 
-                        <button @click='editImagery()' class='btn fr mb6 round btn--stroke color-gray color-green-on-hover'>
+                        <button @click='$router.push({ path: `/model/${$route.params.modelid}/imagery` })' class='btn fr mb6 round btn--stroke color-gray color-green-on-hover'>
                             <svg class='icon'><use href='#icon-plus'/></svg>
                         </button>
                     </div>
@@ -110,7 +110,7 @@
                             </div>
                         </template>
                         <template v-else>
-                            <div :key='img.id' v-for='img in imagery' @click='editImagery(img.id)' class='cursor-pointer col col--12'>
+                            <div :key='img.id' v-for='img in imagery' @click='$router.push({ path: `/model/${$route.params.modelid}/imagery/${img.id}` })' class='cursor-pointer col col--12'>
                                 <div class='col col--12 grid py6 px12 bg-darken10-on-hover'>
                                     <div class='col col--8'><h3 class='txt-h4 fl' v-text='img.name'></h3></div>
                                     <div class='col col--4'><div v-text='img.fmt' class='fr mx3 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue px6 py3 round txt-xs txt-bold'></div></div>
@@ -121,18 +121,12 @@
                     <div class='col col--12 border-b border--gray-light clearfix pt24'>
                         <h3 class='fl mt6 cursor-default'>Integrations:</h3>
 
-                        <button @click='editIntegration()' class='btn fr mb6 round btn--stroke color-gray color-green-on-hover'>
+                        <button @click='$router.push({ path: `/model/${$route.params.modelid}/integration` })' class='btn fr mb6 round btn--stroke color-gray color-green-on-hover'>
                             <svg class='icon'><use href='#icon-plus'/></svg>
                         </button>
                     </div>
 
-                    <Integrations @integration='editIntegration($event.id)'/>
-                </template>
-                <template v-else-if='mode === "editIntegration"'>
-                    <Integration @err='$emit("err", $event)' :modelid='model.modelId' :integrationid='integrationid' @close='refresh'/>
-                </template>
-                <template v-else-if='mode === "editImagery"'>
-                    <Imagery @err='$emit("err", $event)' :modelid='model.modelId' :imageryid='imageryid' @close='refresh'/>
+                    <Integrations @integration='$router.push({ path: `/model/${$route.params.modelid}/integration/${$event.id}` })'/>
                 </template>
             </div>
         </template>
@@ -149,8 +143,6 @@
 
 <script>
 import vSort from 'semver-sort';
-import Imagery from './Imagery.vue';
-import Integration from './Integration.vue';
 import Integrations from './Integrations.vue';
 
 export default {
@@ -163,22 +155,13 @@ export default {
             model: {},
             imagery: [],
             integrations: [],
-            imageryid: false,
             integrationid: false,
             loading: {
                 model: true
-            },
-            prediction: {
-                modelId: this.$route.params.modelid,
-                version: '',
-                tileZoom: 18,
-                bbox: [-180.0, -90.0, 180.0, 90.0]
             }
         }
     },
     components: {
-        Imagery,
-        Integration,
         Integrations,
     },
     mounted: function() {
@@ -200,24 +183,6 @@ export default {
             if (!url) return;
 
             window.open(url, "_blank")
-        },
-        editImagery: function(imgid) {
-            if (imgid) {
-                this.imageryid = imgid;
-            } else {
-                this.imageryid = false;
-            }
-
-            this.mode = 'editImagery';
-        },
-        editIntegration: function(intid) {
-            if (intid) {
-                this.integrationid = intid;
-            } else {
-                this.integrationid = false;
-            }
-
-            this.mode = 'editIntegration';
         },
         getPredictions: async function() {
             try {

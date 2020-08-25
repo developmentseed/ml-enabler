@@ -2,15 +2,15 @@
     <div class="col col--12">
         <div class='col col--12 clearfix py6'>
             <h2 class='fl cursor-default'>
-                <span v-if='imageryid'>Update Imagery</span>
+                <span v-if='$route.params.imageryid'>Update Imagery</span>
                 <span v-else=''>Add Imagery</span>
             </h2>
 
-            <button @click='close' class='btn fr round btn--stroke color-gray color-black-on-hover'>
+            <button @click='$router.go(-1)' class='btn fr round btn--stroke color-gray color-black-on-hover'>
                 <svg class='icon'><use href='#icon-close'/></svg>
             </button>
 
-            <button v-if='imageryid' @click='deleteImagery' class='mr12 btn fr round btn--stroke color-gray color-red-on-hover'>
+            <button v-if='$route.params.imageryid' @click='deleteImagery' class='mr12 btn fr round btn--stroke color-gray color-red-on-hover'>
                 <svg class='icon'><use href='#icon-trash'/></svg>
             </button>
         </div>
@@ -38,7 +38,7 @@
                 </div>
 
                 <div class='col col--12 py12'>
-                    <template v-if='imageryid'>
+                    <template v-if='$route.params.imageryid'>
                         <button @click='postImagery' class='btn btn--stroke round fr color-blue-light color-green-on-hover'>Update Imagery</button>
                     </template>
                     <template v-else>
@@ -54,11 +54,8 @@
 <script>
 export default {
     name: 'Imagery',
-    props: ['modelid', 'imageryid'],
     mounted: function() {
-        this.imagery.modelId = this.modelid;
-
-        if (this.imageryid) {
+        if (this.$route.params.imageryid) {
             this.getImagery();
         }
     },
@@ -66,7 +63,7 @@ export default {
         return {
             imagery: {
                 imageryId: false,
-                modelId: false,
+                modelId: this.$route.params.modelid,
                 name: '',
                 fmt: 'wms',
                 url: ''
@@ -74,12 +71,9 @@ export default {
         };
     },
     methods: {
-        close: function() {
-            this.$emit('close');
-        },
         getImagery: async function() {
             try {
-                const res = await fetch(window.api + `/v1/model/${this.modelid}/imagery/${this.imageryid}`, {
+                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/imagery/${this.$route.params.imageryid}`, {
                     method: 'GET'
                 });
 
@@ -93,20 +87,20 @@ export default {
         },
         deleteImagery: async function() {
             try {
-                const res = await fetch(window.api + `/v1/model/${this.modelid}/imagery/${this.imageryid}`, {
+                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/imagery/${this.$route.params.imageryid}`, {
                     method: 'DELETE'
                 });
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
-                this.close();
+                if (!res.ok) throw new Error('Failed to delete imagery');
+                this.$emit('refresh');
+                this.$router.go(-1);
             } catch (err) {
                 this.$emit('err', err);
             }
         },
         postImagery: async function() {
             try {
-                const res = await fetch(window.api + `/v1/model/${this.modelid}/imagery${this.imageryid ? '/' + this.imageryid : ''}`, {
-                    method: this.imageryid ? 'PATCH' : 'POST',
+                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/imagery${this.$route.params.imageryid ? '/' + this.$route.params.imageryid : ''}`, {
+                    method: this.$route.params.imageryid ? 'PATCH' : 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
@@ -120,8 +114,8 @@ export default {
 
                 const body = await res.json();
                 if (!res.ok) throw new Error(body.message);
-                this.imagery.imageryId = body.imageryId;
-                this.close();
+                this.$emit('refresh');
+                this.$router.go(-1);
             } catch (err) {
                 this.$emit('err', err);
             }

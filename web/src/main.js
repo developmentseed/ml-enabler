@@ -8,6 +8,8 @@ import Login from './components/Login.vue';
 import Model from './components/Model.vue';
 import EditModel from './components/EditModel.vue';
 import Prediction from './components/Prediction.vue';
+import Imagery from './components/Imagery.vue';
+import Integration from './components/Integration.vue';
 import CreateTraining from './components/CreateTraining.vue';
 import CreatePrediction from './components/CreatePrediction.vue';
 
@@ -44,6 +46,22 @@ const router = new VueRouter({
                 path: '/model/:modelid/prediction',
                 name: 'createPrediction',
                 component: CreatePrediction,
+            },{
+                path: '/model/:modelid/imagery',
+                name: 'createImagery',
+                component: Imagery,
+            },{
+                path: '/model/:modelid/imagery/:imageryid',
+                name: 'editImagery',
+                component: Imagery,
+            },{
+                path: '/model/:modelid/integration',
+                name: 'createImagery',
+                component: Integration,
+            },{
+                path: '/model/:modelid/integration/:integrationid',
+                name: 'editImagery',
+                component: Integration,
             },{
                 name: 'prediction',
                 path: '/model/:modelid/prediction/:predid',
