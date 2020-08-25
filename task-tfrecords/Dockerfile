@@ -7,7 +7,6 @@ WORKDIR $HOME
 COPY ./ $HOME/retrain
 WORKDIR $HOME/retrain
 
-RUN mkdir /ml
 RUN mkdir /tmp/tfrecords
 
 
