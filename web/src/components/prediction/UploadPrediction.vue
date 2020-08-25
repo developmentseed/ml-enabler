@@ -36,11 +36,18 @@ export default {
         return {
             done: false,
             files: [],
-            label: ''
+            label: '',
+            filetype: ''
         };
     },
     mounted: function() {
-        this.label = `Drop ${this.type}.zip here`;
+        if (this.type === 'inferences') {
+            this.label = 'Drop labels.geojson here';
+            this.filetype = 'application/geo+json';
+        } else {
+            this.label = `Drop ${this.type}.zip here`;
+            this.filetype = 'application/zip';
+        }
     },
     methods: {
         uploaded: function(err) {
