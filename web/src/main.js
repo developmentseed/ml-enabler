@@ -10,7 +10,6 @@ import EditModel from './components/EditModel.vue';
 import Prediction from './components/Prediction.vue';
 import Imagery from './components/Imagery.vue';
 import Integration from './components/Integration.vue';
-import CreateTraining from './components/CreateTraining.vue';
 import CreatePrediction from './components/CreatePrediction.vue';
 
 import Assets from './components/prediction/Assets.vue';
@@ -41,7 +40,7 @@ const router = new VueRouter({
             },{
                 path: '/model/:modelid/training',
                 name: 'createTraining',
-                component: CreateTraining,
+                component: CreatePrediction,
             },{
                 path: '/model/:modelid/prediction',
                 name: 'createPrediction',

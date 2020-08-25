@@ -1,7 +1,7 @@
 <template>
     <div class="col col--12">
         <div class='col col--12 clearfix py6'>
-            <h2 class='fl cursor-default'>Add Prediction</h2>
+            <h2 class='fl cursor-default'>Create <span v-text='type'/></h2>
 
             <button @click='$router.go(-1)' class='btn fr round btn--stroke color-gray color-black-on-hover'>
                 <svg class='icon'><use href='#icon-close'/></svg>
@@ -10,12 +10,17 @@
         <div class='border border--gray-light round col col--12 px12 py12 clearfix'>
             <div class='grid grid--gut12'>
                 <div class='col col--6 py6'>
-                    <label>Prediction Version</label>
+                    <label><span v-text='type'/> Version</label>
                     <input v-model='prediction.version' class='input' placeholder='0.0.0'/>
                 </div>
 
                 <div class='col col--6 py6'>
-                    <label>Prediction Zoom Level</label>
+                    <label><span v-text='type'/> Zoom Level</label>
+                    <label class='switch-container px6 fr'>
+                        <span class='mr6'>Supertile</span>
+                        <input :disabled='prediction.infType == "detection"' v-model='prediction.infSupertile' type='checkbox' />
+                        <div class='switch'></div>
+                    </label>
                     <input v-model='prediction.tileZoom' class='input' placeholder='18'/>
                 </div>
                 <div class='col col--4'>
@@ -42,16 +47,9 @@
                     <div class='col col--8'>
                     </div>
                 </template>
-                <div class='col col--4'>
-                    <label class='switch-container px6 fr'>
-                        <span class='mr6'>Supertile</span>
-                        <input :disabled='prediction.infType == "detection"' v-model='prediction.infSupertile' type='checkbox' />
-                        <div class='switch'></div>
-                    </label>
-                </div>
                 <div class='col col--8'></div>
                 <div class='col col--12 py12'>
-                    <button @click='postPrediction' class='btn btn--stroke round fr color-green-light color-green-on-hover'>Add Prediction</button>
+                    <button @click='postPrediction' class='btn btn--stroke round fr color-green-light color-green-on-hover'>Add <span v-text='type'/></button>
                 </div>
             </div>
         </div>
@@ -64,6 +62,7 @@ export default {
     name: 'CreatePrediction',
     data: function() {
         return {
+            type: this.$route.name === 'createTraining' ? 'Training' : 'Prediction',
             prediction: {
                 version: '',
                 tileZoom: '18',
@@ -99,7 +98,7 @@ export default {
                     },
                     body: JSON.stringify({
                         modelId: this.$route.params.modelid,
-                        hint: 'prediction',
+                        hint: this.type.toLowerCase(),
                         version: this.prediction.version,
                         tileZoom: this.prediction.tileZoom,
                         infList: this.prediction.infList,
