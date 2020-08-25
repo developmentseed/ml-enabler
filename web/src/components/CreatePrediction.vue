@@ -99,6 +99,7 @@ export default {
                     },
                     body: JSON.stringify({
                         modelId: this.$route.params.modelid,
+                        hint: 'prediction',
                         version: this.prediction.version,
                         tileZoom: this.prediction.tileZoom,
                         infList: this.prediction.infList,
