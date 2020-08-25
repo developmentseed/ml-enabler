@@ -13,8 +13,35 @@
 
         <h2 class='w-full align-center txt-h4 py12'>Prediction Assets</h2>
 
-        <template v-if='prediction.modelLink'>
-            <div class='col col--12 py3'>
+        <template v-if='prediction.hint === "prediction" && !prediction.modelLink'>
+            <div class='align-center pb6'>Upload a model to get started</div>
+
+            <UploadPrediction
+                type='model'
+                :prediction='prediction'
+                v-on:close='$router.push({ name: "model", params: { modelid: $route.params.modelid } })'
+            />
+        </template>
+        <template v-else-if='prediction.hint === "training"'>
+            <div class='align-center pb6'>Upload GeoJSON Training Data to get started</div>
+
+            <UploadPrediction
+                type='inferences'
+                :prediction='prediction'
+                v-on:close='$router.push({ name: "model", params: { modelid: $route.params.modelid } })'
+            />
+        </template>
+        <template v-else-if='meta.environment !== "aws"'>
+            <div class='flex-parent flex-parent--center-main pt36'>
+                <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-info'/></svg>
+            </div>
+
+            <div class='flex-parent flex-parent--center-main pt12 pb36'>
+                <h1 class='flex-child txt-h4 cursor-default align-center'>Assets can only be created when MLEnabler is running in an "aws" environment</h1>
+            </div>
+        </template>
+        <template v-else>
+            <div v-if='prediction.modelLink' class='col col--12 py3'>
                 <div class='align-center'>TF Model</div>
                 <pre class='pre' v-text='"s3://" + prediction.modelLink'></pre>
             </div>
@@ -34,24 +61,6 @@
                 <div class='align-center'>ECR Container</div>
                 <pre class='pre' v-text='prediction.dockerLink'></pre>
             </div>
-        </template>
-        <template v-else-if='meta.environment !== "aws"'>
-            <div class='flex-parent flex-parent--center-main pt36'>
-                <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-info'/></svg>
-            </div>
-
-            <div class='flex-parent flex-parent--center-main pt12 pb36'>
-                <h1 class='flex-child txt-h4 cursor-default align-center'>Assets can only be created when MLEnabler is running in an "aws" environment</h1>
-            </div>
-        </template>
-        <template v-else>
-            <div class='align-center pb6'>Upload a model to get started</div>
-
-            <UploadPrediction
-                type='model'
-                :prediction='prediction'
-                v-on:close='$router.push({ name: "model", params: { modelid: $route.params.modelid } })'
-            />
         </template>
     </div>
 </template>

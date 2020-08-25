@@ -1028,6 +1028,7 @@ class PredictionSingleAPI(Resource):
 
             pred = {
                 "predictionsId": prediction.id,
+                "hint": prediction.hint,
                 "modelId": prediction.model_id,
                 "version": prediction.version,
                 "dockerUrl": prediction.docker_url,

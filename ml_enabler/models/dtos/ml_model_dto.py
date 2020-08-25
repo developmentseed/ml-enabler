@@ -43,7 +43,7 @@ class PredictionDTO(Model):
     """ Describes JSON of a set of predictions from a model """
 
     prediction_id = IntType(serialized_name='predictionsId')
-    hint = StringType()
+    hint = StringType(required=True)
     created = DateTimeType()
     model_id = IntType(serialized_name='modelId', required=True)
     version = StringType(serialized_name='version', required=True)
