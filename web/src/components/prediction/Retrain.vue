@@ -2,7 +2,7 @@
     <div class='col col--12'>
         <div class='col col--12 border-b border--gray-light clearfix mb6'>
             <PredictionHeader
-                v-on:mode='mode = $event'
+                :prediction='prediction'
             />
         </div>
         <template v-if='!prediction'>

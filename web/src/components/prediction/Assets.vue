@@ -2,7 +2,7 @@
     <div class='col col--12'>
         <div class='col col--12 border-b border--gray-light clearfix mb6'>
             <PredictionHeader
-                v-on:mode='mode = $event'
+                :prediction='prediction'
             />
 
             <div class='fr'>
@@ -11,7 +11,7 @@
             </div>
         </div>
 
-        <h2 class='w-full align-center txt-h4 py12'>Prediction Assets</h2>
+        <h2 class='w-full align-center txt-h4 py12'><span v-text='prediction.hint.charAt(0).toUpperCase() + prediction.hint.slice(1)'/> Assets</h2>
 
         <template v-if='prediction.hint === "prediction" && !prediction.modelLink'>
             <div class='align-center pb6'>Upload a model to get started</div>

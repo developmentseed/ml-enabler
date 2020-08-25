@@ -3,7 +3,7 @@
         <button @click='$router.push({ name: "assets" })' :class='{
             "btn--stroke": mode !== "assets"
         }' class="btn btn--pill btn--pill-stroke btn--s btn--pill-hl round">Assets</button>
-        <button @click='$router.push({ name: "stack" })' :class='{
+        <button v-if='prediction.hint === "prediction"' @click='$router.push({ name: "stack" })' :class='{
             "btn--stroke": mode !== "stack"
         }' class="btn btn--pill btn--s btn--pill-hc btn--pill-stroke round">Stack</button>
         <button @click='$router.push({ name: "map" })' :class='{
@@ -21,7 +21,7 @@
 <script>
 export default {
     name: 'PredictionHeader',
-    props: [],
+    props: ['prediction'],
     data: function() {
         return {
             mode: false

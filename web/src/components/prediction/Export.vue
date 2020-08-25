@@ -1,7 +1,9 @@
 <template>
     <div class='col col--12 relative'>
         <div class='col col--12 border-b border--gray-light clearfix mb6'>
-            <PredictionHeader/>
+            <PredictionHeader
+                :prediction='prediction'
+            />
         </div>
 
         <template v-if='tilejson'>

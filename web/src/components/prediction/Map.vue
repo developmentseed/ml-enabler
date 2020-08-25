@@ -1,7 +1,9 @@
 <template>
     <div class='col col--12'>
         <div class='col col--12 border-b border--gray-light clearfix mb6'>
-            <PredictionHeader/>
+            <PredictionHeader
+                :prediction='prediction'
+            />
             <div class='fr'>
                 <button @click='$emit("refresh")' class='mx3 btn btn--stroke color-gray color-blue-on-hover round'><svg class='icon fl'><use href='#icon-refresh'/></svg></button>
             </div>

@@ -1,7 +1,9 @@
 <template>
     <div class='col col--12'>
         <div class='col col--12 border-b border--gray-light clearfix mb6'>
-            <PredictionHeader/>
+            <PredictionHeader
+                :prediction='prediction'
+            />
 
             <div v-if='prediction.modelLink' class='fr'>
                 <button @click='refresh' class='btn fr round btn--stroke btn--gray'>
