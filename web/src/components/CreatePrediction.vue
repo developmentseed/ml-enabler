@@ -111,6 +111,7 @@ export default {
                 const body = await res.json();
                 if (!res.ok) throw new Error(body.message);
 
+                this.$emit('refresh');
                 this.$router.push({ path: `/model/${this.$route.params.modelid}/prediction/${body.prediction_id}` });
             } catch(err) {
                 return this.$emit('err', err);

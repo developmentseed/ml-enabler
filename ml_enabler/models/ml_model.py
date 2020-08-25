@@ -74,6 +74,7 @@ class Prediction(db.Model):
         """ Creates and saves the current model to the DB """
 
         self.model_id = prediction_dto.model_id
+        self.hint = prediction_dto.hint
         self.version = prediction_dto.version
         self.docker_url = prediction_dto.docker_url
         self.tile_zoom = prediction_dto.tile_zoom
@@ -125,6 +126,7 @@ class Prediction(db.Model):
         """
         query = db.session.query(
             Prediction.id,
+            Prediction.hint,
             Prediction.created,
             Prediction.docker_url,
             Prediction.model_id,
@@ -153,6 +155,7 @@ class Prediction(db.Model):
         """
         query = db.session.query(
             Prediction.id,
+            Prediction.hint,
             Prediction.created,
             Prediction.docker_url,
             Prediction.model_id,
@@ -184,21 +187,22 @@ class Prediction(db.Model):
         prediction_dto = PredictionDTO()
 
         prediction_dto.prediction_id = prediction[0]
-        prediction_dto.created = prediction[1]
-        prediction_dto.docker_url = prediction[2]
-        prediction_dto.model_id = prediction[3]
-        prediction_dto.tile_zoom = prediction[4]
-        prediction_dto.version = prediction[5]
-        prediction_dto.log_link = prediction[6]
-        prediction_dto.model_link = prediction[7]
-        prediction_dto.docker_link = prediction[8]
-        prediction_dto.save_link = prediction[9]
-        prediction_dto.tfrecord_link = prediction[10]
-        prediction_dto.checkpoint_link = prediction[11]
-        prediction_dto.inf_list = prediction[12]
-        prediction_dto.inf_type = prediction[13]
-        prediction_dto.inf_binary = prediction[14]
-        prediction_dto.inf_supertile = prediction[15]
+        prediction_dto.hint = prediction[1]
+        prediction_dto.created = prediction[2]
+        prediction_dto.docker_url = prediction[3]
+        prediction_dto.model_id = prediction[4]
+        prediction_dto.tile_zoom = prediction[5]
+        prediction_dto.version = prediction[6]
+        prediction_dto.log_link = prediction[7]
+        prediction_dto.model_link = prediction[8]
+        prediction_dto.docker_link = prediction[9]
+        prediction_dto.save_link = prediction[10]
+        prediction_dto.tfrecord_link = prediction[11]
+        prediction_dto.checkpoint_link = prediction[12]
+        prediction_dto.inf_list = prediction[13]
+        prediction_dto.inf_type = prediction[14]
+        prediction_dto.inf_binary = prediction[15]
+        prediction_dto.inf_supertile = prediction[16]
 
         return prediction_dto
 

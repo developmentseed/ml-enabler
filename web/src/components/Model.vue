@@ -64,7 +64,7 @@
                                     <div class='col col--6'>
                                         <div class='col col--12 clearfix'>
                                             <h3 class='txt-h4 fl' v-text='"v" + pred.version'></h3>
-                                            <span class='fl ml6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer' v-text='"id: " + pred.predictionsId'/>
+                                            <span class='fl ml6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer' v-text='pred.hint'/>
                                         </div>
                                     </div>
                                     <div class='col col--6 clearfix'>

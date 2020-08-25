@@ -26,6 +26,7 @@ class PredictionService():
 
         prediction_dto = PredictionDTO()
         prediction_dto.model_id = model_id
+        prediction_dto.hint = payload.get('hint', 'prediction')
         prediction_dto.version = payload['version']
         prediction_dto.tile_zoom = payload['tileZoom']
         prediction_dto.inf_list = payload['infList']
