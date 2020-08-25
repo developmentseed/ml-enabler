@@ -30,10 +30,16 @@
             <div class='border border--gray-light round col col--12 px12 py12 clearfix'>
                 <template v-if='mode === "model"'>
                     <div class='col col--12 border-b border--gray-light clearfix'>
-                        <h3 class='fl mt6 cursor-default'>Predictions:</h3>
+                        <h3 class='fl mt6 cursor-default'>Predictions &amp; Data:</h3>
 
-                        <button @click='mode = "editPrediction"' class='btn fr mb6 round btn--stroke color-gray color-green-on-hover'>
-                            <svg class='icon'><use href='#icon-plus'/></svg>
+                        <button @click='' class='dropdown btn fr h24 mr6 mb6 round btn--stroke color-gray color-green-on-hover'>
+                            <svg class='icon fl'><use href='#icon-plus'/></svg>
+                            <svg class='icon fl'><use href='#icon-chevron-down'/></svg>
+
+                            <div class='round dropdown-content color-black' style='top: 24px;'>
+                                <div @click='' class='round bg-gray-faint-on-hover'>Prediction</div>
+                                <div @click='' class='round bg-gray-faint-on-hover'>Training</div>
+                            </div>
                         </button>
                     </div>
 
@@ -295,3 +301,24 @@ export default {
     }
 }
 </script>
+
+<style>
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 6px 12px;
+    z-index: 1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+</style>
+
