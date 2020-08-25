@@ -12,9 +12,9 @@
         <button @click='mode !== "export" && $router.push({ name: "export" })' :class='{
             "btn--stroke": mode !== "export"
         }' class="btn btn--pill btn--s btn--pill-hc btn--pill-stroke round">Export</button>
-        <button @click='mode !== "retrain" && $router.push({ name: "retrain" })' :class='{
-            "btn--stroke": mode !== "retrain"
-        }' class="btn btn--pill btn--s btn--pill-hr btn--pill-stroke round">Retrain</button>
+        <button @click='mode !== "tasks" && $router.push({ name: "tasks" })' :class='{
+            "btn--stroke": mode !== "tasks"
+        }' class="btn btn--pill btn--s btn--pill-hr btn--pill-stroke round">Tasks</button>
     </div>
 </template>
 

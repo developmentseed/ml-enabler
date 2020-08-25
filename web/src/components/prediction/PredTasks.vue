@@ -113,7 +113,7 @@ import PredictionHeader from './PredictionHeader.vue';
 import UploadPrediction from './UploadPrediction.vue';
 
 export default {
-    name: 'Retrain',
+    name: 'PredTasks',
     props: ['meta', 'prediction', 'tilejson'],
     data: function() {
         return {
