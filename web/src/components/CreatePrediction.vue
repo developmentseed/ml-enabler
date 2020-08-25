@@ -9,52 +9,50 @@
         </div>
         <div class='border border--gray-light round col col--12 px12 py12 clearfix'>
             <div class='grid grid--gut12'>
-                <template v-if='!predictionId'>
-                    <div class='col col--6 py6'>
-                        <label>Prediction Version</label>
-                        <input v-model='prediction.version' class='input' placeholder='0.0.0'/>
-                    </div>
+                <div class='col col--6 py6'>
+                    <label>Prediction Version</label>
+                    <input v-model='prediction.version' class='input' placeholder='0.0.0'/>
+                </div>
 
-                    <div class='col col--6 py6'>
-                        <label>Prediction Zoom Level</label>
-                        <input v-model='prediction.tileZoom' class='input' placeholder='18'/>
+                <div class='col col--6 py6'>
+                    <label>Prediction Zoom Level</label>
+                    <input v-model='prediction.tileZoom' class='input' placeholder='18'/>
+                </div>
+                <div class='col col--4'>
+                    <label>Model Type:</label>
+                    <div class='select-container'>
+                        <select v-model='prediction.infType' class='select'>
+                            <option value='classification'>Classification</option>
+                            <option value='detection'>Object Detection</option>
+                        </select>
+                        <div class='select-arrow'></div>
                     </div>
-                    <div class='col col--4'>
-                        <label>Model Type:</label>
-                        <div class='select-container'>
-                            <select v-model='prediction.infType' class='select'>
-                                <option value='classification'>Classification</option>
-                                <option value='detection'>Object Detection</option>
-                            </select>
-                            <div class='select-arrow'></div>
-                        </div>
-                    </div>
+                </div>
 
-                    <template v-if='prediction.infType === "classification"'>
-                        <div class='col col--8'>
-                            <label>Inferences List:</label>
-                            <label class='switch-container px6 fr'>
-                                <span class='mr6'>Binary Inference</span>
-                                <input :disabled='prediction.infList.split(",").length !== 2' v-model='prediction.infBinary' type='checkbox' />
-                                <div class='switch'></div>
-                            </label>
-                            <input v-model='prediction.infList' type='text' class='input' placeholder='buildings,schools,roads,...'/>
-                        </div>
-                        <div class='col col--8'>
-                        </div>
-                    </template>
-                    <div class='col col--4'>
+                <template v-if='prediction.infType === "classification"'>
+                    <div class='col col--8'>
+                        <label>Inferences List:</label>
                         <label class='switch-container px6 fr'>
-                            <span class='mr6'>Supertile</span>
-                            <input :disabled='prediction.infType == "detection"' v-model='prediction.infSupertile' type='checkbox' />
+                            <span class='mr6'>Binary Inference</span>
+                            <input :disabled='prediction.infList.split(",").length !== 2' v-model='prediction.infBinary' type='checkbox' />
                             <div class='switch'></div>
                         </label>
+                        <input v-model='prediction.infList' type='text' class='input' placeholder='buildings,schools,roads,...'/>
                     </div>
-                    <div class='col col--8'></div>
-                    <div class='col col--12 py12'>
-                        <button @click='postPrediction' class='btn btn--stroke round fr color-green-light color-green-on-hover'>Add Prediction</button>
+                    <div class='col col--8'>
                     </div>
                 </template>
+                <div class='col col--4'>
+                    <label class='switch-container px6 fr'>
+                        <span class='mr6'>Supertile</span>
+                        <input :disabled='prediction.infType == "detection"' v-model='prediction.infSupertile' type='checkbox' />
+                        <div class='switch'></div>
+                    </label>
+                </div>
+                <div class='col col--8'></div>
+                <div class='col col--12 py12'>
+                    <button @click='postPrediction' class='btn btn--stroke round fr color-green-light color-green-on-hover'>Add Prediction</button>
+                </div>
             </div>
         </div>
     </div>
@@ -64,16 +62,9 @@
 <script>
 export default {
     name: 'CreatePrediction',
-    props: ['modelid'],
-    mounted: function() {
-        this.prediction.modelId = this.modelid;
-    },
     data: function() {
         return {
-            predictionId: false,
             prediction: {
-                modelId: false,
-                predictionsId: false,
                 version: '',
                 tileZoom: '18',
                 infList: '',
@@ -101,13 +92,13 @@ export default {
             }
 
             try {
-                let res = await fetch(window.api + `/v1/model/${this.modelid}/prediction`, {
+                let res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/prediction`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        modelId: this.prediction.modelId,
+                        modelId: this.$route.params.modelid,
                         version: this.prediction.version,
                         tileZoom: this.prediction.tileZoom,
                         infList: this.prediction.infList,
@@ -120,9 +111,7 @@ export default {
                 const body = await res.json();
                 if (!res.ok) throw new Error(body.message);
 
-                this.predictionId = body.prediction_id;
-                this.prediction.predictionsId = body.prediction_id;
-                this.$router.go(-1)
+                this.$router.push({ path: `/model/${this.$route.params.modelid}/prediction/${body.prediction_id}` });
             } catch(err) {
                 return this.$emit('err', err);
             }
