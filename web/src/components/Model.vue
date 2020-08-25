@@ -30,7 +30,7 @@
             <div class='border border--gray-light round col col--12 px12 py12 clearfix'>
                 <template v-if='mode === "model"'>
                     <div class='col col--12 border-b border--gray-light clearfix'>
-                        <h3 class='fl mt6 cursor-default'>Predictions &amp; Data:</h3>
+                        <h3 class='fl mt6 cursor-default'>Model Iterations:</h3>
 
                         <button class='dropdown btn fr h24 mr6 mb6 round btn--stroke color-gray color-green-on-hover'>
                             <svg class='icon fl'><use href='#icon-plus'/></svg>

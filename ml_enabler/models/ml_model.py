@@ -43,6 +43,11 @@ class Prediction(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     created = db.Column(db.DateTime, default=timestamp, nullable=False)
+
+    # One of 'prediction' or 'training' - On the backend these are essentially the same
+    # but on the frontend, a training hint will not prompt for model upload
+    hint = db.Column(db.String, nullable=False)
+
     model_id = db.Column(
         db.BigInteger,
         db.ForeignKey('ml_models.id', name='fk_models'),
