@@ -8,6 +8,8 @@ import Login from './components/Login.vue';
 import Model from './components/Model.vue';
 import EditModel from './components/EditModel.vue';
 import Prediction from './components/Prediction.vue';
+import CreateTraining from './components/CreateTraining.vue';
+import CreatePrediction from './components/CreatePrediction.vue';
 
 import Assets from './components/prediction/Assets.vue';
 import Export  from './components/prediction/Export.vue';
@@ -23,7 +25,7 @@ const router = new VueRouter({
     routes: [
         { path: '/', name: 'home', component: Home },
         { path: '/login', name: 'login', component: Login },
-        
+
         { path: '/model/new', name: 'newmodel', component: EditModel },
 
         {
@@ -34,6 +36,14 @@ const router = new VueRouter({
                 path: 'edit',
                 name: 'editmodel',
                 component: EditModel,
+            },{
+                path: '/model/:modelid/training',
+                name: 'createTraining',
+                component: CreateTraining,
+            },{
+                path: '/model/:modelid/prediction',
+                name: 'createPrediction',
+                component: CreatePrediction,
             },{
                 name: 'prediction',
                 path: '/model/:modelid/prediction/:predid',

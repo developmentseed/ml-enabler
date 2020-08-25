@@ -1,7 +1,7 @@
 <template>
     <div class="col col--12">
         <div class='col col--12 clearfix py6'>
-            <h2 class='fl cursor-default'>Add Prediction</h2>
+            <h2 class='fl cursor-default'>Create Training Data</h2>
 
             <button @click='$router.go(-1)' class='btn fr round btn--stroke color-gray color-black-on-hover'>
                 <svg class='icon'><use href='#icon-close'/></svg>
@@ -11,16 +11,16 @@
             <div class='grid grid--gut12'>
                 <template v-if='!predictionId'>
                     <div class='col col--6 py6'>
-                        <label>Prediction Version</label>
+                        <label>Data Version</label>
                         <input v-model='prediction.version' class='input' placeholder='0.0.0'/>
                     </div>
 
                     <div class='col col--6 py6'>
-                        <label>Prediction Zoom Level</label>
+                        <label>Data Zoom Level</label>
                         <input v-model='prediction.tileZoom' class='input' placeholder='18'/>
                     </div>
                     <div class='col col--4'>
-                        <label>Model Type:</label>
+                        <label>Data Type:</label>
                         <div class='select-container'>
                             <select v-model='prediction.infType' class='select'>
                                 <option value='classification'>Classification</option>
@@ -122,7 +122,7 @@ export default {
 
                 this.predictionId = body.prediction_id;
                 this.prediction.predictionsId = body.prediction_id;
-                this.$router.go(-1)
+                this.$router.go(-1);
             } catch(err) {
                 return this.$emit('err', err);
             }

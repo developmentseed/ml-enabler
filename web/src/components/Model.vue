@@ -37,8 +37,8 @@
                             <svg class='icon fl'><use href='#icon-chevron-down'/></svg>
 
                             <div class='round dropdown-content color-black' style='top: 24px;'>
-                                <div @click='' class='round bg-gray-faint-on-hover'>Prediction</div>
-                                <div @click='' class='round bg-gray-faint-on-hover'>Training</div>
+                                <div @click='$router.push({ path: `/model/${$route.params.modelid}/prediction` })' class='round bg-gray-faint-on-hover'>Prediction</div>
+                                <div @click='$router.push({ path: `/model/${$route.params.modelid}/training` })' class='round bg-gray-faint-on-hover'>Training</div>
                             </div>
                         </button>
                     </div>
@@ -134,9 +134,6 @@
                 <template v-else-if='mode === "editImagery"'>
                     <Imagery @err='$emit("err", $event)' :modelid='model.modelId' :imageryid='imageryid' @close='refresh'/>
                 </template>
-                <template v-else-if='mode === "editPrediction"'>
-                    <CreatePrediction @err='$emit("err", $event)' :modelid='model.modelId' @close='refresh' />
-                </template>
             </div>
         </template>
         <template v-else>
@@ -155,7 +152,6 @@ import vSort from 'semver-sort';
 import Imagery from './Imagery.vue';
 import Integration from './Integration.vue';
 import Integrations from './Integrations.vue';
-import CreatePrediction from './CreatePrediction.vue';
 
 export default {
     name: 'Model',
@@ -180,21 +176,10 @@ export default {
             }
         }
     },
-    watch: {
-        mode: function() {
-            if (this.mode === 'editPrediction') {
-                this.prediction.modelId = this.$route.params.modelid;
-                this.prediction.version = '';
-                this.prediction.tileZoom = 18;
-                this.prediction.bbox = [-180.0, -90.0, 180.0, 90.0];
-            }
-        }
-    },
     components: {
         Imagery,
         Integration,
         Integrations,
-        CreatePrediction
     },
     mounted: function() {
         this.refresh();
