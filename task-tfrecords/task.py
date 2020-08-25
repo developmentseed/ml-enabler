@@ -54,6 +54,8 @@ def get_asset(bucket, key):
 
     return '/tmp/' + dirr
 
+
+#TO-DO allow users to upload vector file, or the ability to get vector file from S3 via http
 def get_label_npz(model_id, prediction_id):
     payload = {'format':'npz', 'inferences':'all', 'threshold': 0}
     r = requests.get(api + '/v1/model/' + model_id + '/prediction/' + prediction_id + '/export', params=payload,
@@ -66,33 +68,6 @@ def get_label_npz(model_id, prediction_id):
 def increment_versions(version):
     v = semver.VersionInfo.parse(version)
     return v.bump_minor()
-
-def get_versions(model_id):
-    r = requests.get(api + '/v1/model/' + model_id + '/prediction/all', auth=HTTPBasicAuth('machine', auth))
-    r.raise_for_status()
-    preds = r.json()
-    version_lst = []
-    for pred_dict in preds:
-        version_lst.append(pred_dict['version'])
-    version_highest = str(max(map(semver.VersionInfo.parse, version_lst)))
-    return version_highest
-
-def post_pred(pred, version):
-    data_pred = {
-        'modelId': pred['modelId'],
-        'version': version,
-        'tileZoom': pred['tileZoom'],
-        'infList': pred['infList'],
-        'infType':  pred['infType'],
-        'infBinary':  pred['infBinary'],
-        'infSupertile': pred['infSupertile']
-    }
-
-    r = requests.post(api + '/v1/model/' + model_id + '/prediction',  json=data_pred, auth=HTTPBasicAuth('machine', auth))
-    r.raise_for_status()
-    print(r.status_code)
-    pred = r.json()
-    return pred['prediction_id']
 
 def update_link(pred, link_type, zip_path):
     payload = {'type': link_type}
@@ -124,14 +99,6 @@ if supertile:
 else:
     x_feature_shape = [-1, 256, 256, 3]
 
-v = get_versions(model_id)
-
-model = get_asset(bucket, pred['modelLink'].replace(bucket + '/', ''))
-checkpoint = get_asset(bucket, pred['checkpointLink'].replace(bucket + '/', ''))
-
-print(model)
-print(checkpoint)
-
 get_label_npz(model_id, prediction_id)
 
 # download image tiles that match validated labels.npz file
@@ -143,4 +110,4 @@ make_datanpz(dest_folder='/tmp', imagery=imagery)
 #convert data.npz into tf-records
 create_tfr(npz_path='/tmp/data.npz', city='city')
 
-# TODO - Upload to MLEnabler
+# TODO - Upload tf-records to MLEnabler
