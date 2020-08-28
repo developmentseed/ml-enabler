@@ -11,7 +11,6 @@ from requests_toolbelt.utils import dump
 from zipfile import ZipFile
 
 from model import train
-from generate_datanpz import download_img_match_labels, make_datanpz
 
 s3 = boto3.client('s3')
 
@@ -52,15 +51,6 @@ def get_asset(bucket, key):
           zipObj.extractall('/tmp/' + dirr)
 
     return '/tmp/' + dirr
-
-def get_label_npz(model_id, prediction_id):
-    payload = {'format':'npz', 'inferences':'all', 'threshold': 0}
-    r = requests.get(api + '/v1/model/' + model_id + '/prediction/' + prediction_id + '/export', params=payload,
-                    auth=HTTPBasicAuth('machine', auth))
-    r.raise_for_status()
-    with open('/tmp/labels.npz', 'wb') as f:
-        f.write(r.content)
-    return f
 
 def increment_versions(version):
     v = semver.VersionInfo.parse(version)
@@ -130,14 +120,6 @@ checkpoint = get_asset(bucket, pred['checkpointLink'].replace(bucket + '/', ''))
 
 print(model)
 print(checkpoint)
-
-get_label_npz(model_id, prediction_id)
-
-# download image tiles that match validated labels.npz file
-download_img_match_labels(labels_folder='/tmp', imagery=imagery, folder='/tmp/tiles', zoom=zoom, supertile=supertile)
-
-# create data.npz file that matchs up images and labels
-make_datanpz(dest_folder='/tmp', imagery=imagery)
 
 #get train and val number of samples
 d = np.load('/tmp/data.npz')
