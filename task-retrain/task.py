@@ -104,7 +104,7 @@ def update_link(pred, link_type, zip_path):
     encoder = MultipartEncoder(fields={'file': ('filename', open(zip_path, 'rb'), 'application/zip')})
     print('/v1/model/' + str(model_id) + '/prediction/' + str(prediction_id) + '/upload')
 
-    r = requests.post(api + '/v1/model/' + str(model_id) + '/prediction/' + str(prediction_id) + '/upload', params=payload,  
+    r = requests.post(api + '/v1/model/' + str(model_id) + '/prediction/' + str(prediction_id) + '/upload', params=payload,
                         data = encoder, headers= {'Content-Type': encoder.content_type}, auth=HTTPBasicAuth('machine', auth))
     r.raise_for_status()
 
@@ -119,9 +119,9 @@ supertile = pred['infSupertile']
 version = pred['version']
 inflist = pred['infList'].split(',')
 
-if supertile: 
+if supertile:
      x_feature_shape = [-1, 512, 512, 3]
-else: 
+else:
     x_feature_shape = [-1, 256, 256, 3]
 
 v = get_versions(model_id)
@@ -140,7 +140,7 @@ download_img_match_labels(labels_folder='/tmp', imagery=imagery, folder='/tmp/ti
 # create data.npz file that matchs up images and labels
 make_datanpz(dest_folder='/tmp', imagery=imagery)
 
-#get train and val number of samples 
+#get train and val number of samples
 d = np.load('/tmp/data.npz')
 n_train_samps = d['y_train'].shape[0]
 n_val_samps = d['y_val'].shape[0]
@@ -150,9 +150,9 @@ create_tfr(npz_path='/tmp/data.npz', city='city')
 
 
 # conduct re-training
-train(tf_train_steps=200, tf_dir='/tmp/tfrecords.zip', 
-       retraining_weights='/tmp/checkpoint.zip', 
-       n_classes=len(inflist), class_names=inflist,  x_feature_shape=x_feature_shape, 
+train(tf_train_steps=200, tf_dir='/tmp/tfrecords.zip',
+       retraining_weights='/tmp/checkpoint.zip',
+       n_classes=len(inflist), class_names=inflist,  x_feature_shape=x_feature_shape,
        n_train_samps=n_train_samps, n_val_samps=n_val_samps)
 
 # increment model version
@@ -170,7 +170,7 @@ update_link(newpred, link_type='tfrecord', zip_path = '/tmp/tfrecords.zip')
 print("tfrecords link updated")
 
 # update model link
-update_link(newpred, link_type='model', zip_path ='/ml/models.zip') 
+update_link(newpred, link_type='model', zip_path ='/ml/models.zip')
 print("models link updated")
 
 # update checkpoint
