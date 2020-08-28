@@ -12,7 +12,6 @@ from zipfile import ZipFile
 
 from model import train
 from generate_datanpz import download_img_match_labels, make_datanpz
-from generate_tfrecords import create_tfr
 
 s3 = boto3.client('s3')
 
@@ -145,10 +144,6 @@ d = np.load('/tmp/data.npz')
 n_train_samps = d['y_train'].shape[0]
 n_val_samps = d['y_val'].shape[0]
 
-#convert data.npz into tf-records
-create_tfr(npz_path='/tmp/data.npz', city='city')
-
-
 # conduct re-training
 train(tf_train_steps=200, tf_dir='/tmp/tfrecords.zip',
        retraining_weights='/tmp/checkpoint.zip',
@@ -162,12 +157,7 @@ print(updated_version)
 
 # post new pred
 newpred_id = post_pred(pred=pred, version=updated_version)
-
 newpred = get_pred(model_id, newpred_id)
-
-# update tf-records zip
-update_link(newpred, link_type='tfrecord', zip_path = '/tmp/tfrecords.zip')
-print("tfrecords link updated")
 
 # update model link
 update_link(newpred, link_type='model', zip_path ='/ml/models.zip')
