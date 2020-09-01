@@ -869,7 +869,7 @@ class PredictionStackAPI(Resource):
                 return err(500, "Failed to get stack info"), 500
 
 class PredictionUploadAPI(Resource):
-    """ Upload raw ML Models to the platform """
+    """ Upload Prediction Assets to the platform """
 
     @login_required
     def post(self, model_id, prediction_id):
@@ -893,7 +893,7 @@ class PredictionUploadAPI(Resource):
         if CONFIG.EnvironmentConfig.ASSET_BUCKET is None:
             return err(501, "Not Configured"), 501
 
-        modeltype = request.args.get('type', 'model')
+        modeltype = request.args.get('type', 'model', 'inferences')
         if modeltype not in ["model", "tfrecord", "checkpoint"]:
             return err(400, "Unsupported type param"), 400
 
