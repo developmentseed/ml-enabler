@@ -34,7 +34,6 @@ def url(tile, imagery):
 
 def download_tile_tms(tile, imagery, folder, zoom, supertile=False):
     """Download a satellite image tile from a tms endpoint"""
-
     image_format = get_image_format(imagery)
     r = requests.get(url(tile.split('-'), imagery))
     tile_img = op.join(folder, '{}{}'.format(tile, image_format))
@@ -85,8 +84,8 @@ def download_img_match_labels(labels_folder, imagery, folder, zoom, supertile=Fa
         os.makedirs(tiles_dir)
     class_tiles = [tile for tile in tiles.files]
     #download images
-    with concurrent.futures.ThreadPoolExecutor(max_workers=50) as executor:
-        [executor.submit(download_tile_tms, imagery, folder, zoom, supertile=False) for tile in tiles]
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        [executor.submit(download_tile_tms, tile, imagery, folder, zoom, supertile=False) for tile in class_tiles]
         executor.shutdown(wait=True)
 
 # package up the images + labels into one data.npz file
@@ -132,7 +131,6 @@ def make_datanpz(dest_folder, imagery,
 
     # open the images and load those plus the labels into the final arrays
     image_format = get_image_format(imagery)
-    print(image_format)
 
     x_vals = []
     y_vals = []
