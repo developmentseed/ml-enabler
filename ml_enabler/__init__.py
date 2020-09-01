@@ -69,6 +69,7 @@ def init_routes(app):
     api.add_resource(PredictionValidity,        '/v1/model/<int:model_id>/prediction/<int:prediction_id>/validity', methods=['POST'])
 
     api.add_resource(PredictionExport,          '/v1/model/<int:model_id>/prediction/<int:prediction_id>/export', methods=['GET'])
+    api.add_resource(PredictionImport,          '/v1/model/<int:model_id>/prediction/<int:prediction_id>/import', methods=['POST'])
 
     api.add_resource(PredictionRetrain,         '/v1/model/<int:model_id>/prediction/<int:prediction_id>/retrain', methods=['POST'])
 
