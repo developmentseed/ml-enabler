@@ -108,5 +108,5 @@ def create_tfr(npz_path, city, dest_folder='/tmp/tfrecords/', n_imgs_shard=800):
                 writer.write(tf_example.SerializeToString())
         print('TFrecords created for val.')
 
-    #zip up tf-records 
+    #zip up tf-records
     shutil.make_archive(dest_folder, 'zip', dest_folder)
