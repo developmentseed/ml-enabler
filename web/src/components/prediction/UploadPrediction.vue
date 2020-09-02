@@ -49,7 +49,7 @@ export default {
         } else {
             this.label = `Drop ${this.type}.zip here`;
             this.filetype = 'application/zip';
-            this.server = `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/upload?type=${type}`;
+            this.server = `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/upload?type=${this.type}`;
         }
     },
     methods: {

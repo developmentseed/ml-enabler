@@ -282,14 +282,23 @@ class PredictionImport(Resource):
 
         files = list(request.files.keys())
         if len(files) == 0:
-            return err(400, "Model not found in request"), 400
+            return err(400, "File not found in request"), 400
 
-        model = request.files[files[0]]
+        inferences = request.files[files[0]]
 
         try:
             pred = PredictionService.get_prediction_by_id(prediction_id)
 
+            infstream = io.BytesIO()
+            inferences.save(infstream)
+            inferences = infstream.getvalue().decode('UTF-8').split('\n')
 
+            for inf in inferences:
+                if len(inf) == 0:
+                    continue
+                feat = geojson.loads(inf)
+
+                print(feat)
 
         except PredictionsNotFound:
             return err(404, "Predictions not found"), 404
