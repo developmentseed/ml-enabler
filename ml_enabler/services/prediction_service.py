@@ -127,9 +127,9 @@ class PredictionTileService():
             predtile = {
                 'prediction_id': pred.id,
                 'quadkey': None,
-                'quadkey_geom': shape(feat).wkt,
-                'predictions': 1,
-                'validity': 1
+                'geom': shape(feat.get('geometry')).wkt,
+                'predictions': {},
+                'validity': {}
             }
 
             data.append(predtile)
@@ -146,11 +146,11 @@ class PredictionTileService():
         """
 
         for prediction in data['predictions']:
-            if prediction.get('quadkey_geom') is not None:
-                polygon = prediction.get('quadkey_geom')
+            if prediction.get('geom') is not None:
+                polygon = prediction.get('geom')
                 bounds = [polygon['coordinates'][0][0][0], polygon['coordinates'][0][0][1], polygon['coordinates'][0][2][0], polygon['coordinates'][0][2][1]]
 
-                prediction["quadkey_geom"] = "SRID=4326;POLYGON(({0} {1},{0} {3},{2} {3},{2} {1},{0} {1}))".format(
+                prediction["geom"] = "SRID=4326;POLYGON(({0} {1},{0} {3},{2} {3},{2} {1},{0} {1}))".format(
                     bounds[0],
                     bounds[1],
                     bounds[2],
@@ -158,7 +158,7 @@ class PredictionTileService():
                 )
             else:
                 bounds = mercantile.bounds(mercantile.quadkey_to_tile(prediction.get('quadkey')))
-                prediction["quadkey_geom"] = "SRID=4326;POLYGON(({0} {1},{0} {3},{2} {3},{2} {1},{0} {1}))".format(
+                prediction["geom"] = "SRID=4326;POLYGON(({0} {1},{0} {3},{2} {3},{2} {1},{0} {1}))".format(
                     bounds[0],
                     bounds[1],
                     bounds[2],

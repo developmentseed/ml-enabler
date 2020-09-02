@@ -112,7 +112,7 @@ class Prediction(db.Model):
         return db.session.query(
             PredictionTile.id,
             PredictionTile.quadkey,
-            ST_AsGeoJSON(PredictionTile.quadkey_geom).label('geometry'),
+            ST_AsGeoJSON(PredictionTile.geom).label('geometry'),
             PredictionTile.predictions,
             PredictionTile.validity
         ).filter(PredictionTile.prediction_id == self.id).yield_per(100)
@@ -275,7 +275,7 @@ class PredictionTile(db.Model):
     def bbox(prediction_id: int):
         result = db.session.execute(text('''
             SELECT
-                ST_Extent(quadkey_geom)
+                ST_Extent(geom)
             FROM
                 prediction_tiles
             WHERE
@@ -302,7 +302,7 @@ class PredictionTile(db.Model):
                     p.id AS id,
                     quadkey AS quadkey,
                     predictions || COALESCE(v.validity, '{}'::JSONB) AS props,
-                    ST_AsMVTGeom(quadkey_geom, ST_Transform(ST_MakeEnvelope(:minx, :miny, :maxx, :maxy, 3857), 4326), 4096, 256, false) AS geom
+                    ST_AsMVTGeom(geom, ST_Transform(ST_MakeEnvelope(:minx, :miny, :maxx, :maxy, 3857), 4326), 4096, 256, false) AS geom
                 FROM
                     prediction_tiles AS p
                     LEFT JOIN (
@@ -317,7 +317,7 @@ class PredictionTile(db.Model):
                     ) AS v ON p.id = v.id
                 WHERE
                     p.prediction_id = :pred
-                    AND ST_Intersects(p.quadkey_geom, ST_Transform(ST_MakeEnvelope(:minx, :miny, :maxx, :maxy, 3857), 4326))
+                    AND ST_Intersects(p.geom, ST_Transform(ST_MakeEnvelope(:minx, :miny, :maxx, :maxy, 3857), 4326))
             ) q
         '''), {
             'pred': prediction_id,
