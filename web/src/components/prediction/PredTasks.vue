@@ -17,7 +17,7 @@
 
             <div class='flex-parent flex-parent--center-main pt12 pb36'>
                 <h1 class='flex-child txt-h4 cursor-default align-center'>
-                    Retraining can only occur when MLEnabler is running in an "aws" environment
+                    Task creation can only occur when MLEnabler is running in an "aws" environment
                 </h1>
             </div>
         </template>
@@ -106,7 +106,7 @@
         </template>
         <template v-else-if='create === "tfrecords"'>
             <div class='col col--12'>
-                <h2 class='w-full align-center txt-h4 py12'>New Model Retraining</h2>
+                <h2 class='w-full align-center txt-h4 py12'>TFRecord Creation</h2>
 
                 <label>Imagery Source:</label>
                 <div class='border border--gray-light round my12'>
