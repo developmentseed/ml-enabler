@@ -30,12 +30,18 @@
             <div class='col col--12 grid border-b border--gray-light'>
                 <div class='col col--2'>Type</div>
                 <div class='col col--2'>Status</div>
-                <div class='col col--6'>Note</div>
-                <div class='col col--2 clearfix pr6'>
-                    <button @click='$emit("create")' class='btn btn--s fr round btn--stroke btn--gray color-green-on-hover'>
-                        <svg class='icon'><use href='#icon-plus'/></svg>
+                <div class='col col--5'>Note</div>
+                <div class='col col--3 clearfix pr6'>
+                    <button class='dropdown btn fr h24 mr6 mb6 round btn--stroke btn--s color-gray color-green-on-hover'>
+                        <svg class='icon fl'><use href='#icon-plus'/></svg>
+                        <svg class='icon fl'><use href='#icon-chevron-down'/></svg>
+
+                        <div class='round dropdown-content color-black' style='top: 24px;'>
+                            <div @click='$emit("create", "tfrecords")' class='round bg-gray-faint-on-hover'>TFRecords</div>
+                            <div @click='$emit("create", "retrain")' class='round bg-gray-faint-on-hover'>Retraining</div>
+                        </div>
                     </button>
-                    <button @click='getTasks' class='mr6 btn btn--s fr round btn--stroke btn--gray color-green-on-hover'>
+                    <button @click='getTasks' class='mr6 btn fr round btn--stroke btn--gray color-green-on-hover'>
                         <svg class='icon'><use href='#icon-refresh'/></svg>
                     </button>
 
