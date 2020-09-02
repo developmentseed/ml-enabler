@@ -27,7 +27,7 @@
                 :prediction='prediction'
             />
         </template>
-        <template v-else-if='!prediction.modelLink'>
+        <template v-else-if='create === "retrain" && !prediction.modelLink'>
             <div class='flex-parent flex-parent--center-main pt36'>
                 <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-info'/></svg>
             </div>
@@ -58,7 +58,7 @@
                 </button>
             </div>
         </template>
-        <template v-else-if='!prediction.checkpointLink'>
+        <template v-else-if='create === "retrain" && !prediction.checkpointLink'>
             <div class='flex-parent flex-parent--center-main pt12 pb36'>
                 <h1 class='flex-child txt-h4 cursor-default align-center'>
                     Checkpoint Upload
@@ -154,7 +154,7 @@ export default {
                 image: false,
             },
             tfrecordsparams: {
-
+                image: false,
             },
             loading: {
                 retrain: true,
