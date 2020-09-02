@@ -32,7 +32,7 @@
                 <div class='col col--2'>Status</div>
                 <div class='col col--5'>Note</div>
                 <div class='col col--3 clearfix pr6'>
-                    <button class='dropdown btn fr h24 mr6 mb6 round btn--stroke btn--s color-gray color-green-on-hover'>
+                    <button class='dropdown btn fr h24 mb6 round btn--stroke btn--s color-gray color-green-on-hover'>
                         <svg class='icon fl'><use href='#icon-plus'/></svg>
                         <svg class='icon fl'><use href='#icon-chevron-down'/></svg>
 
