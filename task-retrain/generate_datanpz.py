@@ -1,8 +1,9 @@
 # code adopted from LabelMaker (https://github.com/developmentseed/label-maker)
 import os
 from os import path as op
-import requests 
-import rasterio  
+import requests
+import rasterio
+import concurrent.futures
 
 from requests.auth import HTTPBasicAuth
 from io import BytesIO
@@ -19,12 +20,11 @@ from mercantile import Tile, children
 import numpy as np
 
 def get_image_format(imagery):
-    #TO-DO fix for non-mapbox imagery 
+    #TO-DO fix for non-mapbox imagery
     o = urlparse(imagery)
     _, image_format = op.splitext(o.path)
-    if not image_format in ['.png', '.jpg', '.jpeg']: 
+    if not image_format in ['.png', '.jpg', '.jpeg']:
         image_format =  '.png'
-      
     return image_format
 
 def url(tile, imagery):
@@ -34,7 +34,6 @@ def url(tile, imagery):
 
 def download_tile_tms(tile, imagery, folder, zoom, supertile=False):
     """Download a satellite image tile from a tms endpoint"""
-
     image_format = get_image_format(imagery)
     r = requests.get(url(tile.split('-'), imagery))
     tile_img = op.join(folder, '{}{}'.format(tile, image_format))
@@ -85,14 +84,14 @@ def download_img_match_labels(labels_folder, imagery, folder, zoom, supertile=Fa
         os.makedirs(tiles_dir)
     class_tiles = [tile for tile in tiles.files]
     #download images
-    for tile in class_tiles:
-        download_tile_tms(tile, imagery, folder, zoom, supertile=False)
-        
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        [executor.submit(download_tile_tms, tile, imagery, folder, zoom, supertile=False) for tile in class_tiles]
+        executor.shutdown(wait=True)
 
-# package up the images + labels into one data.npz file 
-def make_datanpz(dest_folder, imagery, 
-                    seed=False, 
-                    split_names=('train', 'val', 'test'), 
+# package up the images + labels into one data.npz file
+def make_datanpz(dest_folder, imagery,
+                    seed=False,
+                    split_names=('train', 'val', 'test'),
                     split_vals=(0.7, .2, .1)):
     """Generate an .npz file containing arrays for training machine learning algorithms
     Parameters
@@ -132,7 +131,6 @@ def make_datanpz(dest_folder, imagery,
 
     # open the images and load those plus the labels into the final arrays
     image_format = get_image_format(imagery)
-    print(image_format)
 
     x_vals = []
     y_vals = []
