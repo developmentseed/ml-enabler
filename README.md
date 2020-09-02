@@ -4,7 +4,9 @@
 
 ## Background
 
-Machine Learning has proven to be very successful to make mapping fast with high quality. With a diverse set of models and tools, it is hard to integrate them to existing tools like Tasking Manager and iD. HOT is developing ml-enabler to enable AI-assist to existing mapping tools.
+Machine Learning has proven to be very successful to make mapping fast with high quality. With a diverse set of models and tools, it is hard to integrate them to existing tools like Tasking Manager and iD. ML Enabler is a service that provides better integration during model development as well integrating model inferences to mapping tools.
+
+ML Enabler was initially developed by Development Seed in partnership with Humanitarian OpenStreetMap Team.
 
 The API uses the following terms:
 * **Model** --
