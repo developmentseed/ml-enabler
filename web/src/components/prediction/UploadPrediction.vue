@@ -7,9 +7,9 @@
                 :label-idle='label'
                 v-bind:allow-multiple='false'
                 v-on:processfile='uploaded'
-                accepted-file-types='application/zip'
+                :accepted-file-types='filetype'
                 allowRevert='false'
-                :server='`/v1/model/${$route.params.modelid}/prediction/${$route.params.predid}/upload?type=${type}`'
+                :server='server'
                 v-bind:files='files'
             />
         </div>
@@ -37,6 +37,7 @@ export default {
             done: false,
             files: [],
             label: '',
+            server: '',
             filetype: ''
         };
     },
@@ -44,9 +45,11 @@ export default {
         if (this.type === 'inferences') {
             this.label = 'Drop labels.geojson here';
             this.filetype = 'application/geo+json';
+            this.server = `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/import`;
         } else {
             this.label = `Drop ${this.type}.zip here`;
             this.filetype = 'application/zip';
+            this.server = `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/upload?type=${type}`;
         }
     },
     methods: {

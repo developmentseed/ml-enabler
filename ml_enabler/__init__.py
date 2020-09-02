@@ -37,7 +37,7 @@ def init_routes(app):
 
     # import apis
     from ml_enabler.api.ml import StatusCheckAPI, MLModelAPI, GetAllModels, \
-        PredictionAPI, PredictionUploadAPI, PredictionTileAPI, \
+        PredictionAPI, PredictionUploadAPI, PredictionTileAPI, PredictionImport, \
         GetAllPredictions, PredictionTileMVT, PredictionRetrain, \
         PredictionStackAPI, PredictionStacksAPI, PredictionInfAPI, MapboxAPI, MetaAPI, \
         PredictionExport, PredictionSingleAPI, PredictionValidity
