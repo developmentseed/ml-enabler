@@ -28,6 +28,10 @@
             />
         </template>
         <template v-else-if='create === "retrain" && !prediction.modelLink'>
+            <button @click='create = false' class='btn fr round btn--stroke color-gray color-black-on-hover'>
+                <svg class='icon'><use href='#icon-close'/></svg>
+            </button>
+
             <div class='flex-parent flex-parent--center-main pt36'>
                 <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-info'/></svg>
             </div>
@@ -44,6 +48,10 @@
             </div>
         </template>
         <template v-else-if='!tilejson'>
+            <button @click='create = false' class='btn fr round btn--stroke color-gray color-black-on-hover'>
+                <svg class='icon'><use href='#icon-close'/></svg>
+            </button>
+
             <div class='flex-parent flex-parent--center-main pt36'>
                 <svg class='flex-child icon w60 h60 color-gray'><use href='#icon-info'/></svg>
             </div>
@@ -63,7 +71,12 @@
                 <h1 class='flex-child txt-h4 cursor-default align-center'>
                     Checkpoint Upload
                 </h1>
+
+                <button @click='create = false' class='btn fr round btn--stroke color-gray color-black-on-hover'>
+                    <svg class='icon'><use href='#icon-close'/></svg>
+                </button>
             </div>
+
             <UploadPrediction
                 type='checkpoint'
                 :prediction='prediction'
@@ -71,6 +84,10 @@
             />
         </template>
         <template v-else-if='!imagery || !imagery.length'>
+            <button @click='create = false' class='btn fr round btn--stroke color-gray color-black-on-hover'>
+                <svg class='icon'><use href='#icon-close'/></svg>
+            </button>
+
             <div class='flex-parent flex-parent--center-main py12'>
                 No imagery sources found to create a stack with
             </div>
@@ -78,6 +95,9 @@
         <template v-else-if='create === "retrain"'>
             <div class='col col--12'>
                 <h2 class='w-full align-center txt-h4 py12'>New Model Retraining</h2>
+                <button @click='create = false' class='btn fr round btn--stroke color-gray color-black-on-hover'>
+                    <svg class='icon'><use href='#icon-close'/></svg>
+                </button>
 
                 <label>Imagery Source:</label>
                 <div class='border border--gray-light round my12'>
@@ -107,6 +127,10 @@
         <template v-else-if='create === "tfrecords"'>
             <div class='col col--12'>
                 <h2 class='w-full align-center txt-h4 py12'>TFRecord Creation</h2>
+
+                <button @click='create = false' class='btn fr round btn--stroke color-gray color-black-on-hover'>
+                    <svg class='icon'><use href='#icon-close'/></svg>
+                </button>
 
                 <label>Imagery Source:</label>
                 <div class='border border--gray-light round my12'>
