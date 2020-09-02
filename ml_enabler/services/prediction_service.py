@@ -1,4 +1,5 @@
 import ml_enabler.config as CONFIG
+from shapely.geometry import shape
 import sqlalchemy
 import mercantile, semver
 from ml_enabler.models.ml_model import MLModel, PredictionTile, Prediction
@@ -119,6 +120,23 @@ class PredictionService():
 
 
 class PredictionTileService():
+    @staticmethod
+    def create_geojson(pred, features):
+        data = []
+        for feat in features:
+            predtile = {
+                'prediction_id': pred.id,
+                'quadkey': None,
+                'quadkey_geom': shape(feat).wkt,
+                'predictions': 1,
+                'validity': 1
+            }
+
+            data.append(predtile)
+
+        connection = db.engine.connect()
+        connection.execute(PredictionTile.__table__.insert(), data)
+
     @staticmethod
     def create(data):
         """

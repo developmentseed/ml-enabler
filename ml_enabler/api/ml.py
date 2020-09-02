@@ -293,13 +293,14 @@ class PredictionImport(Resource):
             inferences.save(infstream)
             inferences = infstream.getvalue().decode('UTF-8').split('\n')
 
+            data = []
             for inf in inferences:
                 if len(inf) == 0:
                     continue
-                feat = geojson.loads(inf)
 
-                print(feat)
+                data.append(geojson.loads(inf))
 
+            PredictionTileService.create_geojson(pred, data)
         except PredictionsNotFound:
             return err(404, "Predictions not found"), 404
         except Exception as e:

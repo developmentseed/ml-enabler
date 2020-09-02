@@ -219,9 +219,8 @@ class PredictionTile(db.Model):
         nullable=False
     )
 
-    quadkey = db.Column(db.String, nullable=False)
-    quadkey_geom = db.Column(Geometry('POLYGON', srid=4326), nullable=False)
-    centroid = db.Column(Geometry('POINT', srid=4326))
+    quadkey = db.Column(db.String, nullable=True)
+    geom = db.Column(Geometry('POLYGON', srid=4326), nullable=False)
     predictions = db.Column(postgresql.JSONB, nullable=False)
     validity = db.Column(MutableDict.as_mutable(postgresql.JSONB), nullable=True)
 
@@ -337,13 +336,6 @@ class PredictionTile(db.Model):
             func.avg(cast(cast(PredictionTile.predictions['ml_prediction'], sqlalchemy.String), sqlalchemy.Float)).label('ml_prediction'),
             func.avg(cast(cast(PredictionTile.predictions['osm_building_area'], sqlalchemy.String), sqlalchemy.Float)).label('osm_building_area')
         ).filter(PredictionTile.prediction_id == prediction_id).filter(func.substr(PredictionTile.quadkey, 1, zoom).in_(quadkeys)).group_by(func.substr(PredictionTile.quadkey, 1, zoom)).all()
-
-    @staticmethod
-    def get_aggregate_for_polygon(prediction_id: int, polygon: str):
-        return db.session.query(
-            func.avg(cast(cast(PredictionTile.predictions['ml_prediction'], sqlalchemy.String), sqlalchemy.Float)).label('ml_prediction'),
-            func.avg(cast(cast(PredictionTile.predictions['osm_building_area'], sqlalchemy.String), sqlalchemy.Float)).label('osm_building_area')
-        ).filter(PredictionTile.prediction_id == prediction_id).filter(ST_Within(PredictionTile.centroid, ST_GeomFromText(polygon)) == 'True').one()
 
 class MLModel(db.Model):
     """ Describes an ML model registered with the service """
