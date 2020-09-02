@@ -23,7 +23,7 @@
         </template>
         <template v-else-if='!create'>
             <Tasks
-                @create='create = true'
+                @create='create = $event'
                 :prediction='prediction'
             />
         </template>
@@ -75,14 +75,14 @@
                 No imagery sources found to create a stack with
             </div>
         </template>
-        <template v-else>
+        <template v-else-if='create === "retrain"'>
             <div class='col col--12'>
                 <h2 class='w-full align-center txt-h4 py12'>New Model Retraining</h2>
 
                 <label>Imagery Source:</label>
                 <div class='border border--gray-light round my12'>
-                    <div @click='params.image = img' :key='img.id' v-for='img in imagery' class='col col--12 cursor-pointer bg-darken10-on-hover'>
-                        <h3 v-if='params.image.id === img.id' class='px12 py6 txt-h4 w-full bg-gray color-white round' v-text='img.name'></h3>
+                    <div @click='retrainparams.image = img' :key='img.id' v-for='img in imagery' class='col col--12 cursor-pointer bg-darken10-on-hover'>
+                        <h3 v-if='retrainparams.image.id === img.id' class='px12 py6 txt-h4 w-full bg-gray color-white round' v-text='img.name'></h3>
                         <h3 v-else class='txt-h4 round px12 py6' v-text='img.name'></h3>
                     </div>
                 </div>
@@ -104,6 +104,35 @@
                 </div>
             </div>
         </template>
+        <template v-else-if='create === "tfrecords"'>
+            <div class='col col--12'>
+                <h2 class='w-full align-center txt-h4 py12'>New Model Retraining</h2>
+
+                <label>Imagery Source:</label>
+                <div class='border border--gray-light round my12'>
+                    <div @click='tfrecordsparams.image = img' :key='img.id' v-for='img in imagery' class='col col--12 cursor-pointer bg-darken10-on-hover'>
+                        <h3 v-if='tfrecordsparams.image.id === img.id' class='px12 py6 txt-h4 w-full bg-gray color-white round' v-text='img.name'></h3>
+                        <h3 v-else class='txt-h4 round px12 py6' v-text='img.name'></h3>
+                    </div>
+                </div>
+                <template v-if='!advanced'>
+                    <div class='col col--12'>
+                        <button @click='advanced = !advanced' class='btn btn--white color-gray px0'><svg class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg><span class='fl pl6'>Advanced Options</span></button>
+                    </div>
+                </template>
+                <template v-else>
+                    <div class='col col--12 border-b border--gray-light mb12'>
+                        <button @click='advanced = !advanced' class='btn btn--white color-gray px0'><svg class='icon fl my6'><use xlink:href='#icon-chevron-down'/></svg><span class='fl pl6'>Advanced Options</span></button>
+                    </div>
+                </template>
+                <template v-if='advanced'>
+                    <div class='w-full align-center py12'>No Advanced Options Yet</div>
+                </template>
+                <div class='col col--12 clearfix py12'>
+                    <button @click='createTfrecords' class='fr btn btn--stroke color-gray color-green-on-hover round'>Generate TFRecords</button>
+                </div>
+            </div>
+        </template>
     </div>
 </template>
 
@@ -121,8 +150,11 @@ export default {
             create: false,
             imagery: [],
             looping: false,
-            params: {
+            retrainparams: {
                 image: false,
+            },
+            tfrecordsparams: {
+
             },
             loading: {
                 retrain: true,
@@ -148,7 +180,7 @@ export default {
             window.open(url, "_blank")
         },
         createRetrain: async function() {
-            if (!this.params.image) return;
+            if (!this.retrainparams.image) return;
 
             try {
                 const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/retrain`, {
@@ -157,7 +189,28 @@ export default {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        imagery: this.params.image.url
+                        imagery: this.retrainparams.image.url
+                    })
+                });
+
+                const body = await res.json();
+                if (!res.ok) throw new Error(body.message)
+                this.create = false;
+            } catch (err) {
+                this.$emit('err', err);
+            }
+        },
+        createTfrecords: async function() {
+            if (!this.tfrecordsparams.image) return;
+
+            try {
+                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/tfrecords`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        imagery: this.tfrecordsparams.image.url
                     })
                 });
 

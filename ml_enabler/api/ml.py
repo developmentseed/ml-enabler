@@ -620,6 +620,58 @@ class PredictionInfAPI(Resource):
             current_app.logger.error(error_msg)
             return err(500, error_msg), 500
 
+class PredictionTfrecords(Resource):
+    @login_required
+    def post(self, model_id, prediction_id):
+        """
+        Create a TFRecords file with validated predictions
+        ---
+        produces:
+            - application/json
+        """
+
+        if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
+            return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
+
+        if CONFIG.EnvironmentConfig.ASSET_BUCKET is None:
+            return err(501, "Not Configured"), 501
+
+        payload = request.get_json()
+
+        if payload.get("imagery") is None:
+            return err(400, "imagery key required in body"), 400
+
+        try:
+            batch = boto3.client(
+                service_name='batch',
+                region_name='us-east-1',
+                endpoint_url='https://batch.us-east-1.amazonaws.com'
+            )
+
+            # Submit to AWS Batch to convert to ECR image
+            job = batch.submit_job(
+                jobName=CONFIG.EnvironmentConfig.STACK + '-tfrecords',
+                jobQueue=CONFIG.EnvironmentConfig.STACK + '-queue',
+                jobDefinition=CONFIG.EnvironmentConfig.STACK + '-job',
+                containerOverrides={
+                    'environment': [
+                        { 'name': 'MODEL_ID', 'value': str(model_id) },
+                        { 'name': 'PREDICTION_ID', 'value': str(prediction_id) },
+                        { 'name': 'TILE_ENDPOINT', 'value': payload.get("imagery") },
+                    ]
+                }
+            )
+
+            TaskService.create({
+                'pred_id': prediction_id,
+                'type': 'tfrecords',
+                'batch_id': job.get('jobId')
+            })
+        except Exception as e:
+            error_msg = f'Batch GPU Error: {str(e)}'
+            current_app.logger.error(error_msg)
+            return err(500, "Failed to start GPU Retrain"), 500
+
 class PredictionRetrain(Resource):
     @login_required
     def post(self, model_id, prediction_id):

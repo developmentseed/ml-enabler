@@ -38,7 +38,7 @@ def init_routes(app):
     # import apis
     from ml_enabler.api.ml import StatusCheckAPI, MLModelAPI, GetAllModels, \
         PredictionAPI, PredictionUploadAPI, PredictionTileAPI, PredictionImport, \
-        GetAllPredictions, PredictionTileMVT, PredictionRetrain, \
+        GetAllPredictions, PredictionTileMVT, PredictionRetrain, PredictionTfrecords,\
         PredictionStackAPI, PredictionStacksAPI, PredictionInfAPI, MapboxAPI, MetaAPI, \
         PredictionExport, PredictionSingleAPI, PredictionValidity
     from ml_enabler.api.swagger import SwaggerDocsAPI
@@ -72,6 +72,7 @@ def init_routes(app):
     api.add_resource(PredictionImport,          '/v1/model/<int:model_id>/prediction/<int:prediction_id>/import', methods=['POST'])
 
     api.add_resource(PredictionRetrain,         '/v1/model/<int:model_id>/prediction/<int:prediction_id>/retrain', methods=['POST'])
+    api.add_resource(PredictionTfrecords,       '/v1/model/<int:model_id>/prediction/<int:prediction_id>/tfrecords', methods=['POST'])
 
     api.add_resource(PredictionTileAPI,         '/v1/model/<int:model_id>/prediction/<int:prediction_id>/tiles', endpoint="get", methods=['GET'])
     api.add_resource(PredictionTileMVT,         '/v1/model/<int:model_id>/prediction/<int:prediction_id>/tiles/<int:z>/<int:x>/<int:y>.mvt', methods=['GET'])
