@@ -127,8 +127,8 @@ class PredictionTileService():
             predtile = {
                 'prediction_id': pred.id,
                 'quadkey': None,
-                'geom': shape(feat.get('geometry')).wkt,
-                'predictions': {},
+                'geom': 'SRID=4326;' + shape(feat.get('geometry')).wkt,
+                'predictions': feat.get('properties').get('predictions'),
                 'validity': {}
             }
 

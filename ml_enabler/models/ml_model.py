@@ -268,7 +268,7 @@ class PredictionTile(db.Model):
     @staticmethod
     def count(prediction_id: int):
         return db.session.query(
-            func.count(PredictionTile.quadkey).label("count")
+            func.count(PredictionTile.geom).label("count")
         ).filter(PredictionTile.prediction_id == prediction_id).one()
 
     @staticmethod
