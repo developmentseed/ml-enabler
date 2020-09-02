@@ -83,6 +83,33 @@ def update_link(pred, link_type, zip_path):
                         data = encoder, headers= {'Content-Type': encoder.content_type}, auth=HTTPBasicAuth('machine', auth))
     r.raise_for_status()
 
+def get_versions(model_id):
+    r = requests.get(api + '/v1/model/' + model_id + '/prediction/all', auth=HTTPBasicAuth('machine', auth))
+    r.raise_for_status()
+    preds = r.json()
+    version_lst = []
+    for pred_dict in preds:
+        version_lst.append(pred_dict['version'])
+    version_highest = str(max(map(semver.VersionInfo.parse, version_lst)))
+    return version_highest
+
+def post_pred(pred, version):
+    data_pred = {
+        'modelId': pred['modelId'],
+        'version': version,
+        'tileZoom': pred['tileZoom'],
+        'infList': pred['infList'],
+        'infType':  pred['infType'],
+        'infBinary':  pred['infBinary'],
+        'infSupertile': pred['infSupertile']
+    }
+
+    r = requests.post(api + '/v1/model/' + model_id + '/prediction',  json=data_pred, auth=HTTPBasicAuth('machine', auth))
+    r.raise_for_status()
+    print(r.status_code)
+    pred = r.json()
+    return pred['prediction_id']
+
 pred = get_pred(model_id, prediction_id)
 if pred['modelLink'] is None:
     raise Exception("Cannot retrain without modelLink")
@@ -94,10 +121,7 @@ supertile = pred['infSupertile']
 version = pred['version']
 inflist = pred['infList'].split(',')
 
-if supertile:
-     x_feature_shape = [-1, 512, 512, 3]
-else:
-    x_feature_shape = [-1, 256, 256, 3]
+v = get_versions(model_id)
 
 get_label_npz(model_id, prediction_id)
 
@@ -110,4 +134,13 @@ make_datanpz(dest_folder='/tmp', imagery=imagery)
 #convert data.npz into tf-records
 create_tfr(npz_path='/tmp/data.npz', city='city')
 
+updated_version = str(increment_versions(version=v))
+print(updated_version)
+
+# post new pred
+newpred_id = post_pred(pred=pred, version=updated_version)
+newpred = get_pred(model_id, newpred_id)
+
 # TODO - Upload tf-records to MLEnabler
+update_link(newpred, link_type='tfrecord', zip_path = '/tmp/tfrecords.zip')
+print("tfrecords link updated")
