@@ -22,7 +22,7 @@
                 v-on:close='$router.push({ name: "model", params: { modelid: $route.params.modelid } })'
             />
         </template>
-        <template v-else-if='prediction.hint === "training"'>
+        <template v-else-if='prediction.hint === "training" && !tilejson'>
             <div class='align-center pb6'>Upload GeoJSON Training Data to get started</div>
 
             <UploadPrediction
@@ -71,7 +71,7 @@ import PredictionHeader from './PredictionHeader.vue';
 
 export default {
     name: 'Assets',
-    props: ['meta', 'prediction'],
+    props: ['meta', 'prediction', 'tilejson'],
     data: function() {
         return { }
     },
