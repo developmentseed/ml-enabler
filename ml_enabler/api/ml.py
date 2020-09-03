@@ -301,6 +301,8 @@ class PredictionImport(Resource):
                 data.append(geojson.loads(inf))
 
             PredictionTileService.create_geojson(pred, data)
+        except InvalidGeojson as e:
+            return err(400, str(e)), 400
         except PredictionsNotFound:
             return err(404, "Predictions not found"), 404
         except Exception as e:

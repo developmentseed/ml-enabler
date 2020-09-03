@@ -37,7 +37,14 @@ export default {
             done: false,
             files: [],
             label: '',
-            server: '',
+            server: {
+                url: this.type === 'inferences'
+                    ? `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/import`
+                    : `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/upload?type=${this.type}`,
+                process: {
+                    onerror: this.error
+                }
+            },
             filetype: ''
         };
     },
@@ -45,14 +52,15 @@ export default {
         if (this.type === 'inferences') {
             this.label = 'Drop labels.geojson here';
             this.filetype = 'application/geo+json';
-            this.server = `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/import`;
         } else {
             this.label = `Drop ${this.type}.zip here`;
             this.filetype = 'application/zip';
-            this.server = `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/upload?type=${this.type}`;
         }
     },
     methods: {
+        error: function(res) {
+            this.$emit('err', new Error(JSON.parse(res).message));
+        },
         uploaded: function(err) {
             if (err) return;
 

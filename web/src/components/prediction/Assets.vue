@@ -19,7 +19,8 @@
             <UploadPrediction
                 type='model'
                 :prediction='prediction'
-                v-on:close='$router.push({ name: "model", params: { modelid: $route.params.modelid } })'
+                @err='$emit("err", $event)'
+                @close='$router.push({ name: "model", params: { modelid: $route.params.modelid } })'
             />
         </template>
         <template v-else-if='prediction.hint === "training" && !tilejson'>
@@ -28,7 +29,8 @@
             <UploadPrediction
                 type='inferences'
                 :prediction='prediction'
-                v-on:close='$router.push({ name: "model", params: { modelid: $route.params.modelid } })'
+                @err='$emit("err", $event)'
+                @close='$router.push({ name: "model", params: { modelid: $route.params.modelid } })'
             />
         </template>
         <template v-else-if='meta.environment !== "aws"'>

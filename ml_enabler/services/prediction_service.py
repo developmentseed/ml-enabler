@@ -4,6 +4,7 @@ import sqlalchemy
 import mercantile, semver
 from ml_enabler.models.ml_model import MLModel, PredictionTile, Prediction
 from ml_enabler.models.dtos.ml_model_dto import PredictionDTO
+from ml_enabler.utils import InvalidGeojson
 from ml_enabler.models.utils import PredictionsNotFound, NotFound, VersionExists
 from psycopg2.errors import UniqueViolation
 from ml_enabler import db
@@ -125,6 +126,13 @@ class PredictionTileService():
     def create_geojson(pred, features):
         data = []
         for feat in features:
+            if feat.get('type') != "Feature":
+                raise InvalidGeojson('All Geometries must be a GeoJSON Feature')
+            elif feat.get('properties') is None:
+                raise InvalidGeojson('Feature must have properties object')
+            elif feat.get('properties').get('predictions') is None:
+                raise InvalidGeojson('Feature must have properties.predictions object')
+
             predtile = {
                 'prediction_id': pred.id,
                 'quadkey': None,
