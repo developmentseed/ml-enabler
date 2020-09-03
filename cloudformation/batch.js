@@ -155,7 +155,7 @@ const stack = {
             Type: 'AWS::Batch::JobDefinition',
             Properties: {
                 Type: 'container',
-                JobDefinitionName: cf.join('-', [cf.stackName, 'gpu-job']),
+                JobDefinitionName: cf.join('-', [cf.stackName, 'retrain-job']),
                 RetryStrategy: {
                     Attempts: 1
                 },
@@ -195,7 +195,7 @@ const stack = {
             Type: 'AWS::Batch::JobDefinition',
             Properties: {
                 Type: 'container',
-                JobDefinitionName: cf.join('-', [cf.stackName, 'job']),
+                JobDefinitionName: cf.join('-', [cf.stackName, 'build-job']),
                 RetryStrategy: {
                     Attempts: 1
                 },
@@ -223,7 +223,7 @@ const stack = {
             Type: 'AWS::Batch::JobDefinition',
             Properties: {
                 Type: 'container',
-                JobDefinitionName: cf.join('-', [cf.stackName, 'job']),
+                JobDefinitionName: cf.join('-', [cf.stackName, 'tfrecords-job']),
                 RetryStrategy: {
                     Attempts: 1
                 },

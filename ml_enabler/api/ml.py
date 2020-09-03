@@ -652,7 +652,7 @@ class PredictionTfrecords(Resource):
             job = batch.submit_job(
                 jobName=CONFIG.EnvironmentConfig.STACK + '-tfrecords',
                 jobQueue=CONFIG.EnvironmentConfig.STACK + '-queue',
-                jobDefinition=CONFIG.EnvironmentConfig.STACK + '-job',
+                jobDefinition=CONFIG.EnvironmentConfig.STACK + '-tfrecords-job',
                 containerOverrides={
                     'environment': [
                         { 'name': 'MODEL_ID', 'value': str(model_id) },
@@ -703,7 +703,7 @@ class PredictionRetrain(Resource):
             job = batch.submit_job(
                 jobName=CONFIG.EnvironmentConfig.STACK + '-retrain',
                 jobQueue=CONFIG.EnvironmentConfig.STACK + '-gpu-queue',
-                jobDefinition=CONFIG.EnvironmentConfig.STACK + '-gpu-job',
+                jobDefinition=CONFIG.EnvironmentConfig.STACK + '-retrain-job',
                 containerOverrides={
                     'environment': [
                         { 'name': 'MODEL_ID', 'value': str(model_id) },
@@ -1065,7 +1065,7 @@ class PredictionUploadAPI(Resource):
                     batch.submit_job(
                         jobName=CONFIG.EnvironmentConfig.STACK + 'ecr-build',
                         jobQueue=CONFIG.EnvironmentConfig.STACK + '-queue',
-                        jobDefinition=CONFIG.EnvironmentConfig.STACK + '-job',
+                        jobDefinition=CONFIG.EnvironmentConfig.STACK + '-build-job',
                         containerOverrides={
                             'environment': [{
                                 'name': 'MODEL',
