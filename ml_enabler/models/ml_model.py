@@ -48,6 +48,8 @@ class Prediction(db.Model):
     # but on the frontend, a training hint will not prompt for model upload
     hint = db.Column(db.String, nullable=False)
 
+    imagery_id = db.Column(db.BigInteger, nullable=True)
+
     model_id = db.Column(
         db.BigInteger,
         db.ForeignKey('ml_models.id', name='fk_models'),
@@ -73,6 +75,7 @@ class Prediction(db.Model):
     def create(self, prediction_dto: PredictionDTO):
         """ Creates and saves the current model to the DB """
 
+        self.imagery_id = prediction_dto.imagery_id
         self.model_id = prediction_dto.model_id
         self.hint = prediction_dto.hint
         self.version = prediction_dto.version
@@ -141,7 +144,8 @@ class Prediction(db.Model):
             Prediction.inf_list,
             Prediction.inf_type,
             Prediction.inf_binary,
-            Prediction.inf_supertile
+            Prediction.inf_supertile,
+            Prediction.imagery_id
         ).filter(Prediction.id == prediction_id)
 
         return Prediction.query.get(prediction_id)
@@ -170,7 +174,8 @@ class Prediction(db.Model):
             Prediction.inf_list,
             Prediction.inf_type,
             Prediction.inf_binary,
-            Prediction.inf_supertile
+            Prediction.inf_supertile,
+            Prediction.imagery_id
         ).filter(Prediction.model_id == model_id)
 
         return query.all()
@@ -203,6 +208,7 @@ class Prediction(db.Model):
         prediction_dto.inf_type = prediction[14]
         prediction_dto.inf_binary = prediction[15]
         prediction_dto.inf_supertile = prediction[16]
+        prediction_dto.imagery_id = prediction[17]
 
         return prediction_dto
 

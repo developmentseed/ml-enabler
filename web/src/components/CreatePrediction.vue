@@ -48,6 +48,28 @@
                     </div>
                 </template>
                 <div class='col col--8'></div>
+
+                <div class='col col--12 pt6'>
+                    <label>Imagery Source:</label>
+                    <div class='border border--gray-light round'>
+                        <template v-if='loading.imagery'>
+                            <div class='flex-parent flex-parent--center-main w-full py24'>
+                                <div class='flex-child loading py24'></div>
+                            </div>
+                        </template>
+                        <template v-else>
+                            <div @click='prediction.imagery_id = img.id' :key='img.id' v-for='img in imagery' class='col col--12 cursor-pointer bg-darken10-on-hover'>
+                                <div class='w-full py6 px6' :class='{
+                                    "bg-gray-light": prediction.imagery_id === img.id
+                                }'>
+                                    <span class='txt-h4 round' v-text='img.name'/>
+                                    <div v-text='img.fmt' class='fr mx3 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue px6 py3 round txt-xs txt-bold'></div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
                 <div class='col col--12 py12'>
                     <button @click='postPrediction' class='btn btn--stroke round fr color-green-light color-green-on-hover'>Add <span v-text='type'/></button>
                 </div>
@@ -63,7 +85,12 @@ export default {
     data: function() {
         return {
             type: this.$route.name === 'createTraining' ? 'Training' : 'Prediction',
+            loading: {
+                imagery: true
+            },
+            imagery: [],
             prediction: {
+                imagery_id: false,
                 version: '',
                 tileZoom: '18',
                 infList: '',
@@ -73,6 +100,9 @@ export default {
             }
         };
     },
+    mounted: function() {
+        this.refresh();
+    },
     watch: {
         'prediction.infList': function() {
             if (this.prediction.infList.split(",").length !== 2) {
@@ -81,6 +111,30 @@ export default {
         }
     },
     methods: {
+        refresh: function() {
+            this.getImagery();
+        },
+        getImagery: async function() {
+            this.loading.imagery = true;
+
+            try {
+                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/imagery`, {
+                    method: 'GET'
+                });
+
+                const body = await res.json();
+
+                if (!res.ok) throw new Error(body.message);
+                this.imagery = body;
+
+                this.loading.imagery = false;
+                if (this.imagery.length === 1) {
+                    this.params.image = this.imagery[0];
+                }
+            } catch (err) {
+                this.$emit('err', err);
+            }
+        },
         postPrediction: async function() {
             if (!/^\d+\.\d+\.\d+$/.test(this.prediction.version)) {
                 return this.$emit('err', new Error('Version must be valid semver'));

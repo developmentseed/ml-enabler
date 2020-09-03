@@ -368,27 +368,6 @@ export default {
                 this.$emit('err', err);
             }
         },
-        getImagery: async function() {
-            this.loading.imagery = true;
-
-            try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/imagery`, {
-                    method: 'GET'
-                });
-
-                const body = await res.json();
-
-                if (!res.ok) throw new Error(body.message);
-                this.imagery = body;
-
-                this.loading.imagery = false;
-                if (this.imagery.length === 1) {
-                    this.params.image = this.imagery[0];
-                }
-            } catch (err) {
-                this.$emit('err', err);
-            }
-        },
         emitmode: function(mode) {
             this.$emit('mode', mode);
         },
