@@ -637,9 +637,7 @@ class PredictionTfrecords(Resource):
             return err(501, "Not Configured"), 501
 
         payload = request.get_json()
-
-        if payload.get("imagery") is None:
-            return err(400, "imagery key required in body"), 400
+        pred = PredictionService.get_prediction_by_id(prediction_id)
 
         try:
             batch = boto3.client(
@@ -657,7 +655,7 @@ class PredictionTfrecords(Resource):
                     'environment': [
                         { 'name': 'MODEL_ID', 'value': str(model_id) },
                         { 'name': 'PREDICTION_ID', 'value': str(prediction_id) },
-                        { 'name': 'TILE_ENDPOINT', 'value': payload.get("imagery") },
+                        { 'name': 'TILE_ENDPOINT', 'value': str(pred.imagery_id) },
                     ]
                 }
             )
@@ -690,8 +688,7 @@ class PredictionRetrain(Resource):
 
         payload = request.get_json()
 
-        if payload.get("imagery") is None:
-            return err(400, "imagery key required in body"), 400
+        pred = PredictionService.get_prediction_by_id(prediction_id)
 
         try:
             batch = boto3.client(
@@ -709,7 +706,7 @@ class PredictionRetrain(Resource):
                     'environment': [
                         { 'name': 'MODEL_ID', 'value': str(model_id) },
                         { 'name': 'PREDICTION_ID', 'value': str(prediction_id) },
-                        { 'name': 'TILE_ENDPOINT', 'value': payload.get("imagery") },
+                        { 'name': 'TILE_ENDPOINT', 'value': str(pred.imagery_id) },
                     ]
                 }
             )
@@ -822,9 +819,6 @@ class PredictionStackAPI(Resource):
 
         payload = request.get_json()
 
-        if payload.get("imagery") is None:
-            return err(400, "imagery key required in body"), 400
-
         pred = PredictionService.get_prediction_by_id(prediction_id)
         image = "models-{model}-prediction-{prediction}".format(
             model=model_id,
@@ -868,7 +862,7 @@ class PredictionStackAPI(Resource):
                     'ParameterValue': str(prediction_id)
                 },{
                     'ParameterKey': 'ImageryId',
-                    'ParameterValue': str(payload["imagery"]),
+                    'ParameterValue': str(pred.imagery_id),
                 },{
                     'ParameterKey': 'MaxSize',
                     'ParameterValue': payload.get("maxSize", "1"),

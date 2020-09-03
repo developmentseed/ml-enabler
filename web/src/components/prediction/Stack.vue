@@ -25,7 +25,7 @@
                 <h1 class='flex-child txt-h4 cursor-default align-center'>Stacks can only be created when MLEnabler is running in an "aws" environment</h1>
             </div>
         </template>
-        <template v-else-if='!prediction || loading.stack || loading.imagery'>
+        <template v-else-if='!prediction || loading.stack'>
             <div class='flex-parent flex-parent--center-main w-full py24'>
                 <div class='flex-child loading py24'></div>
             </div>
@@ -41,28 +41,10 @@
                 </div>
             </div>
         </template>
-        <template v-else-if='!imagery || !imagery.length'>
-            <div class='flex-parent flex-parent--center-main py12'>
-                No imagery sources found to create a stack with
-            </div>
-        </template>
         <template v-else-if='stack.status === "None"'>
             <h2 class='w-full align-center txt-h4 py12'>Stack Creation</h2>
 
             <div class='col col--12 grid grid--gut12'>
-                <div class='col col--12'>
-                    <label>Imagery Source:</label>
-                    <div class='border border--gray-light round my12'>
-                        <div @click='params.image = img' :key='img.id' v-for='img in imagery' class='col col--12 cursor-pointer bg-darken10-on-hover'>
-                            <div class='w-full py6 px6' :class='{
-                                "bg-gray-light": params.image.id === img.id
-                            }'>
-                                <span class='txt-h4 round' v-text='img.name'/>
-                                <div v-text='img.fmt' class='fr mx3 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue px6 py3 round txt-xs txt-bold'></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <template v-if='!advanced'>
                     <div class='col col--12'>
                         <button @click='advanced = !advanced' class='btn btn--white color-gray px0'><svg class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg><span class='fl pl6'>Advanced Options</span></button>
@@ -203,8 +185,7 @@ export default {
             ],
             loading: {
                 stack: true,
-                queue: true,
-                imagery: true
+                queue: true
             },
             queue: {
                 queued: 0,
@@ -212,7 +193,6 @@ export default {
                 dead: 0
             },
             looping: false,
-            imagery: [],
             params: {
                 image: false,
                 maxSize: '1',
@@ -390,7 +370,6 @@ export default {
                                 Value: tag.Value
                             };
                         }),
-                        imagery: this.params.image.id,
                         maxSize: this.params.maxSize,
                         maxConcurrency: this.params.maxConcurrency
                     })
