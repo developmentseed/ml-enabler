@@ -8,6 +8,7 @@
                 v-bind:allow-multiple='false'
                 v-on:processfile='uploaded'
                 :accepted-file-types='filetype'
+                :fileValidateTypeDetectType='detect'
                 allowRevert='false'
                 :server='server'
                 v-bind:files='files'
@@ -58,6 +59,11 @@ export default {
         }
     },
     methods: {
+        detect: async function(file) {
+            if (['geojson', 'geojsonld', 'ldgeojson', 'json'].includes(file.name.split('.')[1])) {
+                return 'application/geo+json';
+            }
+        },
         error: function(res) {
             this.$emit('err', new Error(JSON.parse(res).message));
         },
