@@ -152,6 +152,7 @@ export default {
                     },
                     body: JSON.stringify({
                         modelId: this.$route.params.modelid,
+                        imagery_id: this.prediction.imagery_id,
                         hint: this.type.toLowerCase(),
                         version: this.prediction.version,
                         tileZoom: this.prediction.tileZoom,

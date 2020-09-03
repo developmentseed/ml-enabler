@@ -34,6 +34,7 @@ class PredictionService():
         prediction_dto.inf_type = payload['infType']
         prediction_dto.inf_binary = payload['infBinary']
         prediction_dto.inf_supertile = payload['infSupertile']
+        prediction_dto.imagery_id = payload['imagery_id']
         prediction_dto.validate()
 
         new_prediction = Prediction()
