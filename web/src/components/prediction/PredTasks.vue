@@ -83,15 +83,6 @@
                 v-on:close='$emit("refresh")'
             />
         </template>
-        <template v-else-if='!imagery || !imagery.length'>
-            <button @click='create = false' class='btn fr round btn--stroke color-gray color-black-on-hover'>
-                <svg class='icon'><use href='#icon-close'/></svg>
-            </button>
-
-            <div class='flex-parent flex-parent--center-main py12'>
-                No imagery sources found to create a stack with
-            </div>
-        </template>
         <template v-else-if='create === "retrain"'>
             <div class='col col--12'>
                 <h2 class='w-full align-center txt-h4 py12'>New Model Retraining</h2>
@@ -99,13 +90,6 @@
                     <svg class='icon'><use href='#icon-close'/></svg>
                 </button>
 
-                <label>Imagery Source:</label>
-                <div class='border border--gray-light round my12'>
-                    <div @click='retrainparams.image = img' :key='img.id' v-for='img in imagery' class='col col--12 cursor-pointer bg-darken10-on-hover'>
-                        <h3 v-if='retrainparams.image.id === img.id' class='px12 py6 txt-h4 w-full bg-gray color-white round' v-text='img.name'></h3>
-                        <h3 v-else class='txt-h4 round px12 py6' v-text='img.name'></h3>
-                    </div>
-                </div>
                 <template v-if='!advanced'>
                     <div class='col col--12'>
                         <button @click='advanced = !advanced' class='btn btn--white color-gray px0'><svg class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg><span class='fl pl6'>Advanced Options</span></button>
@@ -132,13 +116,6 @@
                     <svg class='icon'><use href='#icon-close'/></svg>
                 </button>
 
-                <label>Imagery Source:</label>
-                <div class='border border--gray-light round my12'>
-                    <div @click='tfrecordsparams.image = img' :key='img.id' v-for='img in imagery' class='col col--12 cursor-pointer bg-darken10-on-hover'>
-                        <h3 v-if='tfrecordsparams.image.id === img.id' class='px12 py6 txt-h4 w-full bg-gray color-white round' v-text='img.name'></h3>
-                        <h3 v-else class='txt-h4 round px12 py6' v-text='img.name'></h3>
-                    </div>
-                </div>
                 <template v-if='!advanced'>
                     <div class='col col--12'>
                         <button @click='advanced = !advanced' class='btn btn--white color-gray px0'><svg class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg><span class='fl pl6'>Advanced Options</span></button>
@@ -172,7 +149,6 @@ export default {
         return {
             advanced: false,
             create: false,
-            imagery: [],
             looping: false,
             retrainparams: {
                 image: false,
@@ -181,8 +157,7 @@ export default {
                 image: false,
             },
             loading: {
-                retrain: true,
-                imagery: true
+                retrain: true
             }
         }
     },
@@ -212,9 +187,7 @@ export default {
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        imagery: this.retrainparams.image.url
-                    })
+                    body: JSON.stringify({})
                 });
 
                 const body = await res.json();
@@ -233,36 +206,12 @@ export default {
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        imagery: this.tfrecordsparams.image.url
-                    })
+                    body: JSON.stringify({})
                 });
 
                 const body = await res.json();
                 if (!res.ok) throw new Error(body.message)
                 this.create = false;
-            } catch (err) {
-                this.$emit('err', err);
-            }
-        },
-        getImagery: async function() {
-            this.loading.imagery = true;
-
-            try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/imagery`, {
-                    method: 'GET'
-                });
-
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
-
-                this.imagery = body;
-
-                this.loading.imagery = false;
-
-                if (this.imagery.length === 1) {
-                    this.params.image = this.imagery[0];
-                }
             } catch (err) {
                 this.$emit('err', err);
             }
