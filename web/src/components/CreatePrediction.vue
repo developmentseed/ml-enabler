@@ -129,7 +129,7 @@ export default {
 
                 this.loading.imagery = false;
                 if (this.imagery.length === 1) {
-                    this.params.image = this.imagery[0];
+                    this.prediction.imagery_id = this.imagery[0].id;
                 }
             } catch (err) {
                 this.$emit('err', err);
