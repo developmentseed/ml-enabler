@@ -171,7 +171,6 @@ export default {
     },
     methods: {
         refresh: function() {
-            this.getImagery();
         },
         external: function(url) {
             if (!url) return;
