@@ -62,6 +62,8 @@ export default {
         detect: async function(file) {
             if (['geojson', 'geojsonld', 'ldgeojson', 'json'].includes(file.name.split('.')[1])) {
                 return 'application/geo+json';
+            } else if (['zip'].includes(file.name.split('.')[1])) {
+                return 'application/zip';
             }
         },
         error: function(res) {
