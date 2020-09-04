@@ -329,6 +329,10 @@ class PredictionExport(Resource):
         stream = PredictionService.export(prediction_id)
         inferences = PredictionService.inferences(prediction_id)
         pred = PredictionService.get_prediction_by_id(prediction_id)
+        hint = pred.hint
+        z = pred.tile_zoom
+        print(z)
+        print(hint)
 
         first = False
 
@@ -337,27 +341,48 @@ class PredictionExport(Resource):
 
         def generate_npz():
             nonlocal req_threshold
+            nonlocal hint
+            nonlocal z
             labels_dict ={}
+            print(stream)
             for row in stream:
+                print('row')
+                print(row)
                 if req_inferences != 'all' and row[3].get(req_inferences) is None:
                     continue
 
                 if req_inferences != 'all' and row[3].get(req_inferences) <= req_threshold:
                     continue
-                if row[4]:
-                    i_lst = pred.inf_list.split(",")
 
-                    #convert raw predictions into 0 or 1 based on threshold
-                    raw_pred = []
-                    for num, inference in enumerate(i_lst):
-                        raw_pred.append(row[3][inference])
-                    if  req_inferences == 'all':
-                        req_threshold = request.args.get('threshold', '0.5')
-                        req_threshold = float(req_threshold)
-                    l = [1 if score >= req_threshold else 0 for score in raw_pred]
-
-                    #convert quadkey to x-y-z
+                # set labels.npz key to be x-y-z tile either from quadkey or wkt geometry
+                # TO-DO address the non-WMS case where labels.npz key should match image-chip to line up with tile on S3
+                #convert quadkey to x-y-z
+                if row[1]:
                     t = '-'.join([str(i) for i in mercantile.quadkey_to_tile(row[1])])
+                else:
+                    s = shape(json.loads(row[2])).centroid
+                    t = '-'.join([str(i) for i in mercantile.tile(s.x, s.y, z)])
+
+                #convert raw predictions into 0 or 1 based on threshold
+                raw_pred = []
+                i_lst = pred.inf_list.split(",")
+                print(i_lst)
+                for num, inference in enumerate(i_lst):
+                    raw_pred.append(row[3][inference])
+                if  req_inferences == 'all':
+                    req_threshold = request.args.get('threshold', '0.5')
+                    req_threshold = float(req_threshold)
+                l = [1 if score >= req_threshold else 0 for score in raw_pred]
+
+                # special case for training and not predictions
+                if hint == 'training':
+                    t = 'x-y-z'
+                    print(t)
+                    labels_dict.update({t:l})
+                elif row[4]:
+                    t = '-'.join([str(i) for i in mercantile.quadkey_to_tile(row[1])])
+
+                    print(row[1])
 
                     # special case for binary
                     if (pred.inf_binary) and (len(i_lst) != 2):
@@ -398,7 +423,6 @@ class PredictionExport(Resource):
                 rowdata.extend(inferences)
                 csv.writer(output, quoting=csv.QUOTE_NONNUMERIC).writerow(rowdata)
                 yield output.getvalue()
-
             for row in stream:
                 if req_inferences != 'all' and row[3].get(req_inferences) is None:
                     continue
