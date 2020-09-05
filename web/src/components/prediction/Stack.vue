@@ -231,7 +231,6 @@ export default {
                 this.getStatus();
                 this.getQueue();
             }
-            this.getImagery();
         },
         purgeQueue: async function() {
             this.loading.queue = true;
