@@ -351,7 +351,6 @@ export default {
             this.$emit('mode', mode);
         },
         createStack: async function() {
-            if (!this.params.image) return;
             if (this.params.type === 'classification' && !this.params.inferences) return;
 
             this.loading.stack = true;
