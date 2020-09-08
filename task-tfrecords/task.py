@@ -10,9 +10,9 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 from requests_toolbelt.utils import dump
 from zipfile import ZipFile
 
-from model import train
 from generate_datanpz import download_img_match_labels, make_datanpz
 from generate_tfrecords import create_tfr
+from imagery import chiplist
 
 s3 = boto3.client('s3')
 
@@ -28,21 +28,18 @@ assert(auth)
 assert(model_id)
 assert(prediction_id)
 assert(api)
-assert(imagery)
 
 def get_pred(model_id, prediction_id):
     r = requests.get(api + '/v1/model/' + str(model_id) + '/prediction/' + str(prediction_id), auth=HTTPBasicAuth('machine', auth))
     r.raise_for_status()
 
-    pred = r.json()
-    return pred
+    return r.json()
 
 def get_imagery(model_id, imagery_id):
     r = requests.get(api + '/v1/model/' + str(model_id) + '/imagery/' + str(imagery_id), auth=HTTPBasicAuth('machine', auth))
     r.raise_for_status()
 
-    pred = r.json()
-    return imagery
+    return r.json()
 
 def get_asset(bucket, key):
     print('ok - downloading: ' + bucket + '/' + key)
@@ -118,14 +115,12 @@ def post_pred(pred, version):
 
 pred = get_pred(model_id, prediction_id)
 
-if pred['modelLink'] is None:
-    raise Exception("Cannot retrain without modelLink")
 if pred['imagery_id'] is None:
     raise Exception("Cannot retrain without imagery_id")
-if pred['checkpointLink'] is None:
-    raise Exception("Cannot retrain without checkpointLink")
 
-imagery = get_imagery(model_id, pred.imagery_id)
+imagery = get_imagery(model_id, pred['imagery_id'])
+
+imglist = chiplist(api, auth, imagery, pred)
 
 zoom = pred['tileZoom']
 supertile = pred['infSupertile']
