@@ -80,7 +80,7 @@
                         <div class='col col--6 px6' v-text='task.statusReason'></div>
                     </template>
                     <div class='col col--2 px6 clearfix'>
-                        <button @click='deleteTask(task.id)' class='btn fr round btn--stroke btn--s btn--gray color-red-on-hover'>
+                        <button @click.prevent.stop='deleteTask(task.id)' class='btn fr round btn--stroke btn--s btn--gray color-red-on-hover'>
                             <svg class='icon'><use href='#icon-trash'/></svg>
                         </button>
                         <div v-if='task.logs' class='fr bg-gray-faint color-gray inline-block px6 py3 round txt-xs txt-bold mr6'>
