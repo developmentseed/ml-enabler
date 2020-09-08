@@ -229,7 +229,7 @@ const stack = {
                 },
                 Parameters: { },
                 ContainerProperties: {
-                    Command: ['./task.py'],
+                    Command: ['python', './task.py'],
                     Environment: [
                         { Name: 'StackName' , Value: cf.stackName },
                         { Name: 'BATCH_ECR' , Value: cf.ref('BatchECR') },
