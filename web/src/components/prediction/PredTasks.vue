@@ -178,8 +178,6 @@ export default {
             window.open(url, "_blank")
         },
         createRetrain: async function() {
-            if (!this.retrainparams.image) return;
-
             try {
                 const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/retrain`, {
                     method: 'POST',
@@ -197,8 +195,6 @@ export default {
             }
         },
         createTfrecords: async function() {
-            if (!this.tfrecordsparams.image) return;
-
             try {
                 const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/tfrecords`, {
                     method: 'POST',
