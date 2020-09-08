@@ -9,7 +9,6 @@ WORKDIR $HOME/retrain
 
 RUN mkdir /tmp/tfrecords
 
-
 RUN apt-get update \
     && apt-get install -y git curl
 

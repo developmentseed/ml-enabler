@@ -1163,7 +1163,8 @@ class PredictionSingleAPI(Resource):
                 "checkpointLink": prediction.checkpoint_link,
                 "infList": prediction.inf_list,
                 "infBinary": prediction.inf_binary,
-                "infType": prediction.inf_type
+                "infType": prediction.inf_type,
+                "imagery_id": prediction.imagery_id
             }
 
             return pred, 200

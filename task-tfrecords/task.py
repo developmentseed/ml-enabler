@@ -22,7 +22,6 @@ model_id = os.getenv('MODEL_ID')
 prediction_id = os.getenv('PREDICTION_ID')
 bucket = os.getenv('ASSET_BUCKET')
 api = os.getenv('API_URL')
-imagery = os.getenv('TILE_ENDPOINT')
 
 assert(stack)
 assert(auth)
@@ -37,6 +36,13 @@ def get_pred(model_id, prediction_id):
 
     pred = r.json()
     return pred
+
+def get_imagery(model_id, imagery_id):
+    r = requests.get(api + '/v1/model/' + str(model_id) + '/imagery/' + str(imagery_id), auth=HTTPBasicAuth('machine', auth))
+    r.raise_for_status()
+
+    pred = r.json()
+    return imagery
 
 def get_asset(bucket, key):
     print('ok - downloading: ' + bucket + '/' + key)
@@ -111,10 +117,15 @@ def post_pred(pred, version):
     return pred['prediction_id']
 
 pred = get_pred(model_id, prediction_id)
+
 if pred['modelLink'] is None:
     raise Exception("Cannot retrain without modelLink")
+if pred['imagery_id'] is None:
+    raise Exception("Cannot retrain without imagery_id")
 if pred['checkpointLink'] is None:
     raise Exception("Cannot retrain without checkpointLink")
+
+imagery = get_imagery(model_id, pred.imagery_id)
 
 zoom = pred['tileZoom']
 supertile = pred['infSupertile']
