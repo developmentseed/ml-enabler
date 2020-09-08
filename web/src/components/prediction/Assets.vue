@@ -42,6 +42,17 @@
                 <h1 class='flex-child txt-h4 cursor-default align-center'>Assets can only be created when MLEnabler is running in an "aws" environment</h1>
             </div>
         </template>
+        <template v-else-if='
+            !prediction.modelLink
+            && !prediction.tfrecordLink
+            && !prediction.checkpointLink
+            && !prediction.saveLink
+            && !prediction.dockerLink
+        '>
+            <div class='col col--12 py3'>
+                <div class='align-center'>No Downloadable Assets</div>
+            </div>
+        </template>
         <template v-else>
             <div v-if='prediction.modelLink' class='col col--12 py3'>
                 <div class='align-center'>TF Model</div>
