@@ -117,8 +117,7 @@ if pred['imagery_id'] is None:
     raise Exception("Cannot retrain without imagery_id")
 
 imagery = get_imagery(model_id, pred['imagery_id'])
-
-imglist = chiplist(api, auth, imagery, pred)
+chiplist(api, auth, imagery, pred)
 
 zoom = pred['tileZoom']
 supertile = pred['infSupertile']
@@ -130,7 +129,13 @@ v = get_versions(model_id)
 get_label_npz(model_id, prediction_id)
 
 # download image tiles that match validated labels.npz file
-download_img_match_labels(labels_folder='/tmp', imagery=imagery, folder='/tmp/tiles', zoom=zoom, supertile=supertile)
+download_img_match_labels(
+    labels_folder='/tmp',
+    imagery=imagery,
+    folder='/tmp/tiles',
+    zoom=zoom,
+    supertile=supertile
+)
 
 # create data.npz file that matchs up images and labels
 make_datanpz(dest_folder='/tmp', imagery=imagery)

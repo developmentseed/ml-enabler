@@ -1,42 +1,21 @@
-import requests, shapely, mercantile, pyproj
+import requests, shapely, mercantile, pyproj, csv
 from requests.auth import HTTPBasicAuth
 from tiletanic import tilecover, tileschemes
 from functools import partial
 from shapely.ops import transform
+from io import StringIO
 
 def chiplist(api, auth, imagery, pred):
 
-    if imagery['fmt'] == 'wms':
-        tilejson = get_pred_tilejson(api, auth, pred['modelId'], pred['predictionsId'])
+    if imagery['fmt'] != 'wms':
+        imagery['imglist'] = {}
 
-        poly = shapely.geometry.box(tilejson['bounds'][0], tilejson['bounds'][1], tilejson['bounds'][2], tilejson['bounds'][3])
-
-        project = partial(
-            pyproj.transform,
-            pyproj.Proj('epsg:4326'),
-            pyproj.Proj('epsg:3857')
-        )
-
-        poly = transform(project, poly)
-        tiles = tilecover.cover_geometry(tileschemes.WebMercator(), poly, pred['tileZoom'])
-
-        imglist = []
-
-        for tile in tiles:
-            bounds = mercantile.bounds(tile)
-
-            imglist.append({
-                'name': '{}-{}-{}'.format(str(tile.x), str(tile.y), str(tile.z)),
-                'url': imagery['url']
-                    .replace('{x}', str(tile.x))
-                    .replace('{y}', str(tile.y))
-                    .replace('{z}', str(tile.z)),
-                'bounds': [ bounds[0], bounds[1], bounds[2], bounds[3] ]
-            })
-
-        return imglist
-    else:
-        return get_list(imagery['url'])
+        f = StringIO(get_list(imagery['url']))
+        for row in csv.reader(f, delimiter=','):
+            imagery['imglist']['test'] = {
+                'url': row[0],
+                'bounds': row[1]
+            }
 
 def get_pred_tilejson(api, auth, model_id, prediction_id):
     r = requests.get(api + '/v1/model/' + str(model_id) + '/prediction/' + str(prediction_id) + '/tiles', auth=HTTPBasicAuth('machine', auth))
@@ -48,5 +27,5 @@ def get_list(imagery_url):
     r = requests.get(imagery_url)
     r.raise_for_status()
 
-    print(r)
+    return r.text
 

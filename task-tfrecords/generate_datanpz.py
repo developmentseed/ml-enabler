@@ -30,12 +30,14 @@ def url(tile, imagery):
     """Return a tile url provided an imagery template and a tile"""
     return imagery.replace('{x}', tile[0]).replace('{y}', tile[1]).replace('{z}', tile[2])
 
+def download_tilelist(chip, imagery, folder):
+    print("TILELIST")
 
 def download_tile_tms(tile, imagery, folder, zoom, supertile=False):
     """Download a satellite image tile from a tms endpoint"""
 
-    image_format = get_image_format(imagery)
-    r = requests.get(url(tile.split('-'), imagery))
+    image_format = get_image_format(imagery['url'])
+    r = requests.get(url(tile.split('-'), imagery['url']))
     tile_img = op.join(folder, '{}{}'.format(tile, image_format))
     tile = tile.split('-')
 
@@ -59,7 +61,7 @@ def download_tile_tms(tile, imagery, folder, zoom, supertile=False):
                         width=new_dim, count=3, dtype=rasterio.uint8) as w:
                 for num, t in enumerate(child_tiles):
                     t = [str(t[0]), str(t[1]), str(t[2])]
-                    r = requests.get(url(t, imagery))
+                    r = requests.get(url(t, imagery['url']))
                     img = np.array(Image.open(io.BytesIO(r.content)), dtype=np.uint8)
                     try:
                         img = img.reshape((256, 256, 3)) # 4 channels returned from some endpoints, but not all
@@ -69,7 +71,7 @@ def download_tile_tms(tile, imagery, folder, zoom, supertile=False):
                     img = np.rollaxis(img, 2, 0)
                     w.write(img, window=w_lst[num])
     else:
-        r = requests.get(url(tile, imagery))
+        r = requests.get(url(tile, imagery['url']))
         with open(tile_img, 'wb')as w:
             w.write(r.content)
     return tile_img
@@ -77,15 +79,19 @@ def download_tile_tms(tile, imagery, folder, zoom, supertile=False):
 def download_img_match_labels(labels_folder, imagery, folder, zoom, supertile=False):
     #open the labels file and read the key (so we only download the images we have labels for)
     labels_file = op.join(labels_folder, 'labels.npz')
-    tiles = np.load(labels_file)
-    # create tiles directory
-    tiles_dir = op.join(folder, 'tiles')
-    if not op.isdir(tiles_dir):
-        os.makedirs(tiles_dir)
-    class_tiles = [tile for tile in tiles.files]
+    nplabels = np.load(labels_file)
+
+    chips_dir = op.join(folder, 'chips')
+    if not op.isdir(chips_dir):
+        os.makedirs(chips_dir)
+    class_chips = [tile for tile in nplabels.files]
+
     #download images
-    for tile in class_tiles:
-        download_tile_tms(tile, imagery, folder, zoom, supertile=False)
+    for chip in class_chips:
+        if imagery['fmt'] == 'wms':
+            download_tile_tms(chip, imagery, folder, zoom, supertile=False)
+        else:
+            download_tilelist(chip, imagery, folder)
 
 # package up the images + labels into one data.npz file
 def make_datanpz(dest_folder, imagery,
@@ -127,9 +133,8 @@ def make_datanpz(dest_folder, imagery,
     tiles = np.array(tile_names)
     np.random.shuffle(tiles)
 
-
     # open the images and load those plus the labels into the final arrays
-    image_format = get_image_format(imagery)
+    image_format = get_image_format(imagery['url'])
     print(image_format)
 
     x_vals = []
