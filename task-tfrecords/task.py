@@ -9,10 +9,10 @@ from requests.auth import HTTPBasicAuth
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 from requests_toolbelt.utils import dump
 from zipfile import ZipFile
+from imagery import chiplist
 
 from generate_datanpz import download_img_match_labels, make_datanpz
 from generate_tfrecords import create_tfr
-from imagery import chiplist
 
 s3 = boto3.client('s3')
 
@@ -57,8 +57,6 @@ def get_asset(bucket, key):
 
     return '/tmp/' + dirr
 
-
-#TO-DO allow users to upload vector file, or the ability to get vector file from S3 via http
 def get_label_npz(model_id, prediction_id):
     payload = {'format':'npz', 'inferences':'all', 'threshold': 0}
     r = requests.get(api + '/v1/model/' + model_id + '/prediction/' + prediction_id + '/export', params=payload,

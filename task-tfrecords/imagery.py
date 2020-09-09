@@ -1,20 +1,40 @@
-import requests, shapely, mercantile
+import requests, shapely, mercantile, pyproj
 from requests.auth import HTTPBasicAuth
 from tiletanic import tilecover, tileschemes
+from functools import partial
+from shapely.ops import transform
 
 def chiplist(api, auth, imagery, pred):
 
     if imagery['fmt'] == 'wms':
         tilejson = get_pred_tilejson(api, auth, pred['modelId'], pred['predictionsId'])
 
-        tiler = tileschemes.WebMercator()
-
         poly = shapely.geometry.box(tilejson['bounds'][0], tilejson['bounds'][1], tilejson['bounds'][2], tilejson['bounds'][3])
-        tiles = tilecover.cover_geometry(tiler, poly, pred['tileZoom'])
+
+        project = partial(
+            pyproj.transform,
+            pyproj.Proj('epsg:4326'),
+            pyproj.Proj('epsg:3857')
+        )
+
+        poly = transform(project, poly)
+        tiles = tilecover.cover_geometry(tileschemes.WebMercator(), poly, pred['tileZoom'])
+
+        imglist = []
 
         for tile in tiles:
             bounds = mercantile.bounds(tile)
-            print(bounds, tile)
+
+            imglist.append({
+                'name': '{}-{}-{}'.format(str(tile.x), str(tile.y), str(tile.z)),
+                'url': imagery['url']
+                    .replace('{x}', str(tile.x))
+                    .replace('{y}', str(tile.y))
+                    .replace('{z}', str(tile.z)),
+                'bounds': [ bounds[0], bounds[1], bounds[2], bounds[3] ]
+            })
+
+        return imglist
     else:
         return get_list(imagery['url'])
 
