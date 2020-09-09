@@ -34,7 +34,8 @@ def create_tfr(npz_path, dest_folder='/tmp/tfrecords/', n_imgs_shard=800):
     """
     Converts a data.npz file with keys train, test, and val into a 3 tf records files (train, test, and val).
     """
-    os.mkdir(dest_folder)
+    if not os.path.isdir(dest_folder):
+        os.mkdir(dest_folder)
 
     npz = np.load(npz_path)
     train_shp = npz['y_train'].shape[0]
