@@ -12,6 +12,7 @@ from schematics.exceptions import DataError
 from ml_enabler.services.ml_model_service import MLModelService
 from ml_enabler.services.prediction_service import PredictionService, PredictionTileService
 from ml_enabler.services.task_service import TaskService
+from ml_enabler.services.imagery_service import ImageryService
 from ml_enabler.utils import err
 from ml_enabler.models.utils import NotFound, VersionNotFound, VersionExists, \
     PredictionsNotFound, ImageryNotFound
@@ -331,8 +332,7 @@ class PredictionExport(Resource):
         pred = PredictionService.get_prediction_by_id(prediction_id)
         hint = pred.hint
         z = pred.tile_zoom
-        print(z)
-        print(hint)
+        i_info = ImageryService.get(pred.imagery_id)
 
         first = False
 
@@ -343,6 +343,7 @@ class PredictionExport(Resource):
             nonlocal req_threshold
             nonlocal hint
             nonlocal z
+            nonlocal i_info
             labels_dict ={}
             print(stream)
             for row in stream:
@@ -357,11 +358,17 @@ class PredictionExport(Resource):
                 # set labels.npz key to be x-y-z tile either from quadkey or wkt geometry
                 # TO-DO address the non-WMS case where labels.npz key should match image-chip to line up with tile on S3
                 #convert quadkey to x-y-z
-                if row[1]:
-                    t = '-'.join([str(i) for i in mercantile.quadkey_to_tile(row[1])])
-                else:
-                    s = shape(json.loads(row[2])).centroid
-                    t = '-'.join([str(i) for i in mercantile.tile(s.x, s.y, z)])
+                if i_info['fmt'] == "wms":
+                    print('wms')
+                    if row[1]:
+                        t = '-'.join([str(i) for i in mercantile.quadkey_to_tile(row[1])])
+                    else:
+                        s = shape(json.loads(row[2])).centroid
+                        t = '-'.join([str(i) for i in mercantile.tile(s.x, s.y, z)])
+                if i_info['fmt'] == "list":
+                    print('tile list')
+                    #TO-DO fix
+                    t = 'x-y-z'
 
                 #convert raw predictions into 0 or 1 based on threshold
                 raw_pred = []
@@ -376,13 +383,9 @@ class PredictionExport(Resource):
 
                 # special case for training and not predictions
                 if hint == 'training':
-                    t = 'x-y-z'
-                    print(t)
                     labels_dict.update({t:l})
                 elif row[4]:
                     t = '-'.join([str(i) for i in mercantile.quadkey_to_tile(row[1])])
-
-                    print(row[1])
 
                     # special case for binary
                     if (pred.inf_binary) and (len(i_lst) != 2):
