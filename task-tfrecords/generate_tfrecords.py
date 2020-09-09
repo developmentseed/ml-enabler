@@ -1,5 +1,6 @@
 import tensorflow as tf
 import shutil
+import os
 import numpy as np
 
 def _bytes_feature(value):
@@ -32,7 +33,9 @@ def gen_tf_image_example(img, label):
 def create_tfr(npz_path, dest_folder='/tmp/tfrecords/', n_imgs_shard=800):
     """
     Converts a data.npz file with keys train, test, and val into a 3 tf records files (train, test, and val).
-   """
+    """
+    os.mkdir(dest_folder)
+
     npz = np.load(npz_path)
     train_shp = npz['y_train'].shape[0]
 
@@ -48,17 +51,15 @@ def create_tfr(npz_path, dest_folder='/tmp/tfrecords/', n_imgs_shard=800):
                 for img, label in z:
                     tf_example = gen_tf_image_example(img, label)
                     writer.write(tf_example.SerializeToString())
-        print('TFrecords created for train.')
+        print('ok - tfrecords created for train.')
     else:
-        print(dest_folder)
         path = dest_folder + 'train.tfrecords'
-        print(path)
         with tf.io.TFRecordWriter(path) as writer:
             z = zip(npz['x_train'], npz['y_train'])
             for img, label in z:
                 tf_example = gen_tf_image_example(img, label)
                 writer.write(tf_example.SerializeToString())
-            print('TFrecords created for train.')
+            print('ok - tfrecords created for train.')
 
     test_shp = npz['y_test'].shape[0]
     if test_shp > n_imgs_shard:
@@ -68,13 +69,12 @@ def create_tfr(npz_path, dest_folder='/tmp/tfrecords/', n_imgs_shard=800):
 
         for i in np.arange(0, test_shards_num):
             path = dest_folder + 'test_{}.tfrecords'.format(i)
-            print(path)
             with tf.io.TFRecordWriter(path) as writer:
                 z = zip(test_split_x[i], test_split_y[i])
                 for img, label in z:
                     tf_example = gen_tf_image_example(img, label)
                     writer.write(tf_example.SerializeToString())
-        print('TFrecords created for test.')
+        print('ok - tfrecords created for test.')
 
     else:
         path = dest_folder + 'test.tfrecords'
@@ -83,7 +83,7 @@ def create_tfr(npz_path, dest_folder='/tmp/tfrecords/', n_imgs_shard=800):
             for img, label in z:
                 tf_example = gen_tf_image_example(img, label)
                 writer.write(tf_example.SerializeToString())
-            print('TFrecords created for test.')
+            print('ok - tfrecords created for test.')
 
     val_shp = npz['y_val'].shape[0]
     if val_shp > n_imgs_shard:
@@ -98,7 +98,7 @@ def create_tfr(npz_path, dest_folder='/tmp/tfrecords/', n_imgs_shard=800):
                 for img, label in z:
                     tf_example = gen_tf_image_example(img, label)
                     writer.write(tf_example.SerializeToString())
-        print('TFrecords created for val.')
+        print('ok - tfrecords created for val.')
     else:
         path = dest_folder + 'val.tfrecords'
         with tf.io.TFRecordWriter(path) as writer:
@@ -106,7 +106,7 @@ def create_tfr(npz_path, dest_folder='/tmp/tfrecords/', n_imgs_shard=800):
             for img, label in z:
                 tf_example = gen_tf_image_example(img, label)
                 writer.write(tf_example.SerializeToString())
-        print('TFrecords created for val.')
+        print('ok - tfrecords created for val.')
 
     #zip up tf-records
     shutil.make_archive(dest_folder, 'zip', dest_folder)
