@@ -141,7 +141,7 @@ download_img_match_labels(
 make_datanpz(dest_folder='/tmp', imagery=imagery)
 
 #convert data.npz into tf-records
-create_tfr(npz_path='/tmp/data.npz', city='city')
+create_tfr(npz_path='/tmp/data.npz')
 
 updated_version = str(increment_versions(version=v))
 print(updated_version)
