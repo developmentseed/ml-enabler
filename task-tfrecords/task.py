@@ -66,22 +66,20 @@ def get_label_npz(model_id, prediction_id):
         f.write(r.content)
     return f
 
-def increment_versions(version):
-    v = semver.VersionInfo.parse(version)
-    return v.bump_minor()
-
 def update_link(pred, link_type, zip_path):
     payload = {'type': link_type}
-    print(payload)
     model_id = pred['modelId']
-    print(model_id)
     prediction_id = pred['predictionsId']
-    print(prediction_id)
     encoder = MultipartEncoder(fields={'file': ('filename', open(zip_path, 'rb'), 'application/zip')})
-    print('/v1/model/' + str(model_id) + '/prediction/' + str(prediction_id) + '/upload')
+    print('ok - /v1/model/' + str(model_id) + '/prediction/' + str(prediction_id) + '/upload')
 
-    r = requests.post(api + '/v1/model/' + str(model_id) + '/prediction/' + str(prediction_id) + '/upload', params=payload,
-                        data = encoder, headers= {'Content-Type': encoder.content_type}, auth=HTTPBasicAuth('machine', auth))
+    r = requests.post(
+        api + '/v1/model/' + str(model_id) + '/prediction/' + str(prediction_id) + '/upload',
+        params = payload,
+        data = encoder,
+        headers = {'Content-Type': encoder.content_type},
+        auth=HTTPBasicAuth('machine', auth)
+    )
     r.raise_for_status()
 
 def get_versions(model_id):
@@ -93,23 +91,6 @@ def get_versions(model_id):
         version_lst.append(pred_dict['version'])
     version_highest = str(max(map(semver.VersionInfo.parse, version_lst)))
     return version_highest
-
-def post_pred(pred, version):
-    data_pred = {
-        'modelId': pred['modelId'],
-        'version': version,
-        'tileZoom': pred['tileZoom'],
-        'infList': pred['infList'],
-        'infType':  pred['infType'],
-        'infBinary':  pred['infBinary'],
-        'infSupertile': pred['infSupertile']
-    }
-
-    r = requests.post(api + '/v1/model/' + model_id + '/prediction',  json=data_pred, auth=HTTPBasicAuth('machine', auth))
-    r.raise_for_status()
-    print(r.status_code)
-    pred = r.json()
-    return pred['prediction_id']
 
 pred = get_pred(model_id, prediction_id)
 
@@ -143,13 +124,5 @@ make_datanpz(dest_folder='/tmp', imagery=imagery)
 #convert data.npz into tf-records
 create_tfr(npz_path='/tmp/data.npz')
 
-updated_version = str(increment_versions(version=v))
-print(updated_version)
-
-# post new pred
-newpred_id = post_pred(pred=pred, version=updated_version)
-newpred = get_pred(model_id, newpred_id)
-
-# TODO - Upload tf-records to MLEnabler
-update_link(newpred, link_type='tfrecord', zip_path = '/tmp/tfrecords.zip')
-print("tfrecords link updated")
+update_link(pred, link_type='tfrecord', zip_path = '/tmp/tfrecords.zip')
+print("ok - tfrecords link updated")

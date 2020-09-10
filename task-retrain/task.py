@@ -74,7 +74,8 @@ def post_pred(pred, version):
         'infList': pred['infList'],
         'infType':  pred['infType'],
         'infBinary':  pred['infBinary'],
-        'infSupertile': pred['infSupertile']
+        'infSupertile': pred['infSupertile'],
+        'imagery_id': pred['imagery_id']
     }
 
     r = requests.post(api + '/v1/model/' + model_id + '/prediction',  json=data_pred, auth=HTTPBasicAuth('machine', auth))
