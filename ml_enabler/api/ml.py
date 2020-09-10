@@ -1,7 +1,7 @@
 import ml_enabler.config as CONFIG
 import io, os, pyproj, json, csv, geojson, boto3, mercantile
 from tiletanic import tilecover, tileschemes
-from shapely.geometry import shape
+from shapely.geometry import shape, box
 from shapely.ops import transform
 from functools import partial
 from flask import make_response
@@ -20,6 +20,9 @@ from ml_enabler.utils import version_to_array, geojson_bounds, bbox_str_to_list,
 from sqlalchemy.exc import IntegrityError
 from flask_login import login_required
 import numpy as np
+import pandas as pd
+import geopandas as gpd
+import requests
 
 import logging
 from flask import Flask
@@ -333,6 +336,11 @@ class PredictionExport(Resource):
         hint = pred.hint
         z = pred.tile_zoom
         i_info = ImageryService.get(pred.imagery_id)
+        print('i info')
+        print(i_info)
+        c_list = ImageryService.get(pred.imagery_id)
+        print('c_list')
+        print(c_list)
 
         first = False
 
@@ -344,6 +352,15 @@ class PredictionExport(Resource):
             nonlocal hint
             nonlocal z
             nonlocal i_info
+            nonlocal c_list
+
+            # get chip list csv as dataframe to match up chip-lst name + geometry with geometry in the predictions database
+
+            r = requests.get(c_list['url'])
+            df = pd.read_csv(io.StringIO(r.text))
+            df['c'] = df['bounds'].apply(lambda x: box(*[float(n) for n in x.split(',')]))
+            gdf = gpd.GeoDataFrame(df, crs="EPSG:4326", geometry=df['c'])
+
             labels_dict ={}
             print(stream)
             for row in stream:
@@ -356,8 +373,6 @@ class PredictionExport(Resource):
                     continue
 
                 # set labels.npz key to be x-y-z tile either from quadkey or wkt geometry
-                # TO-DO address the non-WMS case where labels.npz key should match image-chip to line up with tile on S3
-                #convert quadkey to x-y-z
                 if i_info['fmt'] == "wms":
                     print('wms')
                     if row[1]:
@@ -367,8 +382,13 @@ class PredictionExport(Resource):
                         t = '-'.join([str(i) for i in mercantile.tile(s.x, s.y, z)])
                 if i_info['fmt'] == "list":
                     print('tile list')
-                    #TO-DO fix
-                    t = 'x-y-z'
+                    #get tile name that where chip-list geom and geom in prediction row match
+                    pred_centroid = shape(json.loads(row[2]))
+                    gdf_2 = gpd.GeoDataFrame({'geometry': [shape(json.loads(row[2]))]}, crs="EPSG:4326")
+                    #To-DO account for no overlap case
+                    i = gpd.overlay(gdf, gdf_2, how='intersection')
+                    t = ','.join(i['name'].tolist())
+                    print(t)
 
                 #convert raw predictions into 0 or 1 based on threshold
                 raw_pred = []
