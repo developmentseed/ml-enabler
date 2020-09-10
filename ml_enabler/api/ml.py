@@ -356,11 +356,6 @@ class PredictionExport(Resource):
 
             # get chip list csv as dataframe to match up chip-lst name + geometry with geometry in the predictions database
 
-            r = requests.get(c_list['url'])
-            df = pd.read_csv(io.StringIO(r.text))
-            df['c'] = df['bounds'].apply(lambda x: box(*[float(n) for n in x.split(',')]))
-            gdf = gpd.GeoDataFrame(df, crs="EPSG:4326", geometry=df['c'])
-
             labels_dict ={}
             print(stream)
             for row in stream:
@@ -381,14 +376,18 @@ class PredictionExport(Resource):
                         s = shape(json.loads(row[2])).centroid
                         t = '-'.join([str(i) for i in mercantile.tile(s.x, s.y, z)])
                 if i_info['fmt'] == "list":
+                    r = requests.get(c_list['url'])
+                    df = pd.read_csv(io.StringIO(r.text))
+                    df['c'] = df['bounds'].apply(lambda x: box(*[float(n) for n in x.split(',')]))
+                    gdf = gpd.GeoDataFrame(df, crs="EPSG:4326", geometry=df['c'])
                     print('tile list')
                     #get tile name that where chip-list geom and geom in prediction row match
                     pred_centroid = shape(json.loads(row[2]))
                     gdf_2 = gpd.GeoDataFrame({'geometry': [shape(json.loads(row[2]))]}, crs="EPSG:4326")
                     #To-DO account for no overlap case
                     i = gpd.overlay(gdf, gdf_2, how='intersection')
-                    t = ','.join(i['name'].tolist())
-                    print(t)
+                    tiles_intersection = i['name'].tolist()
+                    print(tiles_intersection)
 
                 #convert raw predictions into 0 or 1 based on threshold
                 raw_pred = []
@@ -403,7 +402,11 @@ class PredictionExport(Resource):
 
                 # special case for training and not predictions
                 if hint == 'training':
-                    labels_dict.update({t:l})
+                    if i_info['fmt'] == "list":
+                        for chip_name in tiles_intersection:
+                            labels_dict.update({chip_name:l})
+                    else:
+                        labels_dict.update({t:l})
                 elif row[4]:
                     t = '-'.join([str(i) for i in mercantile.quadkey_to_tile(row[1])])
 
