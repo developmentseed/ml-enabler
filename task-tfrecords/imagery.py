@@ -13,8 +13,9 @@ def chiplist(api, auth, imagery, pred):
         f = StringIO(get_list(imagery['url']))
         for row in csv.reader(f, delimiter=','):
             imagery['imglist']['test'] = {
-                'url': row[0],
-                'bounds': row[1]
+                'name': row[0],
+                'url': row[1],
+                'bounds': row[2]
             }
 
 def get_pred_tilejson(api, auth, model_id, prediction_id):

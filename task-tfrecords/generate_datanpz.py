@@ -31,7 +31,16 @@ def url(tile, imagery):
     return imagery.replace('{x}', tile[0]).replace('{y}', tile[1]).replace('{z}', tile[2])
 
 def download_tilelist(chip, imagery, folder):
-    print("TILELIST")
+    image_format = get_image_format(imagery['imglist'][chip]['url'])
+    tile_img = op.join(folder, '{}{}'.format(imagery['imglist'][chip]['name'], image_format))
+
+    r = requests.get(imagery['imglist'][chip]['url']
+    r.raise_for_status()
+
+    with open(tile_img, 'wb')as w:
+        w.write(r.content)
+
+    return tile_img
 
 def download_tile_tms(tile, imagery, folder, zoom, supertile=False):
     """Download a satellite image tile from a tms endpoint"""
