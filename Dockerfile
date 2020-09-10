@@ -11,7 +11,7 @@ WORKDIR $HOME/ml-enabler
 
 RUN \
     apt-get update \
-    && apt-get install -y postgresql postgresql-contrib git curl nginx
+    && apt-get install -y postgresql postgresql-contrib git curl nginx libspatialindex-dev
 
 RUN curl 'https://nodejs.org/dist/v13.8.0/node-v13.8.0-linux-x64.tar.gz' | tar -xzv \
     && cp ./node-v13.8.0-linux-x64/bin/node /usr/bin/ \
