@@ -1130,7 +1130,7 @@ class PredictionUploadAPI(Resource):
 
             return { "status": "model uploaded" }, 200
         else:
-            return err(400, "model exists"), 400
+            return err(400, "asset exists"), 400
 
 class PredictionValidity(Resource):
     @login_required

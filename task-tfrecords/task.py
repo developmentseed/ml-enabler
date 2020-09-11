@@ -80,6 +80,7 @@ def update_link(pred, link_type, zip_path):
         headers = {'Content-Type': encoder.content_type},
         auth=HTTPBasicAuth('machine', auth)
     )
+
     r.raise_for_status()
 
 def get_versions(model_id):
