@@ -1,9 +1,14 @@
 import os
+import glob
 import numpy as np
 import requests
 import boto3
 import semver
 import json
+import zipfile
+
+import tensorflow as tf
+
 
 from requests.auth import HTTPBasicAuth
 from requests_toolbelt.multipart.encoder import MultipartEncoder
@@ -123,6 +128,22 @@ tfrecord = get_asset(bucket, pred['tfrecordLink'].replace(bucket + '/', ''))
 print(model)
 print(checkpoint)
 print(tfrecord)
+
+#unzip + count tf-records
+with zipfile.ZipFile('/tmp/tfrecords.zip', "r") as zip_ref:
+    zip_ref.extractall('/tmp/tfrecords')
+
+f_train = []
+for name in glob.glob('/tmp/tfrecords/train*.tfrecords'):
+    f_train.append(name)
+n_train_samps = sum([tf.data.TFRecordDataset(f).reduce(np.int64(0), lambda x, _: x + 1).numpy() for f in f_train])
+print(n_train_samps)
+
+f_val = []
+for name in glob.glob('/tmp/tfrecords/val*.tfrecords'):
+    f_val.append(name)
+n_val_samps = sum([tf.data.TFRecordDataset(f).reduce(np.int64(0), lambda x, _: x + 1).numpy() for f in f_val])
+print(n_val_samps)
 
 # conduct re-training
 train(tf_train_steps=200, tf_dir='/tmp/tfrecords.zip',
