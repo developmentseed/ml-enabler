@@ -34,7 +34,7 @@ def download_tilelist(chip, imagery, folder):
     image_format = get_image_format(imagery['imglist'][chip]['url'])
     tile_img = op.join(folder, '{}{}'.format(imagery['imglist'][chip]['name'], image_format))
 
-    r = requests.get(imagery['imglist'][chip]['url']
+    r = requests.get(imagery['imglist'][chip]['url'])
     r.raise_for_status()
 
     with open(tile_img, 'wb')as w:
