@@ -282,16 +282,20 @@ export default {
         postQueue: async function(geojson) {
             this.loading.stack = true;
 
-            let body = undefined;
-            if (geojson) body = JSON.stringify(geojson.geometry);
+            let reqbody;
+            if (geojson) {
+                reqbody = JSON.stringify(geojson.geometry);
+            } else {
+                reqbody = false;
+            }
 
             try {
                 const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/stack/tiles`, {
                     method: 'POST',
-                    headers: body ? {
+                    headers: reqbody ? {
                         'Content-Type': 'application/json'
                     } : {},
-                    body: body
+                    body: reqbody
                 });
 
                 const body = await res.json();
