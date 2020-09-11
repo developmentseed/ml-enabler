@@ -12,7 +12,7 @@ def chiplist(api, auth, imagery, pred):
 
         f = StringIO(get_list(imagery['url']))
         for row in csv.reader(f, delimiter=','):
-            imagery['imglist']['test'] = {
+            imagery['imglist'][row[0]] = {
                 'name': row[0],
                 'url': row[1],
                 'bounds': row[2]
