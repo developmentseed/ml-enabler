@@ -626,47 +626,53 @@ class PredictionInfAPI(Resource):
 
         try:
             prediction = PredictionService.get_prediction_by_id(prediction_id)
+            imagery = ImageryService.get(prediction.imagery_id)
 
-            poly = shape(geojson.loads(payload))
+            if imagery['fmt'] == "wms":
+                poly = shape(geojson.loads(payload))
 
-            project = partial(
-                pyproj.transform,
-                pyproj.Proj(init='epsg:4326'),
-                pyproj.Proj(init='epsg:3857')
-            )
+                project = partial(
+                    pyproj.transform,
+                    pyproj.Proj(init='epsg:4326'),
+                    pyproj.Proj(init='epsg:3857')
+                )
 
-            poly = transform(project, poly)
+                poly = transform(project, poly)
 
-            tiles = tilecover.cover_geometry(tiler, poly, prediction.tile_zoom)
+                tiles = tilecover.cover_geometry(tiler, poly, prediction.tile_zoom)
 
-            queue_name = "{stack}-models-{model}-prediction-{prediction}-queue".format(
-                stack=CONFIG.EnvironmentConfig.STACK,
-                model=model_id,
-                prediction=prediction_id
-            )
+                queue_name = "{stack}-models-{model}-prediction-{prediction}-queue".format(
+                    stack=CONFIG.EnvironmentConfig.STACK,
+                    model=model_id,
+                    prediction=prediction_id
+                )
 
-            queue = boto3.resource('sqs').get_queue_by_name(
-                QueueName=queue_name
-            )
+                queue = boto3.resource('sqs').get_queue_by_name(
+                    QueueName=queue_name
+                )
 
-            cache = []
-            for tile in tiles:
-                if len(cache) < 10:
-                    cache.append({
-                        "Id": str(tile.z) + "-" + str(tile.x) + "-" + str(tile.y),
-                        "MessageBody": json.dumps({
-                            "x": tile.x,
-                            "y": tile.y,
-                            "z": tile.z
+                cache = []
+                for tile in tiles:
+                    if len(cache) < 10:
+                        cache.append({
+                            "Id": str(tile.z) + "-" + str(tile.x) + "-" + str(tile.y),
+                            "MessageBody": json.dumps({
+                                "x": tile.x,
+                                "y": tile.y,
+                                "z": tile.z
+                            })
                         })
-                    })
-                else:
-                    queue.send_messages(
-                        Entries=cache
-                    )
-                    cache = []
+                    else:
+                        queue.send_messages(
+                            Entries=cache
+                        )
+                        cache = []
 
-            return {}, 200
+                return {}, 200
+            else if imagery['fmt'] == "list":
+
+            else:
+                return err(400, "Unknown imagery type"), 400
         except Exception as e:
             error_msg = f'Predction Tiler Error: {str(e)}'
             current_app.logger.error(error_msg)
