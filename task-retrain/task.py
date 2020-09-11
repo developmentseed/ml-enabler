@@ -118,14 +118,11 @@ v = get_versions(model_id)
 
 model = get_asset(bucket, pred['modelLink'].replace(bucket + '/', ''))
 checkpoint = get_asset(bucket, pred['checkpointLink'].replace(bucket + '/', ''))
+tfrecord = get_asset(bucket, pred['tfrecordLink'].replace(bucket + '/', ''))
 
 print(model)
 print(checkpoint)
-
-#get train and val number of samples
-d = np.load('/tmp/data.npz')
-n_train_samps = d['y_train'].shape[0]
-n_val_samps = d['y_val'].shape[0]
+print(tfrecord)
 
 # conduct re-training
 train(tf_train_steps=200, tf_dir='/tmp/tfrecords.zip',
