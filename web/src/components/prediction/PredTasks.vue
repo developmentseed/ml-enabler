@@ -27,6 +27,21 @@
                 :prediction='prediction'
             />
         </template>
+        <template v-else-if='create === "retrain" && !prediction.tfrecordLink'>
+            <button @click='create = false' class='btn fr round btn--stroke color-gray color-black-on-hover'>
+                <svg class='icon'><use href='#icon-close'/></svg>
+            </button>
+
+            <div class='flex-parent flex-parent--center-main pt36'>
+                <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-info'/></svg>
+            </div>
+
+            <div class='flex-parent flex-parent--center-main pt12 pb36'>
+                <h1 class='flex-child txt-h4 cursor-default align-center'>
+                    A TFRecords file must be created before retraining occurs
+                </h1>
+            </div>
+        </template>
         <template v-else-if='create === "retrain" && !prediction.modelLink'>
             <button @click='create = false' class='btn fr round btn--stroke color-gray color-black-on-hover'>
                 <svg class='icon'><use href='#icon-close'/></svg>
