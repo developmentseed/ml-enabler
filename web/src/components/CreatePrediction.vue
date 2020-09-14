@@ -9,21 +9,12 @@
         </div>
         <div class='border border--gray-light round col col--12 px12 py12 clearfix'>
             <div class='grid grid--gut12'>
-                <div class='col col--6 py6'>
+                <div class='col col--8 py6'>
                     <label><span v-text='type'/> Version</label>
                     <input v-model='prediction.version' class='input' placeholder='0.0.0'/>
                 </div>
 
-                <div class='col col--6 py6'>
-                    <label><span v-text='type'/> Zoom Level</label>
-                    <label class='switch-container px6 fr'>
-                        <span class='mr6'>Supertile</span>
-                        <input :disabled='prediction.infType == "detection"' v-model='prediction.infSupertile' type='checkbox' />
-                        <div class='switch'></div>
-                    </label>
-                    <input v-model='prediction.tileZoom' class='input' placeholder='18'/>
-                </div>
-                <div class='col col--4'>
+                <div class='col col--4 py6'>
                     <label>Model Type:</label>
                     <div class='select-container'>
                         <select v-model='prediction.infType' class='select'>
@@ -35,7 +26,7 @@
                 </div>
 
                 <template v-if='prediction.infType === "classification"'>
-                    <div class='col col--8'>
+                    <div class='col col--12 pr12 my12'>
                         <label>Inferences List:</label>
                         <label class='switch-container px6 fr'>
                             <span class='mr6'>Binary Inference</span>
@@ -70,6 +61,16 @@
                     </div>
                 </div>
 
+                <div v-if='isWMS' class='col col--12 py12'>
+                    <label><span v-text='type'/> Zoom Level</label>
+                    <label class='switch-container px6 fr'>
+                        <span class='mr6'>Supertile</span>
+                        <input :disabled='prediction.infType == "detection"' v-model='prediction.infSupertile' type='checkbox' />
+                        <div class='switch'></div>
+                    </label>
+                    <input v-model='prediction.tileZoom' class='input' placeholder='18'/>
+                </div>
+
                 <div class='col col--12 py12'>
                     <button @click='postPrediction' class='btn btn--stroke round fr color-green-light color-green-on-hover'>Add <span v-text='type'/></button>
                 </div>
@@ -102,6 +103,19 @@ export default {
     },
     mounted: function() {
         this.refresh();
+    },
+    computed: {
+        isWMS: function() {
+            if (!this.prediction.imagery_id) return false;
+
+            for (const img of this.imagery) {
+                if (img.id === this.prediction.imagery_id && img.fmt === 'wms') {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     },
     watch: {
         'prediction.infList': function() {
