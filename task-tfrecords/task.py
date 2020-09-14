@@ -62,7 +62,8 @@ def get_label_npz(model_id, prediction_id):
     r = requests.get(api + '/v1/model/' + model_id + '/prediction/' + prediction_id + '/export', params=payload,
                     auth=HTTPBasicAuth('machine', auth))
     r.raise_for_status()
-    with open('/tmp/labels.npz', 'wb') as f:
+    #with open('/tmp/labels.npz', 'wb') as f:
+    with open('/Users/marthamorrissey/Documents/mle_tfr/labels.npz', 'wb') as f:
         f.write(r.content)
     return f
 
