@@ -33,28 +33,15 @@ class ModelType(Enum):
     OBJECT_DETECT = 1
     CLASSIFICATION = 2
 
-class MLEnabler(object):
-    def __init__(self, mlenabler_endpoint: str):
-        super(MLEnabler, self).__init__()
-
-        self.api = mlenabler_endpoint
-
-    def get_imagery(self, model_id, imagery_id):
-        r = requests.get(self.api + "/v1/model/" + model_id + "/imagery/" + imagery_id)
-        r.raise_for_status()
-        return r.json()
-
-
 class DownloadAndPredict(object):
     """
     base object DownloadAndPredict implementing all necessary methods to
     make machine learning predictions
     """
 
-    def __init__(self, imagery: str, mlenabler_endpoint: str, prediction_endpoint: str):
+    def __init__(self, mlenabler_endpoint: str, prediction_endpoint: str):
         super(DownloadAndPredict, self).__init__()
 
-        self.imagery = imagery
         self.mlenabler_endpoint = mlenabler_endpoint
         self.prediction_endpoint = prediction_endpoint
         self.meta = {}

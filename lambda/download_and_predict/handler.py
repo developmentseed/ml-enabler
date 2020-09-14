@@ -2,13 +2,12 @@
 
 import os
 from typing import Dict, Any
-from download_and_predict.base import MLEnabler, DownloadAndPredict, ModelType, SuperTileDownloader
+from download_and_predict.base import DownloadAndPredict, ModelType, SuperTileDownloader
 from download_and_predict.custom_types import SQSEvent
 
 def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
     # read all our environment variables to throw errors early
     auth = os.getenv('MACHINE_AUTH')
-    imagery_id = os.getenv('IMAGERY_ID')
     model_id = os.getenv('MODEL_ID')
     prediction_id = os.getenv('PREDICTION_ID')
     prediction_endpoint = os.getenv('PREDICTION_ENDPOINT')
@@ -16,21 +15,13 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
     super_tile = os.getenv('INF_SUPERTILE')
 
     assert(auth)
-    assert(imagery_id)
     assert(model_id)
     assert(prediction_id)
     assert(prediction_endpoint)
     assert(mlenabler_endpoint)
 
-    ml = MLEnabler(mlenabler_endpoint)
-    imagery = ml.get_imagery(
-        model_id=model_id,
-        imagery_id=imagery_id
-    )
-
     # instantiate our DownloadAndPredict class
     dap = DownloadAndPredict(
-        imagery=imagery.get('url'),
         mlenabler_endpoint=mlenabler_endpoint,
         prediction_endpoint=prediction_endpoint
     )
