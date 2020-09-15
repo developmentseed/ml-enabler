@@ -43,6 +43,13 @@ class Prediction(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     created = db.Column(db.DateTime, default=timestamp, nullable=False)
+
+    # One of 'prediction' or 'training' - On the backend these are essentially the same
+    # but on the frontend, a training hint will not prompt for model upload
+    hint = db.Column(db.String, nullable=False)
+
+    imagery_id = db.Column(db.BigInteger, nullable=True)
+
     model_id = db.Column(
         db.BigInteger,
         db.ForeignKey('ml_models.id', name='fk_models'),
@@ -68,7 +75,9 @@ class Prediction(db.Model):
     def create(self, prediction_dto: PredictionDTO):
         """ Creates and saves the current model to the DB """
 
+        self.imagery_id = prediction_dto.imagery_id
         self.model_id = prediction_dto.model_id
+        self.hint = prediction_dto.hint
         self.version = prediction_dto.version
         self.docker_url = prediction_dto.docker_url
         self.tile_zoom = prediction_dto.tile_zoom
@@ -106,7 +115,7 @@ class Prediction(db.Model):
         return db.session.query(
             PredictionTile.id,
             PredictionTile.quadkey,
-            ST_AsGeoJSON(PredictionTile.quadkey_geom).label('geometry'),
+            ST_AsGeoJSON(PredictionTile.geom).label('geometry'),
             PredictionTile.predictions,
             PredictionTile.validity
         ).filter(PredictionTile.prediction_id == self.id).yield_per(100)
@@ -120,6 +129,7 @@ class Prediction(db.Model):
         """
         query = db.session.query(
             Prediction.id,
+            Prediction.hint,
             Prediction.created,
             Prediction.docker_url,
             Prediction.model_id,
@@ -134,7 +144,8 @@ class Prediction(db.Model):
             Prediction.inf_list,
             Prediction.inf_type,
             Prediction.inf_binary,
-            Prediction.inf_supertile
+            Prediction.inf_supertile,
+            Prediction.imagery_id
         ).filter(Prediction.id == prediction_id)
 
         return Prediction.query.get(prediction_id)
@@ -148,6 +159,7 @@ class Prediction(db.Model):
         """
         query = db.session.query(
             Prediction.id,
+            Prediction.hint,
             Prediction.created,
             Prediction.docker_url,
             Prediction.model_id,
@@ -162,7 +174,8 @@ class Prediction(db.Model):
             Prediction.inf_list,
             Prediction.inf_type,
             Prediction.inf_binary,
-            Prediction.inf_supertile
+            Prediction.inf_supertile,
+            Prediction.imagery_id
         ).filter(Prediction.model_id == model_id)
 
         return query.all()
@@ -179,21 +192,23 @@ class Prediction(db.Model):
         prediction_dto = PredictionDTO()
 
         prediction_dto.prediction_id = prediction[0]
-        prediction_dto.created = prediction[1]
-        prediction_dto.docker_url = prediction[2]
-        prediction_dto.model_id = prediction[3]
-        prediction_dto.tile_zoom = prediction[4]
-        prediction_dto.version = prediction[5]
-        prediction_dto.log_link = prediction[6]
-        prediction_dto.model_link = prediction[7]
-        prediction_dto.docker_link = prediction[8]
-        prediction_dto.save_link = prediction[9]
-        prediction_dto.tfrecord_link = prediction[10]
-        prediction_dto.checkpoint_link = prediction[11]
-        prediction_dto.inf_list = prediction[12]
-        prediction_dto.inf_type = prediction[13]
-        prediction_dto.inf_binary = prediction[14]
-        prediction_dto.inf_supertile = prediction[15]
+        prediction_dto.hint = prediction[1]
+        prediction_dto.created = prediction[2]
+        prediction_dto.docker_url = prediction[3]
+        prediction_dto.model_id = prediction[4]
+        prediction_dto.tile_zoom = prediction[5]
+        prediction_dto.version = prediction[6]
+        prediction_dto.log_link = prediction[7]
+        prediction_dto.model_link = prediction[8]
+        prediction_dto.docker_link = prediction[9]
+        prediction_dto.save_link = prediction[10]
+        prediction_dto.tfrecord_link = prediction[11]
+        prediction_dto.checkpoint_link = prediction[12]
+        prediction_dto.inf_list = prediction[13]
+        prediction_dto.inf_type = prediction[14]
+        prediction_dto.inf_binary = prediction[15]
+        prediction_dto.inf_supertile = prediction[16]
+        prediction_dto.imagery_id = prediction[17]
 
         return prediction_dto
 
@@ -210,9 +225,8 @@ class PredictionTile(db.Model):
         nullable=False
     )
 
-    quadkey = db.Column(db.String, nullable=False)
-    quadkey_geom = db.Column(Geometry('POLYGON', srid=4326), nullable=False)
-    centroid = db.Column(Geometry('POINT', srid=4326))
+    quadkey = db.Column(db.String, nullable=True)
+    geom = db.Column(Geometry('POLYGON', srid=4326), nullable=False)
     predictions = db.Column(postgresql.JSONB, nullable=False)
     validity = db.Column(MutableDict.as_mutable(postgresql.JSONB), nullable=True)
 
@@ -260,14 +274,14 @@ class PredictionTile(db.Model):
     @staticmethod
     def count(prediction_id: int):
         return db.session.query(
-            func.count(PredictionTile.quadkey).label("count")
+            func.count(PredictionTile.geom).label("count")
         ).filter(PredictionTile.prediction_id == prediction_id).one()
 
     @staticmethod
     def bbox(prediction_id: int):
         result = db.session.execute(text('''
             SELECT
-                ST_Extent(quadkey_geom)
+                ST_Extent(geom)
             FROM
                 prediction_tiles
             WHERE
@@ -294,7 +308,7 @@ class PredictionTile(db.Model):
                     p.id AS id,
                     quadkey AS quadkey,
                     predictions || COALESCE(v.validity, '{}'::JSONB) AS props,
-                    ST_AsMVTGeom(quadkey_geom, ST_Transform(ST_MakeEnvelope(:minx, :miny, :maxx, :maxy, 3857), 4326), 4096, 256, false) AS geom
+                    ST_AsMVTGeom(geom, ST_Transform(ST_MakeEnvelope(:minx, :miny, :maxx, :maxy, 3857), 4326), 4096, 256, false) AS geom
                 FROM
                     prediction_tiles AS p
                     LEFT JOIN (
@@ -309,7 +323,7 @@ class PredictionTile(db.Model):
                     ) AS v ON p.id = v.id
                 WHERE
                     p.prediction_id = :pred
-                    AND ST_Intersects(p.quadkey_geom, ST_Transform(ST_MakeEnvelope(:minx, :miny, :maxx, :maxy, 3857), 4326))
+                    AND ST_Intersects(p.geom, ST_Transform(ST_MakeEnvelope(:minx, :miny, :maxx, :maxy, 3857), 4326))
             ) q
         '''), {
             'pred': prediction_id,
@@ -328,13 +342,6 @@ class PredictionTile(db.Model):
             func.avg(cast(cast(PredictionTile.predictions['ml_prediction'], sqlalchemy.String), sqlalchemy.Float)).label('ml_prediction'),
             func.avg(cast(cast(PredictionTile.predictions['osm_building_area'], sqlalchemy.String), sqlalchemy.Float)).label('osm_building_area')
         ).filter(PredictionTile.prediction_id == prediction_id).filter(func.substr(PredictionTile.quadkey, 1, zoom).in_(quadkeys)).group_by(func.substr(PredictionTile.quadkey, 1, zoom)).all()
-
-    @staticmethod
-    def get_aggregate_for_polygon(prediction_id: int, polygon: str):
-        return db.session.query(
-            func.avg(cast(cast(PredictionTile.predictions['ml_prediction'], sqlalchemy.String), sqlalchemy.Float)).label('ml_prediction'),
-            func.avg(cast(cast(PredictionTile.predictions['osm_building_area'], sqlalchemy.String), sqlalchemy.Float)).label('osm_building_area')
-        ).filter(PredictionTile.prediction_id == prediction_id).filter(ST_Within(PredictionTile.centroid, ST_GeomFromText(polygon)) == 'True').one()
 
 class MLModel(db.Model):
     """ Describes an ML model registered with the service """

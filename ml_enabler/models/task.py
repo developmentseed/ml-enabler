@@ -1,6 +1,7 @@
 from ml_enabler.models.utils import timestamp
 from ml_enabler import db
 from ml_enabler.models.dtos.ml_model_dto import TaskDTO
+from sqlalchemy.sql.expression import any_
 import sqlalchemy
 
 class Task(db.Model):
@@ -41,8 +42,8 @@ class Task(db.Model):
 
         if pred_id is not None:
             filters.append(Task.pred_id == pred_id)
-        if type is not None:
-            filters.append(Task.type == task_type)
+        if task_type is not None:
+            filters.append(Task.type.like(any_(task_type)))
 
         return Task.query.filter(*filters)
 

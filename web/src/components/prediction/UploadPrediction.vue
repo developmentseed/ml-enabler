@@ -7,9 +7,10 @@
                 :label-idle='label'
                 v-bind:allow-multiple='false'
                 v-on:processfile='uploaded'
-                accepted-file-types='application/zip'
+                :accepted-file-types='filetype'
+                :fileValidateTypeDetectType='detect'
                 allowRevert='false'
-                :server='`/v1/model/${$route.params.modelid}/prediction/${$route.params.predid}/upload?type=${type}`'
+                :server='server'
                 v-bind:files='files'
             />
         </div>
@@ -36,13 +37,38 @@ export default {
         return {
             done: false,
             files: [],
-            label: ''
+            label: '',
+            server: {
+                url: this.type === 'inferences'
+                    ? `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/import`
+                    : `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/upload?type=${this.type}`,
+                process: {
+                    onerror: this.error
+                }
+            },
+            filetype: ''
         };
     },
     mounted: function() {
-        this.label = `Drop ${this.type}.zip here`;
+        if (this.type === 'inferences') {
+            this.label = 'Drop labels.geojson here';
+            this.filetype = 'application/geo+json';
+        } else {
+            this.label = `Drop ${this.type}.zip here`;
+            this.filetype = 'application/zip';
+        }
     },
     methods: {
+        detect: async function(file) {
+            if (['geojson', 'geojsonld', 'ldgeojson', 'json'].includes(file.name.split('.')[1])) {
+                return 'application/geo+json';
+            } else if (['zip'].includes(file.name.split('.')[1])) {
+                return 'application/zip';
+            }
+        },
+        error: function(res) {
+            this.$emit('err', new Error(JSON.parse(res).message));
+        },
         uploaded: function(err) {
             if (err) return;
 

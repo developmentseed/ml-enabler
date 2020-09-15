@@ -8,12 +8,15 @@ import Login from './components/Login.vue';
 import Model from './components/Model.vue';
 import EditModel from './components/EditModel.vue';
 import Prediction from './components/Prediction.vue';
+import Imagery from './components/Imagery.vue';
+import Integration from './components/Integration.vue';
+import CreatePrediction from './components/CreatePrediction.vue';
 
 import Assets from './components/prediction/Assets.vue';
 import Export  from './components/prediction/Export.vue';
 import Map  from './components/prediction/Map.vue';
 import Stack from './components/prediction/Stack.vue';
-import Retrain from './components/prediction/Retrain.vue';
+import PredTasks from './components/prediction/PredTasks.vue';
 
 Vue.use(VueRouter);
 Vue.config.productionTip = false
@@ -23,7 +26,7 @@ const router = new VueRouter({
     routes: [
         { path: '/', name: 'home', component: Home },
         { path: '/login', name: 'login', component: Login },
-        
+
         { path: '/model/new', name: 'newmodel', component: EditModel },
 
         {
@@ -34,6 +37,30 @@ const router = new VueRouter({
                 path: 'edit',
                 name: 'editmodel',
                 component: EditModel,
+            },{
+                path: '/model/:modelid/training',
+                name: 'createTraining',
+                component: CreatePrediction,
+            },{
+                path: '/model/:modelid/prediction',
+                name: 'createPrediction',
+                component: CreatePrediction,
+            },{
+                path: '/model/:modelid/imagery',
+                name: 'createImagery',
+                component: Imagery,
+            },{
+                path: '/model/:modelid/imagery/:imageryid',
+                name: 'editImagery',
+                component: Imagery,
+            },{
+                path: '/model/:modelid/integration',
+                name: 'createImagery',
+                component: Integration,
+            },{
+                path: '/model/:modelid/integration/:integrationid',
+                name: 'editImagery',
+                component: Integration,
             },{
                 name: 'prediction',
                 path: '/model/:modelid/prediction/:predid',
@@ -48,9 +75,9 @@ const router = new VueRouter({
                     path: 'stack',
                     component: Stack
                 },{
-                    name: 'retrain',
-                    path: 'retrain',
-                    component: Retrain
+                    name: 'tasks',
+                    path: 'tasks',
+                    component: PredTasks
                 },{
                     name: 'map',
                     path: 'map',

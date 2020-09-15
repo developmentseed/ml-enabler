@@ -30,10 +30,16 @@
             <div class='border border--gray-light round col col--12 px12 py12 clearfix'>
                 <template v-if='mode === "model"'>
                     <div class='col col--12 border-b border--gray-light clearfix'>
-                        <h3 class='fl mt6 cursor-default'>Predictions:</h3>
+                        <h3 class='fl mt6 cursor-default'>Model Iterations:</h3>
 
-                        <button @click='mode = "editPrediction"' class='btn fr mb6 round btn--stroke color-gray color-green-on-hover'>
-                            <svg class='icon'><use href='#icon-plus'/></svg>
+                        <button class='dropdown btn fr h24 mr6 mb6 round btn--stroke color-gray color-green-on-hover'>
+                            <svg class='icon fl'><use href='#icon-plus'/></svg>
+                            <svg class='icon fl'><use href='#icon-chevron-down'/></svg>
+
+                            <div class='round dropdown-content color-black' style='top: 24px;'>
+                                <div @click='$router.push({ path: `/model/${$route.params.modelid}/prediction` })' class='round bg-gray-faint-on-hover'>Prediction</div>
+                                <div @click='$router.push({ path: `/model/${$route.params.modelid}/training` })' class='round bg-gray-faint-on-hover'>Training</div>
+                            </div>
                         </button>
                     </div>
 
@@ -58,11 +64,11 @@
                                     <div class='col col--6'>
                                         <div class='col col--12 clearfix'>
                                             <h3 class='txt-h4 fl' v-text='"v" + pred.version'></h3>
-                                            <span class='fl ml6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer' v-text='"id: " + pred.predictionsId'/>
+                                            <span class='fl ml6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer' v-text='pred.hint'/>
                                         </div>
                                     </div>
                                     <div class='col col--6 clearfix'>
-                                        <template v-if='!pred.modelLink'>
+                                        <template v-if='!pred.modelLink && pred.hint === "prediction"'>
                                             <div class='fr bg-red-faint bg-red-on-hover color-white-on-hover color-red inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>
                                                 No Model
                                             </div>
@@ -86,7 +92,7 @@
                     <div class='col col--12 border-b border--gray-light clearfix pt24'>
                         <h3 class='fl mt6 cursor-default'>Imagery:</h3>
 
-                        <button @click='editImagery()' class='btn fr mb6 round btn--stroke color-gray color-green-on-hover'>
+                        <button @click='$router.push({ path: `/model/${$route.params.modelid}/imagery` })' class='btn fr mb6 round btn--stroke color-gray color-green-on-hover'>
                             <svg class='icon'><use href='#icon-plus'/></svg>
                         </button>
                     </div>
@@ -104,7 +110,7 @@
                             </div>
                         </template>
                         <template v-else>
-                            <div :key='img.id' v-for='img in imagery' @click='editImagery(img.id)' class='cursor-pointer col col--12'>
+                            <div :key='img.id' v-for='img in imagery' @click='$router.push({ path: `/model/${$route.params.modelid}/imagery/${img.id}` })' class='cursor-pointer col col--12'>
                                 <div class='col col--12 grid py6 px12 bg-darken10-on-hover'>
                                     <div class='col col--8'><h3 class='txt-h4 fl' v-text='img.name'></h3></div>
                                     <div class='col col--4'><div v-text='img.fmt' class='fr mx3 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue px6 py3 round txt-xs txt-bold'></div></div>
@@ -115,21 +121,12 @@
                     <div class='col col--12 border-b border--gray-light clearfix pt24'>
                         <h3 class='fl mt6 cursor-default'>Integrations:</h3>
 
-                        <button @click='editIntegration()' class='btn fr mb6 round btn--stroke color-gray color-green-on-hover'>
+                        <button @click='$router.push({ path: `/model/${$route.params.modelid}/integration` })' class='btn fr mb6 round btn--stroke color-gray color-green-on-hover'>
                             <svg class='icon'><use href='#icon-plus'/></svg>
                         </button>
                     </div>
 
-                    <Integrations @integration='editIntegration($event.id)'/>
-                </template>
-                <template v-else-if='mode === "editIntegration"'>
-                    <Integration @err='$emit("err", $event)' :modelid='model.modelId' :integrationid='integrationid' @close='refresh'/>
-                </template>
-                <template v-else-if='mode === "editImagery"'>
-                    <Imagery @err='$emit("err", $event)' :modelid='model.modelId' :imageryid='imageryid' @close='refresh'/>
-                </template>
-                <template v-else-if='mode === "editPrediction"'>
-                    <CreatePrediction @err='$emit("err", $event)' :modelid='model.modelId' @close='refresh' />
+                    <Integrations @integration='$router.push({ path: `/model/${$route.params.modelid}/integration/${$event.id}` })'/>
                 </template>
             </div>
         </template>
@@ -146,10 +143,7 @@
 
 <script>
 import vSort from 'semver-sort';
-import Imagery from './Imagery.vue';
-import Integration from './Integration.vue';
 import Integrations from './Integrations.vue';
-import CreatePrediction from './CreatePrediction.vue';
 
 export default {
     name: 'Model',
@@ -161,34 +155,14 @@ export default {
             model: {},
             imagery: [],
             integrations: [],
-            imageryid: false,
             integrationid: false,
             loading: {
                 model: true
-            },
-            prediction: {
-                modelId: this.$route.params.modelid,
-                version: '',
-                tileZoom: 18,
-                bbox: [-180.0, -90.0, 180.0, 90.0]
-            }
-        }
-    },
-    watch: {
-        mode: function() {
-            if (this.mode === 'editPrediction') {
-                this.prediction.modelId = this.$route.params.modelid;
-                this.prediction.version = '';
-                this.prediction.tileZoom = 18;
-                this.prediction.bbox = [-180.0, -90.0, 180.0, 90.0];
             }
         }
     },
     components: {
-        Imagery,
-        Integration,
         Integrations,
-        CreatePrediction
     },
     mounted: function() {
         this.refresh();
@@ -209,24 +183,6 @@ export default {
             if (!url) return;
 
             window.open(url, "_blank")
-        },
-        editImagery: function(imgid) {
-            if (imgid) {
-                this.imageryid = imgid;
-            } else {
-                this.imageryid = false;
-            }
-
-            this.mode = 'editImagery';
-        },
-        editIntegration: function(intid) {
-            if (intid) {
-                this.integrationid = intid;
-            } else {
-                this.integrationid = false;
-            }
-
-            this.mode = 'editIntegration';
         },
         getPredictions: async function() {
             try {
@@ -295,3 +251,24 @@ export default {
     }
 }
 </script>
+
+<style>
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 6px 12px;
+    z-index: 1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+</style>
+

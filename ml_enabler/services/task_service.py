@@ -41,7 +41,7 @@ class TaskService():
             raise NotFound
 
     @staticmethod
-    def list(pred_id: int, task_type: str):
+    def list(pred_id: int, task_type):
         rawtasks = Task.list(pred_id, task_type)
 
         if not rawtasks:
