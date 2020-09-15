@@ -3,6 +3,7 @@ import os
 from os import path as op
 import requests
 import rasterio
+import glob
 
 from requests.auth import HTTPBasicAuth
 from io import BytesIO
@@ -98,8 +99,10 @@ def download_img_match_labels(labels_folder, imagery, folder, zoom, supertile=Fa
     #download images
     for chip in class_chips:
         if imagery['fmt'] == 'wms':
+            print('in wms case')
             download_tile_tms(chip, imagery, folder, zoom, supertile=False)
         else:
+            print('in chip list case')
             download_tilelist(chip, imagery, folder)
 
 # package up the images + labels into one data.npz file
@@ -143,14 +146,13 @@ def make_datanpz(dest_folder, imagery,
     np.random.shuffle(tiles)
 
     # open the images and load those plus the labels into the final arrays
-    image_format = get_image_format(imagery['url'])
-    print(image_format)
 
     x_vals = []
     y_vals = []
 
     for tile in tiles:
-        image_file = op.join(dest_folder, 'tiles', '{}{}'.format(tile, image_format))
+        #image_file = op.join(dest_folder, 'tiles', '{}{}'.format(tile, image_format))
+        image_file = glob.glob(dest_folder + '/' + 'tiles/' + tile + '*')[0]
         try:
             img = Image.open(image_file)
         except FileNotFoundError:
@@ -175,8 +177,7 @@ def make_datanpz(dest_folder, imagery,
     split_n_samps = [len(x_vals) * val for val in split_vals]
 
     if np.any(split_n_samps == 0):
-        raise ValueError('Split must not generate zero samples per partition. '
-                            'Change ratio of values in config file.')
+        raise ValueError('Split must not generate zero samples per partition.')
 
     # Convert into a cumulative sum to get indices
     split_inds = np.cumsum(split_n_samps).astype(np.integer)

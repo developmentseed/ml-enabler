@@ -358,10 +358,7 @@ class PredictionExport(Resource):
             # get chip list csv as dataframe to match up chip-lst name + geometry with geometry in the predictions database
 
             labels_dict ={}
-            print(stream)
             for row in stream:
-                print('row')
-                print(row)
                 if req_inferences != 'all' and row[3].get(req_inferences) is None:
                     continue
 
@@ -370,7 +367,6 @@ class PredictionExport(Resource):
 
                 # set labels.npz key to be x-y-z tile either from quadkey or wkt geometry
                 if i_info['fmt'] == "wms":
-                    print('wms')
                     if row[1]:
                         t = '-'.join([str(i) for i in mercantile.quadkey_to_tile(row[1])])
                     else:
@@ -381,19 +377,16 @@ class PredictionExport(Resource):
                     df = pd.read_csv(io.StringIO(r.text))
                     df['c'] = df['bounds'].apply(lambda x: box(*[float(n) for n in x.split(',')]))
                     gdf = gpd.GeoDataFrame(df, crs="EPSG:4326", geometry=df['c'])
-                    print('tile list')
                     #get tile name that where chip-list geom and geom in prediction row match
                     pred_centroid = shape(json.loads(row[2]))
                     gdf_2 = gpd.GeoDataFrame({'geometry': [shape(json.loads(row[2]))]}, crs="EPSG:4326")
                     #To-DO account for no overlap case
                     i = gpd.overlay(gdf, gdf_2, how='intersection')
                     tiles_intersection = i['name'].tolist()
-                    print(tiles_intersection)
 
                 #convert raw predictions into 0 or 1 based on threshold
                 raw_pred = []
                 i_lst = pred.inf_list.split(",")
-                print(i_lst)
                 for num, inference in enumerate(i_lst):
                     raw_pred.append(row[3][inference])
                 if  req_inferences == 'all':
