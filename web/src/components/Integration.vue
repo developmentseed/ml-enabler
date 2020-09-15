@@ -26,6 +26,7 @@
                     <div class='select-container w-full'>
                         <select v-model='integration.integration' class='select'>
                             <option value='maproulette'>MapRoulette</option>
+                            <option value='tasking'>Tasking Manager</option>
                         </select>
                         <div class='select-arrow'></div>
                     </div>

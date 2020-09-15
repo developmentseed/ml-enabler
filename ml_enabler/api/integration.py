@@ -1,4 +1,3 @@
-import maproulette
 from flask import Blueprint, session
 from flask_restful import request, current_app
 from ml_enabler.utils import err

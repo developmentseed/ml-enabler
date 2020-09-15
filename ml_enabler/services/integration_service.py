@@ -114,98 +114,100 @@ class IntegrationService():
         if integration is None:
             raise IntegrationNotFound('Integration Not Found')
 
-        if integration.integration != "maproulette":
-            raise Exception("Only MapRoulette Integrations supported");
+        if integration.integration == "maproulette":
+            for ele in ['prediction', 'project', 'project_desc', 'challenge', 'challenge_instr', 'threshold', 'inferences']:
+                if payload.get(ele) is None:
+                    raise Exception('Missing ' + ele + ' key in body')
 
-        for ele in ['prediction', 'project', 'project_desc', 'challenge', 'challenge_instr', 'threshold', 'inferences']:
-            if payload.get(ele) is None:
-                raise Exception('Missing ' + ele + ' key in body')
+            auth = integration.auth
+            if payload.get('auth') is not None:
+                auth = payload.get('auth')
 
-        auth = integration.auth
-        if payload.get('auth') is not None:
-            auth = payload.get('auth')
+            parsed = urlparse(integration.url)
 
-        parsed = urlparse(integration.url)
-
-        config = maproulette.Configuration(
-            api_key=auth,
-            hostname=parsed.netloc,
-            protocol=parsed.scheme
-        )
-
-        project_api = maproulette.Project(config)
-        challenge_api = maproulette.Challenge(config)
-
-        try:
-            project = project_api.get_project_by_name(
-                project_name=payload.get('project')
-            )
-        except:
-            project = project_api.create_project(
-                data={
-                "name": payload.get('project'),
-                "display_name": payload.get('project'),
-                "description": payload.get('project_desc'),
-                "enabled": True
-                }
+            config = maproulette.Configuration(
+                api_key=auth,
+                hostname=parsed.netloc,
+                protocol=parsed.scheme
             )
 
-        try:
-            challenge = challenge_api.create_challenge(
-                data={
-                    'name': payload.get('challenge'),
-                    'parent': project['data']['id'],
-                    'instruction': payload.get('challenge_instr')
-                }
-            )
-        except Exception as e:
-            raise e
+            project_api = maproulette.Project(config)
+            challenge_api = maproulette.Challenge(config)
 
-        req_inferences = payload.get('inferences', 'all')
-        req_threshold = float(payload.get('threshold', '0'))
+            try:
+                project = project_api.get_project_by_name(
+                    project_name=payload.get('project')
+                )
+            except:
+                project = project_api.create_project(
+                    data={
+                    "name": payload.get('project'),
+                    "display_name": payload.get('project'),
+                    "description": payload.get('project_desc'),
+                    "enabled": True
+                    }
+                )
 
-        stream = PredictionService.export(int(payload.get('prediction')))
-        inferences = PredictionService.inferences(int(payload.get('prediction')))
-        pred = PredictionService.get_prediction_by_id(int(payload.get('prediction')))
+            try:
+                challenge = challenge_api.create_challenge(
+                    data={
+                        'name': payload.get('challenge'),
+                        'parent': project['data']['id'],
+                        'instruction': payload.get('challenge_instr')
+                    }
+                )
+            except Exception as e:
+                raise e
 
-        if req_inferences != 'all':
-            inferences = [ req_inferences ]
+            req_inferences = payload.get('inferences', 'all')
+            req_threshold = float(payload.get('threshold', '0'))
 
-        fc = {
-            'type': 'FeatureCollection',
-            'features': []
-        }
+            stream = PredictionService.export(int(payload.get('prediction')))
+            inferences = PredictionService.inferences(int(payload.get('prediction')))
+            pred = PredictionService.get_prediction_by_id(int(payload.get('prediction')))
 
-        for row in stream:
-            if req_inferences != 'all' and row[3].get(req_inferences) is None:
-                continue
-            if req_inferences != 'all' and row[3].get(req_inferences) <= req_threshold:
-                continue
+            if req_inferences != 'all':
+                inferences = [ req_inferences ]
 
-            properties_dict = {}
-            if row[4]:
-                properties_dict = row[3]
-                valid_dict = {}
-                valid_dict.update({'validity': row[4]})
-                properties_dict.update(valid_dict)
-
-            feat = {
-                "id": row[0],
-                "quadkey": row[1],
-                "type": "Feature",
-                "properties": properties_dict,
-                "geometry": json.loads(row[2])
+            fc = {
+                'type': 'FeatureCollection',
+                'features': []
             }
 
-            fc['features'].append(feat)
+            for row in stream:
+                if req_inferences != 'all' and row[3].get(req_inferences) is None:
+                    continue
+                if req_inferences != 'all' and row[3].get(req_inferences) <= req_threshold:
+                    continue
 
-        challenge_api.add_tasks_to_challenge(
-            challenge_id=challenge['data']['id'],
-            data=fc
-        )
+                properties_dict = {}
+                if row[4]:
+                    properties_dict = row[3]
+                    valid_dict = {}
+                    valid_dict.update({'validity': row[4]})
+                    properties_dict.update(valid_dict)
 
-        return {
-            "project": project['data']['id'],
-            "challenge": challenge['data']['id']
-        }
+                feat = {
+                    "id": row[0],
+                    "quadkey": row[1],
+                    "type": "Feature",
+                    "properties": properties_dict,
+                    "geometry": json.loads(row[2])
+                }
+
+                fc['features'].append(feat)
+
+            challenge_api.add_tasks_to_challenge(
+                challenge_id=challenge['data']['id'],
+                data=fc
+            )
+
+            return {
+                "project": project['data']['id'],
+                "challenge": challenge['data']['id']
+            }
+        elif integration.integration == "tasking":
+
+        else
+            raise Exception("Only MapRoulette & Tasking Manager Integrations supported");
 
