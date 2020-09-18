@@ -1,9 +1,14 @@
 import os
+import glob
 import numpy as np
 import requests
 import boto3
 import semver
 import json
+import zipfile
+
+import tensorflow as tf
+
 
 from requests.auth import HTTPBasicAuth
 from requests_toolbelt.multipart.encoder import MultipartEncoder
@@ -11,8 +16,6 @@ from requests_toolbelt.utils import dump
 from zipfile import ZipFile
 
 from model import train
-from generate_datanpz import download_img_match_labels, make_datanpz
-from generate_tfrecords import create_tfr
 
 s3 = boto3.client('s3')
 
@@ -54,15 +57,6 @@ def get_asset(bucket, key):
 
     return '/tmp/' + dirr
 
-def get_label_npz(model_id, prediction_id):
-    payload = {'format':'npz', 'inferences':'all', 'threshold': 0}
-    r = requests.get(api + '/v1/model/' + model_id + '/prediction/' + prediction_id + '/export', params=payload,
-                    auth=HTTPBasicAuth('machine', auth))
-    r.raise_for_status()
-    with open('/tmp/labels.npz', 'wb') as f:
-        f.write(r.content)
-    return f
-
 def increment_versions(version):
     v = semver.VersionInfo.parse(version)
     return v.bump_minor()
@@ -85,7 +79,8 @@ def post_pred(pred, version):
         'infList': pred['infList'],
         'infType':  pred['infType'],
         'infBinary':  pred['infBinary'],
-        'infSupertile': pred['infSupertile']
+        'infSupertile': pred['infSupertile'],
+        'imagery_id': pred['imagery_id']
     }
 
     r = requests.post(api + '/v1/model/' + model_id + '/prediction',  json=data_pred, auth=HTTPBasicAuth('machine', auth))
@@ -104,7 +99,7 @@ def update_link(pred, link_type, zip_path):
     encoder = MultipartEncoder(fields={'file': ('filename', open(zip_path, 'rb'), 'application/zip')})
     print('/v1/model/' + str(model_id) + '/prediction/' + str(prediction_id) + '/upload')
 
-    r = requests.post(api + '/v1/model/' + str(model_id) + '/prediction/' + str(prediction_id) + '/upload', params=payload,  
+    r = requests.post(api + '/v1/model/' + str(model_id) + '/prediction/' + str(prediction_id) + '/upload', params=payload,
                         data = encoder, headers= {'Content-Type': encoder.content_type}, auth=HTTPBasicAuth('machine', auth))
     r.raise_for_status()
 
@@ -119,40 +114,41 @@ supertile = pred['infSupertile']
 version = pred['version']
 inflist = pred['infList'].split(',')
 
-if supertile: 
+if supertile:
      x_feature_shape = [-1, 512, 512, 3]
-else: 
+else:
     x_feature_shape = [-1, 256, 256, 3]
 
 v = get_versions(model_id)
 
 model = get_asset(bucket, pred['modelLink'].replace(bucket + '/', ''))
 checkpoint = get_asset(bucket, pred['checkpointLink'].replace(bucket + '/', ''))
+tfrecord = get_asset(bucket, pred['tfrecordLink'].replace(bucket + '/', ''))
 
 print(model)
 print(checkpoint)
+print(tfrecord)
 
-get_label_npz(model_id, prediction_id)
+#unzip + count tf-records
+with zipfile.ZipFile('/tmp/tfrecords.zip', "r") as zip_ref:
+    zip_ref.extractall('/tmp/tfrecords')
 
-# download image tiles that match validated labels.npz file
-download_img_match_labels(labels_folder='/tmp', imagery=imagery, folder='/tmp/tiles', zoom=zoom, supertile=supertile)
+f_train = []
+for name in glob.glob('/tmp/tfrecords/train*.tfrecords'):
+    f_train.append(name)
+n_train_samps = sum([tf.data.TFRecordDataset(f).reduce(np.int64(0), lambda x, _: x + 1).numpy() for f in f_train])
+print(n_train_samps)
 
-# create data.npz file that matchs up images and labels
-make_datanpz(dest_folder='/tmp', imagery=imagery)
-
-#get train and val number of samples 
-d = np.load('/tmp/data.npz')
-n_train_samps = d['y_train'].shape[0]
-n_val_samps = d['y_val'].shape[0]
-
-#convert data.npz into tf-records
-create_tfr(npz_path='/tmp/data.npz', city='city')
-
+f_val = []
+for name in glob.glob('/tmp/tfrecords/val*.tfrecords'):
+    f_val.append(name)
+n_val_samps = sum([tf.data.TFRecordDataset(f).reduce(np.int64(0), lambda x, _: x + 1).numpy() for f in f_val])
+print(n_val_samps)
 
 # conduct re-training
-train(tf_train_steps=200, tf_dir='/tmp/tfrecords.zip', 
-       retraining_weights='/tmp/checkpoint.zip', 
-       n_classes=len(inflist), class_names=inflist,  x_feature_shape=x_feature_shape, 
+train(tf_train_steps=200, tf_dir='/tmp/tfrecords.zip',
+       retraining_weights='/tmp/checkpoint.zip',
+       n_classes=len(inflist), class_names=inflist,  x_feature_shape=x_feature_shape,
        n_train_samps=n_train_samps, n_val_samps=n_val_samps)
 
 # increment model version
@@ -162,15 +158,10 @@ print(updated_version)
 
 # post new pred
 newpred_id = post_pred(pred=pred, version=updated_version)
-
 newpred = get_pred(model_id, newpred_id)
 
-# update tf-records zip
-update_link(newpred, link_type='tfrecord', zip_path = '/tmp/tfrecords.zip')
-print("tfrecords link updated")
-
 # update model link
-update_link(newpred, link_type='model', zip_path ='/ml/models.zip') 
+update_link(newpred, link_type='model', zip_path ='/ml/models.zip')
 print("models link updated")
 
 # update checkpoint

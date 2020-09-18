@@ -26,35 +26,35 @@ from sklearn.metrics import precision_score, recall_score, fbeta_score
 from utils_metrics import FBetaScore, precision_m, recall_m, fbeta_m
 from utils_readtfrecords import parse_and_augment_fn, parse_fn, get_dataset_feeder
 from utils_loss import sigmoid_focal_crossentropy
-from utils_train import zip_model_export, zip_chekpoint, model_estimator, get_optimizer, resnet_serving_input_receiver_fn 
+from utils_train import zip_model_export, zip_chekpoint, model_estimator, get_optimizer, resnet_serving_input_receiver_fn
 
 
 
 ################
 # Modeling Code
 ###############
-def train(n_classes=2, class_names=['class0', 'class1'], 
-         n_train_samps=100, 
-         n_val_samps=20, 
-         x_feature_shape=[-1, 256, 256, 3], 
-         cycle_length=1, 
-         n_map_threads=4, 
-         shuffle_buffer_size=400, 
-         prefetch_buffer_size=1, 
+def train(n_classes=2, class_names=['class0', 'class1'],
+         n_train_samps=100,
+         n_val_samps=20,
+         x_feature_shape=[-1, 256, 256, 3],
+         cycle_length=1,
+         n_map_threads=4,
+         shuffle_buffer_size=400,
+         prefetch_buffer_size=1,
          tf_dir='/ml/data',
-         tf_model_dir = '/ml/models/', 
+         tf_model_dir = '/ml/models/',
          model_id ='b',
-         tf_steps_per_summary=5, 
+         tf_steps_per_summary=5,
          tf_steps_per_checkpoint=10,
-         tf_batch_size=2, 
+         tf_batch_size=2,
          tf_train_steps=200,
          tf_dense_size_a=256,
          tf_dense_dropout_rate_a=0.3,
          tf_dense_size=128,
          tf_dense_dropout_rate=.35,
-         tf_dense_activation='relu', 
+         tf_dense_activation='relu',
          tf_learning_rate=0.00001,
-         tf_optimizer='adam', 
+         tf_optimizer='adam',
          retraining_weights=None):
 
     """
@@ -125,7 +125,7 @@ def train(n_classes=2, class_names=['class0', 'class1'],
     # Create data feeder functions
     ##############################
 
-    #unzip tf-records dir #TO-DO FIX!!!!! 
+    #unzip tf-records dir #TO-DO FIX!!!!!
     with zipfile.ZipFile(tf_dir, "r") as zip_ref:
         zip_ref.extractall('/tmp/tfrecords')
         tf_dir = '/tmp/tfrecords/'
@@ -134,7 +134,7 @@ def train(n_classes=2, class_names=['class0', 'class1'],
     fpath_train = op.join(tf_dir, 'train_*.tfrecords')
     print(fpath_train)
     map_func = partial(parse_and_augment_fn, n_chan=3,
-                       n_classes=model_params['n_classes'], 
+                       n_classes=model_params['n_classes'],
                        shp=x_feature_shape[1:])
 
     dataset_train_fn = partial(get_dataset_feeder,
@@ -151,7 +151,7 @@ def train(n_classes=2, class_names=['class0', 'class1'],
     fpath_validate = op.join(tf_dir, 'val_*.tfrecords')
     print(fpath_validate)
     map_func = partial(parse_and_augment_fn, n_chan=3,
-                       n_classes=model_params['n_classes'], 
+                       n_classes=model_params['n_classes'],
                        shp=x_feature_shape[1:])
 
     dataset_validate_fn = partial(get_dataset_feeder,
@@ -175,7 +175,7 @@ def train(n_classes=2, class_names=['class0', 'class1'],
     export_final = tf.estimator.FinalExporter(model_id,
                                               serving_input_receiver_fn=resnet_serving_input_receiver_fn)
     logging.info("export final post")
-    
+
     eval_spec = tf.estimator.EvalSpec(input_fn=dataset_validate_fn,
                                       steps=n_val_samps,  # Evaluate until complete
                                       exporters=export_final,
@@ -190,6 +190,6 @@ def train(n_classes=2, class_names=['class0', 'class1'],
     tf.estimator.train_and_evaluate(classifier, train_spec, eval_spec)
     logging.info("training done.")
 
-    # Zip key exports 
+    # Zip key exports
     zip_model_export(model_id=model_id, zip_dir='/ml/models')
     zip_chekpoint(model_id=model_id, zip_dir='/ml/checkpoint')

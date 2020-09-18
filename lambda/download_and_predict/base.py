@@ -187,7 +187,7 @@ class DownloadAndPredict(object):
 
                 pred_list.append({
                     "quadkey": mercantile.quadkey(tiles[i].x, tiles[i].y, tiles[i].z),
-                    "quadkey_geom": bbox,
+                    "geom": bbox,
                     "predictions": {
                         "default": score
                     },

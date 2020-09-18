@@ -1,8 +1,10 @@
 import ml_enabler.config as CONFIG
+from shapely.geometry import shape
 import sqlalchemy
 import mercantile, semver
 from ml_enabler.models.ml_model import MLModel, PredictionTile, Prediction
 from ml_enabler.models.dtos.ml_model_dto import PredictionDTO
+from ml_enabler.utils import InvalidGeojson
 from ml_enabler.models.utils import PredictionsNotFound, NotFound, VersionExists
 from psycopg2.errors import UniqueViolation
 from ml_enabler import db
@@ -26,12 +28,14 @@ class PredictionService():
 
         prediction_dto = PredictionDTO()
         prediction_dto.model_id = model_id
+        prediction_dto.hint = payload.get('hint', 'prediction')
         prediction_dto.version = payload['version']
         prediction_dto.tile_zoom = payload['tileZoom']
         prediction_dto.inf_list = payload['infList']
         prediction_dto.inf_type = payload['infType']
         prediction_dto.inf_binary = payload['infBinary']
         prediction_dto.inf_supertile = payload['infSupertile']
+        prediction_dto.imagery_id = payload['imagery_id']
         prediction_dto.validate()
 
         new_prediction = Prediction()
@@ -119,6 +123,30 @@ class PredictionService():
 
 class PredictionTileService():
     @staticmethod
+    def create_geojson(pred, features):
+        data = []
+        for feat in features:
+            if feat.get('type') != "Feature":
+                raise InvalidGeojson('All Geometries must be a GeoJSON Feature')
+            elif feat.get('properties') is None:
+                raise InvalidGeojson('Feature must have properties object')
+            elif feat.get('properties').get('predictions') is None:
+                raise InvalidGeojson('Feature must have properties.predictions object')
+
+            predtile = {
+                'prediction_id': pred.id,
+                'quadkey': None,
+                'geom': 'SRID=4326;' + shape(feat.get('geometry')).wkt,
+                'predictions': feat.get('properties').get('predictions'),
+                'validity': {}
+            }
+
+            data.append(predtile)
+
+        connection = db.engine.connect()
+        connection.execute(PredictionTile.__table__.insert(), data)
+
+    @staticmethod
     def create(data):
         """
         Bulk inserts prediction tiles
@@ -127,11 +155,11 @@ class PredictionTileService():
         """
 
         for prediction in data['predictions']:
-            if prediction.get('quadkey_geom') is not None:
-                polygon = prediction.get('quadkey_geom')
+            if prediction.get('geom') is not None:
+                polygon = prediction.get('geom')
                 bounds = [polygon['coordinates'][0][0][0], polygon['coordinates'][0][0][1], polygon['coordinates'][0][2][0], polygon['coordinates'][0][2][1]]
 
-                prediction["quadkey_geom"] = "SRID=4326;POLYGON(({0} {1},{0} {3},{2} {3},{2} {1},{0} {1}))".format(
+                prediction["geom"] = "SRID=4326;POLYGON(({0} {1},{0} {3},{2} {3},{2} {1},{0} {1}))".format(
                     bounds[0],
                     bounds[1],
                     bounds[2],
@@ -139,7 +167,7 @@ class PredictionTileService():
                 )
             else:
                 bounds = mercantile.bounds(mercantile.quadkey_to_tile(prediction.get('quadkey')))
-                prediction["quadkey_geom"] = "SRID=4326;POLYGON(({0} {1},{0} {3},{2} {3},{2} {1},{0} {1}))".format(
+                prediction["geom"] = "SRID=4326;POLYGON(({0} {1},{0} {3},{2} {3},{2} {1},{0} {1}))".format(
                     bounds[0],
                     bounds[1],
                     bounds[2],

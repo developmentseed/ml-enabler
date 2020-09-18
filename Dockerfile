@@ -11,7 +11,7 @@ WORKDIR $HOME/ml-enabler
 
 RUN \
     apt-get update \
-    && apt-get install -y postgresql postgresql-contrib git curl nginx
+    && apt-get install -y postgresql postgresql-contrib git curl nginx libspatialindex-dev
 
 RUN curl 'https://nodejs.org/dist/v13.8.0/node-v13.8.0-linux-x64.tar.gz' | tar -xzv \
     && cp ./node-v13.8.0-linux-x64/bin/node /usr/bin/ \
@@ -31,6 +31,7 @@ RUN cp ./cloudformation/nginx.conf /etc/nginx/sites-enabled/default
 CMD service nginx restart \
     && echo "CREATE DATABASE ${POSTGRES_DB}" | psql postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_ENDPOINT}:${POSTGRES_PORT} || true \
     && echo "CREATE EXTENSION POSTGIS" | psql postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_ENDPOINT}:${POSTGRES_PORT}/${POSTGRES_DB} || true \
+    && echo "CREATE EXTENSION PGCRYPTO" | psql postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_ENDPOINT}:${POSTGRES_PORT}/${POSTGRES_DB} || true \
     && flask db upgrade || true \
     && echo "INSERT INTO users (name, password) VALUES ('machine', crypt('$MACHINE_AUTH', gen_salt('bf', 10)))" | psql postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_ENDPOINT}:${POSTGRES_PORT}/${POSTGRES_DB} || true \
     && echo "UPDATE users SET password = crypt('$MACHINE_AUTH', gen_salt('bf', 10)) WHERE name = 'machine'" | psql postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_ENDPOINT}:${POSTGRES_PORT}/${POSTGRES_DB} || true \
