@@ -1,5 +1,6 @@
 from ml_enabler import db
 from ml_enabler.models.utils import timestamp
+from ml_enabler.models.dtos.ml_model_dto import TokenDTO
 import random
 
 class Token(db.Model):
@@ -31,20 +32,18 @@ class Token(db.Model):
         return self
 
     def as_dto(self):
-        imagery_dto = ImageryDTO()
-        imagery_dto.id = self.id
-        imagery_dto.model_id = self.model_id
-        imagery_dto.name = self.name
-        imagery_dto.url = self.url
-        imagery_dto.fmt = self.fmt
+        dto = TokenDTO()
+        dto.uid = self.uid
+        dto.name = self.name
+        dto.created = self.created
 
-        return imagery_dto
+        return dto
 
     def get(token: str):
         query = db.session.query(
             Token.uid,
-            Imagery.name,
-            Imagery.created,
+            Token.name,
+            Token.created,
         ).filter(Token.token == token)
 
         return Token.query.get(token)
@@ -57,8 +56,8 @@ class Token(db.Model):
     def list(uid: int):
         query = db.session.query(
             Token.uid,
-            Imagery.name,
-            Imagery.created
+            Token.name,
+            Token.created
         ).filter(Token.uid == uid)
 
         tokens = []

@@ -61,7 +61,6 @@ class StatusCheckAPI(Resource):
         return {'hello': 'world'}, 200
 
 class MapboxAPI(Resource):
-
     @login_required
     def get(self):
         return {

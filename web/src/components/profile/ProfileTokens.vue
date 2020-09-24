@@ -140,25 +140,28 @@ export default {
                 this.$emit('err', err);
             }
         },
-        getTokens: function() {
+        getTokens: async function() {
             this.loading = true;
 
-            fetch(`${window.location.origin}/api/token`, {
-                method: 'GET',
-                credentials: 'same-origin'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to load tokens');
-                }
-                return res.json();
-            }).then((res) => {
-                this.tokens = res;
+            try {
+                const res = await fetch(`${window.location.origin}/v1/user/token`, {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                });
+
+                const body = await res.json();
+
                 this.loading = false;
-            }).catch((err) => {
+                if (res.statusCode === 404) {
+                    this.tokens = [];
+                } else if (!res.ok && body.message) {
+                    throw new Error(res.message);
+                } else {
+                    this.tokens = body;
+                }
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         },
         deleteToken: function(token_id) {
             fetch(`${window.location.origin}/v1/user/token/${token_id}`, {

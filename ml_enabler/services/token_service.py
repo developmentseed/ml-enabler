@@ -50,7 +50,7 @@ class TokenService():
         :returns imagery
         """
 
-        token = Token.get(token)
+        token = Token.get(token).as_dto()
 
         if (token):
             return token.to_primitive()

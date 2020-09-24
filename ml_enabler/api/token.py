@@ -16,7 +16,7 @@ token_bp = Blueprint(
 @token_bp.route('/v1/user/token', methods=['GET'])
 def list():
     try:
-        tokens = TokenService.list(uid)
+        tokens = TokenService.list(current_user.id)
         return jsonify(tokens), 200
     except Exception as e:
         error_msg = f'Unhandled error: {str(e)}'
@@ -35,7 +35,7 @@ def post():
         return err(500, error_msg), 500
 
 @login_required
-@token_bp.route('/v1/user/token/<str:token>', methods=['GET'])
+@token_bp.route('/v1/user/token/<token>', methods=['GET'])
 def get(token):
     try:
         return TokenService.get(token)
@@ -47,10 +47,11 @@ def get(token):
         return err(500, error_msg), 500
 
 @login_required
-@token_bp.route('/v1/user/token/<str:token>', methods=['DELETE'])
+@token_bp.route('/v1/user/token/<token>', methods=['DELETE'])
 def delete(token):
     try:
-        return TokenService.delete(token)
+        TokenService.delete(token)
+        return True
     except NotFound:
         return err(404, "No Token Found"), 404
     except Exception as e:
