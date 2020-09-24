@@ -13,8 +13,7 @@ class TokenService():
         :raises DataError
         :returns ID of the prediction
         """
-
-        return Token().create(payload)
+        return Token().create(payload).as_dto().to_primitive()
 
     @staticmethod
     def delete(uid: int, token: str):
@@ -51,7 +50,7 @@ class TokenService():
         :returns imagery
         """
 
-        token = Token.get(uid, token).as_dto()
+        token = Token.get(uid, token).as_dto().to_primitive()
 
         if (token):
             return token.to_primitive()

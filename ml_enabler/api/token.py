@@ -28,7 +28,7 @@ def list():
 def post():
     try:
         token_payload = request.get_json();
-        token_payload['id'] = current_user.id
+        token_payload['uid'] = current_user.id
         return TokenService.create(token_payload), 200
     except Exception as e:
         error_msg = f'Unhandled error: {str(e)}'
