@@ -17,13 +17,14 @@ class TokenService():
         return Token().create(payload)
 
     @staticmethod
-    def delete(token: str):
+    def delete(uid: int, token: str):
         """
         Delete an token
 
         :params token
         """
 
+        token = token.get(uid, token)
         if (token):
             token.delete()
         else:
@@ -41,7 +42,7 @@ class TokenService():
         return Token.list(uid)
 
     @staticmethod
-    def get(token: str):
+    def get(uid: int, token: str):
         """
         Fetch information about a given token
         :params token
@@ -50,7 +51,7 @@ class TokenService():
         :returns imagery
         """
 
-        token = Token.get(token).as_dto()
+        token = Token.get(uid, token).as_dto()
 
         if (token):
             return token.to_primitive()

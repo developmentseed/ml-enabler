@@ -28,6 +28,7 @@ def list():
 def post():
     try:
         token_payload = request.get_json();
+        token_payload['id'] = current_user.id
         return TokenService.create(token_payload), 200
     except Exception as e:
         error_msg = f'Unhandled error: {str(e)}'
@@ -38,7 +39,7 @@ def post():
 @token_bp.route('/v1/user/token/<token>', methods=['GET'])
 def get(token):
     try:
-        return TokenService.get(token)
+        return TokenService.get(current_user.id, token)
     except NotFound:
         return err(404, "No Token Found"), 404
     except Exception as e:
@@ -50,7 +51,7 @@ def get(token):
 @token_bp.route('/v1/user/token/<token>', methods=['DELETE'])
 def delete(token):
     try:
-        TokenService.delete(token)
+        TokenService.delete(current_user.id, token)
         return True
     except NotFound:
         return err(404, "No Token Found"), 404

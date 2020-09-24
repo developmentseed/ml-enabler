@@ -23,7 +23,7 @@ class Token(db.Model):
         """ Creates and saves the current token to the DB """
 
         self.uid = token.get("uid")
-        self.name = imagery.get("name")
+        self.name = token.get("name")
         self.token = '%030x' % random.randrange(16**60)
 
         db.session.add(self)
@@ -39,14 +39,17 @@ class Token(db.Model):
 
         return dto
 
-    def get(token: str):
+    def get(uid: int, token: str):
         query = db.session.query(
             Token.uid,
             Token.name,
             Token.created,
-        ).filter(Token.token == token)
+        ).filter(
+            Token.token == token,
+            Token.uid == uid
+        )
 
-        return Token.query.get(token)
+        return Token.query.get(uid, token)
 
     def delete(self):
         """ Deletes the current model from the DB """
