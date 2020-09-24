@@ -10,7 +10,7 @@ login_manager = LoginManager()
 
 # import models
 from ml_enabler.models import * # noqa
-from ml_enabler.api import auth, task, imagery, integration, token
+from ml_enabler.api import auth, task, imagery, integration, token, aoi
 
 def create_app(env=None, app_config='ml_enabler.config.EnvironmentConfig'):
     # create and configure the app
@@ -21,6 +21,7 @@ def create_app(env=None, app_config='ml_enabler.config.EnvironmentConfig'):
     migrate.init_app(app, db)
     login_manager.init_app(app)
 
+    app.register_blueprint(aoi.aoi_bp)
     app.register_blueprint(auth.auth_bp)
     app.register_blueprint(token.token_bp)
     app.register_blueprint(task.task_bp)

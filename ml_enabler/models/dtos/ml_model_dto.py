@@ -5,6 +5,14 @@ class TokenDTO(Model):
     """ Describes JSON of an Integration Source """
 
     id = IntType()
+    model_id = StringType(required=True)
+    pred_id = IntType()
+    bounds = StringType(required=True)
+
+class TokenDTO(Model):
+    """ Describes JSON of an Integration Source """
+
+    id = IntType()
     uid = IntType(required=True)
     name = StringType(required=True)
     token = StringType()
