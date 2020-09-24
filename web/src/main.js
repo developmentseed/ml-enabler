@@ -6,6 +6,7 @@ import App from './App.vue'
 import Home from './components/Home.vue';
 import Login from './components/Login.vue';
 import Model from './components/Model.vue';
+import Profile from './components/Profile.vue';
 import EditModel from './components/EditModel.vue';
 import Prediction from './components/Prediction.vue';
 import Imagery from './components/Imagery.vue';
@@ -26,6 +27,7 @@ const router = new VueRouter({
     routes: [
         { path: '/', name: 'home', component: Home },
         { path: '/login', name: 'login', component: Login },
+        { path: '/profile', name: 'profile', component: Profile },
 
         { path: '/model/new', name: 'newmodel', component: EditModel },
 

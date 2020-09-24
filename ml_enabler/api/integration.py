@@ -75,9 +75,9 @@ def post(model_id):
 @login_required
 @integration_bp.route('/v1/model/<int:model_id>/integration/<int:integration_id>', methods=['POST'])
 def use(model_id, integration_id):
-    integration_payload = request.get_json();
-
     try:
+        integration_payload = request.get_json();
+
         IntegrationService.payload(integration_id, integration_payload)
     except IntegrationNotFound:
         return err(404, "Integration not found"), 404
