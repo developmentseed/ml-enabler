@@ -16,16 +16,20 @@ class TokenService():
         return Token().create(payload).as_dto().to_primitive()
 
     @staticmethod
-    def delete(uid: int, token: str):
+    def delete(uid: int, token_id: int):
         """
         Delete an token
 
         :params token
         """
 
-        token = token.get(uid, token)
+        token = Token.get(uid, token_id)
         if (token):
             token.delete()
+
+            return {
+                'status': 'deleted'
+            }
         else:
             raise NotFound('Token Not Found')
 
@@ -41,7 +45,7 @@ class TokenService():
         return Token.list(uid)
 
     @staticmethod
-    def get(uid: int, token: str):
+    def get(uid: int, token_id: int):
         """
         Fetch information about a given token
         :params token
@@ -50,7 +54,7 @@ class TokenService():
         :returns imagery
         """
 
-        token = Token.get(uid, token).as_dto().to_primitive()
+        token = Token.get(uid, token_id).as_dto().to_primitive()
 
         if (token):
             return token.to_primitive()

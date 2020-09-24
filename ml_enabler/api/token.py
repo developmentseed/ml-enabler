@@ -36,10 +36,10 @@ def post():
         return err(500, error_msg), 500
 
 @login_required
-@token_bp.route('/v1/user/token/<token>', methods=['GET'])
-def get(token):
+@token_bp.route('/v1/user/token/<int:token_id>', methods=['GET'])
+def get(token_id):
     try:
-        return TokenService.get(current_user.id, token)
+        return TokenService.get(current_user.id, token_id)
     except NotFound:
         return err(404, "No Token Found"), 404
     except Exception as e:
@@ -48,11 +48,10 @@ def get(token):
         return err(500, error_msg), 500
 
 @login_required
-@token_bp.route('/v1/user/token/<token>', methods=['DELETE'])
-def delete(token):
+@token_bp.route('/v1/user/token/<int:token_id>', methods=['DELETE'])
+def delete(token_id):
     try:
-        TokenService.delete(current_user.id, token)
-        return True
+        return TokenService.delete(current_user.id, token_id)
     except NotFound:
         return err(404, "No Token Found"), 404
     except Exception as e:

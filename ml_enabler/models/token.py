@@ -33,23 +33,23 @@ class Token(db.Model):
 
     def as_dto(self):
         dto = TokenDTO()
+
+        dto.id = self.id
         dto.uid = self.uid
         dto.name = self.name
         dto.created = self.created
 
         return dto
 
-    def get(uid: int, token: str):
+    def get(uid: int, token_id: int):
         query = db.session.query(
+            Token.id,
             Token.uid,
             Token.name,
             Token.created,
-        ).filter(
-            Token.token == token,
-            Token.uid == uid
-        )
+        ).filter(Token.uid == uid).filter(Token.id == token_id)
 
-        return Token.query.get(uid, token)
+        return Token.query.all()[0]
 
     def delete(self):
         """ Deletes the current model from the DB """
@@ -58,6 +58,7 @@ class Token(db.Model):
 
     def list(uid: int):
         query = db.session.query(
+            Token.id,
             Token.uid,
             Token.name,
             Token.created
@@ -66,9 +67,10 @@ class Token(db.Model):
         tokens = []
         for t in query.all():
             tokens.append({
-                "uid": t[0],
-                "name": t[1],
-                "created": t[2]
+                "id": t[0],
+                "uid": t[1],
+                "name": t[2],
+                "created": t[3]
             })
 
         return tokens
