@@ -5,6 +5,15 @@ class IntegrationDTO(Model):
     """ Describes JSON of an Integration Source """
 
     id = IntType()
+    uid = IntType(required=True)
+    name = StringType(required=True)
+    token = StringType(required=True)
+    created = DateTimeType()
+
+class IntegrationDTO(Model):
+    """ Describes JSON of an Integration Source """
+
+    id = IntType()
     model_id = IntType(required=True)
     integration = StringType(required=True)
     name = StringType(required=True)

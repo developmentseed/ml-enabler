@@ -52,7 +52,7 @@ def init_routes(app):
 
     api.add_resource(MapboxAPI,                 '/v1/mapbox', methods=['GET'])
 
-    api.add_resource(PredictionStacksAPI,        '/v1/stacks', methods=['GET'])
+    api.add_resource(PredictionStacksAPI,       '/v1/stacks', methods=['GET'])
 
     api.add_resource(GetAllModels,              '/v1/model/all', methods=['GET'])
     api.add_resource(MLModelAPI,                '/v1/model', endpoint="post", methods=['POST'])
