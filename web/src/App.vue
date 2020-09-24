@@ -111,10 +111,10 @@ export default {
                     method: 'GET'
                 });
 
+                this.loading.user = false;
                 const body = await res.json();
                 if (!res.ok) throw new Error(body.message);
                 this.user = body;
-                this.loading.user = false;
             } catch (err) {
                 console.error(err);
             }

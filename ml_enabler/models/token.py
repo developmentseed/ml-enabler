@@ -1,5 +1,5 @@
 from ml_enabler import db
-from ml_enabler.models.dtos.ml_model_dto import TokenDTO
+from ml_enabler.models.utils import timestamp
 import random
 
 class Token(db.Model):

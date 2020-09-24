@@ -121,7 +121,7 @@ export default {
         },
         setToken: async function() {
             try {
-                const res = await fetch(`${window.location.origin}/api/token`, {
+                const res = await fetch(`${window.location.origin}/v1/user/token`, {
                     method: 'POST',
                     credentials: 'same-origin',
                     headers: {
@@ -161,7 +161,7 @@ export default {
             });
         },
         deleteToken: function(token_id) {
-            fetch(`${window.location.origin}/api/token/${token_id}`, {
+            fetch(`${window.location.origin}/v1/user/token/${token_id}`, {
                 method: 'DELETE',
                 credentials: 'same-origin'
             }).then((res) => {
