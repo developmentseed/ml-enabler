@@ -38,6 +38,7 @@ class Token(db.Model):
         dto.uid = self.uid
         dto.name = self.name
         dto.created = self.created
+        dto.token = self.token
 
         return dto
 
