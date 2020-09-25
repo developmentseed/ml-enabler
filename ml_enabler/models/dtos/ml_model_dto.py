@@ -1,7 +1,7 @@
 from schematics import Model
 from schematics.types import StringType, IntType, DateTimeType, ListType, FloatType, BooleanType, DictType
 
-class TokenDTO(Model):
+class AOIDTO(Model):
     """ Describes JSON of an Integration Source """
 
     id = IntType()

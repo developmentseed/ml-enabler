@@ -26,7 +26,9 @@ def list(model_id):
 def post(model_id):
     try:
         payload = request.get_json()
-        aoi = AOIService.create(model_id, api)
+
+        payload['model_id'] = model_id;
+        aoi = AOIService.create(payload)
 
         return aoi, 200
     except Exception as e:

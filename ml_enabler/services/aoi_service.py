@@ -5,7 +5,9 @@ from ml_enabler.models.utils import NotFound
 class AOIService():
     @staticmethod
     def create(payload: dict) -> int:
-        return AOI.create(payload)
+        aoi = AOI()
+
+        return aoi.create(payload)
 
     @staticmethod
     def list(model_id: int, pred_id: int):

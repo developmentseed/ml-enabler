@@ -1,5 +1,6 @@
 from ml_enabler import db
 from ml_enabler.models.dtos.ml_model_dto import AOIDTO
+from geoalchemy2 import Geometry
 
 class AOI(db.Model):
     __tablename__ = 'model_aoi'
@@ -37,7 +38,7 @@ class AOI(db.Model):
 
     def list(model_id: int, pred_id: int):
         filters = [
-            AOI.model_id = model_id,
+            AOI.model_id == model_id
         ]
 
         if pred_id is not None:
