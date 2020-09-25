@@ -5,6 +5,7 @@ class AOIDTO(Model):
     """ Describes JSON of an Integration Source """
 
     id = IntType()
+    name = StringType(required=True)
     model_id = StringType(required=True)
     pred_id = IntType()
     bounds = StringType(required=True)

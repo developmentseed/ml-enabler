@@ -7,6 +7,9 @@ class AOI(db.Model):
     __tablename__ = 'model_aoi'
 
     id = db.Column(db.Integer, primary_key=True)
+
+    name = db.Column(db.String, nullable=False)
+
     model_id = db.Column(
         db.BigInteger,
         db.ForeignKey('ml_models.id', name='fk_models'),
@@ -23,6 +26,7 @@ class AOI(db.Model):
     def create(self, payload: dict):
         self.model_id = payload['model_id']
         self.pred_id = payload['pred_id']
+        self.name = payload['name']
 
         bounds = payload['bounds'].split(',')
         self.bounds = "SRID=4326;POLYGON(({0} {1},{0} {3},{2} {3},{2} {1},{0} {1}))".format(
@@ -52,6 +56,7 @@ class AOI(db.Model):
         dto.id = self.id
         dto.pred_id = self.pred_id
         dto.model_id = self.model_id
+        dto.name = self.name
 
         dto.bounds = ','.join(map(str, shapely.wkb.loads(self.bounds.desc, hex=True).bounds))
 
