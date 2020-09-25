@@ -47,10 +47,11 @@ export default {
 
                 const body = await res.json();
                 if (!res.ok) throw new Error(body.message);
+
+                this.$emit('submit');
             } catch (err) {
                 this.$emit('err', err);
             }
-
         }
     }
 }
