@@ -1,6 +1,7 @@
 from ml_enabler import db
 from ml_enabler.models.dtos.ml_model_dto import AOIDTO
 from geoalchemy2 import Geometry
+import shapely
 
 class AOI(db.Model):
     __tablename__ = 'model_aoi'
@@ -51,6 +52,7 @@ class AOI(db.Model):
         dto.id = self.id
         dto.pred_id = self.pred_id
         dto.model_id = self.model_id
-        dto.bounds = self.bounds
+
+        dto.bounds = ','.join(map(str, shapely.wkb.loads(self.bounds.desc, hex=True).bounds))
 
         return dto
