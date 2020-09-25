@@ -7,7 +7,7 @@ class AOIService():
     def create(payload: dict) -> int:
         aoi = AOI()
 
-        return aoi.create(payload)
+        return aoi.create(payload).as_dto().to_primitive()
 
     @staticmethod
     def list(model_id: int, pred_id: int):
