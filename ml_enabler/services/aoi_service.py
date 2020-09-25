@@ -10,7 +10,7 @@ class AOIService():
         return aoi.create(payload).as_dto().to_primitive()
 
     @staticmethod
-    def list(model_id: int, pred_id: int):
+    def list(model_id: int, pred_id=None):
         rawaois = AOI.list(model_id, pred_id)
 
         aois = []

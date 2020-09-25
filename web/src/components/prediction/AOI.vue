@@ -2,7 +2,10 @@
     <div class='grid grid--gut12 col col--12'>
         <div class='col col--6'>
             <label>Area Of Interest</label>
-            <input v-model='name' type='text' class='input' placeholder='name' />
+            <vSelect
+                v-model='name'
+                :options='aois'
+            />
         </div>
         <div class='col col--6'>
             <label>Bounding Box</label>
@@ -16,19 +19,26 @@
 </template>
 
 <script>
+import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
+
 export default {
     name: 'AOI',
     props: ['mapbounds'],
     data: function() {
         return {
             name: '',
-            bounds: ''
+            bounds: '',
+            aois: []
         }
     },
     watch: {
         mapbounds: function() {
             this.bounds = this.mapbounds
         }
+    },
+    mounted: function() {
+        this.getAOI();
     },
     methods: {
         postAOI: async function() {
@@ -52,7 +62,24 @@ export default {
             } catch (err) {
                 this.$emit('err', err);
             }
+        },
+        getAOI: async function() {
+            try {
+                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/aoi`, {
+                    method: 'GET'
+                });
+
+                const body = await res.json();
+                if (!res.ok) throw new Error(body.message);
+
+                this.aois = body;
+            } catch (err) {
+                this.$emit('err', err);
+            }
         }
+    },
+    components: {
+        vSelect
     }
 }
 </script>
