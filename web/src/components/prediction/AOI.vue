@@ -29,7 +29,7 @@
         </div>
         <div class='col col--6'>
             <label>Bounding Box</label>
-            <input :disabled='mode === "existing"' v-model='bounds' type='text' class='input mt6' placeholder='minX, minY, maxX, maxY'/>
+            <input :disabled='mode === "existing"' v-model='name.bounds' type='text' class='input mt6' placeholder='minX, minY, maxX, maxY'/>
         </div>
 
         <div class='col col--12 my12 pr12'>
@@ -50,9 +50,9 @@ export default {
             mode: 'new',
             name: {
                 label: '',
+                bounds: '',
                 code: ''
             },
-            bounds: '',
             aois: []
         }
     },
@@ -61,7 +61,7 @@ export default {
             if (this.mode === "existing") {
                 return !name.code;
             } else {
-                return !this.name.length && this.bounds.split(',').length !== 4;
+                return !this.name.length && this.name.bounds.split(',').length !== 4;
             }
         }
     },
@@ -69,11 +69,12 @@ export default {
         mode: function() {
             this.name = {
                 label: '',
+                bounds: '',
                 code: ''
             }
         },
         mapbounds: function() {
-            this.bounds = this.mapbounds
+            this.name.bounds = this.mapbounds
         },
     },
     mounted: function() {
@@ -89,8 +90,8 @@ export default {
                     },
                     body: JSON.stringify({
                         pred_id: parseInt(this.$route.params.predid),
-                        name: this.name,
-                        bounds: this.bounds
+                        name: this.name.label,
+                        bounds: this.name.bounds
                     })
                 });
 
@@ -114,6 +115,7 @@ export default {
                 this.aois = body.aois.map((aoi) => {
                     return {
                         label: aoi.name,
+                        bounds: aoi.bounds,
                         code: aoi.id
                     };
                 });
