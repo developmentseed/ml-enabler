@@ -186,6 +186,7 @@ export default {
                     [bounds[2], bounds[3]]
                 ]);
             }
+            this.aoi = 'aoi';
         },
         bg: function() {
             this.layers();
@@ -216,9 +217,9 @@ export default {
             this.hide();
         }
     },
-    mounted: function() {
+    mounted: async function() {
+        await this.getAOIs();
         this.getImagery();
-        this.getAOIs();
 
         if (this.tilejson) {
             this.$nextTick(() => {
@@ -331,16 +332,36 @@ export default {
             const polyinner = buffer(bboxPolygon(this.tilejson.bounds), 0.1);
 
             const poly = {
-                type: 'Feature',
-                properties: {},
-                geometry: {
-                    type: 'Polygon',
-                    coordinates: [
-                        polyouter.geometry.coordinates[0],
-                        polyinner.geometry.coordinates[0]
-                    ]
-                }
+                type: 'FeatureCollection',
+                features: [{
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [
+                            polyouter.geometry.coordinates[0],
+                            polyinner.geometry.coordinates[0]
+                        ]
+                    }
+                }]
             };
+
+            for (const aoi of this.aois) {
+                const bounds = aoi.bounds.split(',');
+                const aoipolyouter = buffer(bboxPolygon(bounds), 0.3);
+                const aoipolyinner = buffer(bboxPolygon(bounds), 0.1);
+                poly.features.push({
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [
+                            aoipolyouter.geometry.coordinates[0],
+                            aoipolyinner.geometry.coordinates[0]
+                        ]
+                    }
+                });
+            }
 
             if (!this.map.getSource('tiles')) {
                 this.map.addSource('tiles', {
