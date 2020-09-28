@@ -39,13 +39,9 @@ export default {
             draw: false,
             token: false,
             bounds: '',
-            poly: {
-                type: 'Feature',
-                properties: { },
-                geometry: {
-                    type: 'Polygon',
-                    coordinates: [[[0,0],[0,0],[0,0],[0,0],[0,0]]]
-                }
+            aois: {
+                type: 'FeatureCollection',
+                features: []
             }
         };
     },
@@ -74,7 +70,7 @@ export default {
             const bounds = this.bounds.split(',');
 
             try {
-                this.poly = {
+                this.poly.features[0] = {
                     type: 'Feature',
                     properties: {},
                     geometry: bboxPolygon(bounds).geometry
@@ -144,7 +140,21 @@ export default {
                     }
                 });
             });
-        }
+        },
+        getAOI: async function() {
+            try {
+                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/aoi?pred_id=${this.$route.params.predid}`, {
+                    method: 'GET'
+                });
+
+                const body = await res.json();
+                if (!res.ok) throw new Error(body.message);
+
+                this.aois = body.aois;
+            } catch (err) {
+                this.$emit('err', err);
+            }
+
     },
     components: {
         AOI
