@@ -1,13 +1,11 @@
 <template>
-    <div class='col col--12 grid grid--gut12'>
-
-        <label class='col col--12 pt12'>Bounding Box To Inference</label>
-        <div class='col col--10 mb12'>
-            <input v-model='bounds' type='text' class='input' placeholder='minX, minY, maxX, maxY'/>
-        </div>
-        <div class='col col--2 mb12'>
-            <button @click='$emit("queue", poly)' class='btn btn--stroke round'>Submit</button>
-        </div>
+    <div class='col col--12 grid grid--gut12 pt12'>
+        <AOI
+            :mapbounds='bounds'
+            @bounds='bounds = $event'
+            @submit='$emit("queue", poly)'
+            @err='$emit("err", $event)'
+        />
 
         <div id='map-container' class="col col--12 h600 w-full relative">
             <div id="map" class='w-full h-full'></div>
@@ -16,6 +14,8 @@
 </template>
 
 <script>
+import AOI from './AOI.vue'
+
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -39,13 +39,9 @@ export default {
             draw: false,
             token: false,
             bounds: '',
-            poly: {
-                type: 'Feature',
-                properties: { },
-                geometry: {
-                    type: 'Polygon',
-                    coordinates: [[[0,0],[0,0],[0,0],[0,0],[0,0]]]
-                }
+            aois: {
+                type: 'FeatureCollection',
+                features: []
             }
         };
     },
@@ -74,7 +70,7 @@ export default {
             const bounds = this.bounds.split(',');
 
             try {
-                this.poly = {
+                this.poly.features[0] = {
                     type: 'Feature',
                     properties: {},
                     geometry: bboxPolygon(bounds).geometry
@@ -144,7 +140,10 @@ export default {
                     }
                 });
             });
-        }
+        },
+    },
+    components: {
+        AOI
     }
 }
 </script>

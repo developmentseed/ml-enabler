@@ -26,7 +26,17 @@
                             </div>
                         </div>
                         <div class='col col--12 clearfix pt6'>
-                            <button @click='bboxzoom' class='btn round btn--stroke fl btn--gray'><svg class='icon'><use xlink:href='#icon-viewport'/></svg></button>
+                            <div class='select-container mr6' style='width: 100px;'>
+                                <select v-model='aoi' class='select select--s'>
+                                    <option default value='aoi'>AOI</option>
+                                    <template v-for='aoi in aois'>
+                                        <option v-bind:key='aoi.bounds' v-text='aoi.name'></option>
+                                    </template>
+                                </select>
+                                <div class='select-arrow'></div>
+                            </div>
+
+                            <button @click='bboxzoom' class='btn round btn--stroke fr btn--gray'><svg class='icon'><use xlink:href='#icon-viewport'/></svg></button>
                         </div>
 
                         <template v-if='!advanced'>
@@ -160,10 +170,24 @@ export default {
             threshold: 50,
             opacity: 50,
             map: false,
-            imagery: []
+            imagery: [],
+            aoi: 'aoi',
+            aois: []
         };
     },
     watch: {
+        aoi: function() {
+            for (const aoi of this.aois) {
+                if (aoi.name !== this.aoi) continue;
+
+                const bounds = aoi.bounds.split(',');
+                this.map.fitBounds([
+                    [bounds[0], bounds[1]],
+                    [bounds[2], bounds[3]]
+                ]);
+            }
+            this.aoi = 'aoi';
+        },
         bg: function() {
             this.layers();
         },
@@ -193,7 +217,8 @@ export default {
             this.hide();
         }
     },
-    mounted: function() {
+    mounted: async function() {
+        await this.getAOIs();
         this.getImagery();
 
         if (this.tilejson) {
@@ -307,16 +332,36 @@ export default {
             const polyinner = buffer(bboxPolygon(this.tilejson.bounds), 0.1);
 
             const poly = {
-                type: 'Feature',
-                properties: {},
-                geometry: {
-                    type: 'Polygon',
-                    coordinates: [
-                        polyouter.geometry.coordinates[0],
-                        polyinner.geometry.coordinates[0]
-                    ]
-                }
+                type: 'FeatureCollection',
+                features: [{
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [
+                            polyouter.geometry.coordinates[0],
+                            polyinner.geometry.coordinates[0]
+                        ]
+                    }
+                }]
             };
+
+            for (const aoi of this.aois) {
+                const bounds = aoi.bounds.split(',');
+                const aoipolyouter = buffer(bboxPolygon(bounds), 0.3);
+                const aoipolyinner = buffer(bboxPolygon(bounds), 0.1);
+                poly.features.push({
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [
+                            aoipolyouter.geometry.coordinates[0],
+                            aoipolyinner.geometry.coordinates[0]
+                        ]
+                    }
+                });
+            }
 
             if (!this.map.getSource('tiles')) {
                 this.map.addSource('tiles', {
@@ -444,6 +489,20 @@ export default {
                 const body = await res.json();
                 if (!res.ok) throw new Error(body.message);
                 this.imagery = body;
+            } catch (err) {
+                this.$emit('err', err);
+            }
+        },
+        getAOIs: async function() {
+            try {
+                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/aoi?pred_id=${this.$route.params.predid}`, {
+                    method: 'GET'
+                });
+
+                const body = await res.json();
+                if (!res.ok) throw new Error(body.message);
+
+                this.aois = body.aois;
             } catch (err) {
                 this.$emit('err', err);
             }

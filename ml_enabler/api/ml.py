@@ -215,7 +215,6 @@ class MLModelAPI(Resource):
         """
         try:
             updated_model_dto = MLModelDTO(request.get_json())
-            print(updated_model_dto.to_primitive())
             updated_model_dto.validate()
             model_id = MLModelService.update_ml_model(updated_model_dto)
             return {"model_id": model_id}, 200
@@ -335,11 +334,7 @@ class PredictionExport(Resource):
         hint = pred.hint
         z = pred.tile_zoom
         i_info = ImageryService.get(pred.imagery_id)
-        print('i info')
-        print(i_info)
         c_list = ImageryService.get(pred.imagery_id)
-        print('c_list')
-        print(c_list)
 
         first = False
 
@@ -811,7 +806,6 @@ class PredictionStacksAPI(Resource):
             stacks.extend(stack_res.get("StackSummaries"))
 
             while stack_res.get("NextToken") is not None:
-                print(stack_res.get("NextToken"))
                 stack_res = boto3.client('cloudformation').list_stacks(
                     NextToken = stack_res.get("NextToken")
                 )

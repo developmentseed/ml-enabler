@@ -1,6 +1,15 @@
 from schematics import Model
 from schematics.types import StringType, IntType, DateTimeType, ListType, FloatType, BooleanType, DictType
 
+class AOIDTO(Model):
+    """ Describes JSON of an Integration Source """
+
+    id = IntType()
+    name = StringType(required=True)
+    model_id = StringType(required=True)
+    pred_id = IntType()
+    bounds = StringType(required=True)
+
 class TokenDTO(Model):
     """ Describes JSON of an Integration Source """
 
