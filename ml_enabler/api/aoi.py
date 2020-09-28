@@ -14,7 +14,8 @@ aoi_bp = Blueprint(
 @aoi_bp.route('/v1/model/<int:model_id>/aoi', methods=['GET'])
 def list(model_id):
     try:
-        aoi = AOIService.list(model_id)
+        pred_id = request.args.get('pred_id')
+        aoi = AOIService.list(model_id, pred_id)
         return jsonify(aoi), 200
     except Exception as e:
         error_msg = f'Unhandled error: {str(e)}'

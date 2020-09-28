@@ -141,20 +141,6 @@ export default {
                 });
             });
         },
-        getAOI: async function() {
-            try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/aoi?pred_id=${this.$route.params.predid}`, {
-                    method: 'GET'
-                });
-
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
-
-                this.aois = body.aois;
-            } catch (err) {
-                this.$emit('err', err);
-            }
-
     },
     components: {
         AOI

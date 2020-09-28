@@ -26,7 +26,17 @@
                             </div>
                         </div>
                         <div class='col col--12 clearfix pt6'>
-                            <button @click='bboxzoom' class='btn round btn--stroke fl btn--gray'><svg class='icon'><use xlink:href='#icon-viewport'/></svg></button>
+                            <div class='select-container mr6' style='width: 100px;'>
+                                <select v-model='aoi' class='select select--s'>
+                                    <option default value='aoi'>AOI</option>
+                                    <template v-for='aoi in aois'>
+                                        <option v-bind:key='aoi.bounds' v-text='aoi.name'></option>
+                                    </template>
+                                </select>
+                                <div class='select-arrow'></div>
+                            </div>
+
+                            <button @click='bboxzoom' class='btn round btn--stroke fr btn--gray'><svg class='icon'><use xlink:href='#icon-viewport'/></svg></button>
                         </div>
 
                         <template v-if='!advanced'>
@@ -160,10 +170,23 @@ export default {
             threshold: 50,
             opacity: 50,
             map: false,
-            imagery: []
+            imagery: [],
+            aoi: 'aoi',
+            aois: []
         };
     },
     watch: {
+        aoi: function() {
+            for (const aoi of this.aois) {
+                if (aoi.name !== this.aoi) continue;
+
+                const bounds = aoi.bounds.split(',');
+                this.map.fitBounds([
+                    [bounds[0], bounds[1]],
+                    [bounds[2], bounds[3]]
+                ]);
+            }
+        },
         bg: function() {
             this.layers();
         },
@@ -195,6 +218,7 @@ export default {
     },
     mounted: function() {
         this.getImagery();
+        this.getAOIs();
 
         if (this.tilejson) {
             this.$nextTick(() => {
@@ -444,6 +468,20 @@ export default {
                 const body = await res.json();
                 if (!res.ok) throw new Error(body.message);
                 this.imagery = body;
+            } catch (err) {
+                this.$emit('err', err);
+            }
+        },
+        getAOIs: async function() {
+            try {
+                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/aoi?pred_id=${this.$route.params.predid}`, {
+                    method: 'GET'
+                });
+
+                const body = await res.json();
+                if (!res.ok) throw new Error(body.message);
+
+                this.aois = body.aois;
             } catch (err) {
                 this.$emit('err', err);
             }
