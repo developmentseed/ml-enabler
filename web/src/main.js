@@ -3,8 +3,7 @@ import VueRouter from  'vue-router'
 
 import App from './App.vue'
 
-import Home from './components/prediction/AOI.vue'
-//import Home from './components/Home.vue';
+import Home from './components/Home.vue';
 import Login from './components/Login.vue';
 import Model from './components/Model.vue';
 import Profile from './components/Profile.vue';

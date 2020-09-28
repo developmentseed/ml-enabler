@@ -66,12 +66,15 @@ export default {
         }
     },
     watch: {
+        mode: function() {
+            this.name = {
+                label: '',
+                code: ''
+            }
+        },
         mapbounds: function() {
             this.bounds = this.mapbounds
         },
-        name: function() {
-            console.error(this.name);
-        }
     },
     mounted: function() {
         this.getAOI();
