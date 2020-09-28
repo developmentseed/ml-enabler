@@ -32,7 +32,7 @@
             <input :disabled='mode === "existing"' v-model='name.bounds' type='text' class='input mt6' placeholder='minX, minY, maxX, maxY'/>
         </div>
 
-        <div class='col col--12 my12 pr12'>
+        <div class='col col--12 my12'>
             <button :disabled='isSubmittable' @click='postAOI' class='fr btn btn--stroke round'>Submit</button>
         </div>
     </div>
@@ -58,11 +58,7 @@ export default {
     },
     computed: {
         isSubmittable: function() {
-            if (this.mode === "existing") {
-                return !name.code;
-            } else {
-                return !this.name.length && this.name.bounds.split(',').length !== 4;
-            }
+            return !this.name.length && this.name.bounds.split(',').length !== 4;
         }
     },
     watch: {
@@ -82,6 +78,10 @@ export default {
     },
     methods: {
         postAOI: async function() {
+            if (this.mode === 'existing') {
+                return this.$emit('submit');
+            }
+
             try {
                 const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/aoi`, {
                     method: 'POST',
