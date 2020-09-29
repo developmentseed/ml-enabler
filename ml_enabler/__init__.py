@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_restful import Api
 from flask_login import LoginManager
+from flask_swagger_ui import get_swaggerui_blueprint
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -27,6 +28,11 @@ def create_app(env=None, app_config='ml_enabler.config.EnvironmentConfig'):
     app.register_blueprint(task.task_bp)
     app.register_blueprint(imagery.imagery_bp)
     app.register_blueprint(integration.integration_bp)
+
+    app.register_blueprint(get_swaggerui_blueprint(
+        '/docs',
+        '/v1/docs',
+    ), url_prefix='/docs')
 
     init_routes(app)
     return app
