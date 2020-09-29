@@ -15,6 +15,15 @@ token_bp = Blueprint(
 @login_required
 @token_bp.route('/v1/user/token', methods=['GET'])
 def list():
+    """ 
+    List tokens for the given user session
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: Token List
+    """
     try:
         tokens = TokenService.list(current_user.id)
         return jsonify(tokens), 200
@@ -26,6 +35,15 @@ def list():
 @login_required
 @token_bp.route('/v1/user/token', methods=['POST'])
 def post():
+    """ 
+    Create a new Token
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: Token
+    """
     try:
         token_payload = request.get_json();
         token_payload['uid'] = current_user.id
@@ -38,6 +56,15 @@ def post():
 @login_required
 @token_bp.route('/v1/user/token/<int:token_id>', methods=['GET'])
 def get(token_id):
+    """ 
+    Get a specific Token
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: Token
+    """
     try:
         return TokenService.get(current_user.id, token_id)
     except NotFound:
@@ -50,6 +77,15 @@ def get(token_id):
 @login_required
 @token_bp.route('/v1/user/token/<int:token_id>', methods=['DELETE'])
 def delete(token_id):
+    """ 
+    Delete a specific Token
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: Token
+    """
     try:
         return TokenService.delete(current_user.id, token_id)
     except NotFound:
