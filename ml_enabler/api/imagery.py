@@ -14,6 +14,16 @@ imagery_bp = Blueprint(
 @login_required
 @imagery_bp.route('/v1/model/<int:model_id>/imagery', methods=['GET'])
 def list(model_id):
+    """
+    List imagery sources for a given model
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: Imagery List
+    """
+
     try:
         imagery = ImageryService.list(model_id)
         return jsonify(imagery), 200
@@ -27,6 +37,15 @@ def list(model_id):
 @login_required
 @imagery_bp.route('/v1/model/<int:model_id>/imagery/<int:imagery_id>', methods=['GET'])
 def get(model_id, imagery_id):
+    """
+    Get a specific imagery source
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: Imagery Source
+    """
     try:
         imagery = ImageryService.get(imagery_id)
         return imagery, 200
@@ -40,6 +59,15 @@ def get(model_id, imagery_id):
 @login_required
 @imagery_bp.route('/v1/model/<int:model_id>/imagery/<int:imagery_id>', methods=['PATCH'])
 def patch(model_id, imagery_id):
+    """
+    Patch a specific imagery source
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: Imagery Source
+    """
     imagery = request.get_json();
     imagery_id = ImageryService.patch(model_id, imagery_id, imagery)
 
@@ -51,6 +79,15 @@ def patch(model_id, imagery_id):
 @login_required
 @imagery_bp.route('/v1/model/<int:model_id>/imagery/<int:imagery_id>', methods=['DELETE'])
 def delete(model_id, imagery_id):
+    """
+    Delete a specific imagery source
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: Imagery Source
+    """
     ImageryService.delete(model_id, imagery_id)
 
     return "deleted", 200
@@ -58,6 +95,15 @@ def delete(model_id, imagery_id):
 @login_required
 @imagery_bp.route('/v1/model/<int:model_id>/imagery', methods=['POST'])
 def post(model_id):
+    """
+    Create a new imagery source
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: Imagery Source
+    """
     try:
         imagery = request.get_json()
         imagery_id = ImageryService.create(model_id, imagery)

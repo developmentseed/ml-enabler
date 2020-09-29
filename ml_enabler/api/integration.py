@@ -15,6 +15,15 @@ integration_bp = Blueprint(
 @login_required
 @integration_bp.route('/v1/model/<int:model_id>/integration', methods=['GET'])
 def list(model_id):
+    """
+    List integrations for a given model
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: Integration List
+    """
     try:
         integration = IntegrationService.list(model_id)
         return jsonify(integration), 200
@@ -28,6 +37,15 @@ def list(model_id):
 @login_required
 @integration_bp.route('/v1/model/<int:model_id>/integration/<int:integration_id>', methods=['GET'])
 def get(model_id, integration_id):
+    """
+    Get an single integration
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: Integration
+    """
     try:
         integration = IntegrationService.get(integration_id)
         return integration, 200
@@ -41,6 +59,15 @@ def get(model_id, integration_id):
 @login_required
 @integration_bp.route('/v1/model/<int:model_id>/integration/<int:integration_id>', methods=['PATCH'])
 def patch(model_id, integration_id):
+    """
+    Patch an single integration
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: Integration
+    """
     integration = request.get_json();
     integration_id = IntegrationService.patch(model_id, integration_id, integration)
 
@@ -52,6 +79,15 @@ def patch(model_id, integration_id):
 @login_required
 @integration_bp.route('/v1/model/<int:model_id>/integration/<int:integration_id>', methods=['DELETE'])
 def delete(model_id, integration_id):
+    """
+    Delete an single integration
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: Integration
+    """
     IntegrationService.delete(model_id, integration_id)
 
     return { "status": "deleted" }, 200
@@ -59,6 +95,15 @@ def delete(model_id, integration_id):
 @login_required
 @integration_bp.route('/v1/model/<int:model_id>/integration', methods=['POST'])
 def post(model_id):
+    """
+    Create a new integration
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: Integration
+    """
     try:
         integration = request.get_json()
         integration_id = IntegrationService.create(model_id, integration)
@@ -75,6 +120,15 @@ def post(model_id):
 @login_required
 @integration_bp.route('/v1/model/<int:model_id>/integration/<int:integration_id>', methods=['POST'])
 def use(model_id, integration_id):
+    """
+    Pass data to a given integration
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: Integration
+    """
     try:
         integration_payload = request.get_json();
 

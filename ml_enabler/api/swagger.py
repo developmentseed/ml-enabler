@@ -10,8 +10,8 @@ class SwaggerDocsAPI(Resource):
 
     def get(self):
         template = swagger(current_app)
-        template['info']['title'] = "HOT ML Enabler API"
-        template['info']['description'] = "API endpoints for HOT ML Enabler"
-        template['info']['version'] = "0.0.1"
+        template['info']['title'] = "ML-Enabler API"
+        template['info']['description'] = "API endpoints for ML-Enabler"
+        template['info']['version'] = "1.0.0"
 
         return jsonify(template)

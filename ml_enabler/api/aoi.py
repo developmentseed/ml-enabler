@@ -13,6 +13,16 @@ aoi_bp = Blueprint(
 @login_required
 @aoi_bp.route('/v1/model/<int:model_id>/aoi', methods=['GET'])
 def list(model_id):
+    """
+    Return a list of AOIs for a given model_id
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: AOI List
+    """
+
     try:
         pred_id = request.args.get('pred_id')
         aoi = AOIService.list(model_id, pred_id)
@@ -25,6 +35,15 @@ def list(model_id):
 @login_required
 @aoi_bp.route('/v1/model/<int:model_id>/aoi', methods=['POST'])
 def post(model_id):
+    """
+    Create a new AOI for a given model
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: AOI
+    """
     try:
         payload = request.get_json()
 
