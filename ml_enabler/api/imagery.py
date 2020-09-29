@@ -14,6 +14,16 @@ imagery_bp = Blueprint(
 @login_required
 @imagery_bp.route('/v1/model/<int:model_id>/imagery', methods=['GET'])
 def list(model_id):
+    """
+
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: Task List
+    """
+
     try:
         imagery = ImageryService.list(model_id)
         return jsonify(imagery), 200

@@ -13,6 +13,16 @@ task_bp = Blueprint(
 @login_required
 @task_bp.route('/v1/task', methods=['GET'])
 def list():
+    """
+    Return a list of currently running tasks for a given prediction
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: Task List
+    """
+
     if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
         return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
 
@@ -36,6 +46,15 @@ def list():
 @login_required
 @task_bp.route('/v1/task/<int:task_id>', methods=['GET'])
 def get(task_id):
+    """
+    Return a single task
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: Single Task
+    """
     if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
         return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
 
@@ -51,6 +70,15 @@ def get(task_id):
 @login_required
 @task_bp.route('/v1/task/<int:task_id>/logs', methods=['GET'])
 def logs(task_id):
+    """
+    Return a cloudwatch logs for a given task
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: Single Task
+    """
     if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
         return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
 
@@ -66,6 +94,15 @@ def logs(task_id):
 @login_required
 @task_bp.route('/v1/task/<int:task_id>', methods=['DELETE'])
 def delete(task_id):
+    """
+    Delete a given task
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: Single Task
+    """
     if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
         return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
 

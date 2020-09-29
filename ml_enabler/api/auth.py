@@ -12,6 +12,16 @@ auth_bp = Blueprint(
 
 @auth_bp.route('/v1/user/login', methods=['POST'])
 def login():
+    """
+    Authenticate a session cookie given username & password
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: Authenticated Cookie
+    """
+
     payload = request.get_json()
     username = payload['username']
     password = payload['password']
@@ -42,6 +52,16 @@ def login():
 
 @auth_bp.route('/v1/user/self', methods=['GET'])
 def meta():
+    """
+    Return user information about an authenticated session
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: User Metadata
+    """
+
     if current_user.is_anonymous:
         return { "status": 401, "error": "Not Authenticated" }, 401
 
@@ -51,6 +71,15 @@ def meta():
 
 @auth_bp.route('/v1/user/logout', methods=['GET'])
 def logout():
+    """
+    Remove authentication from a given session cookie
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: User Metadata
+    """
     logout_user()
 
     return {

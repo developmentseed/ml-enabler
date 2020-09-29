@@ -33,10 +33,16 @@ app.logger.setLevel(gunicorn_logger.level)
 
 class MetaAPI(Resource):
 
-    """
-    Return metadata about the API
-    """
     def get(self):
+        """
+        Return metadata about the API
+        ---
+        produces:
+            - application/json
+        responses:
+            200:
+                description: API status check success
+        """
         # -- NOT AUTHENTICATED --
         # Do not put sensitive data in this response
         return {
@@ -47,17 +53,17 @@ class MetaAPI(Resource):
         }, 200
 
 class StatusCheckAPI(Resource):
-    """
-    Healthcheck method
-    ---
-    produces:
-        - application/json
-    responses:
-        200:
-            description: API status check success
-    """
-
     def get(self):
+        """
+        Healthcheck method
+        ---
+        produces:
+            - application/json
+        responses:
+            200:
+                description: API status check success
+        """
+
         return {'hello': 'world'}, 200
 
 class MapboxAPI(Resource):
