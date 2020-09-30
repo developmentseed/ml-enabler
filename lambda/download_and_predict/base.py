@@ -63,42 +63,42 @@ class DownloadAndPredict(object):
             return ModelType.CLASSIFICATION
 
     @staticmethod
-    def get_tiles(event: SQSEvent) -> List[Tile]:
+    def get_chips(event: SQSEvent) -> List[str]:
         """
-        Return the body of our incoming SQS messages as an array of mercantile Tiles
+        Return the body of our incoming SQS messages as an array of dicts
         Expects events of the following format:
 
-        { 'Records': [ { "body": '{ "x": 4, "y": 5, "z":3 }' }] }
+        { 'Records': [ { "body": '{ "url": "", "bounds": "" }' }] }
 
         """
-        return [
-          Tile(*json.loads(record['body']).values())
-          for record
-          in event['Records']
-        ]
+        chips = []
+        for raw in json.loads(record['body']):
+            raw['bounds'] = raw['bounds'].split(',')
+            chips.append(raw)
+
+        return chips
+
     @staticmethod
     def b64encode_image(image_binary:bytes) -> str:
         return b64encode(image_binary).decode('utf-8')
 
-    def get_images(self, tiles: List[Tile]) -> Iterator[Tuple[Tile, bytes]]:
-        for tile in tiles:
-            url = self.imagery.format(x=tile.x, y=tile.y, z=tile.z)
-            print("IMAGE: " + url)
-            r = requests.get(url)
-            yield (tile, r.content)
+    def get_images(self, chips: List[dict]) -> Iterator[Tuple[Tile, bytes]]:
+        for chip in chips:
+            print("IMAGE: " + chip.get('url'))
+            r = requests.get(chip.get('url'))
+            yield (chip, r.content)
 
-    def get_prediction_payload(self, tiles:List[Tile], model_type: ModelType) -> Tuple[List[Tile], Dict[str, Any]]:
+    def get_prediction_payload(self, chips: List[dict], model_type: ModelType) -> Tuple[List[dict], Dict[str, Any]]:
         """
-        tiles: list mercantile Tiles
+        chps: list image tilesk
         imagery: str an imagery API endpoint with three variables {z}/{x}/{y} to replace
         Return:
         - an array of b64 encoded images to send to our prediction endpoint
-        - a corresponding array of tile indices
         These arrays are returned together because they are parallel operations: we
         need to match up the tile indicies with their corresponding images
         """
 
-        tiles_and_images = self.get_images(tiles)
+        tiles_and_images = self.get_images(chips)
         tile_indices, images = zip(*tiles_and_images)
         instances = []
         if model_type == ModelType.CLASSIFICATION:
@@ -110,9 +110,9 @@ class DownloadAndPredict(object):
             "instances": instances
         }
 
-        return (list(tile_indices), payload)
+        return payload
 
-    def cl_post_prediction(self, payload: Dict[str, Any], tiles: List[Tile], prediction_id: str, inferences: List[str]) -> Dict[str, Any]:
+    def cl_post_prediction(self, payload: Dict[str, Any], chips: List[dict], prediction_id: str, inferences: List[str]) -> Dict[str, Any]:
         payload = json.dumps(payload)
         r = requests.post(self.prediction_endpoint + ":predict", data=payload)
         r.raise_for_status()
@@ -120,27 +120,30 @@ class DownloadAndPredict(object):
         preds = r.json()["predictions"]
         pred_list = [];
 
-        for i in range(len(tiles)):
+        for i in range(len(chips)):
             pred_dict = {}
 
             for j in range(len(preds[i])):
                 pred_dict[inferences[j]] = preds[i][j]
 
-            pred_list.append({
-                "quadkey": mercantile.quadkey(tiles[i].x, tiles[i].y, tiles[i].z),
+            body = {
                 "predictions": pred_dict,
                 "prediction_id": prediction_id
-            })
+            }
+            if chips[i]['x'] is not None and chips[i]['y'] is not None and chips[i]['z'] is not None:
+                body['quadkey'] = mercantile.quadkey(chips[i].x, chips[i].y, chips[i].z)
+
+            pred_list.append(body)
 
         return {
             "predictionId": prediction_id,
             "predictions": pred_list
         }
 
-    def od_post_prediction(self, payload: str, tiles: List[Tile], prediction_id: str) -> Dict[str, Any]:
+    def od_post_prediction(self, payload: str, chips: List[dict], prediction_id: str) -> Dict[str, Any]:
         pred_list = [];
 
-        for i in range(len(tiles)):
+        for i in range(len(chips)):
             r = requests.post(self.prediction_endpoint + ":predict", data=json.dumps({
                 "instances": [ payload["instances"][i] ]
             }))
@@ -161,24 +164,26 @@ class DownloadAndPredict(object):
             for bbox in bboxes:
                 bboxes_256.append([c * 256 for c in bbox])
 
-            print("BOUND: " + str(len(bboxes_256)) + " for " + str(tiles[i].x) + "/" + str(tiles[i].y) + "/" + str(tiles[i].z))
-
             for j in range(len(bboxes_256)):
                 bbox = geojson.Feature(
-                    geometry=self.tf_bbox_geo(bboxes_256[j], tiles[i]),
+                    geometry=self.tf_bbox_geo(bboxes_256[j], chips[i].get('bounds')),
                     properties={}
                 ).geometry
 
                 score = preds["detection_scores"][j]
 
-                pred_list.append({
-                    "quadkey": mercantile.quadkey(tiles[i].x, tiles[i].y, tiles[i].z),
+                body = {
                     "geom": bbox,
                     "predictions": {
                         "default": score
                     },
                     "prediction_id": prediction_id
-                })
+                }
+
+                if chips[i]['x'] is not None and chips[i]['y'] is not None and chips[i]['z'] is not None:
+                    body['quadkey'] = mercantile.quadkey(chips[i].x, chips[i].y, chips[i].z)
+
+                pred_list.append(body)
 
         return {
             "predictionId": prediction_id,
@@ -195,13 +200,12 @@ class DownloadAndPredict(object):
 
         return True
 
-    def tf_bbox_geo(self, bbox, tile):
+    def tf_bbox_geo(self, bbox, chip_bounds):
         pred = [bbox[1], bbox[0], bbox[3], bbox[2]]
-        b = mercantile.bounds(tile.x, tile.y, tile.z)
         # Affine Transform
-        width = b[2] - b[0]
-        height = b[3] - b[1]
-        a = affine.Affine(width / 256, 0.0, b[0], 0.0, (0 - height / 256), b[3])
+        width = chip_bounds[2] - chip_bounds[0]
+        height = chip_bounds[3] - chip_bounds[1]
+        a = affine.Affine(width / 256, 0.0, chip_bounds[0], 0.0, (0 - height / 256), chip_bounds[3])
         a_lst = [a.a, a.b, a.d, a.e, a.xoff, a.yoff]
         geographic_bbox = affinity.affine_transform(geometry.box(*pred), a_lst)
 
