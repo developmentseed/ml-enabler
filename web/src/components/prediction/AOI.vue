@@ -62,6 +62,9 @@ export default {
         }
     },
     watch: {
+        'name.bounds': function() {
+            this.$emit('bounds', this.name.bounds);
+        },
         mode: function() {
             this.name = {
                 label: '',
