@@ -39,9 +39,13 @@ export default {
             draw: false,
             token: false,
             bounds: '',
-            aois: {
-                type: 'FeatureCollection',
-                features: []
+            poly: {
+                type: 'Feature',
+                properties: { },
+                geometry: {
+                    type: 'Polygon',
+                    coordinates: [[[0,0],[0,0],[0,0],[0,0],[0,0]]]
+                }
             }
         };
     },
@@ -70,7 +74,7 @@ export default {
             const bounds = this.bounds.split(',');
 
             try {
-                this.poly.features[0] = {
+                this.poly = {
                     type: 'Feature',
                     properties: {},
                     geometry: bboxPolygon(bounds).geometry
