@@ -7,7 +7,7 @@
                     <h1 @click='$router.push({ path: "/" })' class='align-center txt-h3 cursor-default txt-underline-on-hover cursor-pointer'>ML Enabler</h1>
                 </div>
                 <div v-if='!loading.user && $route.path !== "/login"' class='col col--2'>
-                    <button v-if='user.name' class='fr btn btn--stroke btn--s round color-gray color-black-on-hover' v-text='user.name'></button>
+                    <button v-if='user.name' @click='$router.push({ path: "/profile" })' class='fr btn btn--stroke btn--s round color-gray color-black-on-hover' v-text='user.name'></button>
                     <button v-else @click='$router.push({ path: "/login" })' class='fr btn btn--stroke btn--s round color-gray-light color-gray-on-hover'>Login</button>
                 </div>
             </div>
@@ -33,6 +33,7 @@
             </template>
             <template v-else>
                 <router-view
+                    :user='user'
                     :meta='meta'
                     :stacks='stacks'
                     @err='err = $event'

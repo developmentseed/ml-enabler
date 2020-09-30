@@ -81,7 +81,7 @@ class Imagery(db.Model):
         if update.get("url") is not None:
             self.url = update["url"]
         if update.get("fmt") is not None:
-            self.url = update["fmt"]
+            self.fmt = update["fmt"]
 
         db.session.commit()
 

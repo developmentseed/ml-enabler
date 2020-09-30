@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_restful import Api
 from flask_login import LoginManager
+from flask_swagger_ui import get_swaggerui_blueprint
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -10,7 +11,7 @@ login_manager = LoginManager()
 
 # import models
 from ml_enabler.models import * # noqa
-from ml_enabler.api import auth, task, imagery, integration
+from ml_enabler.api import auth, task, imagery, integration, token, aoi
 
 def create_app(env=None, app_config='ml_enabler.config.EnvironmentConfig'):
     # create and configure the app
@@ -21,10 +22,17 @@ def create_app(env=None, app_config='ml_enabler.config.EnvironmentConfig'):
     migrate.init_app(app, db)
     login_manager.init_app(app)
 
+    app.register_blueprint(aoi.aoi_bp)
     app.register_blueprint(auth.auth_bp)
+    app.register_blueprint(token.token_bp)
     app.register_blueprint(task.task_bp)
     app.register_blueprint(imagery.imagery_bp)
     app.register_blueprint(integration.integration_bp)
+
+    app.register_blueprint(get_swaggerui_blueprint(
+        '/docs',
+        '/v1/docs',
+    ), url_prefix='/docs')
 
     init_routes(app)
     return app
@@ -51,7 +59,7 @@ def init_routes(app):
 
     api.add_resource(MapboxAPI,                 '/v1/mapbox', methods=['GET'])
 
-    api.add_resource(PredictionStacksAPI,        '/v1/stacks', methods=['GET'])
+    api.add_resource(PredictionStacksAPI,       '/v1/stacks', methods=['GET'])
 
     api.add_resource(GetAllModels,              '/v1/model/all', methods=['GET'])
     api.add_resource(MLModelAPI,                '/v1/model', endpoint="post", methods=['POST'])
