@@ -523,6 +523,15 @@ class PredictionInfAPI(Resource):
 
     @login_required
     def delete(self, model_id, prediction_id):
+        """
+        Empty the SQS queue of chips to inference
+        ---
+        produces:
+            - application/json
+        responses:
+            200:
+                description: Status Update
+        """
         if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
             return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
 
@@ -557,6 +566,16 @@ class PredictionInfAPI(Resource):
 
     @login_required
     def get(self, model_id, prediction_id):
+        """
+        Return metadata about messages currently in the inference queue
+        ---
+        produces:
+            - application/json
+        responses:
+            200:
+                description: Status Update
+        """
+
         if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
             return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
 
@@ -611,6 +630,16 @@ class PredictionInfAPI(Resource):
 
     @login_required
     def post(self, model_id, prediction_id):
+        """
+        Given a GeoJSON, submit it to the SQS queue
+        ---
+        produces:
+            - application/json
+        responses:
+            200:
+                description: Status Update
+        """
+
         if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
             return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
 
@@ -650,6 +679,9 @@ class PredictionInfAPI(Resource):
                     cache.append({
                         "Id": str(tile.z) + "-" + str(tile.x) + "-" + str(tile.y),
                         "MessageBody": json.dumps({
+                            "name": "{x}-{y}-{z}".format(x=tile.x, y=tile.y, z=tile.z),
+                            "url": imagery['url'].format(x=tile.x, y=tile.y, z=tile.z),
+                            "bounds": mercantile.bounds(tile.x, tile.y, tile.z),
                             "x": tile.x,
                             "y": tile.y,
                             "z": tile.z
