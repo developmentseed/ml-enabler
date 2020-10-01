@@ -73,7 +73,7 @@ class DownloadAndPredict(object):
         """
         chips = []
         for record in event['Records']:
-            raw['bounds'] = json.loads(record['body'])['bounds'].split(',')
+            raw['bounds'] = json.loads(record['body'])['bounds']
             chips.append(raw)
 
         return chips

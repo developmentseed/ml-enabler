@@ -714,7 +714,7 @@ class PredictionInfAPI(Resource):
                         "MessageBody": json.dumps({
                             'name': row[0],
                             'url': row[1],
-                            'bounds': row[2]
+                            'bounds': row[2].split(',')
                         })
                     })
 
