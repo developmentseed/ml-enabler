@@ -133,6 +133,7 @@ f_train = []
 for name in glob.glob('/tmp/tfrecord/train*.tfrecords'):
     f_train.append(name)
 n_train_samps = sum([tf.data.TFRecordDataset(f).reduce(np.int64(0), lambda x, _: x + 1).numpy() for f in f_train])
+print('n train samples')
 print(n_train_samps)
 
 f_val = []
