@@ -125,10 +125,6 @@ def train(n_classes=2, class_names=['class0', 'class1'],
     # Create data feeder functions
     ##############################
 
-    #unzip tf-records dir #TO-DO FIX!!!!!
-    with zipfile.ZipFile(tf_dir, "r") as zip_ref:
-        zip_ref.extractall('/tmp/tfrecords')
-        tf_dir = '/tmp/tfrecords/'
 
     # Create training dataset function
     fpath_train = op.join(tf_dir, 'train_*.tfrecords')

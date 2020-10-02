@@ -72,13 +72,11 @@ def model_estimator(params, model_dir, run_config, retraining_weights, model_id)
     optimizer = get_optimizer(params['optimizer'], params['learning_rate'])
     model.compile(optimizer=optimizer,
                   loss=params['loss'], metrics=params['metrics'])
-    
+
     if retraining_weights:
         print('in retraining weights')
-        with zipfile.ZipFile(retraining_weights, "r") as zip_ref:
-            zip_ref.extractall('/tmp/checkpoint')
-            retraining_weights_ckpt = '/tmp/checkpoint/keras/'  + 'keras_model.ckpt'
-            print(retraining_weights_ckpt)
+        retraining_weights_ckpt = '/tmp/checkpoint/keras/'  + 'keras_model.ckpt'
+        print(retraining_weights_ckpt)
         model.load_weights(retraining_weights_ckpt)
 
     model_id = model_id

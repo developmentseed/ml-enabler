@@ -130,19 +130,19 @@ print(checkpoint)
 print(tfrecord)
 
 f_train = []
-for name in glob.glob('/tmp/tfrecords/train*.tfrecords'):
+for name in glob.glob('/tmp/tfrecord/train*.tfrecords'):
     f_train.append(name)
 n_train_samps = sum([tf.data.TFRecordDataset(f).reduce(np.int64(0), lambda x, _: x + 1).numpy() for f in f_train])
 print(n_train_samps)
 
 f_val = []
-for name in glob.glob('/tmp/tfrecords/val*.tfrecords'):
+for name in glob.glob('/tmp/tfrecord/val*.tfrecords'):
     f_val.append(name)
 n_val_samps = sum([tf.data.TFRecordDataset(f).reduce(np.int64(0), lambda x, _: x + 1).numpy() for f in f_val])
 print(n_val_samps)
 
 # conduct re-training
-train(tf_train_steps=200, tf_dir='/tmp/tfrecords.zip',
+train(tf_train_steps=1000, tf_dir='/tmp/tfrecord/',
        retraining_weights='/tmp/checkpoint.zip',
        n_classes=len(inflist), class_names=inflist,  x_feature_shape=x_feature_shape,
        n_train_samps=n_train_samps, n_val_samps=n_val_samps)
