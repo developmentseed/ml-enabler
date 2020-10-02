@@ -26,7 +26,7 @@ from utils_loss import sigmoid_focal_crossentropy
 
 from sklearn.metrics import precision_score, recall_score, fbeta_score
 
-#File Manipulation 
+#File Manipulation
 
 def zip_model_export(model_id, zip_dir='/ml/models'):
     logging.info("zipping model export")
@@ -43,7 +43,7 @@ def zip_chekpoint(model_id, zip_dir='/ml/checkpoint'):
     logging.info('written checkpoint as zip file')
 
 
-# Modeling Functions 
+# Modeling Functions
 def model_estimator(params, model_dir, run_config, retraining_weights, model_id):
     """Get a model as a tf.estimator object"""
 
@@ -96,26 +96,3 @@ def get_optimizer(opt_name, lr, momentum=0.9):
     if opt_name == 'rmsprop':
         return RMSprop(learning_rate=lr, momentum=momentum)
     raise ValueError('`opt_name`: {} not understood.'.format(opt_name))
-
-
-def resnet_serving_input_receiver_fn():
-    """Convert b64 string encoded images into a tensor for production"""
-    def decode_and_resize(image_str_tensor):
-        """Decodes image string, resizes it and returns a uint8 tensor."""
-        image = tf.image.decode_image(image_str_tensor,
-                                      channels=3,
-                                      dtype=tf.uint8)
-        image = tf.reshape(image, [256, 256, 3])
-        return image
-    # Run processing for batch prediction.
-    input_ph = tf.compat.v1.placeholder(tf.string, shape=[None], name='image_binary')
-    with tf.device("/cpu:0"):
-        images_tensor = tf.map_fn(decode_and_resize, input_ph, back_prop=False, dtype=tf.uint8)
-    # Cast to float
-    images_tensor = tf.cast(images_tensor, dtype=tf.float32)
-    # re-scale pixel values between 0 and 1
-    images_tensor = tf.divide(images_tensor, 255)
-
-    return tf.estimator.export.ServingInputReceiver(
-        {'input_1': images_tensor},
-        {'image_bytes': input_ph})
