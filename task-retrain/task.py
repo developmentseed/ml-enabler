@@ -129,10 +129,6 @@ print(model)
 print(checkpoint)
 print(tfrecord)
 
-#unzip + count tf-records
-with zipfile.ZipFile('/tmp/tfrecords.zip', "r") as zip_ref:
-    zip_ref.extractall('/tmp/tfrecords')
-
 f_train = []
 for name in glob.glob('/tmp/tfrecords/train*.tfrecords'):
     f_train.append(name)
