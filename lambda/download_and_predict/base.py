@@ -130,7 +130,7 @@ class DownloadAndPredict(object):
                 "prediction_id": prediction_id
             }
             if chips[i]['x'] is not None and chips[i]['y'] is not None and chips[i]['z'] is not None:
-                body['quadkey'] = mercantile.quadkey(chips[i].x, chips[i].y, chips[i].z)
+                body['quadkey'] = mercantile.quadkey(chips[i]['x'], chips[i]['y'], chips[i]['z'])
 
             pred_list.append(body)
 
@@ -180,7 +180,7 @@ class DownloadAndPredict(object):
                 }
 
                 if chips[i]['x'] is not None and chips[i]['y'] is not None and chips[i]['z'] is not None:
-                    body['quadkey'] = mercantile.quadkey(chips[i].x, chips[i].y, chips[i].z)
+                    body['quadkey'] = mercantile.quadkey(chips[i]['x'], chips[i]['y'], chips[i]['z'])
 
                 pred_list.append(body)
 
