@@ -8,7 +8,9 @@ import affine
 import geojson
 import requests
 import rasterio
+import shapely
 
+from shapely.geometry import box
 from requests.auth import HTTPBasicAuth
 from shapely import affinity, geometry
 from enum import Enum
@@ -126,9 +128,11 @@ class DownloadAndPredict(object):
                 pred_dict[inferences[j]] = preds[i][j]
 
             body = {
+                "geom": shapely.geometry.mapping(box(*chips[i].get('bounds'))),
                 "predictions": pred_dict,
                 "prediction_id": prediction_id
             }
+
             if chips[i]['x'] is not None and chips[i]['y'] is not None and chips[i]['z'] is not None:
                 body['quadkey'] = mercantile.quadkey(chips[i]['x'], chips[i]['y'], chips[i]['z'])
 
