@@ -43,7 +43,7 @@ def download_tilelist(chip, imagery, folder):
 
     return tile_img
 
-def download_tile_tms(tile, imagery, folder, zoom, supertile=False):
+def download_tile_tms(tile, imagery, folder, zoom, supertile):
     """Download a satellite image tile from a tms endpoint"""
 
     image_format = get_image_format(imagery['url'])
@@ -99,10 +99,8 @@ def download_img_match_labels(labels_folder, imagery, folder, zoom, supertile=Fa
     #download images
     for chip in class_chips:
         if imagery['fmt'] == 'wms':
-            print('in wms case')
-            download_tile_tms(chip, imagery, folder, zoom, supertile=False)
+            download_tile_tms(chip, imagery, folder, zoom, supertile)
         else:
-            print('in chip list case')
             download_tilelist(chip, imagery, folder)
 
 # package up the images + labels into one data.npz file
