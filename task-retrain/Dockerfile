@@ -11,7 +11,7 @@ RUN mkdir /ml
 RUN mkdir /ml/models
 RUN mkdir /ml/data
 RUN mkdir /ml/checkpoint
-RUN mkdir /tmp/tfrecords 
+RUN mkdir /tmp/tfrecords
 
 
 RUN apt-get update \
