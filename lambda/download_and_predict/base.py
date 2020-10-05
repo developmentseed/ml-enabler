@@ -25,7 +25,7 @@ from PIL import Image
 import io
 
 import mercantile
-from mercantile import Tile, children
+from mercantile import children
 import numpy as np
 
 from download_and_predict.custom_types import SQSEvent
@@ -83,7 +83,7 @@ class DownloadAndPredict(object):
     def b64encode_image(image_binary:bytes) -> str:
         return b64encode(image_binary).decode('utf-8')
 
-    def get_images(self, chips: List[dict]) -> Iterator[Tuple[Tile, bytes]]:
+    def get_images(self, chips: List[dict]) -> Iterator[Tuple[dict, bytes]]:
         for chip in chips:
             print("IMAGE: " + chip.get('url'))
             r = requests.get(chip.get('url'))
