@@ -149,7 +149,7 @@ def train(n_classes=2, class_names=['class0', 'class1'],
 
 
     # Create training dataset function
-    fpath_train = op.join(tf_dir, 'train_*.tfrecords')
+    fpath_train = op.join(tf_dir, 'train*.tfrecords')
     print(fpath_train)
     map_func = partial(parse_and_augment_fn, n_chan=3,
                        n_classes=model_params['n_classes'],
@@ -166,7 +166,7 @@ def train(n_classes=2, class_names=['class0', 'class1'],
                                prefetch_buffer_size=prefetch_buffer_size)
 
     # Create validation dataset function
-    fpath_validate = op.join(tf_dir, 'val_*.tfrecords')
+    fpath_validate = op.join(tf_dir, 'val*.tfrecords')
     print(fpath_validate)
     map_func = partial(parse_and_augment_fn, n_chan=3,
                        n_classes=model_params['n_classes'],
