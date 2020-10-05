@@ -26,13 +26,6 @@ def _parse_helper(example, n_chan, n_classes, shp=[256, 256, 3]):
     image = tf.image.decode_image(parsed['image'])
     image = tf.reshape(image, shp)
 
-    # convert image from RGB to grayscale to reduce the feature complexity
-    image = tf.image.rgb_to_grayscale(image)
-    
-    # restore to 3 channel dimensions as required by the net 
-    # by stacking the grayscale channel x3
-    image = tf.image.grayscale_to_rgb(image)
-
     # change dtype to float32
     image = tf.cast(image, tf.float32)
 
