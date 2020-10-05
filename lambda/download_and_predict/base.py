@@ -133,8 +133,8 @@ class DownloadAndPredict(object):
                 "prediction_id": prediction_id
             }
 
-            if chips[i]['x'] is not None and chips[i]['y'] is not None and chips[i]['z'] is not None:
-                body['quadkey'] = mercantile.quadkey(chips[i]['x'], chips[i]['y'], chips[i]['z'])
+            if chips[i].get('x') is not None and chips[i].get('y') is not None and chips[i].get('z') is not None:
+                body['quadkey'] = mercantile.quadkey(chips[i].get('x'), chips[i].get('y'), chips[i].get('z'))
 
             pred_list.append(body)
 
@@ -183,8 +183,8 @@ class DownloadAndPredict(object):
                     "prediction_id": prediction_id
                 }
 
-                if chips[i]['x'] is not None and chips[i]['y'] is not None and chips[i]['z'] is not None:
-                    body['quadkey'] = mercantile.quadkey(chips[i]['x'], chips[i]['y'], chips[i]['z'])
+                if chips[i].get('x') is not None and chips[i].get('y') is not None and chips[i].get('z') is not None:
+                    body['quadkey'] = mercantile.quadkey(chips[i].get('x'), chips[i].get('y'), chips[i].get('z'))
 
                 pred_list.append(body)
 
