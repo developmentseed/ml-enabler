@@ -119,6 +119,7 @@ if supertile:
 else:
     x_feature_shape = [-1, 256, 256, 3]
 
+print(x_feature_shape)
 v = get_versions(model_id)
 
 model = get_asset(bucket, pred['modelLink'].replace(bucket + '/', ''))
