@@ -215,36 +215,29 @@ class DownloadAndPredict(object):
         return geographic_bbox
 
 class SuperTileDownloader(DownloadAndPredict):
-    def __init__(self, imagery: str, mlenabler_endpoint: str, prediction_endpoint: str):
+    def __init__(self, mlenabler_endpoint: str, prediction_endpoint: str):
     # type annotatation error ignored, re: https://github.com/python/mypy/issues/5887
         super(DownloadAndPredict, self).__init__()
-        self.imagery = imagery
         self.mlenabler_endpoint = mlenabler_endpoint
         self.prediction_endpoint = prediction_endpoint
 
-    def get_images(self, tiles: List[Tile]) -> Iterator[Tuple[Tile, bytes]]:
-        """return bounds of original tile filled with the 4 child tiles 1 zoom level up in bytes"""
-        for tile in tiles:
-            print('in SuperTileDownloader get images function')
-            print(tile)
+    def get_images(self, chips: List[dict]) -> Iterator[Tuple[dict, bytes]]:
+        """return bounds of original tile filled with the 4 child chips 1 zoom level up in bytes"""
+        for chip in chips:
             w_lst = []
             for i in range(2):
                 for j in range(2):
                     window = Window(i * 256, j * 256, 256, 256)
                     w_lst.append(window)
-            z = 1 + tile.z
-            child_tiles = children(tile, zoom=z) #get this from database (tile_zoom)
+
+            child_tiles = children(chip.get('x'), chip.get('y'), chip.get('z')) #get this from database (tile_zoom)
             child_tiles.sort()
-            print('in supertile get_images')
-            print(child_tiles)
 
             with MemoryFile() as memfile:
                 with memfile.open(driver='jpeg', height=512, width=512, count=3, dtype=rasterio.uint8) as dataset:
                     for num, t in enumerate(child_tiles):
-                        print(num)
-                        print(t)
-                        url = self.imagery.format(x=t.x, y=t.y, z=t.z)
-                        print(url)
+                        url = chip.get('url').replace(str(chip.get('x')), str(t.x), 1).replace(str(chip.get('y')), str(t.y), 1).replace(str(chip.get('z')), str(t.z), 1)
+
                         r = requests.get(url)
                         img = np.array(Image.open(io.BytesIO(r.content)), dtype=np.uint8)
                         try:
@@ -253,11 +246,9 @@ class SuperTileDownloader(DownloadAndPredict):
                             img = img.reshape((256, 256, 4))
                         img = img[:, :, :3]
                         img = np.rollaxis(img, 2, 0)
-                        print(w_lst[num])
-                        print()
                         dataset.write(img, window=w_lst[num])
                 dataset_b = memfile.read() #but this fails
                 yield(
-                    tile,
+                    chip,
                     dataset_b)
 

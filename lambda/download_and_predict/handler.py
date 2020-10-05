@@ -35,7 +35,7 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
     # construct a payload for our prediction endpoint
 
     if super_tile == 'True':
-        dap = SuperTileDownloader(imagery=imagery.get('url'), mlenabler_endpoint=mlenabler_endpoint, prediction_endpoint=prediction_endpoint)
+        dap = SuperTileDownloader(mlenabler_endpoint=mlenabler_endpoint, prediction_endpoint=prediction_endpoint)
         payload = dap.get_prediction_payload(chips, model_type)
     else:
         payload = dap.get_prediction_payload(chips, model_type)
