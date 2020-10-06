@@ -7,7 +7,7 @@
         </template>
         <template v-else-if='$route.name === "model"'>
             <div class='col col--12 clearfix py6'>
-                <h2 @click='$router.push({ name: "home" })' class='fl cursor-pointer txt-underline-on-hover'>Models</h2>
+                <h2 @click='$router.push({ name: "home" })' class='fl cursor-pointer txt-underline-on-hover'>Projects</h2>
                 <h2 class='fl px6'>&gt;</h2>
                 <h2 @click='mode = "model"' class='fl cursor-pointer txt-underline-on-hover' v-text='model.name + " - " + model.source'></h2>
 
@@ -172,7 +172,7 @@ export default {
             this.mode = 'model';
 
             this.getPredictions();
-            this.getModel();
+            this.getProject();
             this.getImagery();
             this.getIntegration();
         },
@@ -205,7 +205,7 @@ export default {
                 this.$emit('err', err);
             }
         },
-        getModel: async function() {
+        getProject: async function() {
             this.loading.model = true;
 
             try {
