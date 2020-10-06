@@ -67,6 +67,7 @@
 
                     <label class='ml12'>Add User to Project</label>
                     <vSelect
+                        label='name'
                         class='ml12 w-full'
                         v-model='search.name'
                         :options='search.users'
@@ -146,6 +147,8 @@ export default {
         }
     },
     mounted: function() {
+        this.getUsers();
+
         if (this.$route.name === "newmodel") {
             this.users.push({
                 uid: this.user.id,
@@ -209,7 +212,21 @@ export default {
             } catch (err) {
                 this.$emit('err', err);
             }
-        }
+        },
+        getUsers: async function() {
+            try {
+                const res = await fetch(window.api + `/v1/user`, {
+                    method: 'GET'
+                });
+
+                const body = await res.json();
+                if (!res.ok) throw new Error(body.message)
+
+                this.search.users = body;
+            } catch (err) {
+                this.$emit('err', err);
+            }
+        },
     },
     components: {
         vSelect
