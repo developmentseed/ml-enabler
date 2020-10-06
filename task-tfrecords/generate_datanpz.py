@@ -163,13 +163,13 @@ def make_datanpz(dest_folder, imagery,
         img.close()
 
         try:
-            np_img = np_img.reshape((256, 256, 3)) # 4 channels returned from some endpoints, but not all
+            np_img = np_image.reshape((256, 256, 3)) # 4 channels returned from some endpoints, but not all
         except ValueError:
-            np_img = np_img.reshape((256, 256, 4))
-            np_img = np_img[:, :, :3]
+            np_img = np_image.reshape((256, 256, 4))
+            np_img = np_image[:, :, :3]
 
         #focusing just on classification
-        x_vals.append(np_image)
+        x_vals.append(np_img)
         y_vals.append(labels[tile])
 
     # Convert lists to numpy arrays
