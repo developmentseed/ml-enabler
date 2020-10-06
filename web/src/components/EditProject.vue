@@ -48,26 +48,29 @@
                 <template v-if='showUser'>
                     <div class='w-full ml12 border-b border--gray-light mb12'/>
 
-                    <div :key='user.id' v-for='user in users' class='col col--12'>
-                        <div class='col col--6'>
+                    <div :key='user.uid' v-for='user in users' class='col col--12 grid grid--gut12'>
+                        <div class='col col--8'>
+                            <button class='fl mr12 round btn btn--s mt6 btn--stroke color-gray'><svg class='icon'><use xlink:href='#icon-close'/></svg></button>
                             <span v-text='user.name'/>
                         </div>
-                        <div class='col col--5'>
-
-                        </div>
-                        <div class='col col--1'>
-                            <button class='btn btn--white color-gray px0'><svg class='icon fl my6'><use xlink:href='#icon-close'/></svg></button>
+                        <div class='col col--4'>
+                            <div class='select-container fr'>
+                                <select class='select'>
+                                    <option>read</option>
+                                    <option>write</option>
+                                    <option>admin</option>
+                                </select>
+                                <div class='select-arrow'></div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class='col col--12'>
-                        <label class='ml12'>Add User to Project</label>
-                        <vSelect
-                            class='ml12 w-full'
-                            v-model='search.name'
-                            :options='search.users'
-                        />
-                    </div>
+                    <label class='ml12'>Add User to Project</label>
+                    <vSelect
+                        class='ml12 w-full'
+                        v-model='search.name'
+                        :options='search.users'
+                    />
 
                 </template>
 
@@ -131,6 +134,11 @@ export default {
                 name: '',
                 users: []
             },
+            users: [{
+                uid: 1,
+                name: 'ingalls',
+                access: 'read'
+            }],
             project: {
                 name: '',
                 access: false,
