@@ -35,18 +35,55 @@
                     <label>Project Url</label>
                     <input v-model='project.projectUrl' class='input' placeholder='External URL'/>
                 </div>
-
-                <template v-if='!advanced'>
+                <template v-if='!showUser'>
                     <div class='col col--12'>
-                        <button @click='advanced = !advanced' class='btn btn--white color-gray px0'><svg class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg><span class='fl pl6'>Advanced Options</span></button>
+                        <button @click='showUser = !showUser' class='btn btn--white color-gray px0'><svg class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg><span class='fl pl6'>User Access</span></button>
                     </div>
                 </template>
                 <template v-else>
-                    <div class='col col--12 border-b border--gray-light mb12'>
-                        <button @click='advanced = !advanced' class='btn btn--white color-gray px0'><svg class='icon fl my6'><use xlink:href='#icon-chevron-down'/></svg><span class='fl pl6'>Advanced Options</span></button>
+                    <div class='col col--12'>
+                        <button @click='showUser = !showUser' class='btn btn--white color-gray px0'><svg class='icon fl my6'><use xlink:href='#icon-chevron-down'/></svg><span class='fl pl6'>User Access</span></button>
                     </div>
                 </template>
-                <template v-if='advanced'>
+                <template v-if='showUser'>
+                    <div class='w-full ml12 border-b border--gray-light mb12'/>
+
+                    <div :key='user.id' v-for='user in users' class='col col--12'>
+                        <div class='col col--6'>
+                            <span v-text='user.name'/>
+                        </div>
+                        <div class='col col--5'>
+
+                        </div>
+                        <div class='col col--1'>
+                            <button class='btn btn--white color-gray px0'><svg class='icon fl my6'><use xlink:href='#icon-close'/></svg></button>
+                        </div>
+                    </div>
+
+                    <div class='col col--12'>
+                        <label class='ml12'>Add User to Project</label>
+                        <vSelect
+                            class='ml12 w-full'
+                            v-model='search.name'
+                            :options='search.users'
+                        />
+                    </div>
+
+                </template>
+
+                <template v-if='!showAdvanced'>
+                    <div class='col col--12'>
+                        <button @click='showAdvanced = !showAdvanced' class='btn btn--white color-gray px0'><svg class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg><span class='fl pl6'>Advanced Options</span></button>
+                    </div>
+                </template>
+                <template v-else>
+                    <div class='col col--12'>
+                        <button @click='showAdvanced = !showAdvanced' class='btn btn--white color-gray px0'><svg class='icon fl my6'><use xlink:href='#icon-chevron-down'/></svg><span class='fl pl6'>Advanced Options</span></button>
+                    </div>
+                </template>
+                <template v-if='showAdvanced'>
+                    <div class='w-full ml12 border-b border--gray-light mb12'/>
+
                     <div class='col col--12'>
                         <label>Stack Tags</label>
                     </div>
@@ -79,18 +116,27 @@
 </template>
 
 <script>
+import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
+
 export default {
     name: 'EditProject',
     props: ['meta'],
     data: function() {
         return {
             newProject: this.$route.name === 'newmodel',
-            advanced: false,
+            showUser: false,
+            showAdvanced: false,
+            search: {
+                name: '',
+                users: []
+            },
             project: {
                 name: '',
                 access: false,
                 source: '',
                 projectUrl: '',
+                users: [],
                 tags: []
             }
         }
@@ -154,6 +200,9 @@ export default {
                 this.$emit('err', err);
             }
         }
+    },
+    components: {
+        vSelect
     }
 }
 </script>
