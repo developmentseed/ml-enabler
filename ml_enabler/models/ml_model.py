@@ -346,6 +346,8 @@ class PredictionTile(db.Model):
 class ProjectAccess(db.Model):
     __tablename__ = 'projects_access'
 
+    id = db.Column(db.Integer, primary_key=True)
+
     model_id = db.Column(
         db.BigInteger,
         db.ForeignKey('ml_models.id', name='fk_models'),
