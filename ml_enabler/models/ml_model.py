@@ -12,7 +12,7 @@ from sqlalchemy.sql import func, text
 from sqlalchemy.sql.expression import cast
 import sqlalchemy
 from flask_login import UserMixin
-from ml_enabler.models.dtos.ml_model_dto import MLModelDTO, PredictionDTO
+from ml_enabler.models.dtos.ml_model_dto import MLModelDTO, PredictionDTO, ProjectAccessDTO
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -361,6 +361,27 @@ class ProjectAccess(db.Model):
     )
 
     access = db.Column(db.String, nullable=False)
+
+    def create(self, dto: ProjectAccessDTO):
+        """ Creates and saves the current project access dto to the DB """
+
+        self.model_id = dto.model_id
+        self.uid = dto.uid
+        self.access = dto.access
+
+        db.session.add(self)
+        db.session.commit()
+        return self
+
+    def update(self, dto: ProjectAccessDTO):
+        """ Updates an project access """
+        self.access = dto.access
+        db.session.commit()
+
+    def delete(self):
+        """ Deletes the current project access from the DB """
+        db.session.delete(self)
+        db.session.commit()
 
 class MLModel(db.Model):
     """ Describes an ML model registered with the service """

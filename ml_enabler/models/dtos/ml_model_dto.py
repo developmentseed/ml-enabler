@@ -46,6 +46,14 @@ class TaskDTO(Model):
     created = DateTimeType()
     batch_id = IntType()
 
+class ProjectAccessDTO(Model):
+    """ Describes JSON of a ProjectAccess """
+
+    id = IntType()
+    model_id = IntType(required=True)
+    uid = StringType(required=True)
+    access = StringType(required=True)
+
 class MLModelDTO(Model):
     """ Describes JSON of an ML Model """
 
