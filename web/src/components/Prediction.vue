@@ -1,7 +1,7 @@
 <template>
     <div class="col col--12">
         <div class='col col--12 clearfix py6'>
-            <h2 @click='$router.push({ name: "home" })' class='fl cursor-pointer txt-underline-on-hover'>Models</h2>
+            <h2 @click='$router.push({ name: "home" })' class='fl cursor-pointer txt-underline-on-hover'>Projects</h2>
             <h2 class='fl px6'>&gt;</h2>
             <h2 @click='$router.push({ name: "model", params: { modelid: $route.params.modelid } })' class='fl cursor-pointer txt-underline-on-hover' v-text='$route.params.modelid'></h2>
             <h2 class='fl px6'>&gt;</h2>

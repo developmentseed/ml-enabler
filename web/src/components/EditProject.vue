@@ -1,38 +1,39 @@
 <template>
     <div class="col col--12">
         <div class='col col--12 clearfix py6'>
-            <h2 v-if='!newModel' class='fl'>Modify Model</h2>
-            <h2 v-else class='fl cursor-default'>Add Model</h2>
+            <h2 v-if='!newProject' class='fl'>Modify Project</h2>
+            <h2 v-else class='fl cursor-default'>Add Project</h2>
 
             <button @click='$router.push({ path: "/" });' class='btn fr round btn--stroke color-gray color-black-on-hover'>
                 <svg class='icon'><use href='#icon-close'/></svg>
             </button>
 
-            <button v-if='!newModel' @click='deleteModel($route.params.modelid)' class='mr12 btn fr round btn--stroke color-gray color-red-on-hover'>
+            <button v-if='!newProject' @click='deleteProject($route.params.modelid)' class='mr12 btn fr round btn--stroke color-gray color-red-on-hover'>
                 <svg class='icon'><use href='#icon-trash'/></svg>
             </button>
         </div>
         <div class='border border--gray-light round col col--12 px12 py12 clearfix'>
             <div class='grid grid--gut12'>
                 <div class='col col--12 py6'>
-                    <label class='fl'>Model Name</label>
+                    <label class='fl'>Project Name</label>
 
                     <label class='fr switch-container'>
+                        <span class='mr6'>Public Project</span>
                         <input v-model='access' type='checkbox' />
                         <div class='switch'></div>
                     </label>
 
-                    <input v-model='model.name' class='input' placeholder='Model Name'/>
+                    <input v-model='project.name' class='input' placeholder='Model Name'/>
                 </div>
 
                 <div class='col col--6 py6'>
-                    <label>Model Source</label>
-                    <input v-model='model.source' class='input' placeholder='Company'/>
+                    <label>Project Source</label>
+                    <input v-model='project.source' class='input' placeholder='Company'/>
                 </div>
 
                 <div class='col col--6 py6'>
                     <label>Project Url</label>
-                    <input v-model='model.projectUrl' class='input' placeholder='External URL'/>
+                    <input v-model='project.projectUrl' class='input' placeholder='External URL'/>
                 </div>
 
                 <template v-if='!advanced'>
@@ -50,7 +51,7 @@
                         <label>Stack Tags</label>
                     </div>
 
-                    <div class='col col--12 grid grid--gut12' :key='tag_idx' v-for='(tag, tag_idx) in model.tags'>
+                    <div class='col col--12 grid grid--gut12' :key='tag_idx' v-for='(tag, tag_idx) in project.tags'>
                         <div class='col col--4 py6'>
                             <input v-model='tag.Key' input='text' class='input w-full' placeholder='Key'/>
                         </div>
@@ -58,19 +59,19 @@
                             <input v-model='tag.Value' input='text' class='input w-full' placeholder='Value'/>
                         </div>
                         <div class='col col--1 py6'>
-                            <button @click='model.tags.splice(tag_idx, 1)' class='btn btn--stroke round color-gray color-blue-on-hover h36'><svg class='icon'><use href='#icon-close'/></svg></button>
+                            <button @click='project.tags.splice(tag_idx, 1)' class='btn btn--stroke round color-gray color-blue-on-hover h36'><svg class='icon'><use href='#icon-close'/></svg></button>
                         </div>
                     </div>
 
                     <div class='col col--12 py6'>
-                        <button @click='model.tags.push({"Key": "", "Value": ""})' class='btn btn--stroke round color-gray color-blue-on-hover'><svg class='icon'><use href='#icon-plus'/></svg></button>
+                        <button @click='project.tags.push({"Key": "", "Value": ""})' class='btn btn--stroke round color-gray color-blue-on-hover'><svg class='icon'><use href='#icon-plus'/></svg></button>
                     </div>
                 </template>
 
                 <div class='col col--12 py12'>
-                    <button v-if='!newModel' @click='postModel(true)' class='btn btn--stroke round fl color-gray color-red-on-hover'>Archive Model</button>
-                    <button v-if='!newModel' @click='postModel(false)' class='btn btn--stroke round fr color-blue-light color-blue-on-hover'>Update Model</button>
-                    <button v-else @click='postModel(false)' class='btn btn--stroke round fr color-green-light color-green-on-hover'>Add Model</button>
+                    <button v-if='!newProject' @click='postProject(true)' class='btn btn--stroke round fl color-gray color-red-on-hover'>Archive Project</button>
+                    <button v-if='!newProject' @click='postProject(false)' class='btn btn--stroke round fr color-blue-light color-blue-on-hover'>Update Project</button>
+                    <button v-else @click='postProject(false)' class='btn btn--stroke round fr color-green-light color-green-on-hover'>Add Project</button>
                 </div>
             </div>
         </div>
@@ -79,13 +80,13 @@
 
 <script>
 export default {
-    name: 'EditModel',
+    name: 'EditProject',
     props: ['meta'],
     data: function() {
         return {
-            newModel: this.$route.name === 'newmodel',
+            newProject: this.$route.name === 'newmodel',
             advanced: false,
-            model: {
+            project: {
                 name: '',
                 access: false,
                 source: '',
@@ -95,24 +96,24 @@ export default {
         }
     },
     mounted: function() {
-        this.getModel();
+        this.getProject();
     },
     methods: {
-        postModel: async function(archive) {
+        postProject: async function(archive) {
             try {
-                const res = await fetch(window.api + `/v1/model${!this.newModel ? '/' + this.$route.params.modelid : ''}`, {
+                const res = await fetch(window.api + `/v1/model${!this.newProject ? '/' + this.$route.params.modelid : ''}`, {
                     method: this.$route.params.modelid ? 'PUT' : 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        modelId: !this.newModel ? this.$route.params.modelid : undefined,
-                        name: this.model.name,
-                        access: this.model.access ? 'public' : 'private',
-                        source: this.model.source,
-                        projectUrl: this.model.projectUrl,
+                        modelId: !this.newProject ? this.$route.params.modelid : undefined,
+                        name: this.project.name,
+                        access: this.project.access ? 'public' : 'private',
+                        source: this.project.source,
+                        projectUrl: this.project.projectUrl,
                         archived: archive ? true : false,
-                        tags: this.model.tags
+                        tags: this.project.tags
                     })
                 });
 
@@ -123,7 +124,7 @@ export default {
                 this.$emit('err', err);
             }
         },
-        getModel: async function() {
+        getProject: async function() {
             if (this.$route.name === "newmodel") return;
 
             try {
@@ -135,12 +136,12 @@ export default {
                 if (!res.ok) throw new Error(body.message)
                 body.access = body.access === 'public' ? true : false;
 
-                this.model = body;
+                this.project = body;
             } catch (err) {
                 this.$emit('err', err);
             }
         },
-        deleteModel: async function() {
+        deleteProject: async function() {
             try {
                 const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}`, {
                     method: 'DELETE'

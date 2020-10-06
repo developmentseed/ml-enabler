@@ -1,7 +1,7 @@
 <template>
     <div class='col col--12'>
         <div class='col col--12 clearfix py6'>
-            <h2 class='fl cursor-default'>Models</h2>
+            <h2 class='fl cursor-default'>Projects</h2>
 
             <div class='fr'>
                 <label class='switch-container px6'>
@@ -37,7 +37,7 @@
                     <div class='flex-child loading py24'></div>
                 </div>
                 <div class='flex-parent flex-parent--center-main w-full'>
-                    <div class='flex-child py24'>Loading Models</div>
+                    <div class='flex-child py24'>Loading Projects</div>
                 </div>
             </template>
             <template v-else-if='models.length === 0'>
@@ -46,7 +46,7 @@
                 </div>
 
                 <div class='flex-parent flex-parent--center-main pt12 pb36'>
-                    <h1 class='flex-child txt-h4 cursor-default'>No Models Found</h1>
+                    <h1 class='flex-child txt-h4 cursor-default'>No Projects Found</h1>
                 </div>
             </template>
             <template v-else>
@@ -138,13 +138,13 @@ export default {
     methods: {
         refresh: function() {
             this.page = 0;
-            this.getModels();
+            this.getProjects();
         },
         external: function(url) {
             if (!url) return;
             window.open(url, "_blank")
         },
-        getModels: async function() {
+        getProjects: async function() {
             this.loading.models = true;
             this.models = [];
             try {
