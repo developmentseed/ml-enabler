@@ -15,7 +15,13 @@
         <div class='border border--gray-light round col col--12 px12 py12 clearfix'>
             <div class='grid grid--gut12'>
                 <div class='col col--12 py6'>
-                    <label>Model Name</label>
+                    <label class='fl'>Model Name</label>
+
+                    <label class='fr switch-container'>
+                        <input v-model='access' type='checkbox' />
+                        <div class='switch'></div>
+                    </label>
+
                     <input v-model='model.name' class='input' placeholder='Model Name'/>
                 </div>
 
@@ -81,6 +87,7 @@ export default {
             advanced: false,
             model: {
                 name: '',
+                access: false,
                 source: '',
                 projectUrl: '',
                 tags: []
@@ -101,6 +108,7 @@ export default {
                     body: JSON.stringify({
                         modelId: !this.newModel ? this.$route.params.modelid : undefined,
                         name: this.model.name,
+                        access: this.model.access ? 'public' : 'private',
                         source: this.model.source,
                         projectUrl: this.model.projectUrl,
                         archived: archive ? true : false,
@@ -125,6 +133,8 @@ export default {
 
                 const body = await res.json();
                 if (!res.ok) throw new Error(body.message)
+                body.access = body.access === 'public' ? true : false;
+
                 this.model = body;
             } catch (err) {
                 this.$emit('err', err);
