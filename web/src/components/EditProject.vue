@@ -19,7 +19,7 @@
 
                     <label class='fr switch-container'>
                         <span class='mr6'>Public Project</span>
-                        <input v-model='access' type='checkbox' />
+                        <input v-model='project.access' type='checkbox' />
                         <div class='switch'></div>
                     </label>
 
