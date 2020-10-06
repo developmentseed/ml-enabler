@@ -1,5 +1,6 @@
 import ml_enabler.config as CONFIG
 import io, os, pyproj, json, csv, geojson, boto3, mercantile
+from io import StringIO
 from tiletanic import tilecover, tileschemes
 from shapely.geometry import shape, box
 from shapely.ops import transform
@@ -522,6 +523,15 @@ class PredictionInfAPI(Resource):
 
     @login_required
     def delete(self, model_id, prediction_id):
+        """
+        Empty the SQS queue of chips to inference
+        ---
+        produces:
+            - application/json
+        responses:
+            200:
+                description: Status Update
+        """
         if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
             return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
 
@@ -556,6 +566,16 @@ class PredictionInfAPI(Resource):
 
     @login_required
     def get(self, model_id, prediction_id):
+        """
+        Return metadata about messages currently in the inference queue
+        ---
+        produces:
+            - application/json
+        responses:
+            200:
+                description: Status Update
+        """
+
         if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
             return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
 
@@ -610,6 +630,16 @@ class PredictionInfAPI(Resource):
 
     @login_required
     def post(self, model_id, prediction_id):
+        """
+        Given a GeoJSON, submit it to the SQS queue
+        ---
+        produces:
+            - application/json
+        responses:
+            200:
+                description: Status Update
+        """
+
         if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
             return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
 
@@ -619,18 +649,7 @@ class PredictionInfAPI(Resource):
 
         try:
             prediction = PredictionService.get_prediction_by_id(prediction_id)
-
-            poly = shape(geojson.loads(payload))
-
-            project = partial(
-                pyproj.transform,
-                pyproj.Proj(init='epsg:4326'),
-                pyproj.Proj(init='epsg:3857')
-            )
-
-            poly = transform(project, poly)
-
-            tiles = tilecover.cover_geometry(tiler, poly, prediction.tile_zoom)
+            imagery = ImageryService.get(prediction.imagery_id)
 
             queue_name = "{stack}-models-{model}-prediction-{prediction}-queue".format(
                 stack=CONFIG.EnvironmentConfig.STACK,
@@ -642,26 +661,80 @@ class PredictionInfAPI(Resource):
                 QueueName=queue_name
             )
 
-            cache = []
-            for tile in tiles:
-                if len(cache) < 10:
+            if imagery['fmt'] == "wms":
+                poly = shape(geojson.loads(payload))
+
+                project = partial(
+                    pyproj.transform,
+                    pyproj.Proj(init='epsg:4326'),
+                    pyproj.Proj(init='epsg:3857')
+                )
+
+                poly = transform(project, poly)
+
+                tiles = tilecover.cover_geometry(tiler, poly, prediction.tile_zoom)
+
+                cache = []
+                for tile in tiles:
                     cache.append({
                         "Id": str(tile.z) + "-" + str(tile.x) + "-" + str(tile.y),
                         "MessageBody": json.dumps({
+                            "name": "{x}-{y}-{z}".format(x=tile.x, y=tile.y, z=tile.z),
+                            "url": imagery['url'].format(x=tile.x, y=tile.y, z=tile.z),
+                            "bounds": mercantile.bounds(tile.x, tile.y, tile.z),
                             "x": tile.x,
                             "y": tile.y,
                             "z": tile.z
                         })
                     })
-                else:
+
+                    if len(cache) == 10:
+                        queue.send_messages(
+                            Entries=cache
+                        )
+
+                        cache = []
+
+                if len(cache) > 0:
                     queue.send_messages(
                         Entries=cache
                     )
-                    cache = []
 
-            return {}, 200
+                return {}, 200
+            elif imagery['fmt'] == "list":
+
+                r = requests.get(imagery['url'])
+                r.raise_for_status()
+
+                f = StringIO(r.text)
+                cache = []
+                for row in csv.reader(f, delimiter=','):
+                    cache.append({
+                        "Id": row[0],
+                        "MessageBody": json.dumps({
+                            'name': row[0],
+                            'url': row[1],
+                            'bounds': row[2].split(',')
+                        })
+                    })
+
+                    if len(cache) == 10:
+                        queue.send_messages(
+                            Entries=cache
+                        )
+                        cache = []
+
+                if len(cache) > 0:
+                    queue.send_messages(
+                        Entries=cache
+                    )
+
+                return {}, 200
+
+            else:
+                return err(400, "Unknown imagery type"), 400
         except Exception as e:
-            error_msg = f'Predction Tiler Error: {str(e)}'
+            error_msg = f'Prediction Tiler Error: {str(e)}'
             current_app.logger.error(error_msg)
             return err(500, error_msg), 500
 

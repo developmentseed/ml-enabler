@@ -152,9 +152,22 @@
                     Imagery Chip Submission
                 </div>
                 <div class='col col--12'>
-                    <StackMap
-                        v-on:queue='postQueue($event)'
-                    />
+                    <template v-if='imagery.fmt === "wms"'>
+                        <StackMap
+                            v-on:queue='postQueue($event)'
+                        />
+                    </template>
+                    <template v-else-if='imagery.fmt === "list"'>
+                        <StackList
+                            :imagery='imagery'
+                            v-on:queue='postQueue($event)'
+                        />
+                    </template>
+                    <template v-else-if='imagery.fmt === "list"'>
+                        <div class='flex-parent flex-parent--center-main w-full py24'>
+                            <div class='flex-child py24'>Imagery Type Not Supported</div>
+                        </div>
+                    </template>
                 </div>
             </div>
         </template>
@@ -171,6 +184,7 @@
 
 <script>
 import PredictionHeader from './PredictionHeader.vue';
+import StackList from './StackList.vue';
 import StackMap from './StackMap.vue';
 
 export default {
@@ -183,6 +197,7 @@ export default {
                 'CREATE_COMPLETE',
                 'UPDATE_COMPLETE'
             ],
+            imagery: {},
             loading: {
                 stack: true,
                 queue: true
@@ -227,6 +242,7 @@ export default {
     },
     methods: {
         refresh: function() {
+            this.getImagery();
             if (this.meta.environment === 'aws') {
                 this.getStatus();
                 this.getQueue();
@@ -266,13 +282,20 @@ export default {
         postQueue: async function(geojson) {
             this.loading.stack = true;
 
+            let reqbody;
+            if (geojson) {
+                reqbody = JSON.stringify(geojson.geometry);
+            } else {
+                reqbody = false;
+            }
+
             try {
                 const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/stack/tiles`, {
                     method: 'POST',
-                    headers: {
+                    headers: reqbody ? {
                         'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(geojson.geometry)
+                    } : {},
+                    body: reqbody
                 });
 
                 const body = await res.json();
@@ -350,6 +373,19 @@ export default {
         emitmode: function(mode) {
             this.$emit('mode', mode);
         },
+        getImagery: async function() {
+            try {
+                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/imagery/${this.prediction.imagery_id}`, {
+                    method: 'GET',
+                });
+
+                const body = await res.json();
+                if (!res.ok) throw new Error(body.message);
+                this.imagery = body;
+            } catch (err) {
+                this.$emit('err', err);
+            }
+        },
         createStack: async function() {
             if (this.params.type === 'classification' && !this.params.inferences) return;
 
@@ -386,6 +422,7 @@ export default {
     },
     components: {
         PredictionHeader,
+        StackList,
         StackMap
     }
 }
