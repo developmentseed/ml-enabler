@@ -5,9 +5,9 @@ import App from './App.vue'
 
 import Home from './components/Home.vue';
 import Login from './components/Login.vue';
-import Model from './components/Model.vue';
+import Project from './components/Project.vue';
 import Profile from './components/Profile.vue';
-import EditModel from './components/EditModel.vue';
+import EditProject from './components/EditProject.vue';
 import Prediction from './components/Prediction.vue';
 import Imagery from './components/Imagery.vue';
 import Integration from './components/Integration.vue';
@@ -29,16 +29,16 @@ const router = new VueRouter({
         { path: '/login', name: 'login', component: Login },
         { path: '/profile', name: 'profile', component: Profile },
 
-        { path: '/model/new', name: 'newmodel', component: EditModel },
+        { path: '/model/new', name: 'newmodel', component: EditProject },
 
         {
             path: '/model/:modelid',
             name: 'model',
-            component: Model,
+            component: Project,
             children: [{
                 path: 'edit',
                 name: 'editmodel',
-                component: EditModel,
+                component: EditProject,
             },{
                 path: '/model/:modelid/training',
                 name: 'createTraining',
