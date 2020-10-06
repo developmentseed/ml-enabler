@@ -22,6 +22,14 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String)
     name = db.Column(db.String)
 
+    def list(user_filter: str):
+        """
+        Get all users in the database
+        """
+        return User.query.filter(
+            User.name.ilike(user_filter + '%'),
+        ).all()
+
     def password_check(self, test):
         results = db.session.execute(text('''
              SELECT
