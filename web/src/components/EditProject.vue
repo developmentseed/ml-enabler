@@ -124,7 +124,7 @@ import "vue-select/dist/vue-select.css";
 
 export default {
     name: 'EditProject',
-    props: ['meta'],
+    props: ['meta', 'user'],
     data: function() {
         return {
             newProject: this.$route.name === 'newmodel',
@@ -134,11 +134,7 @@ export default {
                 name: '',
                 users: []
             },
-            users: [{
-                uid: 1,
-                name: 'ingalls',
-                access: 'read'
-            }],
+            users: [],
             project: {
                 name: '',
                 access: false,
@@ -150,7 +146,15 @@ export default {
         }
     },
     mounted: function() {
-        this.getProject();
+        if (this.$route.name === "newmodel") {
+            this.users.push({
+                uid: this.user.id,
+                name: this.user.name,
+                access: 'admin'
+            });
+        } else {
+            this.getProject();
+        }
     },
     methods: {
         postProject: async function(archive) {
@@ -179,8 +183,6 @@ export default {
             }
         },
         getProject: async function() {
-            if (this.$route.name === "newmodel") return;
-
             try {
                 const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}`, {
                     method: 'GET'
