@@ -354,6 +354,7 @@ class MLModel(db.Model):
     source = db.Column(db.String)
     archived = db.Column(db.Boolean)
     project_url = db.Column(db.String)
+    access = db.Column(db.String)
     predictions = db.relationship(
         Prediction,
         backref='ml_models',
@@ -368,6 +369,7 @@ class MLModel(db.Model):
         self.source = ml_model_dto.source
         self.archived = False
         self.tags = ml_model_dto.tags
+        self.access = ml_model_dto.access
         self.project_url = ml_model_dto.project_url
 
         db.session.add(self)
@@ -414,6 +416,7 @@ class MLModel(db.Model):
         model_dto.source = self.source
         model_dto.archived = self.archived
         model_dto.project_url = self.project_url
+        model_dto.access = self.access
 
         return model_dto
 
@@ -425,6 +428,7 @@ class MLModel(db.Model):
         self.project_url = updated_ml_model_dto.project_url
         self.archived = updated_ml_model_dto.archived
         self.tags = updated_ml_model_dto.tags
+        self.access = updated_ml_model_dto.access
 
         db.session.commit()
 

@@ -51,6 +51,7 @@ class MLModelDTO(Model):
 
     model_id = IntType(serialized_name='modelId')
     created = DateTimeType()
+    access = StringType(required=True)
     name = StringType(required=True)
     tags = ListType(DictType(StringType), required=True)
     source = StringType(required=True)
