@@ -343,6 +343,23 @@ class PredictionTile(db.Model):
             func.avg(cast(cast(PredictionTile.predictions['osm_building_area'], sqlalchemy.String), sqlalchemy.Float)).label('osm_building_area')
         ).filter(PredictionTile.prediction_id == prediction_id).filter(func.substr(PredictionTile.quadkey, 1, zoom).in_(quadkeys)).group_by(func.substr(PredictionTile.quadkey, 1, zoom)).all()
 
+class ProjectAccess(db.Model):
+    __tablename__ = 'project_access'
+
+    model_id = db.Column(
+        db.BigInteger,
+        db.ForeignKey('ml_models.id', name='fk_models'),
+        nullable=False
+    )
+
+    uid = db.Column(
+        db.BigInteger,
+        db.ForeignKey('users.id', name='fk_users'),
+        nullable=False
+    )
+
+    access = db.Column(db.String, nullable=False)
+
 class MLModel(db.Model):
     """ Describes an ML model registered with the service """
     __tablename__ = 'ml_models'
