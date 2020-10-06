@@ -66,7 +66,9 @@ def meta():
         return { "status": 401, "error": "Not Authenticated" }, 401
 
     return {
-        "name": current_user.name
+        "id": current_user.id,
+        "name": current_user.name,
+        "email": current_user.email
     }, 200
 
 @auth_bp.route('/v1/user/logout', methods=['GET'])
