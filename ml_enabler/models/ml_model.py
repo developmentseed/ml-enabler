@@ -344,7 +344,7 @@ class PredictionTile(db.Model):
         ).filter(PredictionTile.prediction_id == prediction_id).filter(func.substr(PredictionTile.quadkey, 1, zoom).in_(quadkeys)).group_by(func.substr(PredictionTile.quadkey, 1, zoom)).all()
 
 class ProjectAccess(db.Model):
-    __tablename__ = 'project_access'
+    __tablename__ = 'projects_access'
 
     model_id = db.Column(
         db.BigInteger,
