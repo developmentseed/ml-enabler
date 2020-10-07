@@ -1,5 +1,5 @@
 from flask import current_app
-from ml_enabler.models.ml_model import Project
+from ml_enabler.models.ml_model import Project, ProjectAccess
 from ml_enabler.models.dtos.dtos import ProjectDTO
 from ml_enabler.models.utils import NotFound
 from ml_enabler.utils import version_to_array
@@ -53,8 +53,10 @@ class ProjectService():
         """
 
         ml_model = Project.get(model_id)
+        users = ProjectAccess.get(model_id)
+
         if ml_model:
-            return ml_model.as_dto()
+            return ml_model.as_dto(users)
         else:
             raise NotFound('Model does not exist')
 

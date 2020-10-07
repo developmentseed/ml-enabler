@@ -370,6 +370,33 @@ class ProjectAccess(db.Model):
 
     access = db.Column(db.String, nullable=False)
 
+    @staticmethod
+    def get(model_id: int):
+        query = db.session.query(
+            ProjectAccess.id,
+            ProjectAccess.uid,
+            User.name,
+            ProjectAccess.model_id,
+            ProjectAccess.access,
+        ).filter(
+            ProjectAccess.model_id == model_id,
+            User.id == ProjectAccess.uid
+        )
+
+        users = []
+        for access in query.all():
+            users.append({
+                "id": access[0],
+                "uid": access[1],
+                "name": access[2],
+                "model_id": access[3],
+                "access": access[4]
+            })
+
+        print(users)
+
+        return users
+
     def create(self, dto: ProjectAccessDTO):
         """ Creates and saves the current project access dto to the DB """
 
@@ -452,7 +479,7 @@ class Project(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def as_dto(self):
+    def as_dto(self, users=None):
         """
         Convert the model to it's dto
         """
@@ -465,6 +492,8 @@ class Project(db.Model):
         model_dto.archived = self.archived
         model_dto.project_url = self.project_url
         model_dto.access = self.access
+        if users:
+            model_dto.users = users
 
         return model_dto
 
