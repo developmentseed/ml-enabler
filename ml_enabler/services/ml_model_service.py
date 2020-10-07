@@ -1,6 +1,6 @@
 from flask import current_app
 from ml_enabler.models.ml_model import MLModel
-from ml_enabler.models.dtos.ml_model_dto import MLModelDTO
+from ml_enabler.models.dtos.dtos import MLModelDTO
 from ml_enabler.models.utils import NotFound
 from ml_enabler.utils import version_to_array
 from sqlalchemy.orm.exc import NoResultFound

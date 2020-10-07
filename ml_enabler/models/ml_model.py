@@ -12,7 +12,7 @@ from sqlalchemy.sql import func, text
 from sqlalchemy.sql.expression import cast
 import sqlalchemy
 from flask_login import UserMixin
-from ml_enabler.models.dtos.ml_model_dto import MLModelDTO, PredictionDTO, ProjectAccessDTO
+from ml_enabler.models.dtos.dtos import MLModelDTO, PredictionDTO, ProjectAccessDTO
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -60,7 +60,7 @@ class Prediction(db.Model):
 
     model_id = db.Column(
         db.BigInteger,
-        db.ForeignKey('ml_models.id', name='fk_models'),
+        db.ForeignKey('projects.id', name='fk_models'),
         nullable=False
     )
 
@@ -358,7 +358,7 @@ class ProjectAccess(db.Model):
 
     model_id = db.Column(
         db.BigInteger,
-        db.ForeignKey('ml_models.id', name='fk_models'),
+        db.ForeignKey('projects.id', name='fk_projects'),
         nullable=False
     )
 
@@ -393,7 +393,7 @@ class ProjectAccess(db.Model):
 
 class MLModel(db.Model):
     """ Describes an ML model registered with the service """
-    __tablename__ = 'ml_models'
+    __tablename__ = 'projects'
 
     id = db.Column(db.Integer, primary_key=True)
     created = db.Column(db.DateTime, default=timestamp, nullable=False)
@@ -405,20 +405,20 @@ class MLModel(db.Model):
     access = db.Column(db.String)
     predictions = db.relationship(
         Prediction,
-        backref='ml_models',
+        backref='projects',
         cascade='all, delete-orphan',
         lazy='dynamic'
     )
 
-    def create(self, ml_model_dto: MLModelDTO):
+    def create(self, dto: MLModelDTO):
         """ Creates and saves the current model to the DB """
 
-        self.name = ml_model_dto.name
-        self.source = ml_model_dto.source
+        self.name = dto.name
+        self.source = dto.source
         self.archived = False
-        self.tags = ml_model_dto.tags
-        self.access = ml_model_dto.access
-        self.project_url = ml_model_dto.project_url
+        self.tags = dto.tags
+        self.access = dto.access
+        self.project_url = dto.project_url
 
         db.session.add(self)
         db.session.commit()
@@ -468,15 +468,15 @@ class MLModel(db.Model):
 
         return model_dto
 
-    def update(self, updated_ml_model_dto: MLModelDTO):
+    def update(self, dto: MLModelDTO):
         """ Updates an ML model """
-        self.id = updated_ml_model_dto.model_id
-        self.name = updated_ml_model_dto.name
-        self.source = updated_ml_model_dto.source
-        self.project_url = updated_ml_model_dto.project_url
-        self.archived = updated_ml_model_dto.archived
-        self.tags = updated_ml_model_dto.tags
-        self.access = updated_ml_model_dto.access
+        self.id = dto.model_id
+        self.name = dto.name
+        self.source = dto.source
+        self.project_url = dto.project_url
+        self.archived = dto.archived
+        self.tags = dto.tags
+        self.access = dto.access
 
         db.session.commit()
 

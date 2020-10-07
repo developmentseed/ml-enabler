@@ -3,7 +3,7 @@ from shapely.geometry import shape
 import sqlalchemy
 import mercantile, semver
 from ml_enabler.models.ml_model import MLModel, PredictionTile, Prediction
-from ml_enabler.models.dtos.ml_model_dto import PredictionDTO
+from ml_enabler.models.dtos.dtos import PredictionDTO
 from ml_enabler.utils import InvalidGeojson
 from ml_enabler.models.utils import PredictionsNotFound, NotFound, VersionExists
 from psycopg2.errors import UniqueViolation

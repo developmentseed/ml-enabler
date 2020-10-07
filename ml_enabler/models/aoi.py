@@ -1,5 +1,5 @@
 from ml_enabler import db
-from ml_enabler.models.dtos.ml_model_dto import AOIDTO
+from ml_enabler.models.dtos.dtos import AOIDTO
 from geoalchemy2 import Geometry
 import shapely
 
@@ -12,7 +12,7 @@ class AOI(db.Model):
 
     model_id = db.Column(
         db.BigInteger,
-        db.ForeignKey('ml_models.id', name='fk_models'),
+        db.ForeignKey('projects.id', name='fk_projects'),
         nullable=False
     )
     pred_id = db.Column(

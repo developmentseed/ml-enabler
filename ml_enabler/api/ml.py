@@ -8,7 +8,7 @@ from functools import partial
 from flask import make_response
 from flask_restful import Resource, request, current_app
 from flask import Response
-from ml_enabler.models.dtos.ml_model_dto import MLModelDTO, PredictionDTO
+from ml_enabler.models.dtos.dtos import MLModelDTO, PredictionDTO
 from schematics.exceptions import DataError
 from ml_enabler.services.ml_model_service import MLModelService
 from ml_enabler.services.prediction_service import PredictionService, PredictionTileService
