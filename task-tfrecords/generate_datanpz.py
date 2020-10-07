@@ -58,11 +58,11 @@ def download_tile_tms(tile, imagery, folder, zoom, supertile):
         child_tiles = children(int(tile[0]), int(tile[1]), int(tile[2]), zoom=new_zoom)
         child_tiles.sort()
 
-        new_dim = 256 * (2 * (new_zoom-zoom))
+        new_dim = 256 * (2 * (new_zoom - zoom))
 
         w_lst = []
-        for i in range (2 * (new_zoom-zoom)):
-            for j in range(2 * (new_zoom-zoom)):
+        for i in range (2 * (new_zoom - zoom)):
+            for j in range(2 * (new_zoom - zoom)):
                 window = Window(i * 256, j * 256, 256, 256)
                 w_lst.append(window)
 
