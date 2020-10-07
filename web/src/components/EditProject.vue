@@ -110,7 +110,7 @@
                 </template>
 
                 <div class='col col--12 py12'>
-                    <button v-if='!newProject' @click='postProject(true)' class='btn btn--stroke round fl color-gray color-red-on-hover'>Archive Project</button>
+                    <button v-if='!newProject && showAdvanced' @click='postProject(true)' class='btn btn--stroke round fl color-gray color-red-on-hover'>Archive Project</button>
                     <button v-if='!newProject' @click='postProject(false)' class='btn btn--stroke round fr color-blue-light color-blue-on-hover'>Update Project</button>
                     <button v-else @click='postProject(false)' class='btn btn--stroke round fr color-green-light color-green-on-hover'>Add Project</button>
                 </div>
