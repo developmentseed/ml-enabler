@@ -43,7 +43,7 @@ def download_tilelist(chip, imagery, folder):
 
     return tile_img
 
-def download_tile_tms(tile, imagery, folder, zoom, supertile=False):
+def download_tile_tms(tile, imagery, folder, zoom, supertile):
     """Download a satellite image tile from a tms endpoint"""
 
     image_format = get_image_format(imagery['url'])
@@ -58,11 +58,11 @@ def download_tile_tms(tile, imagery, folder, zoom, supertile=False):
         child_tiles = children(int(tile[0]), int(tile[1]), int(tile[2]), zoom=new_zoom)
         child_tiles.sort()
 
-        new_dim = 256 * (2 * zoom)
+        new_dim = 256 * (2 * (new_zoom - zoom))
 
         w_lst = []
-        for i in range (2 * zoom):
-            for j in range(2 * zoom):
+        for i in range (2 * (new_zoom - zoom)):
+            for j in range(2 * (new_zoom - zoom)):
                 window = Window(i * 256, j * 256, 256, 256)
                 w_lst.append(window)
 
@@ -99,14 +99,12 @@ def download_img_match_labels(labels_folder, imagery, folder, zoom, supertile=Fa
     #download images
     for chip in class_chips:
         if imagery['fmt'] == 'wms':
-            print('in wms case')
-            download_tile_tms(chip, imagery, folder, zoom, supertile=False)
+            download_tile_tms(chip, imagery, folder, zoom, supertile)
         else:
-            print('in chip list case')
             download_tilelist(chip, imagery, folder)
 
 # package up the images + labels into one data.npz file
-def make_datanpz(dest_folder, imagery,
+def make_datanpz(dest_folder, imagery, supertile,
                     seed=False,
                     split_names=('train', 'val', 'test'),
                     split_vals=(0.7, .2, .1)):
@@ -151,7 +149,6 @@ def make_datanpz(dest_folder, imagery,
     y_vals = []
 
     for tile in tiles:
-        #image_file = op.join(dest_folder, 'tiles', '{}{}'.format(tile, image_format))
         image_file = glob.glob(dest_folder + '/' + 'tiles/' + tile + '*')[0]
         try:
             img = Image.open(image_file)
@@ -164,6 +161,13 @@ def make_datanpz(dest_folder, imagery,
 
         np_image = np.array(img)
         img.close()
+
+        if not supertile:
+            try:
+                np_image = np_image.reshape((256, 256, 3)) # 4 channels returned from some endpoints, but not all
+            except ValueError:
+                np_image = np_image.reshape((256, 256, 4))
+                np_image = np_image[:, :, :3]
 
         #focusing just on classification
         x_vals.append(np_image)

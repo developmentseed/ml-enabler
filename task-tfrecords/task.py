@@ -120,7 +120,7 @@ download_img_match_labels(
 )
 
 # create data.npz file that matchs up images and labels
-make_datanpz(dest_folder='/tmp', imagery=imagery)
+make_datanpz(dest_folder='/tmp', imagery=imagery, supertile=supertile)
 
 #convert data.npz into tf-records
 create_tfr(npz_path='/tmp/data.npz')
