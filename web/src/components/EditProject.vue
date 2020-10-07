@@ -48,9 +48,9 @@
                 <template v-if='showUser'>
                     <div class='w-full ml12 border-b border--gray-light mb12'/>
 
-                    <div :key='user.uid' v-for='user in users' class='col col--12 grid grid--gut12 my3'>
+                    <div :key='user.uid' v-for='(user, user_idx) in users' class='col col--12 grid grid--gut12 my3'>
                         <div class='col col--8'>
-                            <button class='fl mr12 round btn btn--s mt6 btn--stroke color-gray'><svg class='icon'><use xlink:href='#icon-close'/></svg></button>
+                            <button @click='users.splice(user_idx, 1)' class='fl mr12 round btn btn--s mt6 btn--stroke color-gray'><svg class='icon'><use xlink:href='#icon-close'/></svg></button>
                             <span v-text='user.name'/>
                         </div>
                         <div class='col col--4'>
