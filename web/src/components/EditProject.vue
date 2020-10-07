@@ -48,7 +48,7 @@
                 <template v-if='showUser'>
                     <div class='w-full ml12 border-b border--gray-light mb12'/>
 
-                    <div :key='user.uid' v-for='user in users' class='col col--12 grid grid--gut12'>
+                    <div :key='user.uid' v-for='user in users' class='col col--12 grid grid--gut12 my3'>
                         <div class='col col--8'>
                             <button class='fl mr12 round btn btn--s mt6 btn--stroke color-gray'><svg class='icon'><use xlink:href='#icon-close'/></svg></button>
                             <span v-text='user.name'/>
@@ -69,8 +69,9 @@
                     <vSelect
                         label='name'
                         class='ml12 w-full'
-                        v-model='search.name'
+                        v-model='search.user'
                         :options='search.users'
+                        @input='addUser'
                     />
 
                 </template>
@@ -132,7 +133,7 @@ export default {
             showUser: false,
             showAdvanced: false,
             search: {
-                name: '',
+                user: {},
                 users: []
             },
             users: [],
@@ -160,6 +161,22 @@ export default {
         }
     },
     methods: {
+        addUser: function() {
+            for (const user of this.users) {
+                if (this.search.user.id === user.uid) {
+                    this.search.user = null;
+                    return;
+                }
+            }
+
+            this.users.push({
+                uid: this.search.user.id,
+                name: this.search.user.name,
+                access: 'read'
+            });
+
+            this.search.user = null;
+        },
         postProject: async function(archive) {
             try {
                 const res = await fetch(window.api + `/v1/model${!this.newProject ? '/' + this.$route.params.modelid : ''}`, {
