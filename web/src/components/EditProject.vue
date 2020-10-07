@@ -48,9 +48,9 @@
                 <template v-if='showUser'>
                     <div class='w-full ml12 border-b border--gray-light mb12'/>
 
-                    <div :key='user.uid' v-for='(user, user_idx) in users' class='col col--12 grid grid--gut12 my3'>
+                    <div :key='user.uid' v-for='(user, user_idx) in project.users' class='col col--12 grid grid--gut12 my3'>
                         <div class='col col--8'>
-                            <button @click='users.splice(user_idx, 1)' class='fl mr12 round btn btn--s mt6 btn--stroke color-gray'><svg class='icon'><use xlink:href='#icon-close'/></svg></button>
+                            <button @click='project.users.splice(user_idx, 1)' class='fl mr12 round btn btn--s mt6 btn--stroke color-gray'><svg class='icon'><use xlink:href='#icon-close'/></svg></button>
                             <span v-text='user.name'/>
                         </div>
                         <div class='col col--4'>
@@ -136,7 +136,6 @@ export default {
                 user: {},
                 users: []
             },
-            users: [],
             project: {
                 name: '',
                 access: false,
@@ -151,7 +150,7 @@ export default {
         this.getUsers();
 
         if (this.$route.name === "newmodel") {
-            this.users.push({
+            this.project.users.push({
                 uid: this.user.id,
                 name: this.user.name,
                 access: 'admin'
@@ -162,14 +161,14 @@ export default {
     },
     methods: {
         addUser: function() {
-            for (const user of this.users) {
+            for (const user of this.project.users) {
                 if (this.search.user.id === user.uid) {
                     this.search.user = null;
                     return;
                 }
             }
 
-            this.users.push({
+            this.project.users.push({
                 uid: this.search.user.id,
                 name: this.search.user.name,
                 access: 'read'
@@ -191,7 +190,8 @@ export default {
                         source: this.project.source,
                         projectUrl: this.project.projectUrl,
                         archived: archive ? true : false,
-                        tags: this.project.tags
+                        tags: this.project.tags,
+                        users: this.users
                     })
                 });
 
