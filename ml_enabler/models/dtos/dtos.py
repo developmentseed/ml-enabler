@@ -54,8 +54,8 @@ class ProjectAccessDTO(Model):
     uid = StringType(required=True)
     access = StringType(required=True)
 
-class MLModelDTO(Model):
-    """ Describes JSON of an ML Model """
+class ProjectDTO(Model):
+    """ Describes JSON of an Project """
 
     model_id = IntType(serialized_name='modelId')
     created = DateTimeType()
@@ -65,6 +65,7 @@ class MLModelDTO(Model):
     source = StringType(required=True)
     archived = BooleanType()
     project_url = StringType(serialized_name='projectUrl')
+    users = ListType(DictType(StringType), required=False)
 
 class PredictionDTO(Model):
     """ Describes JSON of a set of predictions from a model """

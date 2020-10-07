@@ -2,7 +2,7 @@ import ml_enabler.config as CONFIG
 from shapely.geometry import shape
 import sqlalchemy
 import mercantile, semver
-from ml_enabler.models.ml_model import MLModel, PredictionTile, Prediction
+from ml_enabler.models.ml_model import Project, PredictionTile, Prediction
 from ml_enabler.models.dtos.dtos import PredictionDTO
 from ml_enabler.utils import InvalidGeojson
 from ml_enabler.models.utils import PredictionsNotFound, NotFound, VersionExists
@@ -213,7 +213,7 @@ class PredictionTileService():
         if tiles.count == 0:
             raise PredictionsNotFound('No Prediction Tiles exist')
 
-        ml_model = MLModel.get(model_id)
+        ml_model = Project.get(model_id)
         prediction = Prediction.get(prediction_id)
 
         tilejson = {

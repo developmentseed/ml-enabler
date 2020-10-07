@@ -45,7 +45,7 @@ def init_routes(app):
     api = Api(app)
 
     # import apis
-    from ml_enabler.api.ml import StatusCheckAPI, MLModelAPI, GetAllModels, \
+    from ml_enabler.api.ml import StatusCheckAPI, ProjectAPI, GetAllModels, \
         PredictionAPI, PredictionUploadAPI, PredictionTileAPI, PredictionImport, \
         GetAllPredictions, PredictionTileMVT, PredictionRetrain, PredictionTfrecords,\
         PredictionStackAPI, PredictionStacksAPI, PredictionInfAPI, MapboxAPI, MetaAPI, \
@@ -63,9 +63,9 @@ def init_routes(app):
     api.add_resource(PredictionStacksAPI,       '/v1/stacks', methods=['GET'])
 
     api.add_resource(GetAllModels,              '/v1/model/all', methods=['GET'])
-    api.add_resource(MLModelAPI,                '/v1/model', endpoint="post", methods=['POST'])
+    api.add_resource(ProjectAPI,                '/v1/model', endpoint="post", methods=['POST'])
 
-    api.add_resource(MLModelAPI,                '/v1/model/<int:model_id>', methods=['DELETE', 'GET', 'PUT'])
+    api.add_resource(ProjectAPI,                '/v1/model/<int:model_id>', methods=['DELETE', 'GET', 'PUT'])
 
     api.add_resource(PredictionAPI,             '/v1/model/<int:model_id>/prediction', methods=['POST', 'GET'])
     api.add_resource(GetAllPredictions,         '/v1/model/<int:model_id>/prediction/all', methods=['GET'])

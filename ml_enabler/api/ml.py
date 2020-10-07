@@ -8,9 +8,9 @@ from functools import partial
 from flask import make_response
 from flask_restful import Resource, request, current_app
 from flask import Response
-from ml_enabler.models.dtos.dtos import MLModelDTO, PredictionDTO
+from ml_enabler.models.dtos.dtos import ProjectDTO, PredictionDTO
 from schematics.exceptions import DataError
-from ml_enabler.services.ml_model_service import MLModelService
+from ml_enabler.services.project_service import ProjectService
 from ml_enabler.services.prediction_service import PredictionService, PredictionTileService
 from ml_enabler.services.task_service import TaskService
 from ml_enabler.services.imagery_service import ImageryService
@@ -74,7 +74,7 @@ class MapboxAPI(Resource):
             "token": CONFIG.EnvironmentConfig.MAPBOX_TOKEN
         }, 200
 
-class MLModelAPI(Resource):
+class ProjectAPI(Resource):
 
     @login_required
     def post(self):
@@ -109,10 +109,10 @@ class MLModelAPI(Resource):
                 description: Internal Server Error
         """
         try:
-            model_dto = MLModelDTO(request.get_json())
+            model_dto = ProjectDTO(request.get_json())
             current_app.logger.info(f'request: {str(request.get_json())}')
             model_dto.validate()
-            model_id = MLModelService.subscribe_ml_model(model_dto)
+            model_id = ProjectService.subscribe_ml_model(model_dto)
             return {"model_id": model_id}, 200
         except DataError as e:
             current_app.logger.error(f'Error validating request: {str(e)}')
@@ -143,7 +143,7 @@ class MLModelAPI(Resource):
                 description: Internal Server Error
         """
         try:
-            MLModelService.delete_ml_model(model_id)
+            ProjectService.delete_ml_model(model_id)
             return {"success": "model deleted"}, 200
         except NotFound:
             return err(404, "model not found"), 404
@@ -174,7 +174,7 @@ class MLModelAPI(Resource):
                 description: Internal Server Error
         """
         try:
-            ml_model_dto = MLModelService.get_ml_model_by_id(model_id)
+            ml_model_dto = ProjectService.get_ml_model_by_id(model_id)
             return ml_model_dto.to_primitive(), 200
         except NotFound:
             return err(404, "model not found"), 404
@@ -221,9 +221,9 @@ class MLModelAPI(Resource):
                 description: Internal Server Error
         """
         try:
-            updated_model_dto = MLModelDTO(request.get_json())
+            updated_model_dto = PorjectDTO(request.get_json())
             updated_model_dto.validate()
-            model_id = MLModelService.update_ml_model(updated_model_dto)
+            model_id = ProjectService.update_ml_model(updated_model_dto)
             return {"model_id": model_id}, 200
         except NotFound:
             return err(404, "model not found"), 404
@@ -261,7 +261,7 @@ class GetAllModels(Resource):
             return err(400, "archived param must be 'true' or 'false'"), 400
 
         try:
-            ml_models = MLModelService.get_all(model_filter, model_archived)
+            ml_models = ProjectService.get_all(model_filter, model_archived)
             return ml_models, 200
         except NotFound:
             return err(404, "no models found"), 404
@@ -1311,7 +1311,7 @@ class PredictionAPI(Resource):
             payload = request.get_json()
 
             # check if this model exists
-            ml_model_dto = MLModelService.get_ml_model_by_id(model_id)
+            ml_model_dto = ProjectService.get_ml_model_by_id(model_id)
 
             # check if the version is registered
             prediction_id = PredictionService.create(model_id, payload)
@@ -1398,7 +1398,7 @@ class GetAllPredictions(Resource):
         """
         try:
             # check if this model exists
-            ml_model_dto = MLModelService.get_ml_model_by_id(model_id)
+            ml_model_dto = ProjectService.get_ml_model_by_id(model_id)
 
             predictions = PredictionService.get_all_by_model(ml_model_dto.model_id)
             return predictions, 200

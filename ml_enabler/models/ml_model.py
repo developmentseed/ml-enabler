@@ -12,7 +12,7 @@ from sqlalchemy.sql import func, text
 from sqlalchemy.sql.expression import cast
 import sqlalchemy
 from flask_login import UserMixin
-from ml_enabler.models.dtos.dtos import MLModelDTO, PredictionDTO, ProjectAccessDTO
+from ml_enabler.models.dtos.dtos import ProjectDTO, PredictionDTO, ProjectAccessDTO
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -391,7 +391,7 @@ class ProjectAccess(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-class MLModel(db.Model):
+class Project(db.Model):
     """ Describes an ML model registered with the service """
     __tablename__ = 'projects'
 
@@ -410,7 +410,7 @@ class MLModel(db.Model):
         lazy='dynamic'
     )
 
-    def create(self, dto: MLModelDTO):
+    def create(self, dto: ProjectDTO):
         """ Creates and saves the current model to the DB """
 
         self.name = dto.name
@@ -435,16 +435,16 @@ class MLModel(db.Model):
         :param model_id: ml model ID in scope
         :return ML Model if found otherwise None
         """
-        return MLModel.query.get(model_id)
+        return Project.query.get(model_id)
 
     @staticmethod
     def get_all(model_filter: str, model_archived: bool):
         """
         Get all models in the database
         """
-        return MLModel.query.filter(
-            MLModel.name.ilike(model_filter + '%'),
-            MLModel.archived == model_archived
+        return Project.query.filter(
+            Project.name.ilike(model_filter + '%'),
+            Project.archived == model_archived
         ).all()
 
     def delete(self):
@@ -456,7 +456,7 @@ class MLModel(db.Model):
         """
         Convert the model to it's dto
         """
-        model_dto = MLModelDTO()
+        model_dto = ProjectDTO()
         model_dto.model_id = self.id
         model_dto.name = self.name
         model_dto.tags = self.tags
@@ -468,7 +468,7 @@ class MLModel(db.Model):
 
         return model_dto
 
-    def update(self, dto: MLModelDTO):
+    def update(self, dto: ProjectDTO):
         """ Updates an ML model """
         self.id = dto.model_id
         self.name = dto.name
