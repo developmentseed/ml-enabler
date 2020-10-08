@@ -142,7 +142,21 @@ for name in glob.glob('/tmp/tfrecord/val*.tfrecords'):
 n_val_samps = sum([tf.data.TFRecordDataset(f).reduce(np.int64(0), lambda x, _: x + 1).numpy() for f in f_val])
 print(n_val_samps)
 
-# conduct re-training
+# conduct re-training,
+
+sample_config = json.loads('''{f_train_steps=1000, tf_dir='/tmp/tfrecord/',
+       retraining_weights='/tmp/checkpoint.zip',
+       n_classes=len(inflist), class_names=inflist,  x_feature_shape=x_feature_shape,
+       n_train_samps=n_train_samps, n_val_samps=n_val_samps
+
+
+
+}
+''')
+config = RetrainConfig(sample_config)
+config.validate
+
+ #this will eventually be env variable
 train(tf_train_steps=1000, tf_dir='/tmp/tfrecord/',
        retraining_weights='/tmp/checkpoint.zip',
        n_classes=len(inflist), class_names=inflist,  x_feature_shape=x_feature_shape,
