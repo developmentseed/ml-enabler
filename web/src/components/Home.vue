@@ -32,7 +32,7 @@
                     </div>
                 </div>
             </template>
-            <template v-if='loading.models'>
+            <template v-if='loading.projects'>
                 <div class='flex-parent flex-parent--center-main w-full'>
                     <div class='flex-child loading py24'></div>
                 </div>
@@ -40,7 +40,7 @@
                     <div class='flex-child py24'>Loading Projects</div>
                 </div>
             </template>
-            <template v-else-if='models.length === 0'>
+            <template v-else-if='projects.length === 0'>
                 <div class='flex-parent flex-parent--center-main pt36'>
                     <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-info'/></svg>
                 </div>
@@ -50,27 +50,29 @@
                 </div>
             </template>
             <template v-else>
-                <div @click='$router.push({ name: "model", params: { modelid: model.modelId } })' :key='model.modelId' v-for='model in models.slice(page * 10, page * 10 + 10)'>
+                <div @click='$router.push({ name: "model", params: { modelid: project.modelId } })' :key='project.modelId' v-for='project in projects.slice(page * 10, page * 10 + 10)'>
                     <div class='cursor-pointer bg-darken10-on-hover col col--12 py12'>
                         <div class='col col--12 grid py6 px12'>
                             <div class='col col--6'>
                                 <div class='col col--12 clearfix'>
-                                    <h3 class='txt-h4 fl' v-text='model.name'></h3>
-                                    <svg @click.prevent.stop='$router.push({ name: "editmodel", params: { modelid: model.modelId } })' class='fl my6 mx6 icon cursor-pointer color-gray-light color-gray-on-hover'><use href='#icon-pencil'/></svg>
+                                    <svg v-if='project.access === "private"' class='fl icon color-gray h24 w24'><use xlink:href='#icon-lock'/></svg>
+
+                                    <h3 class='txt-h4 fl' v-text='project.name'></h3>
+                                    <svg @click.prevent.stop='$router.push({ name: "editmodel", params: { modelid: project.modelId } })' class='fl my6 mx6 icon cursor-pointer color-gray-light color-gray-on-hover'><use href='#icon-pencil'/></svg>
                                 </div>
                                 <div class='col col--12'>
-                                    <h3 class='txt-xs' v-text='model.source'></h3>
+                                    <h3 class='txt-xs' v-text='project.source'></h3>
                                 </div>
                             </div>
                             <div class='col col--6'>
-                                <div @click.prevent.stop='external(model.projectUrl)' class='fr bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>
+                                <div @click.prevent.stop='external(project.projectUrl)' class='fr bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>
                                     Project Page
                                 </div>
 
-                                <div v-if='stacks.models.includes(model.modelId)' class='fr bg-green-faint bg-green-on-hover color-white-on-hover color-green inline-block px6 py3 round txt-xs txt-bold mr3'>
+                                <div v-if='stacks.models.includes(project.modelId)' class='fr bg-green-faint bg-green-on-hover color-white-on-hover color-green inline-block px6 py3 round txt-xs txt-bold mr3'>
                                     Active Stack
                                 </div>
-                                <div v-if='model.archived' class='fr bg-gray-faint bg-gray-on-hover color-white-on-hover color-gray inline-block px6 py3 round txt-xs txt-bold mr3'>
+                                <div v-if='project.archived' class='fr bg-gray-faint bg-gray-on-hover color-white-on-hover color-gray inline-block px6 py3 round txt-xs txt-bold mr3'>
                                     Archived
                                 </div>
                             </div>
@@ -80,7 +82,7 @@
 
                 <Pager
                     @page='page = $event'
-                    :total='models.length'
+                    :total='projects.length'
                     perpage='10'
                 />
             </template>
@@ -100,9 +102,9 @@ export default {
             showSearch: false,
             search: '',
             archived: false,
-            models: [],
+            projects: [],
             loading: {
-                models: true
+                projects: true
             }
         }
     },
@@ -145,8 +147,8 @@ export default {
             window.open(url, "_blank")
         },
         getProjects: async function() {
-            this.loading.models = true;
-            this.models = [];
+            this.loading.projects = true;
+            this.projects = [];
             try {
                 const url = new URL(window.api + '/v1/model/all');
                 url.searchParams.append('filter', this.search);
@@ -158,13 +160,13 @@ export default {
 
                 const body = await res.json();
                 if (res.status === 404) {
-                    this.models = [];
-                    this.loading.models = false;
+                    this.projects = [];
+                    this.loading.projects = false;
                 } else if (!res.ok) {
                     throw new Error(body.message);
                 } else {
-                    this.models = body;
-                    this.loading.models = false;
+                    this.projects = body;
+                    this.loading.projects = false;
                 }
             } catch (err) {
                 this.$emit('err', err);

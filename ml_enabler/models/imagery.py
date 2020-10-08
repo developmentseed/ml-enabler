@@ -1,5 +1,5 @@
 from ml_enabler import db
-from ml_enabler.models.dtos.ml_model_dto import ImageryDTO
+from ml_enabler.models.dtos.dtos import ImageryDTO
 
 class Imagery(db.Model):
     """ Store an imagery source for a given model """
@@ -9,7 +9,7 @@ class Imagery(db.Model):
 
     model_id = db.Column(
         db.BigInteger,
-        db.ForeignKey('ml_models.id', name='fk_models'),
+        db.ForeignKey('projects.id', name='fk_projects'),
         nullable=False
     )
 

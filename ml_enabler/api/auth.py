@@ -1,7 +1,9 @@
 from flask import Blueprint, session
+from functools import wraps
+from flask import g, request, redirect, url_for
 from flask_login import current_user, login_required, logout_user, login_user
 from flask_restful import request, current_app
-from ml_enabler.models.ml_model import User
+from ml_enabler.models.ml_model import User, Project, ProjectAccess
 from ml_enabler.models.token import Token
 from ml_enabler import login_manager
 import base64
@@ -9,6 +11,61 @@ import base64
 auth_bp = Blueprint(
     'auth_bp', __name__
 )
+
+from functools import wraps
+from flask import g, request, redirect, url_for
+
+def has_project_read(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        model_id = kwargs.get('model_id')
+
+        project = Project.get(model_id)
+        if project.access == "public":
+            return f(*args, **kwargs)
+
+        for user in ProjectAccess.list(model_id):
+            if current_user.id == user.get('uid'):
+                return f(*args, **kwargs)
+
+        return {
+            "status": 403,
+            "error": "Authentication Insufficient"
+        }, 403
+
+    return decorated_function
+
+def has_project_write(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        model_id = kwargs.get('model_id')
+
+        for user in ProjectAccess.list(model_id):
+            if current_user.id == user.get('uid') and (user.get('access') == 'write' or user.get('access') == 'admin'):
+                return f(*args, **kwargs)
+
+        return {
+            "status": 403,
+            "error": "Authentication Insufficient"
+        }, 403
+
+    return decorated_function
+
+def has_project_admin(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        model_id = kwargs.get('model_id')
+
+        for user in ProjectAccess.list(model_id):
+            if current_user.id == user.get('uid') and user.get('access') == 'admin':
+                return f(*args, **kwargs)
+
+        return {
+            "status": 403,
+            "error": "Authentication Insufficient"
+        }, 403
+
+    return decorated_function
 
 @auth_bp.route('/v1/user/login', methods=['POST'])
 def login():
@@ -66,7 +123,9 @@ def meta():
         return { "status": 401, "error": "Not Authenticated" }, 401
 
     return {
-        "name": current_user.name
+        "id": current_user.id,
+        "name": current_user.name,
+        "email": current_user.email
     }, 200
 
 @auth_bp.route('/v1/user/logout', methods=['GET'])

@@ -4,6 +4,7 @@ from ml_enabler.utils import err
 from ml_enabler.services.task_service import TaskService
 from ml_enabler.models.utils import NotFound
 import ml_enabler.config as CONFIG
+from ml_enabler.api.auth import has_project_read, has_project_write, has_project_admin
 from flask_login import login_required
 
 task_bp = Blueprint(
@@ -11,8 +12,9 @@ task_bp = Blueprint(
 )
 
 @login_required
-@task_bp.route('/v1/task', methods=['GET'])
-def list():
+@has_project_read
+@task_bp.route('/v1/model/<int:model_id>/task', methods=['GET'])
+def list(model_id):
     """
     Return a list of currently running tasks for a given prediction
     ---
@@ -44,8 +46,9 @@ def list():
         return err(500, error_msg), 500
 
 @login_required
-@task_bp.route('/v1/task/<int:task_id>', methods=['GET'])
-def get(task_id):
+@has_project_read
+@task_bp.route('/v1/model/<int:model_id>/task/<int:task_id>', methods=['GET'])
+def get(model_id, task_id):
     """
     Return a single task
     ---
@@ -68,8 +71,9 @@ def get(task_id):
         return err(500, error_msg), 500
 
 @login_required
-@task_bp.route('/v1/task/<int:task_id>/logs', methods=['GET'])
-def logs(task_id):
+@has_project_read
+@task_bp.route('/v1/model/<int:model_id>/task/<int:task_id>/logs', methods=['GET'])
+def logs(model_id, task_id):
     """
     Return a cloudwatch logs for a given task
     ---
@@ -92,8 +96,9 @@ def logs(task_id):
         return err(500, error_msg), 500
 
 @login_required
-@task_bp.route('/v1/task/<int:task_id>', methods=['DELETE'])
-def delete(task_id):
+@has_project_write
+@task_bp.route('/v1/model/<int:model_id>/task/<int:task_id>', methods=['DELETE'])
+def delete(model_id, task_id):
     """
     Delete a given task
     ---

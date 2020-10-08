@@ -4,6 +4,7 @@ from flask_restful import request, current_app
 from ml_enabler.utils import err
 from ml_enabler.services.integration_service import IntegrationService
 from ml_enabler.models.utils import NotFound, IntegrationNotFound
+from ml_enabler.api.auth import has_project_read, has_project_write, has_project_admin
 import ml_enabler.config as CONFIG
 from flask_login import login_required
 from flask import jsonify
@@ -13,6 +14,7 @@ integration_bp = Blueprint(
 )
 
 @login_required
+@has_project_read
 @integration_bp.route('/v1/model/<int:model_id>/integration', methods=['GET'])
 def list(model_id):
     """
@@ -35,6 +37,7 @@ def list(model_id):
         return err(500, error_msg), 500
 
 @login_required
+@has_project_read
 @integration_bp.route('/v1/model/<int:model_id>/integration/<int:integration_id>', methods=['GET'])
 def get(model_id, integration_id):
     """
@@ -57,6 +60,7 @@ def get(model_id, integration_id):
         return err(500, error_msg), 500
 
 @login_required
+@has_project_write
 @integration_bp.route('/v1/model/<int:model_id>/integration/<int:integration_id>', methods=['PATCH'])
 def patch(model_id, integration_id):
     """
@@ -77,6 +81,7 @@ def patch(model_id, integration_id):
     }, 200
 
 @login_required
+@has_project_write
 @integration_bp.route('/v1/model/<int:model_id>/integration/<int:integration_id>', methods=['DELETE'])
 def delete(model_id, integration_id):
     """
@@ -93,6 +98,7 @@ def delete(model_id, integration_id):
     return { "status": "deleted" }, 200
 
 @login_required
+@has_project_write
 @integration_bp.route('/v1/model/<int:model_id>/integration', methods=['POST'])
 def post(model_id):
     """
@@ -118,6 +124,7 @@ def post(model_id):
         return err(500, "Failed to save integration source to DB"), 500
 
 @login_required
+@has_project_write
 @integration_bp.route('/v1/model/<int:model_id>/integration/<int:integration_id>', methods=['POST'])
 def use(model_id, integration_id):
     """

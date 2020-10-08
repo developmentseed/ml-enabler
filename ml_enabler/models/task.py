@@ -1,6 +1,6 @@
 from ml_enabler.models.utils import timestamp
 from ml_enabler import db
-from ml_enabler.models.dtos.ml_model_dto import TaskDTO
+from ml_enabler.models.dtos.dtos import TaskDTO
 from sqlalchemy.sql.expression import any_
 import sqlalchemy
 

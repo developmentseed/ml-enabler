@@ -7,10 +7,11 @@ from shapely.ops import transform
 from functools import partial
 from flask import make_response
 from flask_restful import Resource, request, current_app
+from flask_login import current_user
 from flask import Response
-from ml_enabler.models.dtos.ml_model_dto import MLModelDTO, PredictionDTO
+from ml_enabler.models.dtos.dtos import ProjectDTO, PredictionDTO
 from schematics.exceptions import DataError
-from ml_enabler.services.ml_model_service import MLModelService
+from ml_enabler.services.project_service import ProjectService
 from ml_enabler.services.prediction_service import PredictionService, PredictionTileService
 from ml_enabler.services.task_service import TaskService
 from ml_enabler.services.imagery_service import ImageryService
@@ -19,6 +20,7 @@ from ml_enabler.models.utils import NotFound, VersionNotFound, VersionExists, \
     PredictionsNotFound, ImageryNotFound
 from ml_enabler.utils import version_to_array, geojson_bounds, bbox_str_to_list, validate_geojson, InvalidGeojson, NoValid
 from sqlalchemy.exc import IntegrityError
+from ml_enabler.api.auth import has_project_read, has_project_write, has_project_admin
 from flask_login import login_required
 import numpy as np
 import pandas as pd
@@ -74,12 +76,12 @@ class MapboxAPI(Resource):
             "token": CONFIG.EnvironmentConfig.MAPBOX_TOKEN
         }, 200
 
-class MLModelAPI(Resource):
+class ProjectAPI(Resource):
 
     @login_required
     def post(self):
         """
-        Subscribe a new ML model
+        Create a new Project
         ---
         produces:
             - application/json
@@ -109,10 +111,9 @@ class MLModelAPI(Resource):
                 description: Internal Server Error
         """
         try:
-            model_dto = MLModelDTO(request.get_json())
-            current_app.logger.info(f'request: {str(request.get_json())}')
+            model_dto = ProjectDTO(request.get_json())
             model_dto.validate()
-            model_id = MLModelService.subscribe_ml_model(model_dto)
+            model_id = ProjectService.subscribe_ml_model(model_dto)
             return {"model_id": model_id}, 200
         except DataError as e:
             current_app.logger.error(f'Error validating request: {str(e)}')
@@ -122,6 +123,7 @@ class MLModelAPI(Resource):
             return str(e), 400
 
     @login_required
+    @has_project_admin
     def delete(self, model_id):
         """
         Deletes an existing model and it's predictions
@@ -143,7 +145,7 @@ class MLModelAPI(Resource):
                 description: Internal Server Error
         """
         try:
-            MLModelService.delete_ml_model(model_id)
+            ProjectService.delete_ml_model(model_id)
             return {"success": "model deleted"}, 200
         except NotFound:
             return err(404, "model not found"), 404
@@ -153,6 +155,7 @@ class MLModelAPI(Resource):
             return err(500, error_msg), 500
 
     @login_required
+    @has_project_read
     def get(self, model_id):
         """
         Get model information with the ID
@@ -174,7 +177,7 @@ class MLModelAPI(Resource):
                 description: Internal Server Error
         """
         try:
-            ml_model_dto = MLModelService.get_ml_model_by_id(model_id)
+            ml_model_dto = ProjectService.get_ml_model_by_id(model_id)
             return ml_model_dto.to_primitive(), 200
         except NotFound:
             return err(404, "model not found"), 404
@@ -184,6 +187,7 @@ class MLModelAPI(Resource):
             return err(500, error_msg), 500
 
     @login_required
+    @has_project_admin
     def put(self, model_id):
         """
         Update an existing model
@@ -221,9 +225,9 @@ class MLModelAPI(Resource):
                 description: Internal Server Error
         """
         try:
-            updated_model_dto = MLModelDTO(request.get_json())
+            updated_model_dto = ProjectDTO(request.get_json())
             updated_model_dto.validate()
-            model_id = MLModelService.update_ml_model(updated_model_dto)
+            model_id = ProjectService.update_ml_model(updated_model_dto)
             return {"model_id": model_id}, 200
         except NotFound:
             return err(404, "model not found"), 404
@@ -261,7 +265,7 @@ class GetAllModels(Resource):
             return err(400, "archived param must be 'true' or 'false'"), 400
 
         try:
-            ml_models = MLModelService.get_all(model_filter, model_archived)
+            ml_models = ProjectService.get_all(current_user.id, model_filter, model_archived)
             return ml_models, 200
         except NotFound:
             return err(404, "no models found"), 404
@@ -272,6 +276,7 @@ class GetAllModels(Resource):
 
 class PredictionImport(Resource):
     @login_required
+    @has_project_write
     def post(self, model_id, prediction_id):
         """
         Import a file of GeoJSON inferences into the prediction
@@ -329,6 +334,7 @@ class PredictionExport(Resource):
     # ?threshold=0->1                   [default 0]
 
     @login_required
+    @has_project_read
     def get(self, model_id, prediction_id):
         req_format = request.args.get('format', 'geojson')
         req_inferences = request.args.get('inferences', 'all')
@@ -522,6 +528,7 @@ class PredictionInfAPI(Resource):
     """ Add GeoJSON to SQS Inference Queue """
 
     @login_required
+    @has_project_write
     def delete(self, model_id, prediction_id):
         """
         Empty the SQS queue of chips to inference
@@ -565,6 +572,7 @@ class PredictionInfAPI(Resource):
                 return err(500, "Failed to get stack info"), 500
 
     @login_required
+    @has_project_read
     def get(self, model_id, prediction_id):
         """
         Return metadata about messages currently in the inference queue
@@ -629,6 +637,7 @@ class PredictionInfAPI(Resource):
                 return err(500, "Failed to get stack info"), 500
 
     @login_required
+    @has_project_write
     def post(self, model_id, prediction_id):
         """
         Given a GeoJSON, submit it to the SQS queue
@@ -740,6 +749,7 @@ class PredictionInfAPI(Resource):
 
 class PredictionTfrecords(Resource):
     @login_required
+    @has_project_write
     def post(self, model_id, prediction_id):
         """
         Create a TFRecords file with validated predictions
@@ -790,6 +800,7 @@ class PredictionTfrecords(Resource):
 
 class PredictionRetrain(Resource):
     @login_required
+    @has_project_write
     def post(self, model_id, prediction_id):
         """
         Retrain a model with validated predictions
@@ -841,6 +852,7 @@ class PredictionRetrain(Resource):
 
 class PredictionStacksAPI(Resource):
     @login_required
+    @has_project_read
     def get(self):
         """
         Return a list of all running substacks
@@ -930,6 +942,7 @@ class PredictionStackAPI(Resource):
     """ Create, Manage & Destroy Prediction Stacks """
 
     @login_required
+    @has_project_write
     def post(self, model_id, prediction_id):
         if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
             return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
@@ -1005,6 +1018,7 @@ class PredictionStackAPI(Resource):
             return err(500, "Failed to create stack info"), 500
 
     @login_required
+    @has_project_write
     def delete(self, model_id, prediction_id):
         if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
             return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
@@ -1033,6 +1047,7 @@ class PredictionStackAPI(Resource):
                 return err(500, "Failed to get stack info"), 500
 
     @login_required
+    @has_project_read
     def get(self, model_id, prediction_id):
         """
         Return status of a prediction stack
@@ -1084,6 +1099,7 @@ class PredictionUploadAPI(Resource):
     """ Upload Prediction Assets to the platform """
 
     @login_required
+    @has_project_write
     def post(self, model_id, prediction_id):
         """
         Attach a raw model to a given predition
@@ -1199,6 +1215,7 @@ class PredictionUploadAPI(Resource):
 
 class PredictionValidity(Resource):
     @login_required
+    @has_project_write
     def post(self, model_id, prediction_id):
         try:
             payload = request.get_json()
@@ -1234,6 +1251,7 @@ class PredictionValidity(Resource):
 
 class PredictionSingleAPI(Resource):
     @login_required
+    @has_project_read
     def get(self, model_id, prediction_id):
         try:
             prediction = PredictionService.get_prediction_by_id(prediction_id)
@@ -1269,6 +1287,7 @@ class PredictionAPI(Resource):
     """ Methods to manage ML predictions """
 
     @login_required
+    @has_project_write
     def post(self, model_id):
         """
         Store predictions for an ML Model
@@ -1311,7 +1330,7 @@ class PredictionAPI(Resource):
             payload = request.get_json()
 
             # check if this model exists
-            ml_model_dto = MLModelService.get_ml_model_by_id(model_id)
+            ml_model_dto = ProjectService.get_ml_model_by_id(model_id)
 
             # check if the version is registered
             prediction_id = PredictionService.create(model_id, payload)
@@ -1330,6 +1349,7 @@ class PredictionAPI(Resource):
             return err(500, error_msg), 500
 
     @login_required
+    @has_project_write
     def patch(self, model_id, prediction_id):
         """
         Allow updating of links in model
@@ -1376,6 +1396,7 @@ class PredictionAPI(Resource):
 
 class GetAllPredictions(Resource):
     @login_required
+    @has_project_read
     def get(self, model_id):
         """
         Fetch all predictions for a model
@@ -1398,7 +1419,7 @@ class GetAllPredictions(Resource):
         """
         try:
             # check if this model exists
-            ml_model_dto = MLModelService.get_ml_model_by_id(model_id)
+            ml_model_dto = ProjectService.get_ml_model_by_id(model_id)
 
             predictions = PredictionService.get_all_by_model(ml_model_dto.model_id)
             return predictions, 200
@@ -1415,6 +1436,7 @@ class PredictionTileMVT(Resource):
     """
 
     @login_required
+    @has_project_read
     def get(self, model_id, prediction_id, z, x, y):
         """
         Mapbox Vector Tile Response
@@ -1476,6 +1498,7 @@ class PredictionTileAPI(Resource):
     """
 
     @login_required
+    @has_project_read
     def get(self, model_id, prediction_id):
         """
         TileJSON response for the predictions
@@ -1512,6 +1535,7 @@ class PredictionTileAPI(Resource):
             return err(500, error_msg), 500
 
     @login_required
+    @has_project_write
     def post(self, prediction_id):
         """
         Submit tile level predictions
