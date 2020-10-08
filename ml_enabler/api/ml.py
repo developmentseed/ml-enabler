@@ -19,6 +19,7 @@ from ml_enabler.models.utils import NotFound, VersionNotFound, VersionExists, \
     PredictionsNotFound, ImageryNotFound
 from ml_enabler.utils import version_to_array, geojson_bounds, bbox_str_to_list, validate_geojson, InvalidGeojson, NoValid
 from sqlalchemy.exc import IntegrityError
+from ml_enabler.api.auth import has_project_read
 from flask_login import login_required
 import numpy as np
 import pandas as pd
@@ -79,7 +80,7 @@ class ProjectAPI(Resource):
     @login_required
     def post(self):
         """
-        Subscribe a new ML model
+        Create a new Project
         ---
         produces:
             - application/json
@@ -110,7 +111,6 @@ class ProjectAPI(Resource):
         """
         try:
             model_dto = ProjectDTO(request.get_json())
-            current_app.logger.info(f'request: {str(request.get_json())}')
             model_dto.validate()
             model_id = ProjectService.subscribe_ml_model(model_dto)
             return {"model_id": model_id}, 200
@@ -153,6 +153,7 @@ class ProjectAPI(Resource):
             return err(500, error_msg), 500
 
     @login_required
+    @has_project_read
     def get(self, model_id):
         """
         Get model information with the ID
