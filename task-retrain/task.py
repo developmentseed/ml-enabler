@@ -114,12 +114,7 @@ supertile = pred['infSupertile']
 version = pred['version']
 inflist = pred['infList'].split(',')
 
-if supertile:
-     x_feature_shape = [-1, 512, 512, 3]
-else:
-    x_feature_shape = [-1, 256, 256, 3]
 
-print(x_feature_shape)
 v = get_versions(model_id)
 
 model = get_asset(bucket, pred['modelLink'].replace(bucket + '/', ''))
@@ -151,16 +146,20 @@ sample_config = json.loads('''{f_train_steps=1000, tf_dir='/tmp/tfrecord/',
 
 
 
+
 }
 ''')
 config = RetrainConfig(sample_config)
+if supertile:
+     config.x_feature_shape = [-1, 512, 512, 3]
+else:
+    config.x_feature_shape = [-1, 256, 256, 3]
+
+print(x_feature_shape)
 config.validate
 
  #this will eventually be env variable
-train(tf_train_steps=1000, tf_dir='/tmp/tfrecord/',
-       retraining_weights='/tmp/checkpoint.zip',
-       n_classes=len(inflist), class_names=inflist,  x_feature_shape=x_feature_shape,
-       n_train_samps=n_train_samps, n_val_samps=n_val_samps)
+train(config)
 
 # increment model version
 updated_version = str(increment_versions(version=v))

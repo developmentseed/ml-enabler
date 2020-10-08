@@ -27,6 +27,7 @@ from utils_metrics import FBetaScore, precision_m, recall_m, fbeta_m
 from utils_readtfrecords import parse_and_augment_fn, parse_fn, get_dataset_feeder
 from utils_loss import sigmoid_focal_crossentropy
 from utils_train import zip_model_export, zip_chekpoint, model_estimator, get_optimizer
+from model_config import RetrainConfig
 
 
 
@@ -80,7 +81,7 @@ def train(config: RetrainConfig):
                 "input_shape": config.x_feature_shape[1:4],
                 "train_steps": config.tf_train_steps,
                 "dense_size_a": config.tf_dense_size_a,
-                "dense_size": congig.tf_dense_size,
+                "dense_size": config.tf_dense_size,
                 "dense_activation": config.tf_dense_activation,
                 "dense_dropout_rate_a": config.tf_dense_dropout_rate_a,
                 "dense_dropout_rate": config.tf_dense_dropout_rate,
@@ -159,6 +160,7 @@ def train(config: RetrainConfig):
                                   batch_size=config.tf_batch_size,
                                   cycle_length=config.cycle_length,
                                   prefetch_buffer_size=config.prefetch_buffer_size)
+
     ###################################
     # Run train/val w/ estimator object
     ###################################
