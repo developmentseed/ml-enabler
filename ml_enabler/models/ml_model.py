@@ -401,7 +401,7 @@ class ProjectAccess(db.Model):
 
         # Update all new users
         for user in new_users:
-            uids.append(user.get('uid'))
+            uids.append(int(user.get('uid')))
             user['model_id'] = model_id
 
             access = ProjectAccess.get_uid(model_id, user.get('id'))
