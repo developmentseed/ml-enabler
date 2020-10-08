@@ -19,7 +19,7 @@ from ml_enabler.models.utils import NotFound, VersionNotFound, VersionExists, \
     PredictionsNotFound, ImageryNotFound
 from ml_enabler.utils import version_to_array, geojson_bounds, bbox_str_to_list, validate_geojson, InvalidGeojson, NoValid
 from sqlalchemy.exc import IntegrityError
-from ml_enabler.api.auth import has_project_read
+from ml_enabler.api.auth import has_project_read, has_project_write, has_project_admin
 from flask_login import login_required
 import numpy as np
 import pandas as pd
@@ -122,6 +122,7 @@ class ProjectAPI(Resource):
             return str(e), 400
 
     @login_required
+    @has_project_admin
     def delete(self, model_id):
         """
         Deletes an existing model and it's predictions
@@ -185,6 +186,7 @@ class ProjectAPI(Resource):
             return err(500, error_msg), 500
 
     @login_required
+    @has_project_admin
     def put(self, model_id):
         """
         Update an existing model
@@ -273,6 +275,7 @@ class GetAllModels(Resource):
 
 class PredictionImport(Resource):
     @login_required
+    @has_project_write
     def post(self, model_id, prediction_id):
         """
         Import a file of GeoJSON inferences into the prediction
@@ -330,6 +333,7 @@ class PredictionExport(Resource):
     # ?threshold=0->1                   [default 0]
 
     @login_required
+    @has_project_read
     def get(self, model_id, prediction_id):
         req_format = request.args.get('format', 'geojson')
         req_inferences = request.args.get('inferences', 'all')
@@ -523,6 +527,7 @@ class PredictionInfAPI(Resource):
     """ Add GeoJSON to SQS Inference Queue """
 
     @login_required
+    @has_project_write
     def delete(self, model_id, prediction_id):
         """
         Empty the SQS queue of chips to inference
@@ -566,6 +571,7 @@ class PredictionInfAPI(Resource):
                 return err(500, "Failed to get stack info"), 500
 
     @login_required
+    @has_project_read
     def get(self, model_id, prediction_id):
         """
         Return metadata about messages currently in the inference queue
@@ -630,6 +636,7 @@ class PredictionInfAPI(Resource):
                 return err(500, "Failed to get stack info"), 500
 
     @login_required
+    @has_project_write
     def post(self, model_id, prediction_id):
         """
         Given a GeoJSON, submit it to the SQS queue
@@ -741,6 +748,7 @@ class PredictionInfAPI(Resource):
 
 class PredictionTfrecords(Resource):
     @login_required
+    @has_project_write
     def post(self, model_id, prediction_id):
         """
         Create a TFRecords file with validated predictions
@@ -791,6 +799,7 @@ class PredictionTfrecords(Resource):
 
 class PredictionRetrain(Resource):
     @login_required
+    @has_project_write
     def post(self, model_id, prediction_id):
         """
         Retrain a model with validated predictions
@@ -842,6 +851,7 @@ class PredictionRetrain(Resource):
 
 class PredictionStacksAPI(Resource):
     @login_required
+    @has_project_read
     def get(self):
         """
         Return a list of all running substacks
@@ -931,6 +941,7 @@ class PredictionStackAPI(Resource):
     """ Create, Manage & Destroy Prediction Stacks """
 
     @login_required
+    @has_project_write
     def post(self, model_id, prediction_id):
         if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
             return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
@@ -1006,6 +1017,7 @@ class PredictionStackAPI(Resource):
             return err(500, "Failed to create stack info"), 500
 
     @login_required
+    @has_project_write
     def delete(self, model_id, prediction_id):
         if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
             return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
@@ -1034,6 +1046,7 @@ class PredictionStackAPI(Resource):
                 return err(500, "Failed to get stack info"), 500
 
     @login_required
+    @has_project_read
     def get(self, model_id, prediction_id):
         """
         Return status of a prediction stack
@@ -1085,6 +1098,7 @@ class PredictionUploadAPI(Resource):
     """ Upload Prediction Assets to the platform """
 
     @login_required
+    @has_project_write
     def post(self, model_id, prediction_id):
         """
         Attach a raw model to a given predition
@@ -1200,6 +1214,7 @@ class PredictionUploadAPI(Resource):
 
 class PredictionValidity(Resource):
     @login_required
+    @has_project_write
     def post(self, model_id, prediction_id):
         try:
             payload = request.get_json()
@@ -1235,6 +1250,7 @@ class PredictionValidity(Resource):
 
 class PredictionSingleAPI(Resource):
     @login_required
+    @has_project_read
     def get(self, model_id, prediction_id):
         try:
             prediction = PredictionService.get_prediction_by_id(prediction_id)
@@ -1270,6 +1286,7 @@ class PredictionAPI(Resource):
     """ Methods to manage ML predictions """
 
     @login_required
+    @has_project_write
     def post(self, model_id):
         """
         Store predictions for an ML Model
@@ -1331,6 +1348,7 @@ class PredictionAPI(Resource):
             return err(500, error_msg), 500
 
     @login_required
+    @has_project_write
     def patch(self, model_id, prediction_id):
         """
         Allow updating of links in model
@@ -1377,6 +1395,7 @@ class PredictionAPI(Resource):
 
 class GetAllPredictions(Resource):
     @login_required
+    @has_project_read
     def get(self, model_id):
         """
         Fetch all predictions for a model
@@ -1416,6 +1435,7 @@ class PredictionTileMVT(Resource):
     """
 
     @login_required
+    @has_project_read
     def get(self, model_id, prediction_id, z, x, y):
         """
         Mapbox Vector Tile Response
@@ -1477,6 +1497,7 @@ class PredictionTileAPI(Resource):
     """
 
     @login_required
+    @has_project_read
     def get(self, model_id, prediction_id):
         """
         TileJSON response for the predictions
@@ -1513,6 +1534,7 @@ class PredictionTileAPI(Resource):
             return err(500, error_msg), 500
 
     @login_required
+    @has_project_write
     def post(self, prediction_id):
         """
         Submit tile level predictions

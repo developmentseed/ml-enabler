@@ -35,6 +35,38 @@ def has_project_read(f):
 
     return decorated_function
 
+def has_project_write(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        model_id = kwargs.get('model_id')
+
+        for user in ProjectAccess.list(model_id):
+            if current_user.id == user.get('uid') and (user.get('access') == 'write' or user.get('access') == 'admin'):
+                return f(*args, **kwargs)
+
+        return {
+            "status": 403,
+            "error": "Authentication Insufficient"
+        }, 403
+
+    return decorated_function
+
+def has_project_admin(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        model_id = kwargs.get('model_id')
+
+        for user in ProjectAccess.list(model_id):
+            if current_user.id == user.get('uid') and user.get('access') == 'admin':
+                return f(*args, **kwargs)
+
+        return {
+            "status": 403,
+            "error": "Authentication Insufficient"
+        }, 403
+
+    return decorated_function
+
 @auth_bp.route('/v1/user/login', methods=['POST'])
 def login():
     """

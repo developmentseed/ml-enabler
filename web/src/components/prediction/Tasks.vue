@@ -138,7 +138,7 @@ export default {
             this.log = task_id;
 
             try {
-                const res = await fetch(window.api + `/v1/task/${task_id}/logs`, {
+                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/task/${task_id}/logs`, {
                     method: 'GET'
                 });
 
@@ -160,7 +160,7 @@ export default {
             }
 
             try {
-                const res = await fetch(window.api + `/v1/task?pred_id=${this.$route.params.predid}&type=retrain,tfrecords`, {
+                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/task?pred_id=${this.$route.params.predid}&type=retrain,tfrecords`, {
                     method: 'GET'
                 });
 
@@ -183,7 +183,7 @@ export default {
         },
         getTask: async function(task_id) {
             try {
-                const res = await fetch(window.api + `/v1/task/${task_id}`, {
+                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/task/${task_id}`, {
                     method: 'GET'
                 });
 
@@ -204,7 +204,7 @@ export default {
         },
         deleteTask: async function(task_id) {
             try {
-                let res = await fetch(window.api + `/v1/task/${task_id}`, {
+                let res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/task/${task_id}`, {
                     method: 'DELETE'
                 });
 

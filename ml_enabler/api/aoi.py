@@ -3,6 +3,7 @@ from flask_restful import request, current_app
 from ml_enabler.utils import err
 from ml_enabler.services.aoi_service import AOIService
 import ml_enabler.config as CONFIG
+from ml_enabler.api.auth import has_project_read, has_project_write, has_project_admin
 from flask_login import login_required
 from flask import jsonify
 
@@ -11,6 +12,7 @@ aoi_bp = Blueprint(
 )
 
 @login_required
+@has_project_read
 @aoi_bp.route('/v1/model/<int:model_id>/aoi', methods=['GET'])
 def list(model_id):
     """
@@ -33,6 +35,7 @@ def list(model_id):
         return err(500, error_msg), 500
 
 @login_required
+@has_project_write
 @aoi_bp.route('/v1/model/<int:model_id>/aoi', methods=['POST'])
 def post(model_id):
     """
