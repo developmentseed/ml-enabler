@@ -1,21 +1,6 @@
+from cerberus import Validator
+
 class RetrainConfig():
-    cycle_length=1
-    n_map_threads=4
-    shuffle_buffer_size=400
-    prefetch_buffer_size=1
-    tf_steps_per_summary=5
-    tf_steps_per_checkpoint=10
-    tf_batch_size=8
-    tf_train_steps=200
-    tf_dense_size_a=256
-    tf_dense_dropout_rate_a=0.34
-    tf_dense_size=128
-    tf_dense_dropout_rate=.35
-    tf_dense_activation='relu'
-    tf_learning_rate=0.00001
-    tf_optimizer='adam'
-
-
     #set from the database and are not user configuarable
     x_feature_shape=[-1, 256, 256, 3]
     n_classes=2
@@ -47,5 +32,28 @@ class RetrainConfig():
         self.tf_optimizer = payload.get(tf_optimizer, 'adam')
 
 
-    def validate(self):
+    def validate(self, payload:dict):
+        schema  = {
+        'cylce_length' : {'type': 'integer'},
+        'n_map_threads': {'type': 'integer'},
+        'shuffle_buffer_size': {'type': 'integer'},
+        'prefetch_buffer_size': {'type': 'integer'},
+        'tf_steps_per_summary': {'type': 'integer'},
+        'tf_batch_size': {'type': 'integer', 'max': 16},
+        'tf_steps_per_summary': {'type': 'integer'},
+        'tf_steps_per_checkpoint': {'type': 'integer'},
+        'tf_dense_size_a' : {'type': 'integer'},
+        'tf_dense_dropout_rate_a': {'type': 'float', 'min': 0.1, 'max': 0.5},
+        'tf_dense_size': {'type': 'integer'},
+        'tf_dense_dropout_rate': {'type': 'float',  'min': 0.1, 'max': 0.5},
+        'tf_dense_activation': {'type': 'string'},
+        'tf_learning_rate':  {'type': 'float', 'min': 0.00001, 'max': 0.001},
+        'tf_optimizer': {'type': 'string', 'allowed': ['sdg', 'rsmprop', 'adam']}
+        }
+        v = Validator(schema)
+        valid = v.validate(payload) #should be the user input geojson
+        if not valid:
+            raise Exception(v.errors)
+        else:
+            print('valid re-training config')
 
