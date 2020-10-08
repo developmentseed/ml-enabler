@@ -7,6 +7,7 @@ from shapely.ops import transform
 from functools import partial
 from flask import make_response
 from flask_restful import Resource, request, current_app
+from flask_login import current_user
 from flask import Response
 from ml_enabler.models.dtos.dtos import ProjectDTO, PredictionDTO
 from schematics.exceptions import DataError
@@ -264,7 +265,7 @@ class GetAllModels(Resource):
             return err(400, "archived param must be 'true' or 'false'"), 400
 
         try:
-            ml_models = ProjectService.get_all(model_filter, model_archived)
+            ml_models = ProjectService.get_all(current_user.id, model_filter, model_archived)
             return ml_models, 200
         except NotFound:
             return err(404, "no models found"), 404

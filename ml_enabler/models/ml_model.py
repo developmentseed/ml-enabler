@@ -5,6 +5,7 @@ from sqlalchemy.ext.mutable import MutableDict, MutableList
 from ml_enabler import db
 from ml_enabler.models.utils import timestamp
 from geoalchemy2 import Geometry
+from sqlalchemy import or_, and_
 from geoalchemy2.functions import ST_Envelope, ST_AsGeoJSON, ST_Within, \
      ST_GeomFromText, ST_Intersects, ST_MakeEnvelope
 from sqlalchemy.dialects import postgresql
@@ -511,13 +512,20 @@ class Project(db.Model):
         return Project.query.get(model_id)
 
     @staticmethod
-    def get_all(model_filter: str, model_archived: bool):
+    def get_all(uid: int, model_filter: str, model_archived: bool):
         """
         Get all models in the database
         """
         return Project.query.filter(
             Project.name.ilike(model_filter + '%'),
-            Project.archived == model_archived
+            Project.archived == model_archived,
+            or_(
+                Project.access == "public",
+                and_(
+                    ProjectAccess.uid == uid,
+                    ProjectAccess.model_id == Project.id
+                )
+            )
         ).all()
 
     def delete(self):
