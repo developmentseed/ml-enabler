@@ -221,7 +221,7 @@ class ProjectAPI(Resource):
                 description: Internal Server Error
         """
         try:
-            updated_model_dto = PorjectDTO(request.get_json())
+            updated_model_dto = ProjectDTO(request.get_json())
             updated_model_dto.validate()
             model_id = ProjectService.update_ml_model(updated_model_dto)
             return {"model_id": model_id}, 200

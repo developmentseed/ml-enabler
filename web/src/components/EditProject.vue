@@ -55,7 +55,7 @@
                         </div>
                         <div class='col col--4'>
                             <div class='select-container fr'>
-                                <select class='select'>
+                                <select v-model='user.access' class='select'>
                                     <option>read</option>
                                     <option>write</option>
                                     <option>admin</option>
@@ -191,13 +191,13 @@ export default {
                         projectUrl: this.project.projectUrl,
                         archived: archive ? true : false,
                         tags: this.project.tags,
-                        users: this.users
+                        users: this.project.users
                     })
                 });
 
                 const body = await res.json();
                 if (!res.ok) throw new Error(body.message);
-                this.$router.push({ path: '/' });
+                this.$router.push({ path: `/model/${this.$route.params.modelid}` });
             } catch (err) {
                 this.$emit('err', err);
             }

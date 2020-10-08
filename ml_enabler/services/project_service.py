@@ -53,10 +53,11 @@ class ProjectService():
         """
 
         ml_model = Project.get(model_id)
-        users = ProjectAccess.get(model_id)
+        users = ProjectAccess.list(model_id)
 
         if ml_model:
-            return ml_model.as_dto(users)
+            model = ml_model.as_dto(users=users)
+            return model
         else:
             raise NotFound('Model does not exist')
 
@@ -89,8 +90,14 @@ class ProjectService():
         """
 
         ml_model = Project.get(updated_ml_model_dto.model_id)
+
         if (ml_model):
             ml_model.update(updated_ml_model_dto)
+
+            if updated_ml_model_dto.users:
+                users = ProjectAccess.list(updated_ml_model_dto.model_id)
+                ProjectAccess.list_update(updated_ml_model_dto.model_id, users, updated_ml_model_dto.users)
+
             return updated_ml_model_dto.model_id
         else:
             raise NotFound('Model does not exist')

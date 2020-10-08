@@ -371,7 +371,55 @@ class ProjectAccess(db.Model):
     access = db.Column(db.String, nullable=False)
 
     @staticmethod
-    def get(model_id: int):
+    def get(access_id: int):
+        """
+        Gets specified ML Model
+        :param access_id: access object to get
+        :return ML Model if found otherwise None
+        """
+        return ProjectAccess.query.get(access_id)
+
+    @staticmethod
+    def get_uid(model_id: int, access_id: int):
+        """
+        Gets specified ML Model
+        :param access_id: access object to get
+        :return ML Model if found otherwise None
+        """
+
+        return ProjectAccess.query.filter(
+            ProjectAccess.id == access_id,
+            ProjectAccess.model_id == model_id
+        ).one_or_none()
+
+    @staticmethod
+    def list_update(model_id: int, current_users: list, new_users: list):
+        uids = []
+
+        for user in new_users:
+            user['model_id'] = model_id
+
+        # Update all new users
+        for user in new_users:
+            uids.append(user.get('uid'))
+            user['model_id'] = model_id
+
+            access = ProjectAccess.get_uid(model_id, user.get('id'))
+
+            if not access:
+                access = ProjectAccess()
+                access.create(user)
+            else:
+                access.update(user)
+
+        for user in current_users:
+            if user.get('uid') not in uids:
+                access = ProjectAccess.get_uid(model_id, user.get('id'))
+                access.delete()
+
+
+    @staticmethod
+    def list(model_id: int):
         query = db.session.query(
             ProjectAccess.id,
             ProjectAccess.uid,
@@ -393,16 +441,14 @@ class ProjectAccess(db.Model):
                 "access": access[4]
             })
 
-        print(users)
-
         return users
 
     def create(self, dto: ProjectAccessDTO):
         """ Creates and saves the current project access dto to the DB """
 
-        self.model_id = dto.model_id
-        self.uid = dto.uid
-        self.access = dto.access
+        self.model_id = dto.get('model_id')
+        self.uid = dto.get('uid')
+        self.access = dto.get('access')
 
         db.session.add(self)
         db.session.commit()
@@ -410,7 +456,7 @@ class ProjectAccess(db.Model):
 
     def update(self, dto: ProjectAccessDTO):
         """ Updates an project access """
-        self.access = dto.access
+        self.access = dto['access']
         db.session.commit()
 
     def delete(self):
@@ -483,6 +529,7 @@ class Project(db.Model):
         """
         Convert the model to it's dto
         """
+
         model_dto = ProjectDTO()
         model_dto.model_id = self.id
         model_dto.name = self.name
@@ -492,7 +539,7 @@ class Project(db.Model):
         model_dto.archived = self.archived
         model_dto.project_url = self.project_url
         model_dto.access = self.access
-        if users:
+        if users is not None:
             model_dto.users = users
 
         return model_dto

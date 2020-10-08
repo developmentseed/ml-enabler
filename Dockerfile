@@ -37,6 +37,6 @@ CMD service nginx restart \
     && echo "UPDATE users SET password = crypt('$MACHINE_AUTH', gen_salt('bf', 10)) WHERE name = 'machine'" | psql postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_ENDPOINT}:${POSTGRES_PORT}/${POSTGRES_DB} || true \
     && gunicorn \
         --bind 0.0.0.0:4000 \
-        --access-logfile - \
         --timeout 120 \
-        'ml_enabler:create_app()'
+        'ml_enabler:create_app()' \
+        --access-logfile -
