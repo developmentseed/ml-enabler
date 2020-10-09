@@ -16,6 +16,7 @@ from requests_toolbelt.utils import dump
 from zipfile import ZipFile
 
 from model import train
+from model_config import RetrainConfig
 
 s3 = boto3.client('s3')
 
@@ -139,14 +140,11 @@ print(n_val_samps)
 
 # conduct re-training,
 
-sample_config = json.loads('''{f_train_steps=1000, tf_dir='/tmp/tfrecord/',
-       retraining_weights='/tmp/checkpoint.zip',
-       n_classes=len(inflist), class_names=inflist,  x_feature_shape=x_feature_shape,
-       n_train_samps=n_train_samps, n_val_samps=n_val_samps
-
-
-
-
+sample_config = json.loads('''{
+    "tf_train_steps": 100,
+    "tf_batch_size": 2,
+    "tf_dense_size": 153,
+    "retraining_weights": "/tmp/checkpoint.zip"
 }
 ''')
 config = RetrainConfig(sample_config)
@@ -155,7 +153,12 @@ if supertile:
 else:
     config.x_feature_shape = [-1, 256, 256, 3]
 
-print(x_feature_shape)
+config.n_classes=len(inflist)
+config.class_names=inflist
+config.n_train_samps=n_train_samps
+config.n_val_samps=n_val_samps
+
+print(sample_config)
 config.validate
 
  #this will eventually be env variable

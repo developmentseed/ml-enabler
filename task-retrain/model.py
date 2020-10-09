@@ -128,7 +128,7 @@ def train(config: RetrainConfig):
 
 
     # Create training dataset function
-    fpath_train = op.join(tf_dir, 'train*.tfrecords')
+    fpath_train = op.join(config.tf_dir, 'train*.tfrecords')
     print(fpath_train)
     map_func = partial(parse_and_augment_fn, n_chan=3,
                        n_classes=model_params['n_classes'],
