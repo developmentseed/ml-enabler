@@ -111,7 +111,6 @@ if pred['checkpointLink'] is None:
     raise Exception("Cannot retrain without checkpointLink")
 
 zoom = pred['tileZoom']
-supertile = pred['infSupertile']
 version = pred['version']
 inflist = pred['infList'].split(',')
 
@@ -126,11 +125,20 @@ print(model)
 print(checkpoint)
 print(tfrecord)
 
+def _parse_image_function(example_proto):
+    image_feature_description = {
+        'image': tf.io.FixedLenFeature([], tf.string),
+        'label': tf.io.FixedLenFeature([], tf.string)
+    }
+    return tf.io.parse_single_example(example_proto, image_feature_description)
+
+
 f_train = []
 for name in glob.glob('/tmp/tfrecord/train*.tfrecords'):
     f_train.append(name)
 n_train_samps = sum([tf.data.TFRecordDataset(f).reduce(np.int64(0), lambda x, _: x + 1).numpy() for f in f_train])
 print(n_train_samps)
+
 
 f_val = []
 for name in glob.glob('/tmp/tfrecord/val*.tfrecords'):
@@ -158,7 +166,8 @@ config.class_names=inflist
 config.n_train_samps=n_train_samps
 config.n_val_samps=n_val_samps
 
-print(sample_config)
+print(config.x_feature_shape)
+print(config.x_feature_shape[1:])
 config.validate
 
  #this will eventually be env variable

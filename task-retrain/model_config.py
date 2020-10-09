@@ -6,7 +6,7 @@ class RetrainConfig():
     n_classes=2
 
     # set in task.py not user configurable
-    tf_dir='/ml/data'
+    tf_dir='/tmp/tfrecord/'
     tf_model_dir = '/ml/models/'
     model_id ='b'
     retraining_weights=None

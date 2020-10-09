@@ -107,6 +107,8 @@ def train(config: RetrainConfig):
             image = tf.image.decode_image(image_str_tensor,
                                             channels=3,
                                             dtype=tf.uint8)
+            print('shape')
+            print(image.shape)
             image = tf.reshape(image, [config.x_feature_shape[1], config.x_feature_shape[1], 3])
             return image
     # Run processing for batch prediction.
@@ -129,7 +131,8 @@ def train(config: RetrainConfig):
 
     # Create training dataset function
     fpath_train = op.join(config.tf_dir, 'train*.tfrecords')
-    print(fpath_train)
+    logging.info(fpath_train)
+    logging.info(config.x_feature_shape[1:])
     map_func = partial(parse_and_augment_fn, n_chan=3,
                        n_classes=model_params['n_classes'],
                        shp=config.x_feature_shape[1:])
@@ -146,7 +149,8 @@ def train(config: RetrainConfig):
 
     # Create validation dataset function
     fpath_validate = op.join(config.tf_dir, 'val*.tfrecords')
-    print(fpath_validate)
+    logging.info(fpath_validate)
+    logging.info(config.x_feature_shape[1:])
     map_func = partial(parse_and_augment_fn, n_chan=3,
                        n_classes=model_params['n_classes'],
                        shp=config.x_feature_shape[1:])
@@ -174,7 +178,7 @@ def train(config: RetrainConfig):
                                               serving_input_receiver_fn=resnet_serving_input_receiver_fn)
     logging.info("export final post")
 
-    eval_spec = tf.estimator.EvalSpec(input_fn=config.dataset_validate_fn,
+    eval_spec = tf.estimator.EvalSpec(input_fn=dataset_validate_fn,
                                       steps=config.n_val_samps,  # Evaluate until complete
                                       exporters=export_final,
                                       throttle_secs=1,
