@@ -5,6 +5,7 @@ from sqlalchemy.ext.mutable import MutableDict, MutableList
 from ml_enabler import db
 from ml_enabler.models.utils import timestamp
 from geoalchemy2 import Geometry
+from sqlalchemy import or_, and_
 from geoalchemy2.functions import ST_Envelope, ST_AsGeoJSON, ST_Within, \
      ST_GeomFromText, ST_Intersects, ST_MakeEnvelope
 from sqlalchemy.dialects import postgresql
@@ -12,7 +13,7 @@ from sqlalchemy.sql import func, text
 from sqlalchemy.sql.expression import cast
 import sqlalchemy
 from flask_login import UserMixin
-from ml_enabler.models.dtos.ml_model_dto import MLModelDTO, PredictionDTO
+from ml_enabler.models.dtos.dtos import ProjectDTO, PredictionDTO, ProjectAccessDTO
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -21,6 +22,14 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String, unique=True)
     password = db.Column(db.String)
     name = db.Column(db.String)
+
+    def list(user_filter: str):
+        """
+        Get all users in the database
+        """
+        return User.query.filter(
+            User.name.ilike(user_filter + '%'),
+        ).all()
 
     def password_check(self, test):
         results = db.session.execute(text('''
@@ -52,7 +61,7 @@ class Prediction(db.Model):
 
     model_id = db.Column(
         db.BigInteger,
-        db.ForeignKey('ml_models.id', name='fk_models'),
+        db.ForeignKey('projects.id', name='fk_models'),
         nullable=False
     )
 
@@ -343,9 +352,122 @@ class PredictionTile(db.Model):
             func.avg(cast(cast(PredictionTile.predictions['osm_building_area'], sqlalchemy.String), sqlalchemy.Float)).label('osm_building_area')
         ).filter(PredictionTile.prediction_id == prediction_id).filter(func.substr(PredictionTile.quadkey, 1, zoom).in_(quadkeys)).group_by(func.substr(PredictionTile.quadkey, 1, zoom)).all()
 
-class MLModel(db.Model):
+class ProjectAccess(db.Model):
+    __tablename__ = 'projects_access'
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    model_id = db.Column(
+        db.BigInteger,
+        db.ForeignKey('projects.id', name='fk_projects'),
+        nullable=False
+    )
+
+    uid = db.Column(
+        db.BigInteger,
+        db.ForeignKey('users.id', name='fk_users'),
+        nullable=False
+    )
+
+    access = db.Column(db.String, nullable=False)
+
+    @staticmethod
+    def get(access_id: int):
+        """
+        Gets specified ML Model
+        :param access_id: access object to get
+        :return ML Model if found otherwise None
+        """
+        return ProjectAccess.query.get(access_id)
+
+    @staticmethod
+    def get_uid(model_id: int, access_id: int):
+        """
+        Gets specified ML Model
+        :param access_id: access object to get
+        :return ML Model if found otherwise None
+        """
+
+        return ProjectAccess.query.filter(
+            ProjectAccess.id == access_id,
+            ProjectAccess.model_id == model_id
+        ).one_or_none()
+
+    @staticmethod
+    def list_update(model_id: int, current_users: list, new_users: list):
+        uids = []
+
+        for user in new_users:
+            user['model_id'] = model_id
+
+        # Update all new users
+        for user in new_users:
+            uids.append(int(user.get('uid')))
+            user['model_id'] = model_id
+
+            access = ProjectAccess.get_uid(model_id, user.get('id'))
+
+            if not access:
+                access = ProjectAccess()
+                access.create(user)
+            else:
+                access.update(user)
+
+        for user in current_users:
+            if user.get('uid') not in uids:
+                access = ProjectAccess.get_uid(model_id, user.get('id'))
+                access.delete()
+
+
+    @staticmethod
+    def list(model_id: int):
+        query = db.session.query(
+            ProjectAccess.id,
+            ProjectAccess.uid,
+            User.name,
+            ProjectAccess.model_id,
+            ProjectAccess.access,
+        ).filter(
+            ProjectAccess.model_id == model_id,
+            User.id == ProjectAccess.uid
+        )
+
+        users = []
+        for access in query.all():
+            users.append({
+                "id": access[0],
+                "uid": access[1],
+                "name": access[2],
+                "model_id": access[3],
+                "access": access[4]
+            })
+
+        return users
+
+    def create(self, dto: ProjectAccessDTO):
+        """ Creates and saves the current project access dto to the DB """
+
+        self.model_id = dto.get('model_id')
+        self.uid = dto.get('uid')
+        self.access = dto.get('access')
+
+        db.session.add(self)
+        db.session.commit()
+        return self
+
+    def update(self, dto: ProjectAccessDTO):
+        """ Updates an project access """
+        self.access = dto['access']
+        db.session.commit()
+
+    def delete(self):
+        """ Deletes the current project access from the DB """
+        db.session.delete(self)
+        db.session.commit()
+
+class Project(db.Model):
     """ Describes an ML model registered with the service """
-    __tablename__ = 'ml_models'
+    __tablename__ = 'projects'
 
     id = db.Column(db.Integer, primary_key=True)
     created = db.Column(db.DateTime, default=timestamp, nullable=False)
@@ -354,21 +476,23 @@ class MLModel(db.Model):
     source = db.Column(db.String)
     archived = db.Column(db.Boolean)
     project_url = db.Column(db.String)
+    access = db.Column(db.String)
     predictions = db.relationship(
         Prediction,
-        backref='ml_models',
+        backref='projects',
         cascade='all, delete-orphan',
         lazy='dynamic'
     )
 
-    def create(self, ml_model_dto: MLModelDTO):
+    def create(self, dto: ProjectDTO):
         """ Creates and saves the current model to the DB """
 
-        self.name = ml_model_dto.name
-        self.source = ml_model_dto.source
+        self.name = dto.name
+        self.source = dto.source
         self.archived = False
-        self.tags = ml_model_dto.tags
-        self.project_url = ml_model_dto.project_url
+        self.tags = dto.tags
+        self.access = dto.access
+        self.project_url = dto.project_url
 
         db.session.add(self)
         db.session.commit()
@@ -385,16 +509,23 @@ class MLModel(db.Model):
         :param model_id: ml model ID in scope
         :return ML Model if found otherwise None
         """
-        return MLModel.query.get(model_id)
+        return Project.query.get(model_id)
 
     @staticmethod
-    def get_all(model_filter: str, model_archived: bool):
+    def get_all(uid: int, model_filter: str, model_archived: bool):
         """
         Get all models in the database
         """
-        return MLModel.query.filter(
-            MLModel.name.ilike(model_filter + '%'),
-            MLModel.archived == model_archived
+        return Project.query.filter(
+            Project.name.ilike(model_filter + '%'),
+            Project.archived == model_archived,
+            or_(
+                Project.access == "public",
+                and_(
+                    ProjectAccess.uid == uid,
+                    ProjectAccess.model_id == Project.id
+                )
+            )
         ).all()
 
     def delete(self):
@@ -402,11 +533,12 @@ class MLModel(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def as_dto(self):
+    def as_dto(self, users=None):
         """
         Convert the model to it's dto
         """
-        model_dto = MLModelDTO()
+
+        model_dto = ProjectDTO()
         model_dto.model_id = self.id
         model_dto.name = self.name
         model_dto.tags = self.tags
@@ -414,17 +546,21 @@ class MLModel(db.Model):
         model_dto.source = self.source
         model_dto.archived = self.archived
         model_dto.project_url = self.project_url
+        model_dto.access = self.access
+        if users is not None:
+            model_dto.users = users
 
         return model_dto
 
-    def update(self, updated_ml_model_dto: MLModelDTO):
+    def update(self, dto: ProjectDTO):
         """ Updates an ML model """
-        self.id = updated_ml_model_dto.model_id
-        self.name = updated_ml_model_dto.name
-        self.source = updated_ml_model_dto.source
-        self.project_url = updated_ml_model_dto.project_url
-        self.archived = updated_ml_model_dto.archived
-        self.tags = updated_ml_model_dto.tags
+        self.id = dto.model_id
+        self.name = dto.name
+        self.source = dto.source
+        self.project_url = dto.project_url
+        self.archived = dto.archived
+        self.tags = dto.tags
+        self.access = dto.access
 
         db.session.commit()
 

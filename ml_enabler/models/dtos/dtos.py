@@ -46,16 +46,26 @@ class TaskDTO(Model):
     created = DateTimeType()
     batch_id = IntType()
 
-class MLModelDTO(Model):
-    """ Describes JSON of an ML Model """
+class ProjectAccessDTO(Model):
+    """ Describes JSON of a ProjectAccess """
+
+    id = IntType()
+    model_id = IntType(required=True)
+    uid = StringType(required=True)
+    access = StringType(required=True)
+
+class ProjectDTO(Model):
+    """ Describes JSON of an Project """
 
     model_id = IntType(serialized_name='modelId')
     created = DateTimeType()
+    access = StringType(required=True)
     name = StringType(required=True)
     tags = ListType(DictType(StringType), required=True)
     source = StringType(required=True)
     archived = BooleanType()
     project_url = StringType(serialized_name='projectUrl')
+    users = ListType(DictType(StringType), required=False)
 
 class PredictionDTO(Model):
     """ Describes JSON of a set of predictions from a model """

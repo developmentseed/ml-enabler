@@ -134,6 +134,7 @@
             <router-view
                 :meta='meta'
                 :model='model'
+                :user='user'
                 @refresh='refresh'
                 @err='$emit("err", $event)'
             />
@@ -146,8 +147,8 @@ import vSort from 'semver-sort';
 import Integrations from './Integrations.vue';
 
 export default {
-    name: 'Model',
-    props: ['meta', 'stacks'],
+    name: 'Project',
+    props: ['meta', 'stacks', 'user'],
     data: function() {
         return {
             mode: 'model',
