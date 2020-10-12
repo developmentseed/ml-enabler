@@ -24,7 +24,12 @@
                 </div>
             </div>
             <template v-if='mode === "import"'>
-                <Integrations/>
+                <template v-if='!integration'>
+                    <Integrations @integration='integration = $event'/>
+                </template>
+                <template v-else>
+                    HERE
+                </template>
             </template>
             <template v-else-if='mode === "visualize"'>
                 <div class='col col--12 h600'>
@@ -179,6 +184,7 @@ export default {
     data: function() {
         return {
             mode: 'visualize',
+            integration: false,
             clickListener: false,
             popup: false,
             popupid: false,
