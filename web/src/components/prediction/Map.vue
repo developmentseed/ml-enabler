@@ -9,130 +9,147 @@
             </div>
         </div>
         <template v-if='tilejson'>
-            <h2 class='w-full align-center txt-h4 py12'>Prediction Inferences</h2>
+            <div class='col col--12 clearfix'>
+                <h2 class='fl align-center txt-h4 py12'>
+                    Prediction Inferences
+                </h2>
 
-            <div class='col col--12 h600'>
-                <div id='map-container' class="col col--12 h-full w-full relative">
-                    <div class='bg-white round absolute top left z5 px12 py12 mx12 my12 w180'>
-                        <div class='col col--12'>
-                            <label>Inference Type</label>
-                            <div class='select-container w-full'>
-                                <select v-model='inf' class='select select--s'>
-                                    <template v-for='inf in tilejson.inferences'>
-                                        <option v-bind:key='inf' v-text='inf'></option>
-                                    </template>
-                                </select>
-                                <div class='select-arrow'></div>
-                            </div>
-                        </div>
-                        <div class='col col--12 clearfix pt6'>
-                            <div class='select-container mr6' style='width: 100px;'>
-                                <select v-model='aoi' class='select select--s'>
-                                    <option default value='aoi'>AOI</option>
-                                    <template v-for='aoi in aois'>
-                                        <option v-bind:key='aoi.bounds' v-text='aoi.name'></option>
-                                    </template>
-                                </select>
-                                <div class='select-arrow'></div>
-                            </div>
-
-                            <button @click='bboxzoom' class='btn round btn--stroke fr btn--gray'><svg class='icon'><use xlink:href='#icon-viewport'/></svg></button>
-                        </div>
-
-                        <template v-if='!advanced'>
+                <div class="flex-parent-inline fr py12">
+                    <button @click='mode = "visualize"' :class='{
+                        "btn--stroke": mode !== "visualize"
+                    }' class="btn btn--pill btn--pill-stroke btn--s btn--pill-hl round">Visualize</button>
+                    <button @click='mode = "import"' :class='{
+                        "btn--stroke": mode !== "import"
+                    }' class="btn btn--pill btn--s btn--pill-hr btn--pill-stroke round">Import</button>
+                </div>
+            </div>
+            <template v-if='mode === "import"'>
+                <Integrations/>
+            </template>
+            <template v-else-if='mode === "visualize"'>
+                <div class='col col--12 h600'>
+                    <div id='map-container' class="col col--12 h-full w-full relative">
+                        <div class='bg-white round absolute top left z5 px12 py12 mx12 my12 w180'>
                             <div class='col col--12'>
-                                <button @click='advanced = !advanced' class='btn btn--white color-gray px0'><svg class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg><span class='fl pl6'>Advanced Options</span></button>
-                            </div>
-                        </template>
-                        <template v-else>
-                            <div class='col col--12 border-b border--gray-light mb12'>
-                                <button @click='advanced = !advanced' class='btn btn--white color-gray px0'><svg class='icon fl my6'><use xlink:href='#icon-chevron-down'/></svg><span class='fl pl6'>Advanced Options</span></button>
-                            </div>
-                        </template>
-
-                        <template v-if='advanced'>
-                            <div class='col col--12'>
-                                <label>Opacity (<span v-text='opacity'/>%)</label>
-                                <div class='range range--s color-gray'>
-                                    <input v-on:input='opacity = parseInt($event.target.value)' type='range' min=0 max=100 />
-                                </div>
-                            </div>
-                            <div class='col col--12'>
-                                <label>Threshold (<span v-text='threshold'/>%)</label>
-                                <div class='range range--s color-gray'>
-                                    <input v-on:input='threshold = parseInt($event.target.value)' type='range' min=0 max=100 />
-                                </div>
-                            </div>
-
-                            <div class='col col--12'>
-                                <label>Imagery</label>
+                                <label>Inference Type</label>
                                 <div class='select-container w-full'>
-                                    <select v-model='bg' class='select select--s'>
-                                        <option value='default'>Default</option>
-                                        <option v-for='img in imagery' v-bind:key='img.id' :value='img.id' v-text='img.name'></option>
+                                    <select v-model='inf' class='select select--s'>
+                                        <template v-for='inf in tilejson.inferences'>
+                                            <option v-bind:key='inf' v-text='inf'></option>
+                                        </template>
                                     </select>
                                     <div class='select-arrow'></div>
                                 </div>
                             </div>
-                        </template>
-                    </div>
+                            <div class='col col--12 clearfix pt6'>
+                                <div class='select-container mr6' style='width: 100px;'>
+                                    <select v-model='aoi' class='select select--s'>
+                                        <option default value='aoi'>AOI</option>
+                                        <template v-for='aoi in aois'>
+                                            <option v-bind:key='aoi.bounds' v-text='aoi.name'></option>
+                                        </template>
+                                    </select>
+                                    <div class='select-arrow'></div>
+                                </div>
 
-                    <div class='bg-white round absolute top right z5 mx12 my12'>
-                        <button @click='fullscreen' class='btn btn--stroke round btn--gray'>
-                            <svg class='icon'><use xlink:href='#icon-fullscreen'/></svg>
-                        </button>
-                    </div>
+                                <button @click='bboxzoom' class='btn round btn--stroke fr btn--gray'><svg class='icon'><use xlink:href='#icon-viewport'/></svg></button>
+                            </div>
 
-                    <div class='absolute z5 w180 bg-white round px12 py12' style='bottom: 40px; left: 12px;'>
-                        <template v-if='inspect'>
-                            <div class='flex-parent flex-parent--center-main'>
-                                <div class='flex-child'>
-                                    <svg class='icon w30 h30'><use xlink:href='#icon-info'/></svg>
+                            <template v-if='!advanced'>
+                                <div class='col col--12'>
+                                    <button @click='advanced = !advanced' class='btn btn--white color-gray px0'><svg class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg><span class='fl pl6'>Advanced Options</span></button>
                                 </div>
-                            </div>
-                            <div class='flex-parent flex-parent--center-main'>
-                                <div class='flex-child'>
-                                    <span v-text='inf'></span>: <span v-text='(inspect * 100).toFixed(1)'></span>%
+                            </template>
+                            <template v-else>
+                                <div class='col col--12 border-b border--gray-light mb12'>
+                                    <button @click='advanced = !advanced' class='btn btn--white color-gray px0'><svg class='icon fl my6'><use xlink:href='#icon-chevron-down'/></svg><span class='fl pl6'>Advanced Options</span></button>
                                 </div>
-                            </div>
-                        </template>
-                        <template v-else>
-                            <div class='flex-parent flex-parent--center-main'>
-                                <div class='flex-child'>
-                                    <svg class='icon w30 h30'><use xlink:href='#icon-cursor'/></svg>
-                                </div>
-                            </div>
-                            <div class='flex-parent flex-parent--center-main'>
-                                <div class='flex-child'>
-                                    <div align=center>Hover for Details</div>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
+                            </template>
 
-                    <div id="map" class='w-full h-full'></div>
+                            <template v-if='advanced'>
+                                <div class='col col--12'>
+                                    <label>Opacity (<span v-text='opacity'/>%)</label>
+                                    <div class='range range--s color-gray'>
+                                        <input v-on:input='opacity = parseInt($event.target.value)' type='range' min=0 max=100 />
+                                    </div>
+                                </div>
+                                <div class='col col--12'>
+                                    <label>Threshold (<span v-text='threshold'/>%)</label>
+                                    <div class='range range--s color-gray'>
+                                        <input v-on:input='threshold = parseInt($event.target.value)' type='range' min=0 max=100 />
+                                    </div>
+                                </div>
+
+                                <div class='col col--12'>
+                                    <label>Imagery</label>
+                                    <div class='select-container w-full'>
+                                        <select v-model='bg' class='select select--s'>
+                                            <option value='default'>Default</option>
+                                            <option v-for='img in imagery' v-bind:key='img.id' :value='img.id' v-text='img.name'></option>
+                                        </select>
+                                        <div class='select-arrow'></div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div class='bg-white round absolute top right z5 mx12 my12'>
+                            <button @click='fullscreen' class='btn btn--stroke round btn--gray'>
+                                <svg class='icon'><use xlink:href='#icon-fullscreen'/></svg>
+                            </button>
+                        </div>
+
+                        <div class='absolute z5 w180 bg-white round px12 py12' style='bottom: 40px; left: 12px;'>
+                            <template v-if='inspect'>
+                                <div class='flex-parent flex-parent--center-main'>
+                                    <div class='flex-child'>
+                                        <svg class='icon w30 h30'><use xlink:href='#icon-info'/></svg>
+                                    </div>
+                                </div>
+                                <div class='flex-parent flex-parent--center-main'>
+                                    <div class='flex-child'>
+                                        <span v-text='inf'></span>: <span v-text='(inspect * 100).toFixed(1)'></span>%
+                                    </div>
+                                </div>
+                            </template>
+                            <template v-else>
+                                <div class='flex-parent flex-parent--center-main'>
+                                    <div class='flex-child'>
+                                        <svg class='icon w30 h30'><use xlink:href='#icon-cursor'/></svg>
+                                    </div>
+                                </div>
+                                <div class='flex-parent flex-parent--center-main'>
+                                    <div class='flex-child'>
+                                        <div align=center>Hover for Details</div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div id="map" class='w-full h-full'></div>
+                    </div>
                 </div>
-            </div>
-            <div class='flex-parent flex-parent--center-main my18'>
-                <div class='w240 round shadow-darken10 px12 py12 txt-s'>
-                    <div class='flex-parent flex-parent--center-main flex-parent--center-cross align-center'>
-                        <div class='flex-child flex-child--grow wmin24'>
-                            <span class='inline-block w12 h12 round-full bg-gray-light'></span>
+                <div class='flex-parent flex-parent--center-main my18'>
+                    <div class='w240 round shadow-darken10 px12 py12 txt-s'>
+                        <div class='flex-parent flex-parent--center-main flex-parent--center-cross align-center'>
+                            <div class='flex-child flex-child--grow wmin24'>
+                                <span class='inline-block w12 h12 round-full bg-gray-light'></span>
+                            </div>
+                            <div class='flex-child flex-child--grow wmin24'>
+                                <span class='inline-block w12 h12 round-full bg-blue-light'></span>
+                            </div>
+                            <div class='flex-child flex-child--grow wmin24'>
+                                <span class='inline-block w12 h12 round-full bg-pink-light'></span>
+                            </div>
                         </div>
-                        <div class='flex-child flex-child--grow wmin24'>
-                            <span class='inline-block w12 h12 round-full bg-blue-light'></span>
+                        <div class='grid txt-xs align-center'>
+                            <div class='col col--4'>Unvalidated</div>
+                            <div class='col col--4'>Validated<br>True</div>
+                            <div class='col col--4'>Validated <br>False</div>
                         </div>
-                        <div class='flex-child flex-child--grow wmin24'>
-                            <span class='inline-block w12 h12 round-full bg-pink-light'></span>
-                        </div>
-                    </div>
-                    <div class='grid txt-xs align-center'>
-                        <div class='col col--4'>Unvalidated</div>
-                        <div class='col col--4'>Validated<br>True</div>
-                        <div class='col col--4'>Validated <br>False</div>
                     </div>
                 </div>
-            </div>
+            </template>
         </template>
         <template v-else>
             <div class='col col--12 py6'>
@@ -154,12 +171,14 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import buffer from '../../../node_modules/@turf/buffer/index.js';
 import bboxPolygon from '../../../node_modules/@turf/bbox-polygon/index.js';
 import PredictionHeader from './PredictionHeader.vue';
+import Integrations from '../Integrations.vue';
 
 export default {
     name: 'Map',
     props: ['meta', 'prediction', 'tilejson'],
     data: function() {
         return {
+            mode: 'visualize',
             clickListener: false,
             popup: false,
             popupid: false,
@@ -509,6 +528,7 @@ export default {
         },
     },
     components: {
+        Integrations,
         PredictionHeader
     }
 }
