@@ -1,8 +1,10 @@
+import boto3
 from flask import Blueprint, session
 from flask_restful import request, current_app
 from ml_enabler.utils import err
 import ml_enabler.config as CONFIG
 from ml_enabler.api.auth import has_project_read, has_project_write, has_project_admin
+from ml_enabler.serviceq.prediction_service import PredictionService
 from flask_login import login_required
 from flask import jsonify
 
@@ -169,7 +171,7 @@ def post(model_id, prediction_id):
             OnFailure='ROLLBACK',
         )
 
-        return self.get(model_id, prediction_id)
+        return get(model_id, prediction_id)
     except Exception as e:
         error_msg = f'Prediction Stack Creation Error: {str(e)}'
         current_app.logger.error(error_msg)
@@ -178,7 +180,7 @@ def post(model_id, prediction_id):
 @login_required
 @has_project_write
 @stacks_bp.route('/v1/model/<int:model_id>/prediction/<int:prediction_id>/stack', methods=['DELETE'])
-def delete(self, model_id, prediction_id):
+def delete(model_id, prediction_id):
     if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
         return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
 
@@ -193,7 +195,7 @@ def delete(self, model_id, prediction_id):
             StackName=stack
         )
 
-        return self.get(model_id, prediction_id)
+        return get(model_id, prediction_id)
     except Exception as e:
         if str(e).find("does not exist") != -1:
             return {
@@ -208,7 +210,7 @@ def delete(self, model_id, prediction_id):
 @login_required
 @has_project_read
 @stacks_bp.route('/v1/model/<int:model_id>/prediction/<int:prediction_id>/stack', methods=['GET'])
-def get(self, model_id, prediction_id):
+def get(model_id, prediction_id):
     """
     Return status of a prediction stack
     ---

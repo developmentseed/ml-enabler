@@ -27,14 +27,10 @@ class EnvironmentConfig:
     GitSha=os.getenv('GitSha', None)
     MAPBOX_TOKEN=os.getenv('MAPBOX_TOKEN', None)
 
+    if GitSha is None:
+        GitSha = os.popen('git rev-parse HEAD').read()
+
     if ENVIRONMENT == 'aws':
-        if GitSha is None:
-            if INTERACTIVE is None:
-                print("GitSha Env Var Required")
-                raise
-            else:
-                print('Missing EnvVar: Gitsha')
-                GitSha = input('> ')
         if MACHINE_AUTH is None:
             if INTERACTIVE is None:
                 print("MACHINE_AUTH Env Var Required")
