@@ -28,7 +28,15 @@
                     <Integrations @integration='integration = $event'/>
                 </template>
                 <template v-else>
-                    HERE
+                    <div class='col col--12 grid grid--gut12'>
+                        <div class='col col--10'>
+                            <label>Challenge ID</label>
+                            <input type='text' class='input'/>
+                        </div>
+                        <div class='col col--2'>
+                            <button class='btn btn--stroke round w-full mt24'>Import</button>
+                        </div>
+                    </div>
                 </template>
             </template>
             <template v-else-if='mode === "visualize"'>
