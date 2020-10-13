@@ -37,8 +37,6 @@ assert(api)
 assert(imagery)
 assert(retrain_config)
 
-print(retrain_config)
-
 def get_pred(model_id, prediction_id):
     r = requests.get(api + '/v1/model/' + str(model_id) + '/prediction/' + str(prediction_id), auth=HTTPBasicAuth('machine', auth))
     r.raise_for_status()
@@ -164,8 +162,9 @@ config.class_names=inflist
 config.n_train_samps=n_train_samps
 config.n_val_samps=n_val_samps
 
-print(config.tf_batch_size)
 print(config.x_feature_shape)
+
+#validate re-training config user uploaded
 config.validate
 
 # env variable dervied from json user uploads via UI
