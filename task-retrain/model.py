@@ -49,6 +49,9 @@ def train(config: RetrainConfig):
     # Set logging info so it'll be written the command line
     logging.set_verbosity(logging.INFO)
 
+    logging.info('config')
+    logging.info(config)
+
     os.environ['TF_CONFIG'] = '{}'
     os.environ['_TF_CONFIG_ENV'] = '{}'
 

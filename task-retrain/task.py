@@ -27,6 +27,7 @@ prediction_id = os.getenv('PREDICTION_ID')
 bucket = os.getenv('ASSET_BUCKET')
 api = os.getenv('API_URL')
 imagery = os.getenv('TILE_ENDPOINT')
+retrain_config = os.getenv('RETRAIN_CONFIG')
 
 assert(stack)
 assert(auth)
@@ -34,6 +35,9 @@ assert(model_id)
 assert(prediction_id)
 assert(api)
 assert(imagery)
+assert(retrain_config)
+
+print(retrain_config)
 
 def get_pred(model_id, prediction_id):
     r = requests.get(api + '/v1/model/' + str(model_id) + '/prediction/' + str(prediction_id), auth=HTTPBasicAuth('machine', auth))
@@ -148,13 +152,14 @@ print(n_val_samps)
 
 # conduct re-training,
 
-sample_config = json.loads('''{
-    "tf_train_steps": 100,
-    "tf_batch_size": 2,
-    "tf_dense_size": 153,
-    "retraining_weights": "/tmp/checkpoint.zip"
-}
-''')
+# sample_config = json.loads('''{
+#     "tf_train_steps": 100,
+#     "tf_batch_size": 2,
+#     "tf_dense_size": 153,
+#     "retraining_weights": "/tmp/checkpoint.zip"
+# }
+# ''')
+sample_config = json.loads()
 config = RetrainConfig(sample_config)
 if supertile:
      config.x_feature_shape = [-1, 512, 512, 3]
@@ -165,7 +170,7 @@ config.n_classes=len(inflist)
 config.class_names=inflist
 config.n_train_samps=n_train_samps
 config.n_val_samps=n_val_samps
-
+print(config.tf_batch_size)
 print(config.x_feature_shape)
 print(config.x_feature_shape[1:])
 config.validate
