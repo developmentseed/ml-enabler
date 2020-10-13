@@ -817,6 +817,8 @@ class PredictionRetrain(Resource):
 
         payload = request.get_json()
 
+        CONFIG.RETRAIN_CONFIG = payload
+
         pred = PredictionService.get_prediction_by_id(prediction_id)
 
         try:

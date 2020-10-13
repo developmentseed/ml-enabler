@@ -162,8 +162,6 @@ import Tasks from './Tasks.vue';
 import PredictionHeader from './PredictionHeader.vue';
 import UploadPrediction from './UploadPrediction.vue';
 
-let config;
-console.log(config);
 export default {
     name: 'PredTasks',
     props: ['meta', 'prediction', 'tilejson'],
@@ -181,7 +179,7 @@ export default {
             loading: {
                 retrain: true
             },
-            config,
+            config: '',
         }
     },
     components: {
@@ -207,7 +205,7 @@ export default {
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({})
+                    body: JSON.stringify(this.config)
                 });
 
                 const body = await res.json();
@@ -242,9 +240,7 @@ export default {
             fr.onload = e => {
                 const result = JSON.parse(e.target.result);
                 const formatted = JSON.stringify(result, null, 2);
-                console.log(formatted);
-                config = formatted;
-                console.log(config);
+                this.config = formatted;
             }
             fr.readAsText(file);
         }
