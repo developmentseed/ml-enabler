@@ -4,7 +4,7 @@ from flask_restful import request, current_app
 from ml_enabler.utils import err
 import ml_enabler.config as CONFIG
 from ml_enabler.api.auth import has_project_read, has_project_write, has_project_admin
-from ml_enabler.serviceq.prediction_service import PredictionService
+from ml_enabler.services.prediction_service import PredictionService
 from flask_login import login_required
 from flask import jsonify
 
@@ -171,7 +171,9 @@ def post(model_id, prediction_id):
             OnFailure='ROLLBACK',
         )
 
-        return get(model_id, prediction_id)
+        return {
+            "status": "Stack Creation Initiated"
+        }
     except Exception as e:
         error_msg = f'Prediction Stack Creation Error: {str(e)}'
         current_app.logger.error(error_msg)
@@ -195,7 +197,9 @@ def delete(model_id, prediction_id):
             StackName=stack
         )
 
-        return get(model_id, prediction_id)
+        return {
+            "status": "Stack Deletion Initiated,
+        }
     except Exception as e:
         if str(e).find("does not exist") != -1:
             return {
