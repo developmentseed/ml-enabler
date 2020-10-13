@@ -26,7 +26,9 @@ class EnvironmentConfig:
     STACK=os.getenv('STACK', None)
     GitSha=os.getenv('GitSha', None)
     MAPBOX_TOKEN=os.getenv('MAPBOX_TOKEN', None)
+    RETRAIN_CONFIG = None
 
+    print(ENVIRONMENT)
     if ENVIRONMENT == 'aws':
         if GitSha is None:
             if INTERACTIVE is None:
