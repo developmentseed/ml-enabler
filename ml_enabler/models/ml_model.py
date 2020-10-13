@@ -1,13 +1,10 @@
 import mercantile
-import json
-from sqlalchemy.orm.attributes import flag_modified
 from sqlalchemy.ext.mutable import MutableDict, MutableList
 from ml_enabler import db
 from ml_enabler.models.utils import timestamp
 from geoalchemy2 import Geometry
 from sqlalchemy import or_, and_
-from geoalchemy2.functions import ST_Envelope, ST_AsGeoJSON, ST_Within, \
-     ST_GeomFromText, ST_Intersects, ST_MakeEnvelope
+from geoalchemy2.functions import ST_AsGeoJSON
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.sql import func, text
 from sqlalchemy.sql.expression import cast

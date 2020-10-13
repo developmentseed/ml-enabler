@@ -1,6 +1,4 @@
 from ml_enabler.models.aoi import AOI
-from ml_enabler import db
-from ml_enabler.models.utils import NotFound
 
 class AOIService():
     @staticmethod

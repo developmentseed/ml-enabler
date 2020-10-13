@@ -1,5 +1,4 @@
 from ml_enabler.models.token import Token
-from ml_enabler import db
 
 class TokenService():
     @staticmethod

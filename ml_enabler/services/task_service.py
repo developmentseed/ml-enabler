@@ -1,5 +1,4 @@
 from ml_enabler.models.task import Task
-from ml_enabler import db
 from ml_enabler.models.utils import NotFound
 import boto3
 

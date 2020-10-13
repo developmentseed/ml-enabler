@@ -2,7 +2,6 @@ import maproulette, json
 from ml_enabler.models.integration import Integration
 from ml_enabler.services.prediction_service import PredictionService
 from ml_enabler.models.utils import IntegrationNotFound
-from ml_enabler import db
 from urllib.parse import urlparse
 
 class IntegrationService():

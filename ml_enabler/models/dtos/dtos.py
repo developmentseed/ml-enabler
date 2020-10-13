@@ -1,5 +1,5 @@
 from schematics import Model
-from schematics.types import StringType, IntType, DateTimeType, ListType, FloatType, BooleanType, DictType
+from schematics.types import StringType, IntType, DateTimeType, ListType, BooleanType, DictType
 
 class AOIDTO(Model):
     """ Describes JSON of an Integration Source """
