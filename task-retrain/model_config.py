@@ -9,7 +9,7 @@ class RetrainConfig():
     tf_dir='/tmp/tfrecord/'
     tf_model_dir = '/ml/models/'
     model_id ='b'
-    retraining_weights=None
+    retraining_weights = '/tmp/checkpoint.zip'
     n_train_samps=100
     n_val_samps=20
 
