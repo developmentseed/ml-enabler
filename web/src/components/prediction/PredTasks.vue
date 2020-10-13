@@ -205,7 +205,7 @@ export default {
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(this.config)
+                    body: JSON.stringify(JSON.parse(this.config))
                 });
 
                 const body = await res.json();
