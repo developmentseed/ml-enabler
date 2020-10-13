@@ -27,7 +27,7 @@ prediction_id = os.getenv('PREDICTION_ID')
 bucket = os.getenv('ASSET_BUCKET')
 api = os.getenv('API_URL')
 imagery = os.getenv('TILE_ENDPOINT')
-retrain_config = os.getenv('RETRAIN_CONFIG')
+retrain_config = os.getenv('CONFIG_RETRAIN')
 
 assert(stack)
 assert(auth)
@@ -116,6 +116,7 @@ if pred['checkpointLink'] is None:
 
 zoom = pred['tileZoom']
 version = pred['version']
+supertile = pred['infSupertile']
 inflist = pred['infList'].split(',')
 
 
@@ -151,15 +152,7 @@ n_val_samps = sum([tf.data.TFRecordDataset(f).reduce(np.int64(0), lambda x, _: x
 print(n_val_samps)
 
 # conduct re-training,
-
-# sample_config = json.loads('''{
-#     "tf_train_steps": 100,
-#     "tf_batch_size": 2,
-#     "tf_dense_size": 153,
-#     "retraining_weights": "/tmp/checkpoint.zip"
-# }
-# ''')
-sample_config = json.loads()
+sample_config = json.loads(retrain_config)
 config = RetrainConfig(sample_config)
 if supertile:
      config.x_feature_shape = [-1, 512, 512, 3]
@@ -170,12 +163,12 @@ config.n_classes=len(inflist)
 config.class_names=inflist
 config.n_train_samps=n_train_samps
 config.n_val_samps=n_val_samps
+
 print(config.tf_batch_size)
 print(config.x_feature_shape)
-print(config.x_feature_shape[1:])
 config.validate
 
- #this will eventually be env variable
+# env variable dervied from json user uploads via UI
 train(config)
 
 # increment model version
