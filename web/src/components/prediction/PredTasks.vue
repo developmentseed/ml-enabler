@@ -116,7 +116,12 @@
                     </div>
                 </template>
                 <template v-if='advanced'>
-                    <div class='w-full align-center py12'>No Advanced Options Yet</div>
+                    <!-- <div class='w-full align-center py12'>No Advanced Options Yet</div> -->
+                    <form>
+                     <input ref='fileInput' type='file' id='file' name='file' accept='*' @change='createImport($event)' />
+                     </form>
+                    <pre class='pre' v-text='config'></pre>
+
                 </template>
                 <div class='col col--12 clearfix py12'>
                     <button @click='createRetrain' class='fr btn btn--stroke color-gray color-green-on-hover round'>Retrain</button>
@@ -157,6 +162,8 @@ import Tasks from './Tasks.vue';
 import PredictionHeader from './PredictionHeader.vue';
 import UploadPrediction from './UploadPrediction.vue';
 
+let config;
+console.log(config);
 export default {
     name: 'PredTasks',
     props: ['meta', 'prediction', 'tilejson'],
@@ -173,7 +180,8 @@ export default {
             },
             loading: {
                 retrain: true
-            }
+            },
+            config,
         }
     },
     components: {
@@ -226,6 +234,21 @@ export default {
                 this.$emit('err', err);
             }
         },
+
+        createImport: function(event) {
+            const file = event.target.files[0];
+              const fr = new FileReader();
+
+            fr.onload = e => {
+                const result = JSON.parse(e.target.result);
+                const formatted = JSON.stringify(result, null, 2);
+                console.log(formatted);
+                config = formatted;
+                console.log(config);
+            }
+            fr.readAsText(file);
+        }
+
     }
 }
 </script>
