@@ -9,10 +9,10 @@ class EnvironmentConfig:
     ))
 
     # One of 'docker' or 'aws'
-    ENVIRONMENT = os.getenv('ENVIRONMENT', 'docker');
-    INTERACTIVE = os.getenv('ENVIRONMENT');
+    ENVIRONMENT = os.getenv('ENVIRONMENT', 'docker')
+    INTERACTIVE = os.getenv('ENVIRONMENT')
 
-    SECRET_KEY = os.getenv('SECRET_KEY', 'secretkey');
+    SECRET_KEY = os.getenv('SECRET_KEY', 'secretkey')
 
     # Database connection
     POSTGRES_USER = os.getenv('POSTGRES_USER', None)
@@ -35,31 +35,31 @@ class EnvironmentConfig:
             if INTERACTIVE is None:
                 print("MACHINE_AUTH Env Var Required")
                 raise
-            else:
-                print('Missing EnvVar: MACHINE_AUTH')
-                MACHINE_AUTH = input('> ')
+
+            print('Missing EnvVar: MACHINE_AUTH')
+            MACHINE_AUTH = input('> ')
         if STACK is None:
             if INTERACTIVE is None:
                 print("STACK Env Var Required")
                 raise
-            else:
-                print('Missing EnvVar: STACK')
-                STACK = input('> ')
+
+            print('Missing EnvVar: STACK')
+            STACK = input('> ')
         if ASSET_BUCKET is None:
             if INTERACTIVE is None:
                 print("ASSET_BUCKET Env Var Required")
                 raise
-            else:
-                print('Missing EnvVar: ASSET_BUCKET')
-                ASSET_BUCKET = input('> ')
+
+            print('Missing EnvVar: ASSET_BUCKET')
+            ASSET_BUCKET = input('> ')
 
     if MAPBOX_TOKEN is None:
         if INTERACTIVE is None:
             print("MAPBOX_TOKEN Env Var Required")
             raise
-        else:
-            print('Missing EnvVar: MAPBOX_TOKEN')
-            MAPBOX_TOKEN = input('> ')
+
+        print('Missing EnvVar: MAPBOX_TOKEN')
+        MAPBOX_TOKEN = input('> ')
 
     if os.getenv('MLENABLER_DB', False):
         SQLALCHEMY_DATABASE_URI = os.getenv('MLENABLER_DB', None)
@@ -74,4 +74,7 @@ class EnvironmentConfig:
 
 class TestConfig(EnvironmentConfig):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = os.getenv('MLENABLER_TEST_DB', 'postgresql://admin@127.0.0.1/ml_enabler_test')
+    SQLALCHEMY_DATABASE_URI = os.getenv(
+        'MLENABLER_TEST_DB',
+        'postgresql://admin@127.0.0.1/ml_enabler_test'
+    )

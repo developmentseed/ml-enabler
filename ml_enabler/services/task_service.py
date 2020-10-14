@@ -47,7 +47,7 @@ class TaskService():
             raise NotFound
 
         tasks = []
-        if (rawtasks):
+        if rawtasks:
             for task in rawtasks:
                 tasks.append(task.as_dto().to_primitive())
 
@@ -55,11 +55,11 @@ class TaskService():
                 'pred_id': pred_id,
                 'tasks': tasks
             }
-        else:
-            return {
-                'pred_id': pred_id,
-                'tasks': []
-            }
+
+        return {
+            'pred_id': pred_id,
+            'tasks': []
+        }
 
     @staticmethod
     def get(task_id: int):

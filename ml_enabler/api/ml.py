@@ -411,9 +411,9 @@ class PredictionExport(Resource):
                     t = '-'.join([str(i) for i in mercantile.quadkey_to_tile(row[1])])
 
                     # special case for binary
-                    if (pred.inf_binary) and (len(i_lst) != 2):
+                    if pred.inf_binary and len(i_lst) != 2:
                         return err(400, "binary models must have two catagories"), 400
-                    if (len(i_lst) == 2) and (pred.inf_binary):
+                    if len(i_lst) == 2 and pred.inf_binary:
                         if list(row[4].values())[0]: #validated and true, keep original
                             labels_dict.update({t:l})
                         else:
@@ -1340,7 +1340,7 @@ class PredictionTileAPI(Resource):
         """
         try:
             data = request.get_json()
-            if (len(data['predictions']) == 0):
+            if len(data['predictions']) == 0:
                 return err(400, "Error validating request"), 400
 
             PredictionTileService.create(data)

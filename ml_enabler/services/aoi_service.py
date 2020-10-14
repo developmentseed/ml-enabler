@@ -1,6 +1,10 @@
 from ml_enabler.models.aoi import AOI
 
 class AOIService():
+    """
+    Intermediate class to faciltate web-ready responses from an SQLAlchemy model
+    """
+
     @staticmethod
     def create(payload: dict) -> int:
         aoi = AOI()
@@ -12,7 +16,7 @@ class AOIService():
         rawaois = AOI.list(model_id, pred_id)
 
         aois = []
-        if (rawaois):
+        if rawaois:
             for aoi in rawaois:
                 aois.append(aoi.as_dto().to_primitive())
 
@@ -21,10 +25,9 @@ class AOIService():
                 'pred_id': pred_id,
                 'aois': aois
             }
-        else:
-            return {
-                'model_id': model_id,
-                'pred_id': pred_id,
-                'aois': []
-            }
 
+        return {
+            'model_id': model_id,
+            'pred_id': pred_id,
+            'aois': []
+        }

@@ -44,7 +44,7 @@ class ImageryService():
 
         imagery = Imagery.get(imagery_id)
 
-        if (imagery):
+        if imagery:
             imagery.update(update)
 
             return imagery.id
@@ -75,7 +75,7 @@ class ImageryService():
 
         imagery = Imagery.get(imagery_id)
 
-        if (imagery):
+        if imagery:
             return imagery.as_dto().to_primitive()
         else:
             raise ImageryNotFound('Imagery Not Found')

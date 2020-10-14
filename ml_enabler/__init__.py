@@ -49,7 +49,8 @@ def init_routes(app):
     from ml_enabler.api.ml import StatusCheckAPI, ProjectAPI, GetAllModels, \
         PredictionAPI, PredictionUploadAPI, PredictionTileAPI, PredictionImport, \
         GetAllPredictions, PredictionTileMVT, PredictionRetrain, PredictionTfrecords,\
-        PredictionInfAPI, MapboxAPI, MetaAPI, PredictionExport, PredictionSingleAPI, PredictionValidity
+        PredictionInfAPI, MapboxAPI, MetaAPI, PredictionExport, PredictionSingleAPI, \
+        PredictionValidity
     from ml_enabler.api.swagger import SwaggerDocsAPI
 
     api.add_resource(StatusCheckAPI,            '/v1/health')
