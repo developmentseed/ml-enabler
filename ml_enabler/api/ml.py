@@ -959,6 +959,12 @@ class PredictionUploadAPI(Resource):
                             }]
                         }
                     )
+
+                    TaskService.create({
+                        'pred_id': prediction_id,
+                        'type': 'ecr',
+                        'batch_id': job.get('jobId')
+                    })
                 except Exception as e:
                     error_msg = f'Batch Error: {str(e)}'
                     current_app.logger.error(error_msg)
