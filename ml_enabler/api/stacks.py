@@ -198,7 +198,7 @@ def delete(model_id, prediction_id):
         )
 
         return {
-            "status": "Stack Deletion Initiated,
+            "status": "Stack Deletion Initiated",
         }
     except Exception as e:
         if str(e).find("does not exist") != -1:
