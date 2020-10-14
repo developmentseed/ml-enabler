@@ -94,4 +94,3 @@ class PredictionDTO(Model):
     model_link = StringType(serialized_name='modelLink')
     docker_link = StringType(serialized_name='dockerLink')
     save_link = StringType(serialized_name='saveLink')
-

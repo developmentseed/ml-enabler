@@ -170,7 +170,7 @@ class IntegrationService():
         if req_inferences != 'all':
             inferences = [ req_inferences ]
 
-        fc = {
+        feats = {
             'type': 'FeatureCollection',
             'features': []
         }
@@ -196,11 +196,11 @@ class IntegrationService():
                 "geometry": json.loads(row[2])
             }
 
-            fc['features'].append(feat)
+            feats['features'].append(feat)
 
         challenge_api.add_tasks_to_challenge(
             challenge_id=challenge['data']['id'],
-            data=fc
+            data=feats
         )
 
         return {
