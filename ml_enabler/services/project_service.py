@@ -2,8 +2,6 @@ from flask import current_app
 from ml_enabler.models.ml_model import Project, ProjectAccess
 from ml_enabler.models.dtos.dtos import ProjectDTO
 from ml_enabler.models.utils import NotFound
-from ml_enabler.utils import version_to_array
-from sqlalchemy.orm.exc import NoResultFound
 
 
 class ProjectServiceError(Exception):
@@ -71,7 +69,7 @@ class ProjectService():
         """
 
         ml_models = Project.get_all(uid, model_filter, model_archived)
-        if (ml_models):
+        if ml_models:
             model_collection = []
             for model in ml_models:
                 model_collection.append(model.as_dto().to_primitive())
@@ -91,7 +89,7 @@ class ProjectService():
 
         ml_model = Project.get(updated_ml_model_dto.model_id)
 
-        if (ml_model):
+        if ml_model:
             ml_model.update(updated_ml_model_dto)
 
             if updated_ml_model_dto.users:

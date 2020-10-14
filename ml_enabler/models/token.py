@@ -1,7 +1,8 @@
+import random
+
 from ml_enabler import db
 from ml_enabler.models.utils import timestamp
 from ml_enabler.models.dtos.dtos import TokenDTO
-import random
 
 class Token(db.Model):
     """ Store an api token for a given user """

@@ -1,5 +1,5 @@
 from schematics import Model
-from schematics.types import StringType, IntType, DateTimeType, ListType, FloatType, BooleanType, DictType
+from schematics.types import StringType, IntType, DateTimeType, ListType, BooleanType, DictType
 
 class AOIDTO(Model):
     """ Describes JSON of an Integration Source """
@@ -94,4 +94,3 @@ class PredictionDTO(Model):
     model_link = StringType(serialized_name='modelLink')
     docker_link = StringType(serialized_name='dockerLink')
     save_link = StringType(serialized_name='saveLink')
-

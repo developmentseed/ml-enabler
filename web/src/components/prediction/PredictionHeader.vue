@@ -8,7 +8,7 @@
         }' class="btn btn--pill btn--s btn--pill-hc btn--pill-stroke round">Stack</button>
         <button @click='mode !== "map" && $router.push({ name: "map" })' :class='{
             "btn--stroke": mode !== "map"
-        }' class="btn btn--pill btn--s btn--pill-hc btn--pill-stroke round">Map</button>
+        }' class="btn btn--pill btn--s btn--pill-hc btn--pill-stroke round">Inferences</button>
         <button @click='mode !== "export" && $router.push({ name: "export" })' :class='{
             "btn--stroke": mode !== "export"
         }' class="btn btn--pill btn--s btn--pill-hc btn--pill-stroke round">Export</button>

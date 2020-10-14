@@ -1,7 +1,5 @@
+import mercantile, geojson, json
 from shapely.geometry import box, Point, shape
-import mercantile
-import json
-import geojson
 
 def err(status , msg: str):
     return {
@@ -29,14 +27,14 @@ def bbox_to_polygon_wkt(bbox: list):
 def bbox_str_to_list(bbox: str):
     """ Parse the bbox query param and return a list of floats """
 
-    bboxList = bbox.split(',')
-    return list(map(float, bboxList))
+    bbox_list = bbox.split(',')
+    return list(map(float, bbox_list))
 
 
-def geojson_to_bbox(geojson):
+def geojson_to_bbox(geojson_str):
     """ Convert polygon geojson to bbox list """
 
-    polygon = json.loads(geojson)
+    polygon = json.loads(geojson_str)
     bbox = [polygon['coordinates'][0][0][0], polygon['coordinates'][0][0][1], polygon['coordinates'][0][2][0], polygon['coordinates'][0][2][1]]
     return bbox
 
@@ -71,10 +69,12 @@ def geojson_bounds(geojson):
     # flatten the coordinates
     coords = list(flatten([f['geometry']['coordinates']
                   for f in geojson['features']]))
-
-    return [min(coords[::2]), min(coords[1::2]),
-            max(coords[::2]), max(coords[1::2])]
-
+    return [
+        min(coords[::2]),
+        min(coords[1::2]),
+        max(coords[::2]),
+        max(coords[1::2])
+    ]
 
 def flatten(value):
     """

@@ -2,7 +2,6 @@ import maproulette, json
 from ml_enabler.models.integration import Integration
 from ml_enabler.services.prediction_service import PredictionService
 from ml_enabler.models.utils import IntegrationNotFound
-from ml_enabler import db
 from urllib.parse import urlparse
 
 class IntegrationService():
@@ -35,12 +34,12 @@ class IntegrationService():
 
         integration = Integration.get(integration_id)
 
-        if (integration):
+        if integration:
             integration.delete()
 
             return integration.id
-        else:
-            raise IntegrationNotFound('Integration Not Found')
+
+        raise IntegrationNotFound('Integration Not Found')
 
     @staticmethod
     def patch(model_id: int, integration_id: int, update: dict) -> int:
@@ -54,12 +53,12 @@ class IntegrationService():
 
         integration = Integration.get(integration_id)
 
-        if (integration):
+        if integration:
             integration.update(update)
 
             return integration.id
-        else:
-            raise IntegrationNotFound('Integration Not Found')
+
+        raise IntegrationNotFound('Integration Not Found')
 
     @staticmethod
     def list(model_id: int):
@@ -85,10 +84,10 @@ class IntegrationService():
 
         integration = Integration.get(integration_id)
 
-        if (integration):
+        if integration:
             return integration.as_dto().to_primitive()
-        else:
-            raise IntegrationNotFound('Integration Not Found')
+
+        raise IntegrationNotFound('Integration Not Found')
 
     @staticmethod
     def get_secrets(integration_id: int):
@@ -102,10 +101,10 @@ class IntegrationService():
 
         integration = Integration.get_secrets(integration_id)
 
-        if (integration):
+        if integration:
             return integration
-        else:
-            raise IntegrationNotFound('Integration Not Found')
+
+        raise IntegrationNotFound('Integration Not Found')
 
     @staticmethod
     def payload(integration_id: int, payload: dict):
@@ -115,7 +114,7 @@ class IntegrationService():
             raise IntegrationNotFound('Integration Not Found')
 
         if integration.integration != "maproulette":
-            raise Exception("Only MapRoulette Integrations supported");
+            raise Exception("Only MapRoulette Integrations supported")
 
         for ele in ['prediction', 'project', 'project_desc', 'challenge', 'challenge_instr', 'threshold', 'inferences']:
             if payload.get(ele) is None:
@@ -171,7 +170,7 @@ class IntegrationService():
         if req_inferences != 'all':
             inferences = [ req_inferences ]
 
-        fc = {
+        feats = {
             'type': 'FeatureCollection',
             'features': []
         }
@@ -197,11 +196,11 @@ class IntegrationService():
                 "geometry": json.loads(row[2])
             }
 
-            fc['features'].append(feat)
+            feats['features'].append(feat)
 
         challenge_api.add_tasks_to_challenge(
             challenge_id=challenge['data']['id'],
-            data=fc
+            data=feats
         )
 
         return {

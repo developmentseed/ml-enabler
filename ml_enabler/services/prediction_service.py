@@ -53,7 +53,7 @@ class PredictionService():
     def export(prediction_id: int):
         prediction = Prediction.get(prediction_id)
 
-        if (prediction):
+        if prediction:
             stream = prediction.export()
 
             return stream
@@ -83,7 +83,7 @@ class PredictionService():
 
         prediction = Prediction.get(prediction_id)
 
-        if (prediction):
+        if prediction:
             prediction.link(update)
 
             return prediction_id

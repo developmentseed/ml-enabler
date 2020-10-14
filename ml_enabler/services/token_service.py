@@ -1,5 +1,4 @@
 from ml_enabler.models.token import Token
-from ml_enabler import db
 
 class TokenService():
     @staticmethod
@@ -24,7 +23,7 @@ class TokenService():
         """
 
         token = Token.get(uid, token_id)
-        if (token):
+        if token:
             token.delete()
 
             return {
@@ -56,7 +55,7 @@ class TokenService():
 
         token = Token.get(uid, token_id).as_dto().to_primitive()
 
-        if (token):
+        if token:
             return token.to_primitive()
         else:
             raise NotFound('Token Not Found')

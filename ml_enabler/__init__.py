@@ -11,7 +11,7 @@ login_manager = LoginManager()
 
 # import models
 from ml_enabler.models import * # noqa
-from ml_enabler.api import auth, task, imagery, integration, token, aoi, user
+from ml_enabler.api import auth, task, imagery, integration, token, aoi, user, stacks
 
 def create_app(env=None, app_config='ml_enabler.config.EnvironmentConfig'):
     # create and configure the app
@@ -23,6 +23,7 @@ def create_app(env=None, app_config='ml_enabler.config.EnvironmentConfig'):
     login_manager.init_app(app)
 
     app.register_blueprint(aoi.aoi_bp)
+    app.register_blueprint(stacks.stacks_bp)
     app.register_blueprint(user.user_bp)
     app.register_blueprint(auth.auth_bp)
     app.register_blueprint(token.token_bp)
@@ -48,8 +49,8 @@ def init_routes(app):
     from ml_enabler.api.ml import StatusCheckAPI, ProjectAPI, GetAllModels, \
         PredictionAPI, PredictionUploadAPI, PredictionTileAPI, PredictionImport, \
         GetAllPredictions, PredictionTileMVT, PredictionRetrain, PredictionTfrecords,\
-        PredictionStackAPI, PredictionStacksAPI, PredictionInfAPI, MapboxAPI, MetaAPI, \
-        PredictionExport, PredictionSingleAPI, PredictionValidity
+        PredictionInfAPI, MapboxAPI, MetaAPI, PredictionExport, PredictionSingleAPI, \
+        PredictionValidity
     from ml_enabler.api.swagger import SwaggerDocsAPI
 
     api.add_resource(StatusCheckAPI,            '/v1/health')
@@ -59,8 +60,6 @@ def init_routes(app):
     api.add_resource(SwaggerDocsAPI,            '/v1/docs')
 
     api.add_resource(MapboxAPI,                 '/v1/mapbox', methods=['GET'])
-
-    api.add_resource(PredictionStacksAPI,       '/v1/stacks', methods=['GET'])
 
     api.add_resource(GetAllModels,              '/v1/model/all', methods=['GET'])
     api.add_resource(ProjectAPI,                '/v1/model', endpoint="post", methods=['POST'])
@@ -72,7 +71,6 @@ def init_routes(app):
     api.add_resource(PredictionSingleAPI,       '/v1/model/<int:model_id>/prediction/<int:prediction_id>', methods=['GET'])
     api.add_resource(PredictionAPI,             '/v1/model/<int:model_id>/prediction/<int:prediction_id>', endpoint="patch", methods=['PATCH'])
     api.add_resource(PredictionUploadAPI,       '/v1/model/<int:model_id>/prediction/<int:prediction_id>/upload', methods=['POST'])
-    api.add_resource(PredictionStackAPI,        '/v1/model/<int:model_id>/prediction/<int:prediction_id>/stack', methods=['GET', 'POST', 'DELETE'])
     api.add_resource(PredictionInfAPI,          '/v1/model/<int:model_id>/prediction/<int:prediction_id>/stack/tiles', methods=['POST', 'GET', 'DELETE'])
 
     api.add_resource(PredictionValidity,        '/v1/model/<int:model_id>/prediction/<int:prediction_id>/validity', methods=['POST'])

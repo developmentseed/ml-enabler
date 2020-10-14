@@ -20,12 +20,15 @@ def has_project_read(f):
     def decorated_function(*args, **kwargs):
         model_id = kwargs.get('model_id')
 
+        if current_user.is_authenticated and current_user.name == "machine":
+            return f(*args, **kwargs)
+
         project = Project.get(model_id)
         if project.access == "public":
             return f(*args, **kwargs)
 
         for user in ProjectAccess.list(model_id):
-            if current_user.id == user.get('uid'):
+            if current_user.is_authenticated and current_user.id == user.get('uid'):
                 return f(*args, **kwargs)
 
         return {
@@ -40,8 +43,11 @@ def has_project_write(f):
     def decorated_function(*args, **kwargs):
         model_id = kwargs.get('model_id')
 
+        if current_user.is_authenticated and current_user.name == "machine":
+            return f(*args, **kwargs)
+
         for user in ProjectAccess.list(model_id):
-            if current_user.id == user.get('uid') and (user.get('access') == 'write' or user.get('access') == 'admin'):
+            if current_user.is_authenticated and current_user.id == user.get('uid') and (user.get('access') == 'write' or user.get('access') == 'admin'):
                 return f(*args, **kwargs)
 
         return {
@@ -56,8 +62,11 @@ def has_project_admin(f):
     def decorated_function(*args, **kwargs):
         model_id = kwargs.get('model_id')
 
+        if current_user.is_authenticated and current_user.name == "machine":
+            return f(*args, **kwargs)
+
         for user in ProjectAccess.list(model_id):
-            if current_user.id == user.get('uid') and user.get('access') == 'admin':
+            if current_user.is_authenticated and current_user.id == user.get('uid') and user.get('access') == 'admin':
                 return f(*args, **kwargs)
 
         return {
