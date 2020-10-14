@@ -116,7 +116,12 @@
                     </div>
                 </template>
                 <template v-if='advanced'>
-                    <div class='w-full align-center py12'>No Advanced Options Yet</div>
+                    <!-- <div class='w-full align-center py12'>No Advanced Options Yet</div> -->
+                    <form>
+                     <input ref='fileInput' type='file' id='file' name='file' accept='*' @change='createImport($event)' />
+                     </form>
+                    <pre class='pre' v-text='config'></pre>
+
                 </template>
                 <div class='col col--12 clearfix py12'>
                     <button @click='createRetrain' class='fr btn btn--stroke color-gray color-green-on-hover round'>Retrain</button>
@@ -173,7 +178,8 @@ export default {
             },
             loading: {
                 retrain: true
-            }
+            },
+            config: '',
         }
     },
     components: {
@@ -199,7 +205,7 @@ export default {
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({})
+                    body: JSON.stringify(JSON.parse(this.config))
                 });
 
                 const body = await res.json();
@@ -226,6 +232,19 @@ export default {
                 this.$emit('err', err);
             }
         },
+
+        createImport: function(event) {
+            const file = event.target.files[0];
+              const fr = new FileReader();
+
+            fr.onload = e => {
+                const result = JSON.parse(e.target.result);
+                const formatted = JSON.stringify(result, null, 2);
+                this.config = formatted;
+            }
+            fr.readAsText(file);
+        }
+
     }
 }
 </script>

@@ -16,6 +16,7 @@ from requests_toolbelt.utils import dump
 from zipfile import ZipFile
 
 from model import train
+from model_config import RetrainConfig
 
 s3 = boto3.client('s3')
 
@@ -26,6 +27,7 @@ prediction_id = os.getenv('PREDICTION_ID')
 bucket = os.getenv('ASSET_BUCKET')
 api = os.getenv('API_URL')
 imagery = os.getenv('TILE_ENDPOINT')
+retrain_config = os.getenv('CONFIG_RETRAIN')
 
 assert(stack)
 assert(auth)
@@ -33,6 +35,7 @@ assert(model_id)
 assert(prediction_id)
 assert(api)
 assert(imagery)
+assert(retrain_config)
 
 def get_pred(model_id, prediction_id):
     r = requests.get(api + '/v1/model/' + str(model_id) + '/prediction/' + str(prediction_id), auth=HTTPBasicAuth('machine', auth))
@@ -110,16 +113,11 @@ if pred['checkpointLink'] is None:
     raise Exception("Cannot retrain without checkpointLink")
 
 zoom = pred['tileZoom']
-supertile = pred['infSupertile']
 version = pred['version']
+supertile = pred['infSupertile']
 inflist = pred['infList'].split(',')
 
-if supertile:
-     x_feature_shape = [-1, 512, 512, 3]
-else:
-    x_feature_shape = [-1, 256, 256, 3]
 
-print(x_feature_shape)
 v = get_versions(model_id)
 
 model = get_asset(bucket, pred['modelLink'].replace(bucket + '/', ''))
@@ -130,11 +128,20 @@ print(model)
 print(checkpoint)
 print(tfrecord)
 
+def _parse_image_function(example_proto):
+    image_feature_description = {
+        'image': tf.io.FixedLenFeature([], tf.string),
+        'label': tf.io.FixedLenFeature([], tf.string)
+    }
+    return tf.io.parse_single_example(example_proto, image_feature_description)
+
+
 f_train = []
 for name in glob.glob('/tmp/tfrecord/train*.tfrecords'):
     f_train.append(name)
 n_train_samps = sum([tf.data.TFRecordDataset(f).reduce(np.int64(0), lambda x, _: x + 1).numpy() for f in f_train])
 print(n_train_samps)
+
 
 f_val = []
 for name in glob.glob('/tmp/tfrecord/val*.tfrecords'):
@@ -142,11 +149,24 @@ for name in glob.glob('/tmp/tfrecord/val*.tfrecords'):
 n_val_samps = sum([tf.data.TFRecordDataset(f).reduce(np.int64(0), lambda x, _: x + 1).numpy() for f in f_val])
 print(n_val_samps)
 
-# conduct re-training
-train(tf_train_steps=1000, tf_dir='/tmp/tfrecord/',
-       retraining_weights='/tmp/checkpoint.zip',
-       n_classes=len(inflist), class_names=inflist,  x_feature_shape=x_feature_shape,
-       n_train_samps=n_train_samps, n_val_samps=n_val_samps)
+# conduct re-training,
+sample_config = json.loads(retrain_config)
+config = RetrainConfig(sample_config)
+if supertile:
+     config.x_feature_shape = [-1, 512, 512, 3]
+else:
+    config.x_feature_shape = [-1, 256, 256, 3]
+
+config.n_classes=len(inflist)
+config.class_names=inflist
+config.n_train_samps=n_train_samps
+config.n_val_samps=n_val_samps
+
+#validate re-training config user uploaded
+config.validate
+
+# env variable dervied from json user uploads via UI
+train(config)
 
 # increment model version
 updated_version = str(increment_versions(version=v))

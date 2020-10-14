@@ -836,6 +836,7 @@ class PredictionRetrain(Resource):
                         { 'name': 'MODEL_ID', 'value': str(model_id) },
                         { 'name': 'PREDICTION_ID', 'value': str(prediction_id) },
                         { 'name': 'TILE_ENDPOINT', 'value': str(pred.imagery_id) },
+                        { 'name': 'CONFIG_RETRAIN', 'value': str(json.dumps(payload))}
                     ]
                 }
             )
