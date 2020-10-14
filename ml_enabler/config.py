@@ -27,7 +27,6 @@ class EnvironmentConfig:
     GitSha=os.getenv('GitSha', None)
     MAPBOX_TOKEN=os.getenv('MAPBOX_TOKEN', None)
 
-    print(ENVIRONMENT)
     if ENVIRONMENT == 'aws':
         if GitSha is None:
             if INTERACTIVE is None:
