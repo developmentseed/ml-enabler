@@ -162,8 +162,6 @@ config.class_names=inflist
 config.n_train_samps=n_train_samps
 config.n_val_samps=n_val_samps
 
-print(config.x_feature_shape)
-
 #validate re-training config user uploaded
 config.validate
 
