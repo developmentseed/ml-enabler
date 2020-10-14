@@ -34,12 +34,12 @@ class IntegrationService():
 
         integration = Integration.get(integration_id)
 
-        if (integration):
+        if integration:
             integration.delete()
 
             return integration.id
-        else:
-            raise IntegrationNotFound('Integration Not Found')
+
+        raise IntegrationNotFound('Integration Not Found')
 
     @staticmethod
     def patch(model_id: int, integration_id: int, update: dict) -> int:
@@ -53,12 +53,12 @@ class IntegrationService():
 
         integration = Integration.get(integration_id)
 
-        if (integration):
+        if integration:
             integration.update(update)
 
             return integration.id
-        else:
-            raise IntegrationNotFound('Integration Not Found')
+
+        raise IntegrationNotFound('Integration Not Found')
 
     @staticmethod
     def list(model_id: int):
@@ -84,10 +84,10 @@ class IntegrationService():
 
         integration = Integration.get(integration_id)
 
-        if (integration):
+        if integration:
             return integration.as_dto().to_primitive()
-        else:
-            raise IntegrationNotFound('Integration Not Found')
+
+        raise IntegrationNotFound('Integration Not Found')
 
     @staticmethod
     def get_secrets(integration_id: int):
@@ -101,10 +101,10 @@ class IntegrationService():
 
         integration = Integration.get_secrets(integration_id)
 
-        if (integration):
+        if integration:
             return integration
-        else:
-            raise IntegrationNotFound('Integration Not Found')
+
+        raise IntegrationNotFound('Integration Not Found')
 
     @staticmethod
     def payload(integration_id: int, payload: dict):
@@ -114,7 +114,7 @@ class IntegrationService():
             raise IntegrationNotFound('Integration Not Found')
 
         if integration.integration != "maproulette":
-            raise Exception("Only MapRoulette Integrations supported");
+            raise Exception("Only MapRoulette Integrations supported")
 
         for ele in ['prediction', 'project', 'project_desc', 'challenge', 'challenge_instr', 'threshold', 'inferences']:
             if payload.get(ele) is None:
