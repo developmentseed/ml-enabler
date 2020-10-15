@@ -104,6 +104,7 @@ def update_link(pred, link_type, zip_path):
 
     r = requests.post(api + '/v1/model/' + str(model_id) + '/prediction/' + str(prediction_id) + '/upload', params=payload,
                         data = encoder, headers= {'Content-Type': encoder.content_type}, auth=HTTPBasicAuth('machine', auth))
+    print(r.text)
     r.raise_for_status()
 
 pred = get_pred(model_id, prediction_id)
