@@ -1,19 +1,19 @@
-from flask import Blueprint, session
+from flask import Blueprint
 from functools import wraps
-from flask import g, request, redirect, url_for
-from flask_login import current_user, login_required, logout_user, login_user
-from flask_restful import request, current_app
+from flask import request
+from flask_login import current_user, logout_user, login_user
+from flask_restful import request
 from ml_enabler.models.ml_model import User, Project, ProjectAccess
 from ml_enabler.models.token import Token
 from ml_enabler import login_manager
+from functools import wraps
+from flask import request
+
 import base64
 
 auth_bp = Blueprint(
     'auth_bp', __name__
 )
-
-from functools import wraps
-from flask import g, request, redirect, url_for
 
 def has_project_read(f):
     @wraps(f)

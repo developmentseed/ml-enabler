@@ -1,8 +1,7 @@
-from flask import Blueprint, session
+from flask import Blueprint
 from flask_restful import request, current_app
 from ml_enabler.utils import err
 from ml_enabler.models.utils import NotFound
-import ml_enabler.config as CONFIG
 from flask_login import login_required
 from ml_enabler.services.token_service import TokenService
 from flask import jsonify

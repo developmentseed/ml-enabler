@@ -1,5 +1,5 @@
 import ml_enabler.config as CONFIG
-import io, os, pyproj, json, csv, geojson, boto3, mercantile
+import io, pyproj, json, csv, geojson, boto3, mercantile
 from io import StringIO
 from tiletanic import tilecover, tileschemes
 from shapely.geometry import shape, box
@@ -9,16 +9,16 @@ from flask import make_response
 from flask_restful import Resource, request, current_app
 from flask_login import current_user
 from flask import Response
-from ml_enabler.models.dtos.dtos import ProjectDTO, PredictionDTO
+from ml_enabler.models.dtos.dtos import ProjectDTO
 from schematics.exceptions import DataError
 from ml_enabler.services.project_service import ProjectService
 from ml_enabler.services.prediction_service import PredictionService, PredictionTileService
 from ml_enabler.services.task_service import TaskService
 from ml_enabler.services.imagery_service import ImageryService
 from ml_enabler.utils import err
-from ml_enabler.models.utils import NotFound, VersionNotFound, VersionExists, \
-    PredictionsNotFound, ImageryNotFound
-from ml_enabler.utils import version_to_array, geojson_bounds, bbox_str_to_list, validate_geojson, InvalidGeojson, NoValid
+from ml_enabler.models.utils import NotFound, VersionExists, \
+    PredictionsNotFound
+from ml_enabler.utils import InvalidGeojson, NoValid
 from sqlalchemy.exc import IntegrityError
 from ml_enabler.api.auth import has_project_read, has_project_write, has_project_admin
 from flask_login import login_required
@@ -833,10 +833,10 @@ class PredictionRetrain(Resource):
                 jobDefinition=CONFIG.EnvironmentConfig.STACK + '-retrain-job',
                 containerOverrides={
                     'environment': [
-                        { 'name': 'MODEL_ID', 'value': str(model_id) },
-                        { 'name': 'PREDICTION_ID', 'value': str(prediction_id) },
-                        { 'name': 'TILE_ENDPOINT', 'value': str(pred.imagery_id) },
-                        { 'name': 'CONFIG_RETRAIN', 'value': str(json.dumps(payload))}
+                        {'name': 'MODEL_ID', 'value': str(model_id)},
+                        {'name': 'PREDICTION_ID', 'value': str(prediction_id)},
+                        {'name': 'TILE_ENDPOINT', 'value': str(pred.imagery_id)},
+                        {'name': 'CONFIG_RETRAIN', 'value': str(json.dumps(payload))}
                     ]
                 }
             )
@@ -971,7 +971,7 @@ class PredictionUploadAPI(Resource):
                     current_app.logger.error(error_msg)
                     return err(500, "Failed to start ECR build"), 500
 
-            return { "status": "model uploaded" }, 200
+            return {"status": "model uploaded"}, 200
         else:
             return err(400, "asset exists"), 400
 
@@ -1359,4 +1359,3 @@ class PredictionTileAPI(Resource):
             error_msg = f'Unhandled error: {str(e)}'
             current_app.logger.error(error_msg)
             return err(500, error_msg), 500
-

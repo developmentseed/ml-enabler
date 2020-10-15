@@ -1,10 +1,9 @@
-from flask import Blueprint, session
+from flask import Blueprint
 from flask_restful import request, current_app
 from ml_enabler.utils import err
 from ml_enabler.services.imagery_service import ImageryService
-from ml_enabler.models.utils import NotFound, ImageryNotFound
-from ml_enabler.api.auth import has_project_read, has_project_write, has_project_admin
-import ml_enabler.config as CONFIG
+from ml_enabler.models.utils import ImageryNotFound
+from ml_enabler.api.auth import has_project_read, has_project_write
 from flask_login import login_required
 from flask import jsonify
 

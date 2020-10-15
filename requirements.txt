@@ -1,6 +1,4 @@
-pylint==2.6.0
-pylint-flask==0.6
-pylint_flask_sqlalchemy==0.2.0
+flake8==3.8.4
 semver==2.10.2
 boto3==1.14.39
 pyproj==2.6.0

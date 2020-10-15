@@ -1,14 +1,14 @@
-from flask import Blueprint, session
+from flask import Blueprint
 from flask_restful import request, current_app
 from ml_enabler.utils import err
 from ml_enabler.services.user_service import UserService
-import ml_enabler.config as CONFIG
 from flask_login import login_required
 from flask import jsonify
 
 user_bp = Blueprint(
     'user_bp', __name__
 )
+
 
 @login_required
 @user_bp.route('/v1/user', methods=['GET'])
@@ -30,4 +30,3 @@ def list():
         error_msg = f'Unhandled error: {str(e)}'
         current_app.logger.error(error_msg)
         return err(500, error_msg), 500
-
