@@ -1,4 +1,3 @@
-from ml_enabler.api import auth, task, imagery, integration, token, aoi, user, stacks
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -9,6 +8,8 @@ from flask_swagger_ui import get_swaggerui_blueprint
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
+
+from ml_enabler.api import auth, task, imagery, integration, token, aoi, user, stacks
 
 def create_app(env=None, app_config='ml_enabler.config.EnvironmentConfig'):
     # create and configure the app
