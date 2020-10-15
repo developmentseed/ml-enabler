@@ -58,7 +58,7 @@ def get_asset(bucket, key):
     return '/tmp/' + dirr
 
 def get_label_npz(model_id, prediction_id):
-    payload = {'format':'npz', 'inferences':'all', 'threshold': 0}
+    payload = {'format':'npz', 'inferences':'all', 'threshold': 0.5}
     r = requests.get(api + '/v1/model/' + model_id + '/prediction/' + prediction_id + '/export', params=payload,
                     auth=HTTPBasicAuth('machine', auth))
     r.raise_for_status()
