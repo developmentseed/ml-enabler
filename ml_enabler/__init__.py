@@ -9,8 +9,6 @@ db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
 
-# import models
-from ml_enabler.models import * # noqa
 from ml_enabler.api import auth, task, imagery, integration, token, aoi, user, stacks
 
 def create_app(env=None, app_config='ml_enabler.config.EnvironmentConfig'):

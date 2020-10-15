@@ -1,4 +1,6 @@
 from ml_enabler.models.token import Token
+from ml_enabler.models.utils import NotFound
+
 
 class TokenService():
     @staticmethod

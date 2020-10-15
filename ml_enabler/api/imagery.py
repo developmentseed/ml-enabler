@@ -1,16 +1,16 @@
-from flask import Blueprint, session
+from flask import Blueprint
 from flask_restful import request, current_app
 from ml_enabler.utils import err
 from ml_enabler.services.imagery_service import ImageryService
-from ml_enabler.models.utils import NotFound, ImageryNotFound
-from ml_enabler.api.auth import has_project_read, has_project_write, has_project_admin
-import ml_enabler.config as CONFIG
+from ml_enabler.models.utils import ImageryNotFound
+from ml_enabler.api.auth import has_project_read, has_project_write
 from flask_login import login_required
 from flask import jsonify
 
 imagery_bp = Blueprint(
     'imagery_bp', __name__
 )
+
 
 @login_required
 @has_project_read
@@ -36,6 +36,7 @@ def list(model_id):
         current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
+
 @login_required
 @has_project_read
 @imagery_bp.route('/v1/model/<int:model_id>/imagery/<int:imagery_id>', methods=['GET'])
@@ -59,6 +60,7 @@ def get(model_id, imagery_id):
         current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
+
 @login_required
 @has_project_write
 @imagery_bp.route('/v1/model/<int:model_id>/imagery/<int:imagery_id>', methods=['PATCH'])
@@ -80,6 +82,7 @@ def patch(model_id, imagery_id):
         "imagery_id": imagery_id
     }, 200
 
+
 @login_required
 @has_project_write
 @imagery_bp.route('/v1/model/<int:model_id>/imagery/<int:imagery_id>', methods=['DELETE'])
@@ -96,6 +99,7 @@ def delete(model_id, imagery_id):
     ImageryService.delete(model_id, imagery_id)
 
     return "deleted", 200
+
 
 @login_required
 @has_project_write

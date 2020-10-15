@@ -1,15 +1,16 @@
-from flask import Blueprint, session
+from flask import Blueprint
 from flask_restful import request, current_app
 from ml_enabler.utils import err
 from ml_enabler.services.task_service import TaskService
 from ml_enabler.models.utils import NotFound
 import ml_enabler.config as CONFIG
-from ml_enabler.api.auth import has_project_read, has_project_write, has_project_admin
+from ml_enabler.api.auth import has_project_read, has_project_write
 from flask_login import login_required
 
 task_bp = Blueprint(
     'task_bp', __name__
 )
+
 
 @login_required
 @has_project_read
@@ -45,6 +46,7 @@ def list(model_id):
         current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
+
 @login_required
 @has_project_read
 @task_bp.route('/v1/model/<int:model_id>/task/<int:task_id>', methods=['GET'])
@@ -70,6 +72,7 @@ def get(model_id, task_id):
         current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
+
 @login_required
 @has_project_read
 @task_bp.route('/v1/model/<int:model_id>/task/<int:task_id>/logs', methods=['GET'])
@@ -94,6 +97,7 @@ def logs(model_id, task_id):
         error_msg = f'Unhandled error: {str(e)}'
         current_app.logger.error(error_msg)
         return err(500, error_msg), 500
+
 
 @login_required
 @has_project_write

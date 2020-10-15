@@ -1,8 +1,7 @@
-from flask import Blueprint, session
+from flask import Blueprint
 from flask_restful import request, current_app
 from ml_enabler.utils import err
 from ml_enabler.models.utils import NotFound
-import ml_enabler.config as CONFIG
 from flask_login import login_required
 from ml_enabler.services.token_service import TokenService
 from flask import jsonify
@@ -15,7 +14,7 @@ token_bp = Blueprint(
 @login_required
 @token_bp.route('/v1/user/token', methods=['GET'])
 def list():
-    """ 
+    """
     List tokens for the given user session
     ---
     produces:
@@ -35,7 +34,7 @@ def list():
 @login_required
 @token_bp.route('/v1/user/token', methods=['POST'])
 def post():
-    """ 
+    """
     Create a new Token
     ---
     produces:
@@ -56,7 +55,7 @@ def post():
 @login_required
 @token_bp.route('/v1/user/token/<int:token_id>', methods=['GET'])
 def get(token_id):
-    """ 
+    """
     Get a specific Token
     ---
     produces:
@@ -77,7 +76,7 @@ def get(token_id):
 @login_required
 @token_bp.route('/v1/user/token/<int:token_id>', methods=['DELETE'])
 def delete(token_id):
-    """ 
+    """
     Delete a specific Token
     ---
     produces:

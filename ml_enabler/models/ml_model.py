@@ -1,6 +1,5 @@
 import mercantile
 from sqlalchemy.ext.mutable import MutableDict, MutableList
-from ml_enabler import db
 from ml_enabler.models.utils import timestamp
 from geoalchemy2 import Geometry
 from sqlalchemy import or_, and_
@@ -11,6 +10,7 @@ from sqlalchemy.sql.expression import cast
 import sqlalchemy
 from flask_login import UserMixin
 from ml_enabler.models.dtos.dtos import ProjectDTO, PredictionDTO, ProjectAccessDTO
+from ml_enabler import db
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'

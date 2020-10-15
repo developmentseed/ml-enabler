@@ -118,8 +118,8 @@ class TaskService():
             cwl = boto3.client('logs')
 
             rawlogs = cwl.get_log_events(
-                logGroupName = '/aws/batch/job',
-                logStreamName = task['logs']
+                logGroupName='/aws/batch/job',
+                logStreamName=task['logs']
             )
 
             line = 0;

@@ -23,7 +23,7 @@ class ProjectService():
         :returns ID of the ml model
         """
 
-        new_ml_model = Projet()
+        new_ml_model = Project()
         new_ml_model.create(ml_model_dto)
         current_app.logger.info(new_ml_model)
         return new_ml_model.id
@@ -34,7 +34,7 @@ class ProjectService():
         Deletes ML model and associated predictions
         :params model_id
         """
-        ml_model = Projet.get(model_id)
+        ml_model = Project.get(model_id)
         if ml_model:
             ml_model.delete()
         else:

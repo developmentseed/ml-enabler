@@ -1,5 +1,11 @@
 import ml_enabler.config as CONFIG
-import io, os, pyproj, json, csv, geojson, boto3, mercantile
+import io
+import pyproj
+import json
+import csv
+import geojson
+import boto3
+import mercantile
 from io import StringIO
 from tiletanic import tilecover, tileschemes
 from shapely.geometry import shape, box
@@ -9,16 +15,16 @@ from flask import make_response
 from flask_restful import Resource, request, current_app
 from flask_login import current_user
 from flask import Response
-from ml_enabler.models.dtos.dtos import ProjectDTO, PredictionDTO
+from ml_enabler.models.dtos.dtos import ProjectDTO
 from schematics.exceptions import DataError
 from ml_enabler.services.project_service import ProjectService
 from ml_enabler.services.prediction_service import PredictionService, PredictionTileService
 from ml_enabler.services.task_service import TaskService
 from ml_enabler.services.imagery_service import ImageryService
 from ml_enabler.utils import err
-from ml_enabler.models.utils import NotFound, VersionNotFound, VersionExists, \
-    PredictionsNotFound, ImageryNotFound
-from ml_enabler.utils import version_to_array, geojson_bounds, bbox_str_to_list, validate_geojson, InvalidGeojson, NoValid
+from ml_enabler.models.utils import NotFound, VersionExists, \
+    PredictionsNotFound
+from ml_enabler.utils import InvalidGeojson, NoValid
 from sqlalchemy.exc import IntegrityError
 from ml_enabler.api.auth import has_project_read, has_project_write, has_project_admin
 from flask_login import login_required
@@ -33,6 +39,7 @@ app = Flask(__name__)
 gunicorn_logger = logging.getLogger('gunicorn.error')
 app.logger.handlers = gunicorn_logger.handlers
 app.logger.setLevel(gunicorn_logger.level)
+
 
 class MetaAPI(Resource):
 
@@ -55,6 +62,7 @@ class MetaAPI(Resource):
             'security': 'authenticated'
         }, 200
 
+
 class StatusCheckAPI(Resource):
     def get(self):
         """
@@ -69,12 +77,14 @@ class StatusCheckAPI(Resource):
 
         return {'hello': 'world'}, 200
 
+
 class MapboxAPI(Resource):
     @login_required
     def get(self):
         return {
             "token": CONFIG.EnvironmentConfig.MAPBOX_TOKEN
         }, 200
+
 
 class ProjectAPI(Resource):
 
@@ -236,6 +246,7 @@ class ProjectAPI(Resource):
             current_app.logger.error(error_msg)
             return err(500, error_msg), 500
 
+
 class GetAllModels(Resource):
     """ Methods to fetch many ML models """
 
@@ -273,6 +284,7 @@ class GetAllModels(Resource):
             error_msg = f'Unhandled error: {str(e)}'
             current_app.logger.error(error_msg)
             return err(500, error_msg), 500
+
 
 class PredictionImport(Resource):
     @login_required
@@ -325,7 +337,6 @@ class PredictionImport(Resource):
             return err(500, error_msg), 500
 
 
-
 class PredictionExport(Resource):
     """ Export Prediction Inferences to common formats """
 
@@ -352,7 +363,7 @@ class PredictionExport(Resource):
         first = False
 
         if req_inferences != 'all':
-            inferences = [ req_inferences ]
+            inferences = [req_inferences]
 
         def generate_npz():
             nonlocal req_threshold
@@ -383,14 +394,14 @@ class PredictionExport(Resource):
                     df = pd.read_csv(io.StringIO(r.text))
                     df['c'] = df['bounds'].apply(lambda x: box(*[float(n) for n in x.split(',')]))
                     gdf = gpd.GeoDataFrame(df, crs="EPSG:4326", geometry=df['c'])
-                    #get tile name that where chip-list geom and geom in prediction row match
+                    # get tile name that where chip-list geom and geom in prediction row match
                     pred_centroid = shape(json.loads(row[2]))
                     gdf_2 = gpd.GeoDataFrame({'geometry': [shape(json.loads(row[2]))]}, crs="EPSG:4326")
-                    #To-DO account for no overlap case
+                    # To-DO account for no overlap case
                     i = gpd.overlay(gdf, gdf_2, how='intersection')
                     tiles_intersection = i['name'].tolist()
 
-                #convert raw predictions into 0 or 1 based on threshold
+                # convert raw predictions into 0 or 1 based on threshold
                 raw_pred = []
                 i_lst = pred.inf_list.split(",")
                 for num, inference in enumerate(i_lst):
@@ -404,9 +415,9 @@ class PredictionExport(Resource):
                 if hint == 'training':
                     if i_info['fmt'] == "list":
                         for chip_name in tiles_intersection:
-                            labels_dict.update({chip_name:l})
+                            labels_dict.update({chip_name: l})
                     else:
-                        labels_dict.update({t:l})
+                        labels_dict.update({t: l})
                 elif row[4]:
                     t = '-'.join([str(i) for i in mercantile.quadkey_to_tile(row[1])])
 
@@ -414,14 +425,14 @@ class PredictionExport(Resource):
                     if pred.inf_binary and len(i_lst) != 2:
                         return err(400, "binary models must have two catagories"), 400
                     if len(i_lst) == 2 and pred.inf_binary:
-                        if list(row[4].values())[0]: #validated and true, keep original
-                            labels_dict.update({t:l})
+                        if list(row[4].values())[0]:  # validated and true, keep original
+                            labels_dict.update({t: l})
                         else:
                             if l == [1, 0]:
                                 l = [0, 1]
                             else:
                                 l = [1, 0]
-                            labels_dict.update({t:l})
+                            labels_dict.update({t: l})
                     else:
                         # for multi-label
                         for key in list(row[4].keys()):
@@ -431,7 +442,7 @@ class PredictionExport(Resource):
                                     l[i] = 1
                                 else:
                                     l[i] = 0
-                            labels_dict.update({t:l})
+                            labels_dict.update({t: l})
             if not labels_dict:
                 raise NoValid
 
@@ -482,7 +493,7 @@ class PredictionExport(Resource):
                             yield ',\n' + json.dumps(feat)
                 elif req_format == "csv":
                     output = io.StringIO()
-                    rowdata = [ row[0], row[1], row[2]]
+                    rowdata = [row[0], row[1], row[2]]
                     for inf in inferences:
                         rowdata.append(row[3].get(inf, 0.0))
                     csv.writer(output, quoting=csv.QUOTE_NONNUMERIC).writerow(rowdata)
@@ -505,10 +516,10 @@ class PredictionExport(Resource):
             try:
                 npz = generate_npz()
                 return Response(
-                response = generate_npz(),
-                mimetype = mime,
-                status = 200,
-                headers = {
+                response=generate_npz(),
+                mimetype=mime,
+                status=200,
+                headers={
                     "Content-Disposition": 'attachment; filename="export.' + req_format + '"'
                 }
             )
@@ -517,12 +528,13 @@ class PredictionExport(Resource):
         else:
             return Response(
                 generate(),
-                mimetype = mime,
-                status = 200,
-                headers = {
+                mimetype=mime,
+                status=200,
+                headers={
                     "Content-Disposition": 'attachment; filename="export.' + req_format + '"'
                 }
             )
+
 
 class PredictionInfAPI(Resource):
     """ Add GeoJSON to SQS Inference Queue """
@@ -543,11 +555,11 @@ class PredictionInfAPI(Resource):
             return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
 
         try:
-            queues = response = boto3.client('sqs').list_queues(
+            queues = boto3.client('sqs').list_queues(
                 QueueNamePrefix="{stack}-models-{model}-prediction-{pred}-".format(
-                    stack = CONFIG.EnvironmentConfig.STACK,
-                    model = model_id,
-                    pred = prediction_id
+                    stack=CONFIG.EnvironmentConfig.STACK,
+                    model=model_id,
+                    pred=prediction_id
                 )
             )
 
@@ -588,14 +600,13 @@ class PredictionInfAPI(Resource):
             return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
 
         try:
-            queues = response = boto3.client('sqs').list_queues(
+            queues = boto3.client('sqs').list_queues(
                 QueueNamePrefix="{stack}-models-{model}-prediction-{pred}-".format(
-                    stack = CONFIG.EnvironmentConfig.STACK,
-                    model = model_id,
-                    pred = prediction_id
+                    stack=CONFIG.EnvironmentConfig.STACK,
+                    model=model_id,
+                    pred=prediction_id
                 )
             )
-
 
             active = ""
             dead = ""
@@ -607,7 +618,7 @@ class PredictionInfAPI(Resource):
 
             active = boto3.client('sqs').get_queue_attributes(
                 QueueUrl=active,
-                AttributeNames = [
+                AttributeNames=[
                     'ApproximateNumberOfMessages',
                     'ApproximateNumberOfMessagesNotVisible'
                 ]
@@ -615,7 +626,7 @@ class PredictionInfAPI(Resource):
 
             dead = boto3.client('sqs').get_queue_attributes(
                 QueueUrl=dead,
-                AttributeNames = [
+                AttributeNames=[
                     'ApproximateNumberOfMessages'
                 ]
             )
@@ -747,6 +758,7 @@ class PredictionInfAPI(Resource):
             current_app.logger.error(error_msg)
             return err(500, error_msg), 500
 
+
 class PredictionTfrecords(Resource):
     @login_required
     @has_project_write
@@ -764,7 +776,6 @@ class PredictionTfrecords(Resource):
         if CONFIG.EnvironmentConfig.ASSET_BUCKET is None:
             return err(501, "Not Configured"), 501
 
-        payload = request.get_json()
         pred = PredictionService.get_prediction_by_id(prediction_id)
 
         try:
@@ -781,9 +792,9 @@ class PredictionTfrecords(Resource):
                 jobDefinition=CONFIG.EnvironmentConfig.STACK + '-tfrecords-job',
                 containerOverrides={
                     'environment': [
-                        { 'name': 'MODEL_ID', 'value': str(model_id) },
-                        { 'name': 'PREDICTION_ID', 'value': str(prediction_id) },
-                        { 'name': 'TILE_ENDPOINT', 'value': str(pred.imagery_id) },
+                        {'name': 'MODEL_ID', 'value': str(model_id)},
+                        {'name': 'PREDICTION_ID', 'value': str(prediction_id)},
+                        {'name': 'TILE_ENDPOINT', 'value': str(pred.imagery_id)},
                     ]
                 }
             )
@@ -797,6 +808,7 @@ class PredictionTfrecords(Resource):
             error_msg = f'Batch GPU Error: {str(e)}'
             current_app.logger.error(error_msg)
             return err(500, "Failed to start GPU Retrain"), 500
+
 
 class PredictionRetrain(Resource):
     @login_required
@@ -833,10 +845,10 @@ class PredictionRetrain(Resource):
                 jobDefinition=CONFIG.EnvironmentConfig.STACK + '-retrain-job',
                 containerOverrides={
                     'environment': [
-                        { 'name': 'MODEL_ID', 'value': str(model_id) },
-                        { 'name': 'PREDICTION_ID', 'value': str(prediction_id) },
-                        { 'name': 'TILE_ENDPOINT', 'value': str(pred.imagery_id) },
-                        { 'name': 'CONFIG_RETRAIN', 'value': str(json.dumps(payload))}
+                        {'name': 'MODEL_ID', 'value': str(model_id)},
+                        {'name': 'PREDICTION_ID', 'value': str(prediction_id)},
+                        {'name': 'TILE_ENDPOINT', 'value': str(pred.imagery_id)},
+                        {'name': 'CONFIG_RETRAIN', 'value': str(json.dumps(payload))}
                     ]
                 }
             )
@@ -850,6 +862,7 @@ class PredictionRetrain(Resource):
             error_msg = f'Batch GPU Error: {str(e)}'
             current_app.logger.error(error_msg)
             return err(500, "Failed to start GPU Retrain"), 500
+
 
 class PredictionUploadAPI(Resource):
     """ Upload Prediction Assets to the platform """
@@ -949,7 +962,7 @@ class PredictionUploadAPI(Resource):
                     )
 
                     # Submit to AWS Batch to convert to ECR image
-                    batch.submit_job(
+                    job = batch.submit_job(
                         jobName=CONFIG.EnvironmentConfig.STACK + 'ecr-build',
                         jobQueue=CONFIG.EnvironmentConfig.STACK + '-queue',
                         jobDefinition=CONFIG.EnvironmentConfig.STACK + '-build-job',
@@ -971,9 +984,10 @@ class PredictionUploadAPI(Resource):
                     current_app.logger.error(error_msg)
                     return err(500, "Failed to start ECR build"), 500
 
-            return { "status": "model uploaded" }, 200
+            return {"status": "model uploaded"}, 200
         else:
             return err(400, "asset exists"), 400
+
 
 class PredictionValidity(Resource):
     @login_required
@@ -1010,6 +1024,7 @@ class PredictionValidity(Resource):
             error_msg = f'Unhandled error: {str(e)}'
             current_app.logger.error(error_msg)
             return (500, error_msg), 500
+
 
 class PredictionSingleAPI(Resource):
     @login_required
@@ -1092,7 +1107,7 @@ class PredictionAPI(Resource):
             payload = request.get_json()
 
             # check if this model exists
-            ml_model_dto = ProjectService.get_ml_model_by_id(model_id)
+            ProjectService.get_ml_model_by_id(model_id)
 
             # check if the version is registered
             prediction_id = PredictionService.create(model_id, payload)
@@ -1156,6 +1171,7 @@ class PredictionAPI(Resource):
             current_app.logger.error(error_msg)
             return err(500, error_msg), 500
 
+
 class GetAllPredictions(Resource):
     @login_required
     @has_project_read
@@ -1191,6 +1207,7 @@ class GetAllPredictions(Resource):
             error_msg = f'Unhandled error: {str(e)}'
             current_app.logger.error(error_msg)
             return err(500, error_msg), 500
+
 
 class PredictionTileMVT(Resource):
     """
@@ -1253,6 +1270,7 @@ class PredictionTileMVT(Resource):
             error_msg = f'Unhandled error: {str(e)}'
             current_app.logger.error(error_msg)
             return err(500, error_msg), 500
+
 
 class PredictionTileAPI(Resource):
     """
@@ -1359,4 +1377,3 @@ class PredictionTileAPI(Resource):
             error_msg = f'Unhandled error: {str(e)}'
             current_app.logger.error(error_msg)
             return err(500, error_msg), 500
-

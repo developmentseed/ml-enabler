@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 
+
 class EnvironmentConfig:
     """ Base configuration class """
 
@@ -21,11 +22,11 @@ class EnvironmentConfig:
     POSTGRES_DB = os.getenv('POSTGRES_DB', None)
     POSTGRES_PORT = os.getenv('POSTGRES_PORT', '5432')
 
-    MACHINE_AUTH=os.getenv('MACHINE_AUTH', None)
-    ASSET_BUCKET=os.getenv('ASSET_BUCKET', None)
-    STACK=os.getenv('STACK', None)
-    GitSha=os.getenv('GitSha', None)
-    MAPBOX_TOKEN=os.getenv('MAPBOX_TOKEN', None)
+    MACHINE_AUTH = os.getenv('MACHINE_AUTH', None)
+    ASSET_BUCKET = os.getenv('ASSET_BUCKET', None)
+    STACK = os.getenv('STACK', None)
+    GitSha = os.getenv('GitSha', None)
+    MAPBOX_TOKEN = os.getenv('MAPBOX_TOKEN', None)
 
     if GitSha is None:
         GitSha = os.popen('git rev-parse HEAD').read()
@@ -71,6 +72,7 @@ class EnvironmentConfig:
                                     f'/{POSTGRES_DB}'
 
         SQLALCHEMY_TRACK_MODIFICATIONS = False
+
 
 class TestConfig(EnvironmentConfig):
     TESTING = True
