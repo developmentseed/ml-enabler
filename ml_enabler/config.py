@@ -73,6 +73,7 @@ class EnvironmentConfig:
 
         SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+
 class TestConfig(EnvironmentConfig):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = os.getenv(

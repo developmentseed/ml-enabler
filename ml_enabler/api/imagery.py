@@ -11,6 +11,7 @@ imagery_bp = Blueprint(
     'imagery_bp', __name__
 )
 
+
 @login_required
 @has_project_read
 @imagery_bp.route('/v1/model/<int:model_id>/imagery', methods=['GET'])
@@ -35,6 +36,7 @@ def list(model_id):
         current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
+
 @login_required
 @has_project_read
 @imagery_bp.route('/v1/model/<int:model_id>/imagery/<int:imagery_id>', methods=['GET'])
@@ -58,6 +60,7 @@ def get(model_id, imagery_id):
         current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
+
 @login_required
 @has_project_write
 @imagery_bp.route('/v1/model/<int:model_id>/imagery/<int:imagery_id>', methods=['PATCH'])
@@ -79,6 +82,7 @@ def patch(model_id, imagery_id):
         "imagery_id": imagery_id
     }, 200
 
+
 @login_required
 @has_project_write
 @imagery_bp.route('/v1/model/<int:model_id>/imagery/<int:imagery_id>', methods=['DELETE'])
@@ -95,6 +99,7 @@ def delete(model_id, imagery_id):
     ImageryService.delete(model_id, imagery_id)
 
     return "deleted", 200
+
 
 @login_required
 @has_project_write

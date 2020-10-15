@@ -11,6 +11,7 @@ task_bp = Blueprint(
     'task_bp', __name__
 )
 
+
 @login_required
 @has_project_read
 @task_bp.route('/v1/model/<int:model_id>/task', methods=['GET'])
@@ -45,6 +46,7 @@ def list(model_id):
         current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
+
 @login_required
 @has_project_read
 @task_bp.route('/v1/model/<int:model_id>/task/<int:task_id>', methods=['GET'])
@@ -70,6 +72,7 @@ def get(model_id, task_id):
         current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
+
 @login_required
 @has_project_read
 @task_bp.route('/v1/model/<int:model_id>/task/<int:task_id>/logs', methods=['GET'])
@@ -94,6 +97,7 @@ def logs(model_id, task_id):
         error_msg = f'Unhandled error: {str(e)}'
         current_app.logger.error(error_msg)
         return err(500, error_msg), 500
+
 
 @login_required
 @has_project_write

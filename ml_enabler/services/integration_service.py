@@ -1,4 +1,5 @@
-import maproulette, json
+import maproulette
+import json
 from ml_enabler.models.integration import Integration
 from ml_enabler.services.prediction_service import PredictionService
 from ml_enabler.models.utils import IntegrationNotFound
@@ -142,10 +143,10 @@ class IntegrationService():
         except:
             project = project_api.create_project(
                 data={
-                "name": payload.get('project'),
-                "display_name": payload.get('project'),
-                "description": payload.get('project_desc'),
-                "enabled": True
+                    "name": payload.get('project'),
+                    "display_name": payload.get('project'),
+                    "description": payload.get('project_desc'),
+                    "enabled": True
                 }
             )
 
@@ -207,4 +208,3 @@ class IntegrationService():
             "project": project['data']['id'],
             "challenge": challenge['data']['id']
         }
-
