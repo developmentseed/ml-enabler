@@ -949,7 +949,7 @@ class PredictionUploadAPI(Resource):
                     )
 
                     # Submit to AWS Batch to convert to ECR image
-                    batch.submit_job(
+                    job = batch.submit_job(
                         jobName=CONFIG.EnvironmentConfig.STACK + 'ecr-build',
                         jobQueue=CONFIG.EnvironmentConfig.STACK + '-queue',
                         jobDefinition=CONFIG.EnvironmentConfig.STACK + '-build-job',
