@@ -11,13 +11,13 @@
         <div class='grid grid--gut12'>
             <div class='col col--8 py6'>
                 <label><span v-text='prediction.type'/> Version</label>
-                <input disabled v-model='prediction.version' class='input' placeholder='0.0.0'/>
+                <input disabled :value='prediction.version' class='input' placeholder='0.0.0'/>
             </div>
 
             <div class='col col--4 py6'>
                 <label>Model Type:</label>
                 <div class='select-container'>
-                    <select disabled v-model='prediction.infType' class='select'>
+                    <select disabled :value='prediction.infType' class='select'>
                         <option value='classification'>Classification</option>
                         <option value='detection'>Object Detection</option>
                     </select>
@@ -30,10 +30,10 @@
                     <label>Inferences List:</label>
                     <label class='switch-container px6 fr'>
                         <span class='mr6'>Binary Inference</span>
-                        <input disabled v-model='prediction.infBinary' type='checkbox' />
+                        <input disabled :value='prediction.infBinary' type='checkbox' />
                         <div class='switch'></div>
                     </label>
-                    <input disabled v-model='prediction.infList' type='text' class='input' placeholder='buildings,schools,roads,...'/>
+                    <input disabled :value='prediction.infList' type='text' class='input' placeholder='buildings,schools,roads,...'/>
                 </div>
                 <div class='col col--8'>
                 </div>
@@ -65,10 +65,10 @@
                 <label><span v-text='prediction.type'/> Zoom Level</label>
                 <label class='switch-container px6 fr'>
                     <span class='mr6'>Supertile</span>
-                    <input :disabled='prediction.infType == "detection"' v-model='prediction.infSupertile' type='checkbox' />
+                    <input :disabled='prediction.infType == "detection"' :value='prediction.infSupertile' type='checkbox' />
                     <div class='switch'></div>
                 </label>
-                <input v-model='prediction.tileZoom' class='input' placeholder='18'/>
+                <input :value='prediction.tileZoom' class='input' placeholder='18'/>
             </div>
         </div>
     </div>
