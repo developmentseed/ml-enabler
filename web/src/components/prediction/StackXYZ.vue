@@ -10,7 +10,7 @@
             }'
         />
 
-        <button @click='$emit("queue", this.list.split("\n"))' class='fr btn btn--stroke mt12 round'>Submit</button>
+        <button @click='$emit("queue", list.split("\n"))' class='fr btn btn--stroke mt12 round'>Submit</button>
     </div>
 </template>
 
