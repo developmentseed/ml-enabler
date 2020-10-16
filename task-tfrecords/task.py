@@ -122,8 +122,9 @@ download_img_match_labels(
 # create data.npz file that matchs up images and labels
 make_datanpz(dest_folder='/tmp', imagery=imagery, supertile=supertile)
 
+
 #convert data.npz into tf-records
 create_tfr(npz_path='/tmp/data.npz')
 
-#update_link(pred, link_type='tfrecord', zip_path = '/tmp/tfrecords.zip')
+update_link(pred, link_type='tfrecord', zip_path = '/tmp/tfrecords.zip')
 print("ok - tfrecords link updated")
