@@ -30,7 +30,7 @@ def list(model_id):
         return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
 
     pred_id = request.args.get('pred_id')
-    task_type = request.args.get('type', 'retrain,tfrecords').split(',')
+    task_type = request.args.get('type', 'retrain,tfrecords,ecr').split(',')
 
     if pred_id is None:
         return err(400, 'pred_id param must be specified'), 400
