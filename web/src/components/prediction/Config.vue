@@ -43,21 +43,6 @@
             <div class='col col--12 pt6'>
                 <label>Imagery Source:</label>
                 <div class='border border--gray-light round'>
-                    <template v-if='loading.imagery'>
-                        <div class='flex-parent flex-parent--center-main w-full py24'>
-                            <div class='flex-child loading py24'></div>
-                        </div>
-                    </template>
-                    <template v-else>
-                        <div @click='prediction.imagery_id = img.id' :key='img.id' v-for='img in imagery' class='col col--12 cursor-pointer bg-darken10-on-hover'>
-                            <div class='w-full py6 px6' :class='{
-                                "bg-gray-light": prediction.imagery_id === img.id
-                            }'>
-                                <span class='txt-h4 round' v-text='img.name'/>
-                                <div v-text='img.fmt' class='fr mx3 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue px6 py3 round txt-xs txt-bold'></div>
-                            </div>
-                        </div>
-                    </template>
                 </div>
             </div>
 
