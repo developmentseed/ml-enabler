@@ -23,7 +23,7 @@
                     />
                 </template>
                 <template v-else>
-                    <input v-model='name.label' type='text' class='input'/>
+                    <input v-model='name.label' type='text' class='input' placeholder='New York City, NY, USA'/>
                 </template>
             </div>
         </div>

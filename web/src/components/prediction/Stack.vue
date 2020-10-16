@@ -148,12 +148,27 @@
                     </template>
                 </div>
 
-                <div class='col col--12 pt12 flex-parent flex-parent--center-main'>
+                <div class='col col--12 pt12'>
                     Imagery Chip Submission
+
+                    <div class='fr'>
+                        <button @click='mode = "bbox"' :class='{
+                            "btn--stroke": mode !== "bbox"
+                        }' class="btn btn--pill btn--pill-stroke btn--s btn--pill-hl round">BBox</button>
+                        <button @click='mode = "xyz"' :class='{
+                            "btn--stroke": mode !== "xyz"
+                        }' class="btn btn--pill btn--s btn--pill-hr btn--pill-stroke round">XYZ</button>
+                    </div>
+
                 </div>
                 <div class='col col--12'>
-                    <template v-if='imagery.fmt === "wms"'>
+                    <template v-if='imagery.fmt === "wms" && mode === "bbox"'>
                         <StackMap
+                            v-on:queue='postQueue($event)'
+                        />
+                    </template>
+                    <template v-else-if='imagery.fmt === "wms" && mode === "xyz"'>
+                        <StackXYZ
                             v-on:queue='postQueue($event)'
                         />
                     </template>
@@ -185,6 +200,7 @@
 <script>
 import PredictionHeader from './PredictionHeader.vue';
 import StackList from './StackList.vue';
+import StackXYZ from './StackXYZ.vue';
 import StackMap from './StackMap.vue';
 
 export default {
@@ -192,6 +208,7 @@ export default {
     props: ['meta', 'model', 'prediction'],
     data: function() {
         return {
+            mode: 'bbox',
             advanced: false,
             complete: [
                 'CREATE_COMPLETE',
@@ -279,12 +296,14 @@ export default {
                 //this.$emit('err', err);
             }
         },
-        postQueue: async function(geojson) {
+        postQueue: async function(payload) {
             this.loading.stack = true;
 
             let reqbody;
-            if (geojson) {
-                reqbody = JSON.stringify(geojson.geometry);
+            if (payload && payload.geometry) {
+                reqbody = JSON.stringify(payload.geometry);
+            } else if (payload) {
+                reqbody = JSON.stringify(payload)
             } else {
                 reqbody = false;
             }
@@ -423,6 +442,7 @@ export default {
     components: {
         PredictionHeader,
         StackList,
+        StackXYZ,
         StackMap
     }
 }
