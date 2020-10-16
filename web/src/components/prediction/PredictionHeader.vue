@@ -1,8 +1,11 @@
 <template>
     <div class="flex-parent-inline py3">
+        <button @click='mode !== "config" && $router.push({ name: "config" })' :class='{
+            "btn--stroke": mode !== "config"
+        }' class="btn btn--pill btn--pill-stroke btn--s btn--pill-hl round">Config</button>
         <button @click='mode !== "assets" && $router.push({ name: "assets" })' :class='{
             "btn--stroke": mode !== "assets"
-        }' class="btn btn--pill btn--pill-stroke btn--s btn--pill-hl round">Assets</button>
+        }' class="btn btn--pill btn--pill-stroke btn--s btn--pill-hc round">Assets</button>
         <button v-if='prediction.hint === "prediction"' @click='mode !== "stack" && $router.push({ name: "stack" })' :class='{
             "btn--stroke": mode !== "stack"
         }' class="btn btn--pill btn--s btn--pill-hc btn--pill-stroke round">Stack</button>
