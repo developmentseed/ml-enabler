@@ -687,7 +687,7 @@ class PredictionInfAPI(Resource):
                 if type(payloadjson) is list:
                     for tile in payloadjson:
                         tile = tile.split('-')
-                        tiles.append(mercantile.ul(int(tile[0]), int(tile[1]), int(tile[2])))
+                        tiles.append(mercantile.Tile(int(tile[0]), int(tile[1]), int(tile[2])))
                 else:
 
                     poly = shape(geojson.loads(payload))
