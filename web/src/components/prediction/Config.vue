@@ -43,6 +43,21 @@
             <div class='col col--12 pt6'>
                 <label>Imagery Source:</label>
                 <div class='border border--gray-light round'>
+                    <template v-if='loading.imagery'>
+                        <div class='flex-parent flex-parent--center-main w-full py24'>
+                            <div class='flex-child loading py24'></div>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <div :key='img.id' v-for='img in imagery' class='col col--12 bg-darken10-on-hover'>
+                            <div class='w-full py6 px6' :class='{
+                                "bg-gray-light": prediction.imagery_id === img.id
+                            }'>
+                                <span class='txt-h4 round' v-text='img.name'/>
+                                <div v-text='img.fmt' class='fr mx3 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue px6 py3 round txt-xs txt-bold'></div>
+                            </div>
+                        </div>
+                    </template>
                 </div>
             </div>
 
@@ -50,10 +65,10 @@
                 <label><span v-text='prediction.type'/> Zoom Level</label>
                 <label class='switch-container px6 fr'>
                     <span class='mr6'>Supertile</span>
-                    <input :disabled='prediction.infType == "detection"' :value='prediction.infSupertile' type='checkbox' />
+                    <input disabled :value='prediction.infSupertile' type='checkbox' />
                     <div class='switch'></div>
                 </label>
-                <input :value='prediction.tileZoom' class='input' placeholder='18'/>
+                <input disabled :value='prediction.tileZoom' class='input' placeholder='18'/>
             </div>
         </div>
     </div>
@@ -67,14 +82,37 @@ export default {
     props: ['meta', 'prediction', 'tilejson'],
     data: function() {
         return {
-            loading: {},
+            loading: {
+                imagery: true
+            },
             imagery: []
         }
+    },
+    mounted: function() {
+        this.getImagery();
     },
     components: {
         PredictionHeader,
     },
     methods: {
+        getImagery: async function() {
+            this.loading.imagery = true;
+
+            try {
+                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/imagery`, {
+                    method: 'GET'
+                });
+
+                const body = await res.json();
+
+                if (!res.ok) throw new Error(body.message);
+                this.imagery = body;
+
+                this.loading.imagery = false;
+            } catch (err) {
+                this.$emit('err', err);
+            }
+        }
     },
     computed: {
         isWMS: function() {
