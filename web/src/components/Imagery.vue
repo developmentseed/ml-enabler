@@ -3,7 +3,7 @@
         <div class='col col--12 clearfix py6'>
             <h2 class='fl cursor-default'>
                 <span v-if='$route.params.imageryid'>Update Imagery</span>
-                <span v-else=''>Add Imagery</span>
+                <span v-else>Add Imagery</span>
             </h2>
 
             <button @click='$router.go(-1)' class='btn fr round btn--stroke color-gray color-black-on-hover'>

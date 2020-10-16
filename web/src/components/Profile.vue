@@ -10,11 +10,11 @@
         <div class='col col--12 grid grid--gut12'>
             <div class='col col--6 pt12'>
                 <label>Username:</label>
-                <input v-model='user.name' class='input' placeholder='Username'/>
+                <input :value='user.name' class='input' placeholder='Username'/>
             </div>
             <div class='col col--6 pt12'>
                 <label>Email:</label>
-                <input v-model='user.email' class='input' placeholder='Username'/>
+                <input :value='user.email' class='input' placeholder='Username'/>
             </div>
             <div class='col col--12 clearfix pt12'>
                 <button disabled class='btn btn--stroke btn--gray btn--s round fr'>Update</button>

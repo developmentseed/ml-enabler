@@ -163,7 +163,7 @@
                             v-on:queue='postQueue($event)'
                         />
                     </template>
-                    <template v-else-if='imagery.fmt === "list"'>
+                    <template v-else>
                         <div class='flex-parent flex-parent--center-main w-full py24'>
                             <div class='flex-child py24'>Imagery Type Not Supported</div>
                         </div>
