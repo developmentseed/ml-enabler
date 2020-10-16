@@ -58,7 +58,7 @@ def get_asset(bucket, key):
     return '/tmp/' + dirr
 
 def get_label_npz(model_id, prediction_id):
-    payload = {'format':'npz', 'inferences':'all', 'threshold': 0}
+    payload = {'format':'npz', 'inferences':'all', 'threshold': 0.5}
     r = requests.get(api + '/v1/model/' + model_id + '/prediction/' + prediction_id + '/export', params=payload,
                     auth=HTTPBasicAuth('machine', auth))
     r.raise_for_status()
@@ -121,6 +121,7 @@ download_img_match_labels(
 
 # create data.npz file that matchs up images and labels
 make_datanpz(dest_folder='/tmp', imagery=imagery, supertile=supertile)
+
 
 #convert data.npz into tf-records
 create_tfr(npz_path='/tmp/data.npz')
