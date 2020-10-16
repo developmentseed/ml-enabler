@@ -651,7 +651,7 @@ class PredictionInfAPI(Resource):
     @has_project_write
     def post(self, model_id, prediction_id):
         """
-        Given a GeoJSON, submit it to the SQS queue
+        Given a GeoJSON, xyz list, or tile list, submit it to the SQS queue
         ---
         produces:
             - application/json
@@ -681,18 +681,26 @@ class PredictionInfAPI(Resource):
                 QueueName=queue_name
             )
 
+            tiles = []
+            payloadjson = json.loads(payload)
             if imagery['fmt'] == "wms":
-                poly = shape(geojson.loads(payload))
+                if type(payloadjson) is list:
+                    for tile in payloadjson:
+                        tile = tile.split('-')
+                        tiles.append(mercantile.ul(int(tile[0]), int(tile[1]), int(tile[2])))
+                else:
 
-                project = partial(
-                    pyproj.transform,
-                    pyproj.Proj(init='epsg:4326'),
-                    pyproj.Proj(init='epsg:3857')
-                )
+                    poly = shape(geojson.loads(payload))
 
-                poly = transform(project, poly)
+                    project = partial(
+                        pyproj.transform,
+                        pyproj.Proj(init='epsg:4326'),
+                        pyproj.Proj(init='epsg:3857')
+                    )
 
-                tiles = tilecover.cover_geometry(tiler, poly, prediction.tile_zoom)
+                    poly = transform(project, poly)
+
+                    tiles = tilecover.cover_geometry(tiler, poly, prediction.tile_zoom)
 
                 cache = []
                 for tile in tiles:
