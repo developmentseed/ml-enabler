@@ -197,7 +197,12 @@ export default {
 
                 const body = await res.json();
                 if (!res.ok) throw new Error(body.message);
-                this.$router.push({ path: `/model/${this.$route.params.modelid}` });
+
+                if (this.newProject) {
+                    this.$router.push({ path: `/model/${body.model_id}` });
+                } else {
+                    this.$router.push({ path: `/model/${this.$route.params.modelid}` });
+                }
             } catch (err) {
                 this.$emit('err', err);
             }

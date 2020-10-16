@@ -3,7 +3,7 @@
         <div class='col col--12 clearfix py6'>
             <h2 class='fl cursor-default'>
                 <span v-if='$route.params.integrationid'>Update Integration</span>
-                <span v-else=''>Add Integration</span>
+                <span v-else>Add Integration</span>
             </h2>
 
             <button @click='$router.go(-1)' class='btn fr round btn--stroke color-gray color-black-on-hover'>

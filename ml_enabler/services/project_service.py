@@ -25,7 +25,10 @@ class ProjectService():
 
         new_ml_model = Project()
         new_ml_model.create(ml_model_dto)
-        current_app.logger.info(new_ml_model)
+
+        if ml_model_dto.users:
+            ProjectAccess.list_update(new_ml_model.id, [], ml_model_dto.users)
+
         return new_ml_model.id
 
     @staticmethod

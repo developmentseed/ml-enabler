@@ -13,6 +13,7 @@ import Imagery from './components/Imagery.vue';
 import Integration from './components/Integration.vue';
 import CreatePrediction from './components/CreatePrediction.vue';
 
+import Config from './components/prediction/Config.vue';
 import Assets from './components/prediction/Assets.vue';
 import Export  from './components/prediction/Export.vue';
 import Map  from './components/prediction/Map.vue';
@@ -69,6 +70,10 @@ const router = new VueRouter({
                 redirect: '/model/:modelid/prediction/:predid/assets',
                 component: Prediction,
                 children: [{
+                    name: 'config',
+                    path: 'config',
+                    component: Config
+                },{
                     name: 'assets',
                     path: 'assets',
                     component: Assets
