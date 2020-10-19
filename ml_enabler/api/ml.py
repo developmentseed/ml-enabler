@@ -340,13 +340,59 @@ class PredictionImport(Resource):
 class PredictionExport(Resource):
     """ Export Prediction Inferences to common formats """
 
-    # ?format=(geojson/geojsonseq/csv)  [default: geojson]
-    # ?inferences=all/<custom>          [default: all]
     # ?threshold=0->1                   [default 0]
 
     @login_required
     @has_project_read
     def get(self, model_id, prediction_id):
+        """
+        Export Geospatial Predictions
+        ---
+        parameters:
+            - name: model_id
+              in: path
+              schema:
+                type: integer
+                minimum: 0
+              description: The ID of the Project
+
+            - name: prediction_id
+              in: path
+              schema:
+                type: integer
+                minimum: 0
+              description: The ID of the Project
+
+            - name: format
+              in: query
+              schema:
+                type: string
+                default: geojson
+                enum:
+                  - geojson
+                  - geojsonseq
+                  - csv
+              description: The format to provide records in
+
+            - name: inferences
+              in: query
+              schema:
+                type: string
+                default: all
+              description: Return all inferences or only a single inference
+
+            - name: threshold
+              in: query
+              schema:
+                type: integer
+                default: 0
+                minimum: 0
+                maximum: 1
+              description: The confidence threshold to apply to exported inferences
+        responses:
+            200:
+                description: Exported Data
+        """
         req_format = request.args.get('format', 'geojson')
         req_inferences = request.args.get('inferences', 'all')
         req_threshold = request.args.get('threshold', '0')
