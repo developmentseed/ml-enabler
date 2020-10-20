@@ -21,7 +21,7 @@ def list():
     produces:
         - application/json
     responses:
-    200:
+      200:
         description: ID of the prediction
     """
 
