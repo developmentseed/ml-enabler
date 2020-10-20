@@ -1017,11 +1017,18 @@ class PredictionAssetAPI(Resource):
         if modeltype not in ["model", "tfrecord", "checkpoint", "container"]:
             return err(400, "Unsupported type param"), 400
 
-        key = "models/{0}/prediction/{1}/{2}.zip".format(
-            model_id,
-            prediction_id,
-            modeltype
-        )
+        if modeltype == "container":
+            key = "models/{0}/prediction/{1}/docker-models-{0}-prediction-{1}.tar.gz".format(
+                model_id,
+                prediction_id
+            )
+
+        else:
+            key = "models/{0}/prediction/{1}/{2}.zip".format(
+                model_id,
+                prediction_id,
+                modeltype
+            )
 
         try:
             stream = boto3.resource('s3').Object(
