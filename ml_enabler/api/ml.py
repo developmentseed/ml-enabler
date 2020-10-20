@@ -1024,8 +1024,31 @@ class PredictionAssetAPI(Resource):
         )
 
         try:
-            boto3.resource('s3').Bucket(CONFIG.EnvironmentConfig.ASSET_BUCKET).get_object(
-                Key=key
+            stream = boto3.resource('s3').Object(
+                CONFIG.EnvironmentConfig.ASSET_BUCKET,
+                key
+            )
+
+            if modeltype == "model":
+                mime = "application/zip"
+                fmt = "zip"
+            elif modeltype == "tfrecord":
+                mime = "application/zip"
+                fmt = "zip"
+            elif modeltype == "checkpoint":
+                mime = "application/zip"
+                fmt = "zip"
+            elif modeltype == "container":
+                mime = "application/gzip"
+                fmt = "gz"
+
+            return Response(
+                stream.get()['Body'],
+                mimetype=mime,
+                status=200,
+                headers={
+                    "Content-Disposition": 'attachment; filename="export.' + fmt + '"'
+                }
             )
         except Exception as e:
             error_msg = f'Asset Download Error: {str(e)}'
