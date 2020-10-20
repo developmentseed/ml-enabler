@@ -872,7 +872,7 @@ class PredictionRetrain(Resource):
             return err(500, "Failed to start GPU Retrain"), 500
 
 
-class PredictionUploadAPI(Resource):
+class PredictionAssetAPI(Resource):
     """ Upload Prediction Assets to the platform """
 
     @login_required
@@ -995,6 +995,42 @@ class PredictionUploadAPI(Resource):
             return {"status": "model uploaded"}, 200
         else:
             return err(400, "asset exists"), 400
+
+    @login_required
+    @has_project_write
+    def get(self, model_id, prediction_id):
+        """
+        Download a prediction Asset
+        ---
+        responses:
+            200:
+                description: Prediction Asset
+        """
+
+        if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
+            return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
+
+        if CONFIG.EnvironmentConfig.ASSET_BUCKET is None:
+            return err(501, "Not Configured"), 501
+
+        modeltype = request.args.get('type', 'model')
+        if modeltype not in ["model", "tfrecord", "checkpoint", "container"]:
+            return err(400, "Unsupported type param"), 400
+
+        key = "models/{0}/prediction/{1}/{2}.zip".format(
+            model_id,
+            prediction_id,
+            modeltype
+        )
+
+        try:
+            boto3.resource('s3').Bucket(CONFIG.EnvironmentConfig.ASSET_BUCKET).get_object(
+                Key=key
+            )
+        except Exception as e:
+            error_msg = f'Asset Download Error: {str(e)}'
+            current_app.logger.error(error_msg)
+            return err(500, "Failed to download asset from S3"), 500
 
 
 class PredictionValidity(Resource):

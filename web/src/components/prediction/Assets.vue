@@ -113,6 +113,9 @@ export default {
             const url = `https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/%252Faws%252Fbatch%252Fjob/log-events/${encodeURIComponent(stream)}`
             this.external(url);
         },
+        download: function(asset) {
+            this.external(window.api + `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/asset?type=${asset}`)
+        },
         external: function(url) {
             if (!url) return;
 

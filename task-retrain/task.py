@@ -94,15 +94,11 @@ def post_pred(pred, version):
 
 def update_link(pred, link_type, zip_path):
     payload = {'type': link_type}
-    print(payload)
     model_id = pred['modelId']
-    print(model_id)
     prediction_id = pred['predictionsId']
-    print(prediction_id)
     encoder = MultipartEncoder(fields={'file': ('filename', open(zip_path, 'rb'), 'application/zip')})
-    print('/v1/model/' + str(model_id) + '/prediction/' + str(prediction_id) + '/upload')
 
-    r = requests.post(api + '/v1/model/' + str(model_id) + '/prediction/' + str(prediction_id) + '/upload', params=payload,
+    r = requests.post(api + '/v1/model/' + str(model_id) + '/prediction/' + str(prediction_id) + '/asset', params=payload,
                         data = encoder, headers= {'Content-Type': encoder.content_type}, auth=HTTPBasicAuth('machine', auth))
     r.raise_for_status()
 
