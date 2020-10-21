@@ -190,7 +190,6 @@ class IntegrationService():
                 properties_dict.update(valid_dict)
 
             feat = {
-                "id": row[0],
                 "quadkey": row[1],
                 "type": "Feature",
                 "properties": properties_dict,
