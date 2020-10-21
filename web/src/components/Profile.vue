@@ -23,7 +23,7 @@
 
         <ProfileTokens @err='$emit("err", $event)'/>
 
-        <template>
+        <template v-if='user.access === "admin"'>
             <ProfileAdminUser/>
         </template>
     </div>
