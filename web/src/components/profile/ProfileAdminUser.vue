@@ -49,7 +49,7 @@
             <div :key='user.id' v-for='user in users' class='col col--12 grid'>
                 <div @click='user._open = !user._open' class='grid col col--12 bg-gray-light-on-hover cursor-pointer px12 py12 round'>
                     <div class='col col--3'>
-                        <span v-text='user.username'/>
+                        <span v-text='user.name'/>
                     </div>
                     <div class='col col--6'>
                         <span v-text='user.email'/>
@@ -124,7 +124,7 @@ export default {
         getUsers: function() {
             this.loading = true;
 
-            const url = new URL(`${window.location.origin}/api/user`);
+            const url = new URL(`${window.location.origin}/v1/user`);
             url.searchParams.append('limit', this.perpage)
             url.searchParams.append('page', this.page)
             url.searchParams.append('filter', this.filter)

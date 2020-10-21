@@ -21,10 +21,14 @@
             </div>
         </div>
 
-        <ProfileTokens @err='$emit("err", $event)'/>
+        <ProfileTokens
+            @err='$emit("err", $event)'
+        />
 
         <template v-if='user.access === "admin"'>
-            <ProfileAdminUser/>
+            <ProfileAdminUser
+                @err='$emit("err", $event)'
+            />
         </template>
     </div>
 </template>
