@@ -14,4 +14,18 @@ class SwaggerDocsAPI(Resource):
         template['info']['description'] = "API endpoints for ML-Enabler"
         template['info']['version'] = "1.0.0"
 
+        template['components'] = {
+            'securitySchemes': {
+                'TokenAuth': {
+                    "type": "apiKey",
+                    "in": "query",
+                    "name": "token"
+                }
+            }
+        }
+
+        template["security"] = {
+            "TokenAuth": []
+        }
+
         return jsonify(template)
