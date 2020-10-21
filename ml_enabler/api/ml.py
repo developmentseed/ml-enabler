@@ -1049,11 +1049,13 @@ class PredictionAssetAPI(Resource):
                 mime = "application/gzip"
                 fmt = "gz"
 
+            resp = stream.get()
             return Response(
-                stream.get()['Body'],
+                resp['Body'],
                 mimetype=mime,
                 status=200,
                 headers={
+                    "Content-Length": resp['ContentLength'],
                     "Content-Disposition": 'attachment; filename="export.' + fmt + '"'
                 }
             )
