@@ -55,19 +55,31 @@
         </template>
         <template v-else>
             <div v-if='prediction.modelLink' class='col col--12 py3'>
-                <div class='align-center'>TF Model</div>
-                <pre class='pre' v-text='"s3://" + prediction.modelLink'></pre>
+                <div class='col col--12 mb6'>
+                    <span>TF Model</span>
+                    <button @click='dwn("model")' class='mt6 btn btn--s btn--stroke round fr btn--gray'><svg class='icon'><use href='#icon-arrow-down'/></svg></button>
+                </div>
+                <pre class='pre w-full' v-text='"s3://" + prediction.modelLink'/>
             </div>
             <div v-if='prediction.tfrecordLink' class='col col--12 py3'>
-                <div class='align-center'>TF Records</div>
+                <div class='col col--12 mb6'>
+                    <span>TF Records</span>
+                    <button @click='dwn("tfrecord")' class='mt6 btn btn--s btn--stroke round fr btn--gray'><svg class='icon'><use href='#icon-arrow-down'/></svg></button>
+                </div>
                 <pre class='pre' v-text='"s3://" + prediction.tfrecordLink'></pre>
             </div>
             <div v-if='prediction.checkpointLink' class='col col--12 py3'>
-                <div class='align-center'>TF Checkpoint</div>
+                <div class='col col--12 mb6'>
+                    <span>TF Checkpoint</span>
+                    <button @click='dwn("checkpoint")' class='mt6 btn btn--s btn--stroke round fr btn--gray'><svg class='icon'><use href='#icon-arrow-down'/></svg></button>
+                </div>
                 <pre class='pre' v-text='"s3://" + prediction.checkpointLink'></pre>
             </div>
             <div v-if='prediction.saveLink' class='col col--12 py3'>
-                <div class='align-center'>TFServing Container</div>
+                <div class='col col--12 mb6'>
+                    <span>TFServing Container</span>
+                    <button @click='dwn("container")' class='mt6 btn btn--s btn--stroke round fr btn--gray'><svg class='icon'><use href='#icon-arrow-down'/></svg></button>
+                </div>
                 <pre class='pre' v-text='"s3://" + prediction.saveLink'></pre>
             </div>
             <div v-if='prediction.saveLink' class='col col--12 py3'>
@@ -100,6 +112,9 @@ export default {
         logLink: function(stream) {
             const url = `https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/%252Faws%252Fbatch%252Fjob/log-events/${encodeURIComponent(stream)}`
             this.external(url);
+        },
+        dwn: function(asset) {
+            this.external(window.api + `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/asset?type=${asset}`)
         },
         external: function(url) {
             if (!url) return;
