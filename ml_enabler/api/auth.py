@@ -134,7 +134,8 @@ def meta():
     return {
         "id": current_user.id,
         "name": current_user.name,
-        "email": current_user.email
+        "email": current_user.email,
+        "access": current_user.access
     }, 200
 
 @auth_bp.route('/v1/user/logout', methods=['GET'])

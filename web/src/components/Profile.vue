@@ -22,11 +22,16 @@
         </div>
 
         <ProfileTokens @err='$emit("err", $event)'/>
+
+        <template>
+            <ProfileAdminUser/>
+        </template>
     </div>
 </template>
 
 <script>
 import ProfileTokens from './profile/ProfileTokens.vue'
+import ProfileAdminUser from './profile/ProfileAdminUser.vue'
 
 export default {
     name: 'Profile',
@@ -37,7 +42,8 @@ export default {
     methods: {
     },
     components: {
-        ProfileTokens
+        ProfileTokens,
+        ProfileAdminUser
     }
 }
 </script>
