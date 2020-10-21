@@ -19,6 +19,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String, unique=True)
     password = db.Column(db.String)
     name = db.Column(db.String)
+    access = db.Column(db.String)
 
     def list(user_filter: str):
         """
