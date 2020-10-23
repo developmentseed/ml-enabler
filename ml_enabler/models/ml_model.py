@@ -41,6 +41,8 @@ class User(UserMixin, db.Model):
             'password': self.password
         }).fetchall()
 
+        db.session.commit()
+
         self.id = results[0][0]
 
         return self
