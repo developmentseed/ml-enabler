@@ -8,7 +8,12 @@
                 </h2>
 
                 <div class='fr'>
-                    <button @click='showFilter = !showFilter' class='btn round btn--stroke color-gray mr12'>
+                    <button @click='newUser.show = true' class='btn round btn--stroke color-gray color-green-on-hover mr6'>
+                        <svg class='icon'><use xlink:href='#icon-plus'/></svg>
+                    </button>
+
+
+                    <button @click='showFilter = !showFilter' class='btn round btn--stroke color-gray mr6'>
                         <svg v-if='!showFilter' class='icon'><use href='#icon-search'/></svg>
                         <svg v-else class='icon'><use href='#icon-close'/></svg>
                     </button>
@@ -31,6 +36,9 @@
             </div>
         </template>
 
+        <template v-if='newUser.show'>
+            HERE
+        </template>
 
         <template v-if='loading'>
             <div class='flex-parent flex-parent--center-main w-full'>
@@ -84,7 +92,13 @@ export default {
             page: 0,
             perpage: 10,
             total: 100,
-            users: []
+            users: [],
+            newUser: {
+                show: false,
+                name: '',
+                email: '',
+                access: 'user'
+            }
         };
     },
     mounted: function() {
