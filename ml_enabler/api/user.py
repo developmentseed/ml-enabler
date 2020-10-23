@@ -18,6 +18,25 @@ def list():
     ---
     produces:
         - application/json
+    parameters:
+        - name: filter
+          in: query
+          schema:
+            type: string
+            default: ''
+          description: Username/Email fragment to filter by
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: Number of results to return
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: If there are more results than the given limit, allow the user to page through them
     responses:
         200:
             description: User List
