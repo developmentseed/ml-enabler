@@ -46,8 +46,8 @@ def list():
     try:
         users = UserService.list(
             request.args.get('filter', ''),
-            request.args.get('limit', 10),
-            request.args.get('page', 1),
+            int(request.args.get('limit', 10)),
+            int(request.args.get('page', 0)),
         )
 
         return users, 200

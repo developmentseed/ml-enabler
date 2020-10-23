@@ -51,6 +51,7 @@ class User(UserMixin, db.Model):
         """
         Get all users in the database
         """
+
         results = db.session.execute(text('''
             SELECT
                 count(*) OVER() AS count,
@@ -63,13 +64,15 @@ class User(UserMixin, db.Model):
             WHERE
                 name iLIKE '%'||:filter||'%'
                 OR email iLIKE '%'||:filter||'%'
+            ORDER BY
+                id ASC
             LIMIT
                 :limit
             OFFSET
                 :page
         '''), {
             'limit': limit,
-            'page': page,
+            'page': page * limit,
             'filter': user_filter
         }).fetchall()
 
