@@ -37,7 +37,41 @@
         </template>
 
         <template v-if='newUser.show'>
-            HERE
+            <div class='col col--12 border border--gray-light round my12'>
+                <div class='col col--12 grid grid--gut12 pl12 py6'>
+                    <div class='col col--12 pb6'>
+                        <h2 class='txt-bold fl'>Create New User</h2>
+                        <button @click='newUser.show = false' class='fr btn round btn--s btn--stroke btn--gray'>
+                            <svg class='icon'><use xlink:href='#icon-close'/></svg>
+                        </button>
+                    </div>
+
+                    <div class='col col--4'>
+                        <label>Username</label>
+                        <input v-model='newUser.name' type='text' class='input' placeholder='Username'/>
+                    </div>
+                    <div class='col col--4'>
+                        <label>Email</label>
+                        <input v-model='newUser.email' type='text' class='input' placeholder='Email'/>
+                    </div>
+                    <div class='col col--4'>
+                        <label>Access</label>
+                        <div class='select-container w-full'>
+                            <select v-model='newUser.access' class='select'>
+                                <option>user</option>
+                                <option>admin</option>
+                            </select>
+                            <div class='select-arrow'></div>
+                        </div>
+                    </div>
+
+                    <div class='col col--12 mt12'>
+                        <button @click='createUser' class='fr btn btn--stroke round color-gray color-green-on-hover'>
+                            <svg class='fl icon mt6'><use href='#icon-check'/></svg><span>Create</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </template>
 
         <template v-if='loading'>
@@ -146,6 +180,8 @@ export default {
                 this.$emit('err', err);
             });
         },
+        createUser: function() {
+        }
     },
     components: {
         Pager
