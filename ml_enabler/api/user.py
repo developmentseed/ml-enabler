@@ -24,7 +24,12 @@ def list():
     """
 
     try:
-        users = UserService.list(request.args.get('filter', ''))
+        users = UserService.list(
+            request.args.get('filter', ''),
+            request.args.get('limit', 10),
+            request.args.get('page', 1),
+        )
+
         return users, 200
     except Exception as e:
         error_msg = f'Unhandled error: {str(e)}'
