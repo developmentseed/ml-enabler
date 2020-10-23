@@ -4,7 +4,9 @@ class UserService():
 
     @staticmethod
     def list(user_filter: str, limit: int, page: int):
-        users = User.list(user_filter, limit, page)
+        return User.list(user_filter, limit, page)
 
-        return users
-
+    @staticmethod
+    def create(user):
+        user = User()
+        return user.create(user)

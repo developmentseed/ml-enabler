@@ -9,7 +9,7 @@ from sqlalchemy.sql import func, text
 from sqlalchemy.sql.expression import cast
 import sqlalchemy
 from flask_login import UserMixin
-from ml_enabler.models.dtos.dtos import ProjectDTO, PredictionDTO, ProjectAccessDTO
+from ml_enabler.models.dtos.dtos import ProjectDTO, PredictionDTO, ProjectAccessDTO, UserDTO
 from ml_enabler import db
 
 class User(UserMixin, db.Model):
@@ -20,6 +20,15 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String)
     name = db.Column(db.String)
     access = db.Column(db.String)
+
+    def create(self, dto: UserDTO):
+        self.name = dto.name
+        self.email = dto.email
+        self.access = dto.access
+
+        db.session.add(self)
+        db.session.commit()
+        return self
 
     def list(user_filter: str, limit: int, page: int):
         """

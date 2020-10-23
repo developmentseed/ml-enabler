@@ -1,6 +1,14 @@
 from schematics import Model
 from schematics.types import StringType, IntType, DateTimeType, ListType, BooleanType, DictType
 
+class UserDTO(Model):
+    """ Describes JSON of an Integration Source """
+
+    id = IntType()
+    name = StringType(required=True)
+    email = StringType(required=True)
+    access = StringType(required=True)
+
 class AOIDTO(Model):
     """ Describes JSON of an Integration Source """
 

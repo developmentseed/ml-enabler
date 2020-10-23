@@ -3,6 +3,7 @@ from flask_restful import request, current_app
 from ml_enabler.utils import err
 from ml_enabler.services.user_service import UserService
 from flask_login import login_required
+from ml_enabler.api.auth import has_admin
 from flask import jsonify
 
 user_bp = Blueprint(
@@ -50,6 +51,27 @@ def list():
         )
 
         return users, 200
+    except Exception as e:
+        error_msg = f'Unhandled error: {str(e)}'
+        current_app.logger.error(error_msg)
+        return err(500, error_msg), 500
+
+@login_required
+@has_admin
+@user_bp.route('/v1/user', methods=['POST'])
+def post():
+    """
+    Create a new user
+    ---
+    produces:
+        - application/json
+    responses:
+        200:
+            description: New User Created
+    """
+    try:
+        user = request.get_json()
+        return UserService.create(user)
     except Exception as e:
         error_msg = f'Unhandled error: {str(e)}'
         current_app.logger.error(error_msg)
