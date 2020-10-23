@@ -25,9 +25,24 @@ class User(UserMixin, db.Model):
         self.name = dto.name
         self.email = dto.email
         self.access = dto.access
+        self.password = dto.password
 
-        db.session.add(self)
-        db.session.commit()
+        results = db.session.execute(text('''
+            INSERT INTO users (name, email, access, password) VALUES (
+                :name,
+                :email,
+                :access,
+                crypt(:password, gen_salt('bf', 10))
+            ) RETURNING id
+        '''), {
+            'name': self.name,
+            'email': self.email,
+            'access': self.access,
+            'password': self.password
+        }).fetchall()
+
+        self.id = results[0][0]
+
         return self
 
     def list(user_filter: str, limit: int, page: int):

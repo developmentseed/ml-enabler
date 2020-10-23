@@ -7,6 +7,7 @@ class UserDTO(Model):
     id = IntType()
     name = StringType(required=True)
     email = StringType(required=True)
+    password = StringType(required=True)
     access = StringType(required=True)
 
 class AOIDTO(Model):
