@@ -48,16 +48,16 @@
 
                     <div class='col col--4'>
                         <label>Username</label>
-                        <input v-model='newUser.name' type='text' class='input' placeholder='Username'/>
+                        <input :disabled='newUser.password' v-model='newUser.name' type='text' class='input' placeholder='Username'/>
                     </div>
                     <div class='col col--4'>
                         <label>Email</label>
-                        <input v-model='newUser.email' type='text' class='input' placeholder='Email'/>
+                        <input :disabled='newUser.password' v-model='newUser.email' type='text' class='input' placeholder='Email'/>
                     </div>
                     <div class='col col--4'>
                         <label>Access</label>
                         <div class='select-container w-full'>
-                            <select v-model='newUser.access' class='select'>
+                            <select :disabled='newUser.password' v-model='newUser.access' class='select'>
                                 <option>user</option>
                                 <option>admin</option>
                             </select>
@@ -65,9 +65,19 @@
                         </div>
                     </div>
 
+                    <template v-if='newUser.password'>
+                        <div class='col col--12'>
+                            <label>Temporary Password</label>
+                            <pre class='pre' v-text='newUser.password'></pre>
+                        </div>
+                    </template>
+
                     <div class='col col--12 mt12'>
-                        <button @click='createUser' class='fr btn btn--stroke round color-gray color-green-on-hover'>
+                        <button v-if='!newUser.password' @click='createUser' class='fr btn btn--stroke round color-gray color-green-on-hover'>
                             <svg class='fl icon mt6'><use href='#icon-check'/></svg><span>Create</span>
+                        </button>
+                        <button v-else @click='clear' class='fr btn btn--stroke round color-gray color-green-on-hover'>
+                            <svg class='fl icon mt6'><use href='#icon-check'/></svg><span>Done</span>
                         </button>
                     </div>
                 </div>
@@ -131,7 +141,8 @@ export default {
                 show: false,
                 name: '',
                 email: '',
-                access: 'user'
+                access: 'user',
+                password: false
             }
         };
     },
@@ -149,6 +160,14 @@ export default {
     },
     methods: {
         refresh: function() {
+            this.getUsers();
+        },
+        clear: function() {
+            this.newUser.show = false;
+            this.newUser.name = '';
+            this.newUser.email = '';
+            this.newUser.access = 'user';
+            this.newUser.password = false;
             this.getUsers();
         },
         getUsers: function() {
@@ -198,7 +217,9 @@ export default {
                     throw new Error('Failed to create user');
                 }
 
-                this.getUsers();
+                return res.json();
+            }).then((res) => {
+                this.newUser.password = res.password;
             }).catch((err) => {
                 this.$emit('err', err);
             });
