@@ -181,6 +181,27 @@ export default {
             });
         },
         createUser: function() {
+            fetch(`${window.location.origin}/v1/user`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: this.newUser.name,
+                    email: this.newUser.email,
+                    access: this.newUser.access
+                })
+            }).then((res) => {
+                if (!res.ok && res.statusCode !== 404 && res.message) {
+                    throw new Error(res.message);
+                } else if (!res.ok && res.statusCode !== 404) {
+                    throw new Error('Failed to create user');
+                }
+
+                this.getUsers();
+            }).catch((err) => {
+                this.$emit('err', err);
+            });
         }
     },
     components: {
