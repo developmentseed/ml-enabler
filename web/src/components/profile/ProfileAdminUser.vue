@@ -62,24 +62,6 @@
                 <div v-if='user._open' class='col col-12 border border--gray-light round px12 py12 my6 grid'>
                     <h3 class='pb6 w-full'>User Flags</h3>
 
-                    <div class='col col--6'>
-                        <label class='checkbox-container'>
-                            <input @change='patchUser(user)' v-model='user.flags.upload' type='checkbox' />
-                            <div class='checkbox mr6'>
-                                <svg class='icon'><use xlink:href='#icon-check' /></svg>
-                            </div>
-                            Source Upload
-                        </label>
-                    </div>
-                    <div class='col col--6'>
-                        <label class='checkbox-container'>
-                            <input @change='patchUser(user)' v-model='user.flags.moderator' type='checkbox' />
-                            <div class='checkbox mr6'>
-                                <svg class='icon'><use xlink:href='#icon-check' /></svg>
-                            </div>
-                            Source Moderator
-                        </label>
-                    </div>
                 </div>
             </div>
         </template>
@@ -150,32 +132,6 @@ export default {
                 this.$emit('err', err);
             });
         },
-        patchUser: function(user) {
-            const url = new URL(`${window.location.origin}/api/user/${user.id}`);
-
-            fetch(url, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    flags: user.flags
-                })
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to update user');
-                }
-                return res.json();
-            }).then((res) => {
-                for (const key of Object.keys(res)) {
-                    user[key] = res[key];
-                }
-            }).catch((err) => {
-                this.$emit('err', err);
-            });
-        }
     },
     components: {
         Pager

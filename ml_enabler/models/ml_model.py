@@ -48,7 +48,7 @@ class User(UserMixin, db.Model):
         }).fetchall()
 
         return {
-            'total': results[0][0],
+            'total': results[0][0] if len(results) > 0 else 0,
             'users': [ {
                 'id': u[1],
                 'name': u[2],
