@@ -4,14 +4,7 @@ class UserService():
 
     @staticmethod
     def list(user_filter: str):
-        users = list(map(lambda user: {
-            'id': user.id,
-            'name': user.name,
-            'email': user.email,
-            'access': user.access
-        }, User.list(user_filter)))
+        users = User.list(user_filter, 10, 1)
 
-        return {
-            'users': users
-        }
+        return users
 

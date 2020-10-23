@@ -21,13 +21,43 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String)
     access = db.Column(db.String)
 
-    def list(user_filter: str):
+    def list(user_filter: str, limit: int, page: int):
         """
         Get all users in the database
         """
-        return User.query.filter(
-            User.name.ilike(user_filter + '%'),
-        ).all()
+        results = db.session.execute(text('''
+            SELECT
+                count(*) OVER() AS count,
+                id,
+                name,
+                access,
+                email
+            FROM
+                users
+            WHERE
+                name iLIKE '%'||:filter||'%'
+                OR email iLIKE '%'||:filter||'%'
+            LIMIT
+                :limit
+            OFFSET
+                :page
+        '''), {
+            'limit': limit,
+            'page': page,
+            'filter': user_filter
+        }).fetchall()
+
+        return {
+            'total': results[0][0],
+            'users': [ {
+                'id': u[1],
+                'name': u[2],
+                'access': u[3],
+                'email': u[4]
+            } for u in results ]
+        }
+
+        return results
 
     def password_check(self, test):
         results = db.session.execute(text('''
