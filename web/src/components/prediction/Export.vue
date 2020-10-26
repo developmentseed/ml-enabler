@@ -6,7 +6,12 @@
             />
         </div>
 
-        <template v-if='tilejson'>
+        <template v-if='loading'>
+            <div class='flex-parent flex-parent--center-main w-full py24'>
+                <div class='flex-child loading py24'></div>
+            </div>
+        </template>
+        <template v-else-if='tilejson'>
             <div class='col col--12 grid grid--gut12'>
                 <div class='col col--6'>
                     <h2 class='txt-h4 py12'>Export Inferences</h2>
@@ -54,6 +59,17 @@
 
                     <div class='col col--12 clearfix py6'>
                         <button @click='getExport' class='fr btn btn--stroke color-gray color-green-on-hover round'>Export</button>
+                    </div>
+                </template>
+                <template v-else-if='mode === "complete"'>
+                    <div class='col col--12 py6'>
+                        <div class='flex-parent flex-parent--center-main pt36'>
+                            <svg class='flex-child icon w60 h60 color-gray'><use href='#icon-info'/></svg>
+                        </div>
+
+                        <div class='flex-parent flex-parent--center-main pt12 pb36'>
+                            <h1 class='flex-child txt-h4 cursor-default'>Integration Successful</h1>
+                        </div>
                     </div>
                 </template>
                 <template v-else-if='mode === "integrations"'>
@@ -110,11 +126,6 @@
                 </template>
             </div>
         </template>
-        <template v-else-if='loading'>
-            <div class='flex-parent flex-parent--center-main w-full py24'>
-                <div class='flex-child loading py24'></div>
-            </div>
-        </template>
         <template v-else>
             <div class='col col--12 py6'>
                 <div class='flex-parent flex-parent--center-main pt36'>
@@ -158,7 +169,7 @@ export default {
     },
     mounted: function() {
         this.mr.project = this.model.name;
-        this.mr.challenge = 'v' + this.prediction.version;
+        this.mr.challenge = `${this.model.name} - v${this.prediction.version}`;
     },
     methods: {
         getExport: function() {
@@ -180,6 +191,7 @@ export default {
                 if (!this.mr.challenge) throw new Error('Challenge Name Required');
                 if (!this.mr.challenge_instr) throw new Error('Challenge Description Required');
 
+                this.loading = true;
                 const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/integration/${this.integration.id}`, {
                     method: 'POST',
                     headers: {
@@ -192,14 +204,15 @@ export default {
                         challenge: this.mr.challenge,
                         challenge_instr: this.mr.challenge_instr,
                         inferences: this.mr.inferences,
-                        threshold: this.mr.threshold
+                        threshold: this.mr.threshold / 100
                     })
                 });
 
                 const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
+                this.loading = false;
 
-                console.error('OK - INTEGRATION CREATED');
+                if (!res.ok) throw new Error(body.message);
+                this.mode = 'complete';
             } catch (err) {
                 this.$emit('err', err);
             }

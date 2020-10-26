@@ -189,8 +189,9 @@ class IntegrationService():
                 valid_dict.update({'validity': row[4]})
                 properties_dict.update(valid_dict)
 
+            properties_dict['mle:id'] = row[0]
+
             feat = {
-                "id": row[0],
                 "quadkey": row[1],
                 "type": "Feature",
                 "properties": properties_dict,
