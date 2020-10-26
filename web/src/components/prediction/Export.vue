@@ -169,7 +169,7 @@ export default {
     },
     mounted: function() {
         this.mr.project = this.model.name;
-        this.mr.challenge = 'v' + this.prediction.version;
+        this.mr.challenge = `${this.model.name} - v${this.prediction.version}`;
     },
     methods: {
         getExport: function() {
