@@ -41,7 +41,7 @@ export default {
             server: {
                 url: this.type === 'inferences'
                     ? `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/import`
-                    : `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/upload?type=${this.type}`,
+                    : `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/asset?type=${this.type}`,
                 process: {
                     onerror: this.error
                 }

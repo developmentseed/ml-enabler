@@ -15,6 +15,24 @@ auth_bp = Blueprint(
     'auth_bp', __name__
 )
 
+def has_admin(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        model_id = kwargs.get('model_id')
+
+        if current_user.is_authenticated and current_user.name == "machine":
+            return f(*args, **kwargs)
+
+        if current_user.is_authenticatd and current_user.access == "admin":
+            return f(*args, **kwargs)
+
+        return {
+            "status": 403,
+            "error": "Authentication Insufficient"
+        }, 403
+
+    return decorated_function
+
 def has_project_read(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -134,7 +152,8 @@ def meta():
     return {
         "id": current_user.id,
         "name": current_user.name,
-        "email": current_user.email
+        "email": current_user.email,
+        "access": current_user.access
     }, 200
 
 @auth_bp.route('/v1/user/logout', methods=['GET'])

@@ -9,7 +9,7 @@ from sqlalchemy.sql import func, text
 from sqlalchemy.sql.expression import cast
 import sqlalchemy
 from flask_login import UserMixin
-from ml_enabler.models.dtos.dtos import ProjectDTO, PredictionDTO, ProjectAccessDTO
+from ml_enabler.models.dtos.dtos import ProjectDTO, PredictionDTO, ProjectAccessDTO, UserDTO
 from ml_enabler import db
 
 class User(UserMixin, db.Model):
@@ -19,14 +19,74 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String, unique=True)
     password = db.Column(db.String)
     name = db.Column(db.String)
+    access = db.Column(db.String)
 
-    def list(user_filter: str):
+    def create(self, dto: UserDTO):
+        self.name = dto.name
+        self.email = dto.email
+        self.access = dto.access
+        self.password = dto.password
+
+        results = db.session.execute(text('''
+            INSERT INTO users (name, email, access, password) VALUES (
+                :name,
+                :email,
+                :access,
+                crypt(:password, gen_salt('bf', 10))
+            ) RETURNING id
+        '''), {
+            'name': self.name,
+            'email': self.email,
+            'access': self.access,
+            'password': self.password
+        }).fetchall()
+
+        db.session.commit()
+
+        self.id = results[0][0]
+
+        return self
+
+    def list(user_filter: str, limit: int, page: int):
         """
         Get all users in the database
         """
-        return User.query.filter(
-            User.name.ilike(user_filter + '%'),
-        ).all()
+
+        results = db.session.execute(text('''
+            SELECT
+                count(*) OVER() AS count,
+                id,
+                name,
+                access,
+                email
+            FROM
+                users
+            WHERE
+                name iLIKE '%'||:filter||'%'
+                OR email iLIKE '%'||:filter||'%'
+            ORDER BY
+                id ASC
+            LIMIT
+                :limit
+            OFFSET
+                :page
+        '''), {
+            'limit': limit,
+            'page': page * limit,
+            'filter': user_filter
+        }).fetchall()
+
+        return {
+            'total': results[0][0] if len(results) > 0 else 0,
+            'users': [ {
+                'id': u[1],
+                'name': u[2],
+                'access': u[3],
+                'email': u[4]
+            } for u in results ]
+        }
+
+        return results
 
     def password_check(self, test):
         results = db.session.execute(text('''

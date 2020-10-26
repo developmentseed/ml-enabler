@@ -45,7 +45,7 @@ def init_routes(app):
 
     # import apis
     from ml_enabler.api.ml import StatusCheckAPI, ProjectAPI, GetAllModels, \
-        PredictionAPI, PredictionUploadAPI, PredictionTileAPI, PredictionImport, \
+        PredictionAPI, PredictionAssetAPI, PredictionTileAPI, PredictionImport, \
         GetAllPredictions, PredictionTileMVT, PredictionRetrain, PredictionTfrecords,\
         PredictionInfAPI, MapboxAPI, MetaAPI, PredictionExport, PredictionSingleAPI, \
         PredictionValidity
@@ -68,7 +68,7 @@ def init_routes(app):
     api.add_resource(GetAllPredictions,         '/v1/model/<int:model_id>/prediction/all', methods=['GET'])
     api.add_resource(PredictionSingleAPI,       '/v1/model/<int:model_id>/prediction/<int:prediction_id>', methods=['GET'])
     api.add_resource(PredictionAPI,             '/v1/model/<int:model_id>/prediction/<int:prediction_id>', endpoint="patch", methods=['PATCH'])
-    api.add_resource(PredictionUploadAPI,       '/v1/model/<int:model_id>/prediction/<int:prediction_id>/upload', methods=['POST'])
+    api.add_resource(PredictionAssetAPI,        '/v1/model/<int:model_id>/prediction/<int:prediction_id>/asset', methods=['GET', 'POST'])
     api.add_resource(PredictionInfAPI,          '/v1/model/<int:model_id>/prediction/<int:prediction_id>/stack/tiles', methods=['POST', 'GET', 'DELETE'])
 
     api.add_resource(PredictionValidity,        '/v1/model/<int:model_id>/prediction/<int:prediction_id>/validity', methods=['POST'])

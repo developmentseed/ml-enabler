@@ -244,7 +244,7 @@ export default {
                 const body = await res.json();
                 if (!res.ok) throw new Error(body.message)
 
-                this.search.users = body;
+                this.search.users = body.users;
             } catch (err) {
                 this.$emit('err', err);
             }
