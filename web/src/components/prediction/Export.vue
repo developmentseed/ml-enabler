@@ -204,7 +204,7 @@ export default {
                         challenge: this.mr.challenge,
                         challenge_instr: this.mr.challenge_instr,
                         inferences: this.mr.inferences,
-                        threshold: this.mr.threshold
+                        threshold: this.mr.threshold / 100
                     })
                 });
 
