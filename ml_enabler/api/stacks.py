@@ -101,8 +101,8 @@ def list():
 
 @login_required
 @has_project_write
-@stacks_bp.route('/v1/model/<int:model_id>/prediction/<int:prediction_id>/stack', methods=['POST'])
-def post(model_id, prediction_id):
+@stacks_bp.route('/v1/model/<int:project_id>/prediction/<int:prediction_id>/stack', methods=['POST'])
+def post(project_id, prediction_id):
     if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
         return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
 
@@ -110,7 +110,7 @@ def post(model_id, prediction_id):
 
     pred = PredictionService.get_prediction_by_id(prediction_id)
     image = "models-{model}-prediction-{prediction}".format(
-        model=model_id,
+        model=project_id,
         prediction=prediction_id
     )
 
@@ -145,7 +145,7 @@ def post(model_id, prediction_id):
                 'ParameterValue': pred.inf_list,
             },{
                 'ParameterKey': 'ModelId',
-                'ParameterValue': str(model_id)
+                'ParameterValue': str(project_id)
             },{
                 'ParameterKey': 'PredictionId',
                 'ParameterValue': str(prediction_id)
@@ -180,15 +180,15 @@ def post(model_id, prediction_id):
 
 @login_required
 @has_project_write
-@stacks_bp.route('/v1/model/<int:model_id>/prediction/<int:prediction_id>/stack', methods=['DELETE'])
-def delete(model_id, prediction_id):
+@stacks_bp.route('/v1/model/<int:project_id>/prediction/<int:prediction_id>/stack', methods=['DELETE'])
+def delete(project_id, prediction_id):
     if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
         return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
 
     try:
         stack = "{stack}-models-{model}-prediction-{prediction}".format(
             stack=CONFIG.EnvironmentConfig.STACK,
-            model=model_id,
+            model=project_id,
             prediction=prediction_id
         )
 
@@ -212,8 +212,8 @@ def delete(model_id, prediction_id):
 
 @login_required
 @has_project_read
-@stacks_bp.route('/v1/model/<int:model_id>/prediction/<int:prediction_id>/stack', methods=['GET'])
-def get(model_id, prediction_id):
+@stacks_bp.route('/v1/model/<int:project_id>/prediction/<int:prediction_id>/stack', methods=['GET'])
+def get(project_id, prediction_id):
     """
     Return status of a prediction stack
     ---
@@ -234,7 +234,7 @@ def get(model_id, prediction_id):
     try:
         stack = "{stack}-models-{model}-prediction-{prediction}".format(
             stack=CONFIG.EnvironmentConfig.STACK,
-            model=model_id,
+            model=project_id,
             prediction=prediction_id
         )
 

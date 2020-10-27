@@ -13,8 +13,8 @@ integration_bp = Blueprint(
 
 @login_required
 @has_project_read
-@integration_bp.route('/v1/model/<int:model_id>/integration', methods=['GET'])
-def list(model_id):
+@integration_bp.route('/v1/model/<int:project_id>/integration', methods=['GET'])
+def list(project_id):
     """
     List integrations for a given model
     ---
@@ -25,7 +25,7 @@ def list(model_id):
             description: Integration List
     """
     try:
-        integration = IntegrationService.list(model_id)
+        integration = IntegrationService.list(project_id)
         return jsonify(integration), 200
     except IntegrationNotFound:
         return err(404, "Integration not found"), 404
@@ -36,8 +36,8 @@ def list(model_id):
 
 @login_required
 @has_project_read
-@integration_bp.route('/v1/model/<int:model_id>/integration/<int:integration_id>', methods=['GET'])
-def get(model_id, integration_id):
+@integration_bp.route('/v1/model/<int:project_id>/integration/<int:integration_id>', methods=['GET'])
+def get(project_id, integration_id):
     """
     Get an single integration
     ---
@@ -59,8 +59,8 @@ def get(model_id, integration_id):
 
 @login_required
 @has_project_write
-@integration_bp.route('/v1/model/<int:model_id>/integration/<int:integration_id>', methods=['PATCH'])
-def patch(model_id, integration_id):
+@integration_bp.route('/v1/model/<int:project_id>/integration/<int:integration_id>', methods=['PATCH'])
+def patch(project_id, integration_id):
     """
     Patch an single integration
     ---
@@ -71,17 +71,17 @@ def patch(model_id, integration_id):
             description: Integration
     """
     integration = request.get_json();
-    integration_id = IntegrationService.patch(model_id, integration_id, integration)
+    integration_id = IntegrationService.patch(project_id, integration_id, integration)
 
     return {
-        "model_id": model_id,
+        "project_id": project_id,
         "integration_id": integration_id
     }, 200
 
 @login_required
 @has_project_write
-@integration_bp.route('/v1/model/<int:model_id>/integration/<int:integration_id>', methods=['DELETE'])
-def delete(model_id, integration_id):
+@integration_bp.route('/v1/model/<int:project_id>/integration/<int:integration_id>', methods=['DELETE'])
+def delete(project_id, integration_id):
     """
     Delete an single integration
     ---
@@ -91,14 +91,14 @@ def delete(model_id, integration_id):
         200:
             description: Integration
     """
-    IntegrationService.delete(model_id, integration_id)
+    IntegrationService.delete(project_id, integration_id)
 
     return { "status": "deleted" }, 200
 
 @login_required
 @has_project_write
-@integration_bp.route('/v1/model/<int:model_id>/integration', methods=['POST'])
-def post(model_id):
+@integration_bp.route('/v1/model/<int:project_id>/integration', methods=['POST'])
+def post(project_id):
     """
     Create a new integration
     ---
@@ -110,10 +110,10 @@ def post(model_id):
     """
     try:
         integration = request.get_json()
-        integration_id = IntegrationService.create(model_id, integration)
+        integration_id = IntegrationService.create(project_id, integration)
 
         return {
-            "model_id": model_id,
+            "project_id": project_id,
             "integration_id": integration_id
         }, 200
     except Exception as e:
@@ -123,8 +123,8 @@ def post(model_id):
 
 @login_required
 @has_project_write
-@integration_bp.route('/v1/model/<int:model_id>/integration/<int:integration_id>', methods=['POST'])
-def use(model_id, integration_id):
+@integration_bp.route('/v1/model/<int:project_id>/integration/<int:integration_id>', methods=['POST'])
+def use(project_id, integration_id):
     """
     Pass data to a given integration
     ---

@@ -14,8 +14,8 @@ task_bp = Blueprint(
 
 @login_required
 @has_project_read
-@task_bp.route('/v1/model/<int:model_id>/task', methods=['GET'])
-def list(model_id):
+@task_bp.route('/v1/model/<int:project_id>/task', methods=['GET'])
+def list(project_id):
     """
     Return a list of currently running tasks for a given prediction
     ---
@@ -49,8 +49,8 @@ def list(model_id):
 
 @login_required
 @has_project_read
-@task_bp.route('/v1/model/<int:model_id>/task/<int:task_id>', methods=['GET'])
-def get(model_id, task_id):
+@task_bp.route('/v1/model/<int:project_id>/task/<int:task_id>', methods=['GET'])
+def get(project_id, task_id):
     """
     Return a single task
     ---
@@ -75,8 +75,8 @@ def get(model_id, task_id):
 
 @login_required
 @has_project_read
-@task_bp.route('/v1/model/<int:model_id>/task/<int:task_id>/logs', methods=['GET'])
-def logs(model_id, task_id):
+@task_bp.route('/v1/model/<int:project_id>/task/<int:task_id>/logs', methods=['GET'])
+def logs(project_id, task_id):
     """
     Return a cloudwatch logs for a given task
     ---
@@ -101,8 +101,8 @@ def logs(model_id, task_id):
 
 @login_required
 @has_project_write
-@task_bp.route('/v1/model/<int:model_id>/task/<int:task_id>', methods=['DELETE'])
-def delete(model_id, task_id):
+@task_bp.route('/v1/model/<int:project_id>/task/<int:task_id>', methods=['DELETE'])
+def delete(project_id, task_id):
     """
     Delete a given task
     ---
