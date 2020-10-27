@@ -7,13 +7,12 @@ from ml_enabler.api.auth import has_project_read, has_project_write
 from ml_enabler.services.prediction_service import PredictionService
 from flask_login import login_required
 
-stacks_bp = Blueprint(
-    'stacks_bp', __name__
-)
+stacks_bp = Blueprint("stacks_bp", __name__)
+
 
 @login_required
 @has_project_read
-@stacks_bp.route('/v1/stacks', methods=['GET'])
+@stacks_bp.route("/v1/stacks", methods=["GET"])
 def list():
     """
     Return a list of all running substacks
@@ -28,42 +27,41 @@ def list():
     stacks = []
 
     def getList():
-        token = False;
+        token = False
 
-        stack_res = boto3.client('cloudformation').list_stacks(
-            StackStatusFilter = [
-                'CREATE_IN_PROGRESS',
-                'CREATE_COMPLETE',
-                'ROLLBACK_IN_PROGRESS',
-                'ROLLBACK_FAILED',
-                'ROLLBACK_COMPLETE',
-                'DELETE_IN_PROGRESS',
-                'DELETE_FAILED',
-                'UPDATE_IN_PROGRESS',
-                'UPDATE_COMPLETE_CLEANUP_IN_PROGRESS',
-                'UPDATE_COMPLETE',
-                'UPDATE_ROLLBACK_IN_PROGRESS',
-                'UPDATE_ROLLBACK_FAILED',
-                'UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS',
-                'UPDATE_ROLLBACK_COMPLETE',
-                'REVIEW_IN_PROGRESS',
-                'IMPORT_IN_PROGRESS',
-                'IMPORT_COMPLETE',
-                'IMPORT_ROLLBACK_IN_PROGRESS',
-                'IMPORT_ROLLBACK_FAILED',
-                'IMPORT_ROLLBACK_COMPLETE'
+        stack_res = boto3.client("cloudformation").list_stacks(
+            StackStatusFilter=[
+                "CREATE_IN_PROGRESS",
+                "CREATE_COMPLETE",
+                "ROLLBACK_IN_PROGRESS",
+                "ROLLBACK_FAILED",
+                "ROLLBACK_COMPLETE",
+                "DELETE_IN_PROGRESS",
+                "DELETE_FAILED",
+                "UPDATE_IN_PROGRESS",
+                "UPDATE_COMPLETE_CLEANUP_IN_PROGRESS",
+                "UPDATE_COMPLETE",
+                "UPDATE_ROLLBACK_IN_PROGRESS",
+                "UPDATE_ROLLBACK_FAILED",
+                "UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS",
+                "UPDATE_ROLLBACK_COMPLETE",
+                "REVIEW_IN_PROGRESS",
+                "IMPORT_IN_PROGRESS",
+                "IMPORT_COMPLETE",
+                "IMPORT_ROLLBACK_IN_PROGRESS",
+                "IMPORT_ROLLBACK_FAILED",
+                "IMPORT_ROLLBACK_COMPLETE",
             ]
         )
 
         stacks.extend(stack_res.get("StackSummaries"))
 
         while stack_res.get("NextToken") is not None:
-            stack_res = boto3.client('cloudformation').list_stacks(
-                NextToken = stack_res.get("NextToken")
+            stack_res = boto3.client("cloudformation").list_stacks(
+                NextToken=stack_res.get("NextToken")
             )
 
             stacks.extend(stack_res.get("StackSummaries"))
-
 
     if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
         return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
@@ -71,18 +69,17 @@ def list():
     try:
         getList()
 
-        res = {
-            "models": [],
-            "predictions": [],
-            "stacks": []
-        }
+        res = {"models": [], "predictions": [], "stacks": []}
 
         for stack in stacks:
             name = stack.get("StackName")
-            if name.startswith(CONFIG.EnvironmentConfig.STACK + "-models-") and name not in res["stacks"]:
+            if (
+                name.startswith(CONFIG.EnvironmentConfig.STACK + "-models-")
+                and name not in res["stacks"]
+            ):
                 res["stacks"].append(stack.get("StackName"))
 
-                split = name.split('-')
+                split = name.split("-")
                 model = int(split[len(split) - 3])
                 prediction = int(split[len(split) - 1])
 
@@ -94,14 +91,16 @@ def list():
         return res, 200
 
     except Exception as e:
-        error_msg = f'Prediction Stack List Error: {str(e)}'
+        error_msg = f"Prediction Stack List Error: {str(e)}"
         current_app.logger.error(error_msg)
         return err(500, "Failed to get stack list"), 500
 
 
 @login_required
 @has_project_write
-@stacks_bp.route('/v1/model/<int:model_id>/prediction/<int:prediction_id>/stack', methods=['POST'])
+@stacks_bp.route(
+    "/v1/model/<int:model_id>/prediction/<int:prediction_id>/stack", methods=["POST"]
+)
 def post(model_id, prediction_id):
     if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
         return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
@@ -110,77 +109,76 @@ def post(model_id, prediction_id):
 
     pred = PredictionService.get_prediction_by_id(prediction_id)
     image = "models-{model}-prediction-{prediction}".format(
-        model=model_id,
-        prediction=prediction_id
+        model=model_id, prediction=prediction_id
     )
 
-    stack = "{stack}-{image}".format(
-        stack=CONFIG.EnvironmentConfig.STACK,
-        image=image
-    )
+    stack = "{stack}-{image}".format(stack=CONFIG.EnvironmentConfig.STACK, image=image)
 
-    template = ''
-    with open('cloudformation/prediction.template.json', 'r') as file:
+    template = ""
+    with open("cloudformation/prediction.template.json", "r") as file:
         template = file.read()
 
     try:
-        boto3.client('cloudformation').create_stack(
+        boto3.client("cloudformation").create_stack(
             StackName=stack,
             TemplateBody=template,
-            Tags = payload.get("tags", []),
-            Parameters=[{
-                'ParameterKey': 'GitSha',
-                'ParameterValue': CONFIG.EnvironmentConfig.GitSha,
-            },{
-                'ParameterKey': 'MachineAuth',
-                'ParameterValue': CONFIG.EnvironmentConfig.MACHINE_AUTH
-            },{
-                'ParameterKey': 'StackName',
-                'ParameterValue': CONFIG.EnvironmentConfig.STACK,
-            },{
-                'ParameterKey': 'ImageTag',
-                'ParameterValue': image,
-            },{
-                'ParameterKey': 'Inferences',
-                'ParameterValue': pred.inf_list,
-            },{
-                'ParameterKey': 'ModelId',
-                'ParameterValue': str(model_id)
-            },{
-                'ParameterKey': 'PredictionId',
-                'ParameterValue': str(prediction_id)
-            },{
-                'ParameterKey': 'ImageryId',
-                'ParameterValue': str(pred.imagery_id),
-            },{
-                'ParameterKey': 'MaxSize',
-                'ParameterValue': payload.get("maxSize", "1"),
-            },{
-                'ParameterKey': 'MaxConcurrency',
-                'ParameterValue': payload.get("maxConcurrency", "50"),
-            },{
-                'ParameterKey': 'InfSupertile',
-                'ParameterValue': str(pred.inf_supertile),
-
-            }],
-
-            Capabilities=[
-                'CAPABILITY_NAMED_IAM'
+            Tags=payload.get("tags", []),
+            Parameters=[
+                {
+                    "ParameterKey": "GitSha",
+                    "ParameterValue": CONFIG.EnvironmentConfig.GitSha,
+                },
+                {
+                    "ParameterKey": "MachineAuth",
+                    "ParameterValue": CONFIG.EnvironmentConfig.MACHINE_AUTH,
+                },
+                {
+                    "ParameterKey": "StackName",
+                    "ParameterValue": CONFIG.EnvironmentConfig.STACK,
+                },
+                {
+                    "ParameterKey": "ImageTag",
+                    "ParameterValue": image,
+                },
+                {
+                    "ParameterKey": "Inferences",
+                    "ParameterValue": pred.inf_list,
+                },
+                {"ParameterKey": "ModelId", "ParameterValue": str(model_id)},
+                {"ParameterKey": "PredictionId", "ParameterValue": str(prediction_id)},
+                {
+                    "ParameterKey": "ImageryId",
+                    "ParameterValue": str(pred.imagery_id),
+                },
+                {
+                    "ParameterKey": "MaxSize",
+                    "ParameterValue": payload.get("maxSize", "1"),
+                },
+                {
+                    "ParameterKey": "MaxConcurrency",
+                    "ParameterValue": payload.get("maxConcurrency", "50"),
+                },
+                {
+                    "ParameterKey": "InfSupertile",
+                    "ParameterValue": str(pred.inf_supertile),
+                },
             ],
-            OnFailure='ROLLBACK',
+            Capabilities=["CAPABILITY_NAMED_IAM"],
+            OnFailure="ROLLBACK",
         )
 
-        return {
-            "status": "Stack Creation Initiated"
-        }
+        return {"status": "Stack Creation Initiated"}
     except Exception as e:
-        error_msg = f'Prediction Stack Creation Error: {str(e)}'
+        error_msg = f"Prediction Stack Creation Error: {str(e)}"
         current_app.logger.error(error_msg)
         return err(500, "Failed to create stack info"), 500
 
+
 @login_required
 @has_project_write
-@stacks_bp.route('/v1/model/<int:model_id>/prediction/<int:prediction_id>/stack', methods=['DELETE'])
+@stacks_bp.route(
+    "/v1/model/<int:model_id>/prediction/<int:prediction_id>/stack", methods=["DELETE"]
+)
 def delete(model_id, prediction_id):
     if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
         return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
@@ -189,30 +187,28 @@ def delete(model_id, prediction_id):
         stack = "{stack}-models-{model}-prediction-{prediction}".format(
             stack=CONFIG.EnvironmentConfig.STACK,
             model=model_id,
-            prediction=prediction_id
+            prediction=prediction_id,
         )
 
-        boto3.client('cloudformation').delete_stack(
-            StackName=stack
-        )
+        boto3.client("cloudformation").delete_stack(StackName=stack)
 
         return {
             "status": "Stack Deletion Initiated",
         }
     except Exception as e:
         if str(e).find("does not exist") != -1:
-            return {
-                "name": stack,
-                "status": "None"
-            }, 200
+            return {"name": stack, "status": "None"}, 200
         else:
-            error_msg = f'Prediction Stack Info Error: {str(e)}'
+            error_msg = f"Prediction Stack Info Error: {str(e)}"
             current_app.logger.error(error_msg)
             return err(500, "Failed to get stack info"), 500
 
+
 @login_required
 @has_project_read
-@stacks_bp.route('/v1/model/<int:model_id>/prediction/<int:prediction_id>/stack', methods=['GET'])
+@stacks_bp.route(
+    "/v1/model/<int:model_id>/prediction/<int:prediction_id>/stack", methods=["GET"]
+)
 def get(model_id, prediction_id):
     """
     Return status of a prediction stack
@@ -235,29 +231,22 @@ def get(model_id, prediction_id):
         stack = "{stack}-models-{model}-prediction-{prediction}".format(
             stack=CONFIG.EnvironmentConfig.STACK,
             model=model_id,
-            prediction=prediction_id
+            prediction=prediction_id,
         )
 
-        res = boto3.client('cloudformation').describe_stacks(
-            StackName=stack
-        )
+        res = boto3.client("cloudformation").describe_stacks(StackName=stack)
 
         stack = {
             "id": res.get("Stacks")[0].get("StackId"),
             "name": stack,
-            "status": res.get("Stacks")[0].get("StackStatus")
+            "status": res.get("Stacks")[0].get("StackStatus"),
         }
 
         return stack, 200
     except Exception as e:
         if str(e).find("does not exist") != -1:
-            return {
-                "name": stack,
-                "status": "None"
-            }, 200
+            return {"name": stack, "status": "None"}, 200
         else:
-            error_msg = f'Prediction Stack Info Error: {str(e)}'
+            error_msg = f"Prediction Stack Info Error: {str(e)}"
             current_app.logger.error(error_msg)
             return err(500, "Failed to get stack info"), 500
-
-
