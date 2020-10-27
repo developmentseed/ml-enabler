@@ -23,6 +23,7 @@ RUN curl 'https://nodejs.org/dist/v13.8.0/node-v13.8.0-linux-x64.tar.gz' | tar -
     && cd ..
 
 RUN \
+  pip install --upgrade pip \
   pip install gunicorn; \
   pip install -r requirements.txt
 
