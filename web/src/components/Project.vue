@@ -35,6 +35,7 @@
                         <svg v-else class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg>
 
                         <span class='fl pl6'>Model Iterations</span>
+
                     </button>
 
                     <button v-if='!folding.iterations' class='dropdown btn fr h24 mr6 mb6 round btn--stroke color-gray color-green-on-hover'>
@@ -46,6 +47,9 @@
                             <div @click='$router.push({ path: `/model/${$route.params.modelid}/training` })' class='round bg-gray-faint-on-hover'>Training</div>
                         </div>
                     </button>
+                    <div v-if='folding.iterations' class='fr bg-gray-faint bg-gray-on-hover color-white-on-hover color-gray inline-block px6 py3 round txt-xs txt-bold mr3'>
+                        <span v-text='`${predictions.length > 0 ? predictions.length : "No"} Iterations`'/>
+                    </div>
                 </div>
 
                 <div v-if='!folding.iterations' class='grid grid--gut12'>
@@ -105,6 +109,9 @@
                     <button v-if='!folding.imagery' @click='$router.push({ path: `/model/${$route.params.modelid}/imagery` })' class='btn fr mb6 round btn--stroke color-gray color-green-on-hover'>
                         <svg class='icon'><use href='#icon-plus'/></svg>
                     </button>
+                    <div v-if='folding.imagery' class='fr bg-gray-faint bg-gray-on-hover color-white-on-hover color-gray inline-block px6 py3 round txt-xs txt-bold mr3'>
+                        <span v-text='`${imagery.length > 0 ? imagery.length : "No"} Imagery`'/>
+                    </div>
                 </div>
 
                 <div v-if='!folding.imagery' class='grid grid--gut12'>
@@ -140,9 +147,16 @@
                     <button v-if='!folding.integrations' @click='$router.push({ path: `/model/${$route.params.modelid}/integration` })' class='btn fr mb6 round btn--stroke color-gray color-green-on-hover'>
                         <svg class='icon'><use href='#icon-plus'/></svg>
                     </button>
+                    <div v-if='folding.integrations' class='fr bg-gray-faint bg-gray-on-hover color-white-on-hover color-gray inline-block px6 py3 round txt-xs txt-bold mr3'>
+                        <span v-text='`${integrations > 0 ? integrations : "No"} Integrations`'/>
+                    </div>
                 </div>
 
-                <Integrations v-if='!folding.integrations' @integration='$router.push({ path: `/model/${$route.params.modelid}/integration/${$event.id}` })'/>
+                <Integrations
+                    v-if='!folding.integrations'
+                    @integration='$router.push({ path: `/model/${$route.params.modelid}/integration/${$event.id}` })'
+                    @count='integrations = $event'
+                />
 
                 <template v-if='project.notes'>
                     <div class='col col--12 border-b border--gray-light clearfix pt24'>
@@ -182,7 +196,7 @@ export default {
             predictions: [],
             project: {},
             imagery: [],
-            integrations: [],
+            integrations: 0,
             integrationid: false,
             loading: {
                 project: true
@@ -206,7 +220,6 @@ export default {
             this.getPredictions();
             this.getProject();
             this.getImagery();
-            this.getIntegration();
         },
         close: function() {
             this.$emit('close');
@@ -267,19 +280,6 @@ export default {
                 this.$emit('err', err);
             }
         },
-        getIntegration: async function() {
-            try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/integration`, {
-                    method: 'GET'
-                });
-
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
-                this.integrations = body;
-            } catch (err) {
-                this.$emit('err', err);
-            }
-        }
     }
 }
 </script>
