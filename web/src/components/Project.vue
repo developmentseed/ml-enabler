@@ -30,9 +30,14 @@
 
             <div class='border border--gray-light round col col--12 px12 py12 clearfix'>
                 <div class='col col--12 border-b border--gray-light clearfix'>
-                    <h3 class='fl mt6 cursor-default'>Model Iterations:</h3>
+                    <button @click='folding.iterations = !folding.iterations' class='btn btn--white color-gray px0'>
+                        <svg v-if='!folding.iterations' class='icon fl my6'><use xlink:href='#icon-chevron-down'/></svg>
+                        <svg v-else class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg>
 
-                    <button class='dropdown btn fr h24 mr6 mb6 round btn--stroke color-gray color-green-on-hover'>
+                        <span class='fl pl6'>Model Iterations</span>
+                    </button>
+
+                    <button v-if='!folding.iterations' class='dropdown btn fr h24 mr6 mb6 round btn--stroke color-gray color-green-on-hover'>
                         <svg class='icon fl'><use href='#icon-plus'/></svg>
                         <svg class='icon fl'><use href='#icon-chevron-down'/></svg>
 
@@ -43,7 +48,7 @@
                     </button>
                 </div>
 
-                <div class='grid grid--gut12'>
+                <div v-if='!folding.iterations' class='grid grid--gut12'>
                     <template v-if='predictions.length === 0'>
                         <div class='col col--12 py6'>
                             <div class='flex-parent flex-parent--center-main pt36'>
@@ -90,14 +95,19 @@
                 </div>
 
                 <div class='col col--12 border-b border--gray-light clearfix pt24'>
-                    <h3 class='fl mt6 cursor-default'>Imagery:</h3>
+                    <button @click='folding.imagery = !folding.imagery' class='btn btn--white color-gray px0'>
+                        <svg v-if='!folding.imagery' class='icon fl my6'><use xlink:href='#icon-chevron-down'/></svg>
+                        <svg v-else class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg>
 
-                    <button @click='$router.push({ path: `/model/${$route.params.modelid}/imagery` })' class='btn fr mb6 round btn--stroke color-gray color-green-on-hover'>
+                        <span class='fl pl6'>Imagery</span>
+                    </button>
+
+                    <button v-if='!folding.imagery' @click='$router.push({ path: `/model/${$route.params.modelid}/imagery` })' class='btn fr mb6 round btn--stroke color-gray color-green-on-hover'>
                         <svg class='icon'><use href='#icon-plus'/></svg>
                     </button>
                 </div>
 
-                <div class='grid grid--gut12'>
+                <div v-if='!folding.imagery' class='grid grid--gut12'>
                     <template v-if='imagery.length === 0'>
                         <div class='col col--12 py6'>
                             <div class='flex-parent flex-parent--center-main pt36'>
@@ -118,22 +128,33 @@
                         </div>
                     </template>
                 </div>
-                <div class='col col--12 border-b border--gray-light clearfix pt24'>
-                    <h3 class='fl mt6 cursor-default'>Integrations:</h3>
 
-                    <button @click='$router.push({ path: `/model/${$route.params.modelid}/integration` })' class='btn fr mb6 round btn--stroke color-gray color-green-on-hover'>
+                <div class='col col--12 border-b border--gray-light clearfix pt24'>
+                    <button @click='folding.integrations = !folding.integrations' class='btn btn--white color-gray px0'>
+                        <svg v-if='!folding.integrations' class='icon fl my6'><use xlink:href='#icon-chevron-down'/></svg>
+                        <svg v-else class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg>
+
+                        <span class='fl pl6'>Integrations</span>
+                    </button>
+
+                    <button v-if='!folding.integrations' @click='$router.push({ path: `/model/${$route.params.modelid}/integration` })' class='btn fr mb6 round btn--stroke color-gray color-green-on-hover'>
                         <svg class='icon'><use href='#icon-plus'/></svg>
                     </button>
                 </div>
 
-                <Integrations @integration='$router.push({ path: `/model/${$route.params.modelid}/integration/${$event.id}` })'/>
+                <Integrations v-if='!folding.integrations' @integration='$router.push({ path: `/model/${$route.params.modelid}/integration/${$event.id}` })'/>
 
                 <template v-if='project.notes'>
                     <div class='col col--12 border-b border--gray-light clearfix pt24'>
-                        <h3 class='fl mt6 cursor-default'>Project Notes:</h3>
+                        <button @click='folding.notes = !folding.notes' class='btn btn--white color-gray px0'>
+                            <svg v-if='!folding.notes' class='icon fl my6'><use xlink:href='#icon-chevron-down'/></svg>
+                            <svg v-else class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg>
+
+                            <span class='fl pl6'>Notes</span>
+                        </button>
                     </div>
 
-                    <pre v-text='project.notes' class='pre'/>
+                    <pre v-if='!folding.notes' v-text='project.notes' class='pre'/>
                 </template>
             </div>
         </template>
@@ -165,6 +186,12 @@ export default {
             integrationid: false,
             loading: {
                 project: true
+            },
+            folding: {
+                integrations: false,
+                imagery: false,
+                iterations: false,
+                notes: false
             }
         }
     },
