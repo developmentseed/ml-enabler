@@ -5,6 +5,7 @@ import json
 import csv
 import geojson
 import boto3
+import traceback
 import mercantile
 from io import StringIO
 from tiletanic import tilecover, tileschemes
@@ -129,8 +130,9 @@ class PredictionImport(Resource):
         except PredictionsNotFound:
             return err(404, "Predictions not found"), 404
         except Exception as e:
+            current_app.logger.error(traceback.format_exc())
+
             error_msg = f"Unhandled error: {str(e)}"
-            current_app.logger.error(error_msg)
             return err(500, error_msg), 500
 
 
@@ -443,8 +445,9 @@ class PredictionInfAPI(Resource):
             if str(e).find("does not exist") != -1:
                 return {"name": CONFIG.EnvironmentConfig.STACK, "status": "None"}, 200
             else:
+                current_app.logger.error(traceback.format_exc())
+
                 error_msg = f"Prediction Stack Info Error: {str(e)}"
-                current_app.logger.error(error_msg)
                 return err(500, "Failed to get stack info"), 500
 
     @login_required
@@ -467,7 +470,7 @@ class PredictionInfAPI(Resource):
             queues = boto3.client("sqs").list_queues(
                 QueueNamePrefix="{stack}-models-{model}-prediction-{pred}-".format(
                     stack=CONFIG.EnvironmentConfig.STACK,
-                    model=model_id,
+                    model=project_id,
                     pred=prediction_id,
                 )
             )
@@ -503,8 +506,9 @@ class PredictionInfAPI(Resource):
             if str(e).find("does not exist") != -1:
                 return {"name": CONFIG.EnvironmentConfig.STACK, "status": "None"}, 200
             else:
+                current_app.logger.error(traceback.format_exc())
+
                 error_msg = f"Prediction Stack Info Error: {str(e)}"
-                current_app.logger.error(error_msg)
                 return err(500, "Failed to get stack info"), 500
 
     @login_required
@@ -533,7 +537,7 @@ class PredictionInfAPI(Resource):
 
             queue_name = "{stack}-models-{model}-prediction-{prediction}-queue".format(
                 stack=CONFIG.EnvironmentConfig.STACK,
-                model=model_id,
+                model=project_id,
                 prediction=prediction_id,
             )
 
@@ -626,8 +630,9 @@ class PredictionInfAPI(Resource):
             else:
                 return err(400, "Unknown imagery type"), 400
         except Exception as e:
+            current_app.logger.error(traceback.format_exc())
+
             error_msg = f"Prediction Tiler Error: {str(e)}"
-            current_app.logger.error(error_msg)
             return err(500, error_msg), 500
 
 
@@ -679,8 +684,9 @@ class PredictionTfrecords(Resource):
                 }
             )
         except Exception as e:
+            current_app.logger.error(traceback.format_exc())
+
             error_msg = f"Batch GPU Error: {str(e)}"
-            current_app.logger.error(error_msg)
             return err(500, "Failed to start GPU Retrain"), 500
 
 
@@ -735,8 +741,9 @@ class PredictionRetrain(Resource):
                 }
             )
         except Exception as e:
+            current_app.logger.error(traceback.format_exc())
+
             error_msg = f"Batch GPU Error: {str(e)}"
-            current_app.logger.error(error_msg)
             return err(500, "Failed to start GPU Retrain"), 500
 
 
@@ -791,8 +798,9 @@ class PredictionAssetAPI(Resource):
                     CONFIG.EnvironmentConfig.ASSET_BUCKET
                 ).put_object(Key=key, Body=model.stream)
             except Exception as e:
+                current_app.logger.error(traceback.format_exc())
+
                 error_msg = f"S3 Upload Error: {str(e)}"
-                current_app.logger.error(error_msg)
                 return err(500, "Failed to upload model to S3"), 500
 
             if modeltype == "checkpoint":
@@ -806,8 +814,9 @@ class PredictionAssetAPI(Resource):
                         },
                     )
                 except Exception as e:
+                    current_app.logger.error(traceback.format_exc())
+
                     error_msg = f"SaveLink Error: {str(e)}"
-                    current_app.logger.error(error_msg)
                     return err(500, "Failed to save checkpoint state to DB"), 500
 
             if modeltype == "tfrecord":
@@ -821,8 +830,9 @@ class PredictionAssetAPI(Resource):
                         },
                     )
                 except Exception as e:
+                    current_app.logger.error(traceback.format_exc())
+
                     error_msg = f"SaveLink Error: {str(e)}"
-                    current_app.logger.error(error_msg)
                     return err(500, "Failed to save checkpoint state to DB"), 500
 
             if modeltype == "model":
@@ -837,8 +847,9 @@ class PredictionAssetAPI(Resource):
                         },
                     )
                 except Exception as e:
+                    current_app.logger.error(traceback.format_exc())
+
                     error_msg = f"SaveLink Error: {str(e)}"
-                    current_app.logger.error(error_msg)
                     return err(500, "Failed to save model state to DB"), 500
 
                 try:
@@ -873,8 +884,9 @@ class PredictionAssetAPI(Resource):
                         }
                     )
                 except Exception as e:
+                    current_app.logger.error(traceback.format_exc())
+
                     error_msg = f"Batch Error: {str(e)}"
-                    current_app.logger.error(error_msg)
                     return err(500, "Failed to start ECR build"), 500
 
             return {"status": "model uploaded"}, 200
@@ -941,8 +953,9 @@ class PredictionAssetAPI(Resource):
                 },
             )
         except Exception as e:
+            current_app.logger.error(traceback.format_exc())
+
             error_msg = f"Asset Download Error: {str(e)}"
-            current_app.logger.error(error_msg)
             return err(500, "Failed to download asset from S3"), 500
 
 
@@ -978,8 +991,9 @@ class PredictionValidity(Resource):
 
             return current, 200
         except Exception as e:
+            current_app.logger.error(traceback.format_exc())
+            
             error_msg = f"Unhandled error: {str(e)}"
-            current_app.logger.error(error_msg)
             return (500, error_msg), 500
 
 
@@ -993,7 +1007,7 @@ class PredictionSingleAPI(Resource):
             pred = {
                 "predictionsId": prediction.id,
                 "hint": prediction.hint,
-                "modelId": prediction.project_id,
+                "modelId": prediction.model_id,
                 "version": prediction.version,
                 "dockerUrl": prediction.docker_url,
                 "tileZoom": prediction.tile_zoom,
@@ -1012,8 +1026,9 @@ class PredictionSingleAPI(Resource):
 
             return pred, 200
         except Exception as e:
+            current_app.logger.error(traceback.format_exc())
+
             error_msg = f"Unhandled error: {str(e)}"
-            current_app.logger.error(error_msg)
             return err(500, error_msg), 500
 
 
@@ -1078,8 +1093,9 @@ class PredictionAPI(Resource):
             current_app.logger.error(f"Error validating request: {str(e)}")
             return err(400, str(4)), 400
         except Exception as e:
+            current_app.logger.error(traceback.format_exc())
+
             error_msg = f"Unhandled error: {str(e)}"
-            current_app.logger.error(error_msg)
             return err(500, error_msg), 500
 
     @login_required
@@ -1121,8 +1137,9 @@ class PredictionAPI(Resource):
         except NotFound:
             return err(404, "prediction not found"), 404
         except Exception as e:
+            current_app.logger.error(traceback.format_exc())
+
             error_msg = f"Unhandled error: {str(e)}"
-            current_app.logger.error(error_msg)
             return err(500, error_msg), 500
 
 
@@ -1151,7 +1168,7 @@ class GetAllPredictions(Resource):
         """
         try:
             # check if this model exists
-            dto = ProjectService.get_ml_model_by_id(model_id)
+            dto = ProjectService.get_ml_model_by_id(project_id)
 
             predictions = PredictionService.get_all_by_model(dto.model_id)
 
@@ -1159,8 +1176,9 @@ class GetAllPredictions(Resource):
         except PredictionsNotFound:
             return err(404, "Predictions not found"), 404
         except Exception as e:
+            current_app.logger.error(traceback.format_exc())
+
             error_msg = f"Unhandled error: {str(e)}"
-            current_app.logger.error(error_msg)
             return err(500, error_msg), 500
 
 
@@ -1222,8 +1240,9 @@ class PredictionTileMVT(Resource):
         except PredictionsNotFound:
             return err(404, "Prediction tile not found"), 404
         except Exception as e:
+            current_app.logger.error(traceback.format_exc())
+
             error_msg = f"Unhandled error: {str(e)}"
-            current_app.logger.error(error_msg)
             return err(500, error_msg), 500
 
 
@@ -1265,8 +1284,9 @@ class PredictionTileAPI(Resource):
         except PredictionsNotFound:
             return err(404, "Prediction TileJSON not found"), 404
         except Exception as e:
+            current_app.logger.error(traceback.format_exc())
+
             error_msg = f"Unhandled error: {str(e)}"
-            current_app.logger.error(error_msg)
             return err(500, error_msg), 500
 
     @login_required
@@ -1329,6 +1349,7 @@ class PredictionTileAPI(Resource):
         except PredictionsNotFound:
             return err(404, "Prediction not found"), 404
         except Exception as e:
+            current_app.logger.error(traceback.format_exc())
+
             error_msg = f"Unhandled error: {str(e)}"
-            current_app.logger.error(error_msg)
             return err(500, error_msg), 500

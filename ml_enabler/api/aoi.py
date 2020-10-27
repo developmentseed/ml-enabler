@@ -25,7 +25,7 @@ def list(project_id):
 
     try:
         pred_id = request.args.get("pred_id")
-        aoi = AOIService.list(model_id, pred_id)
+        aoi = AOIService.list(project_id, pred_id)
         return jsonify(aoi), 200
     except Exception as e:
         error_msg = f"Unhandled error: {str(e)}"
@@ -49,7 +49,7 @@ def post(project_id):
     try:
         payload = request.get_json()
 
-        payload["model_id"] = model_id
+        payload["model_id"] = project_id
         aoi = AOIService.create(payload)
 
         return aoi, 200

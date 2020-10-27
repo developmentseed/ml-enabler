@@ -77,70 +77,70 @@ def init_routes(app):
     api.add_resource(MapboxAPI, "/v1/mapbox", methods=["GET"])
 
     api.add_resource(
-        PredictionAPI, "/v1/model/<int:model_id>/prediction", methods=["POST", "GET"]
+        PredictionAPI, "/v1/model/<int:project_id>/prediction", methods=["POST", "GET"]
     )
     api.add_resource(
-        GetAllPredictions, "/v1/model/<int:model_id>/prediction/all", methods=["GET"]
+        GetAllPredictions, "/v1/model/<int:project_id>/prediction/all", methods=["GET"]
     )
     api.add_resource(
         PredictionSingleAPI,
-        "/v1/model/<int:model_id>/prediction/<int:prediction_id>",
+        "/v1/model/<int:project_id>/prediction/<int:prediction_id>",
         methods=["GET"],
     )
     api.add_resource(
         PredictionAPI,
-        "/v1/model/<int:model_id>/prediction/<int:prediction_id>",
+        "/v1/model/<int:project_id>/prediction/<int:prediction_id>",
         endpoint="patch",
         methods=["PATCH"],
     )
     api.add_resource(
         PredictionAssetAPI,
-        "/v1/model/<int:model_id>/prediction/<int:prediction_id>/asset",
+        "/v1/model/<int:project_id>/prediction/<int:prediction_id>/asset",
         methods=["GET", "POST"],
     )
     api.add_resource(
         PredictionInfAPI,
-        "/v1/model/<int:model_id>/prediction/<int:prediction_id>/stack/tiles",
+        "/v1/model/<int:project_id>/prediction/<int:prediction_id>/stack/tiles",
         methods=["POST", "GET", "DELETE"],
     )
 
     api.add_resource(
         PredictionValidity,
-        "/v1/model/<int:model_id>/prediction/<int:prediction_id>/validity",
+        "/v1/model/<int:project_id>/prediction/<int:prediction_id>/validity",
         methods=["POST"],
     )
 
     api.add_resource(
         PredictionExport,
-        "/v1/model/<int:model_id>/prediction/<int:prediction_id>/export",
+        "/v1/model/<int:project_id>/prediction/<int:prediction_id>/export",
         methods=["GET"],
     )
     api.add_resource(
         PredictionImport,
-        "/v1/model/<int:model_id>/prediction/<int:prediction_id>/import",
+        "/v1/model/<int:project_id>/prediction/<int:prediction_id>/import",
         methods=["POST"],
     )
 
     api.add_resource(
         PredictionRetrain,
-        "/v1/model/<int:model_id>/prediction/<int:prediction_id>/retrain",
+        "/v1/model/<int:project_id>/prediction/<int:prediction_id>/retrain",
         methods=["POST"],
     )
     api.add_resource(
         PredictionTfrecords,
-        "/v1/model/<int:model_id>/prediction/<int:prediction_id>/tfrecords",
+        "/v1/model/<int:project_id>/prediction/<int:prediction_id>/tfrecords",
         methods=["POST"],
     )
 
     api.add_resource(
         PredictionTileAPI,
-        "/v1/model/<int:model_id>/prediction/<int:prediction_id>/tiles",
+        "/v1/model/<int:project_id>/prediction/<int:prediction_id>/tiles",
         endpoint="get",
         methods=["GET"],
     )
     api.add_resource(
         PredictionTileMVT,
-        "/v1/model/<int:model_id>/prediction/<int:prediction_id>/tiles/<int:z>/<int:x>/<int:y>.mvt",
+        "/v1/model/<int:project_id>/prediction/<int:prediction_id>/tiles/<int:z>/<int:x>/<int:y>.mvt",
         methods=["GET"],
     )
 

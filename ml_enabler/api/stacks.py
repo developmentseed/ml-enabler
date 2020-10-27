@@ -109,7 +109,7 @@ def post(project_id, prediction_id):
 
     pred = PredictionService.get_prediction_by_id(prediction_id)
     image = "models-{model}-prediction-{prediction}".format(
-        model=model_id, prediction=prediction_id
+        model=project_id, prediction=prediction_id
     )
 
     stack = "{stack}-{image}".format(stack=CONFIG.EnvironmentConfig.STACK, image=image)
@@ -187,7 +187,7 @@ def delete(project_id, prediction_id):
     try:
         stack = "{stack}-models-{model}-prediction-{prediction}".format(
             stack=CONFIG.EnvironmentConfig.STACK,
-            model=model_id,
+            model=project_id,
             prediction=prediction_id,
         )
 
@@ -231,7 +231,7 @@ def get(project_id, prediction_id):
     try:
         stack = "{stack}-models-{model}-prediction-{prediction}".format(
             stack=CONFIG.EnvironmentConfig.STACK,
-            model=model_id,
+            model=project_id,
             prediction=prediction_id,
         )
 

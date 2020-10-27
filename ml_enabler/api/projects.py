@@ -66,7 +66,7 @@ def post():
 @login_required
 @has_project_admin
 @projects_bp.route('/v1/model/<int:project_id>', methods=['DELETE'])
-def delete(model_id):
+def delete(project_id):
     """
     Deletes an existing model and it's predictions
     ---
@@ -74,7 +74,7 @@ def delete(model_id):
         - application/json
     parameters:
         - in: path
-          name: model_id
+          name: project_id
           description: ID of the Model to be deleted
           required: true
           type: integer
@@ -87,7 +87,7 @@ def delete(model_id):
             description: Internal Server Error
     """
     try:
-        ProjectService.delete_ml_model(model_id)
+        ProjectService.delete_ml_model(project_id)
         return {"success": "model deleted"}, 200
     except NotFound:
         return err(404, "model not found"), 404
@@ -100,8 +100,8 @@ def delete(model_id):
 
 @login_required
 @has_project_read
-@projects_bp.route('/v1/model/<int:model_id>', methods=['GET'])
-def get(model_id):
+@projects_bp.route('/v1/model/<int:project_id>', methods=['GET'])
+def get(project_id):
     """
     Get model information with the ID
     ---
@@ -109,7 +109,7 @@ def get(model_id):
         - application/json
     parameters:
         - in: path
-          name: model_id
+          name: project_id
           description: ID of the Model to be fetched
           required: true
           type: integer
@@ -122,7 +122,7 @@ def get(model_id):
             description: Internal Server Error
     """
     try:
-        dto = ProjectService.get_ml_model_by_id(model_id)
+        dto = ProjectService.get_ml_model_by_id(project_id)
         return dto.to_primitive(), 200
     except NotFound:
         return err(404, "model not found"), 404
@@ -135,8 +135,8 @@ def get(model_id):
 
 @login_required
 @has_project_admin
-@projects_bp.route('/v1/model/<int:model_id>', methods=['PUT'])
-def put(model_id):
+@projects_bp.route('/v1/model/<int:project_id>', methods=['PUT'])
+def put(project_id):
     """
     Update an existing model
     ---
@@ -144,7 +144,7 @@ def put(model_id):
         - application/json
     parameters:
         - in: path
-          name: model_id
+          name: project_id
           description: ID of the Model to update
           required: true
           type: integer
