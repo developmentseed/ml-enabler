@@ -582,6 +582,7 @@ class Project(db.Model):
     archived = db.Column(db.Boolean)
     project_url = db.Column(db.String)
     access = db.Column(db.String)
+    notes = db.Column(db.String)
     predictions = db.relationship(
         Prediction, backref="projects", cascade="all, delete-orphan", lazy="dynamic"
     )
@@ -595,6 +596,7 @@ class Project(db.Model):
         self.tags = dto.tags
         self.access = dto.access
         self.project_url = dto.project_url
+        self.notes = dto.notes
 
         db.session.add(self)
         db.session.commit()
@@ -637,19 +639,20 @@ class Project(db.Model):
         Convert the model to it's dto
         """
 
-        model_dto = ProjectDTO()
-        model_dto.model_id = self.id
-        model_dto.name = self.name
-        model_dto.tags = self.tags
-        model_dto.created = self.created
-        model_dto.source = self.source
-        model_dto.archived = self.archived
-        model_dto.project_url = self.project_url
-        model_dto.access = self.access
+        dto = ProjectDTO()
+        dto.model_id = self.id
+        dto.name = self.name
+        dto.tags = self.tags
+        dto.created = self.created
+        dto.source = self.source
+        dto.archived = self.archived
+        dto.project_url = self.project_url
+        dto.access = self.access
+        dto.notes = self.notes
         if users is not None:
-            model_dto.users = users
+            dto.users = users
 
-        return model_dto
+        return dto
 
     def update(self, dto: ProjectDTO):
         """ Updates an ML model """
@@ -660,5 +663,6 @@ class Project(db.Model):
         self.archived = dto.archived
         self.tags = dto.tags
         self.access = dto.access
+        self.notes = dto.notes
 
         db.session.commit()

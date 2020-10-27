@@ -14,20 +14,20 @@ class ProjectServiceError(Exception):
 
 class ProjectService:
     @staticmethod
-    def subscribe_ml_model(ml_model_dto: ProjectDTO) -> int:
+    def subscribe_ml_model(dto: ProjectDTO) -> int:
         """
         Subscribes an ML Model by saving it in the database
-        :params ml_model_dto
+        :params dto
 
         :raises DataError
         :returns ID of the ml model
         """
 
         new_ml_model = Project()
-        new_ml_model.create(ml_model_dto)
+        new_ml_model.create(dto)
 
-        if ml_model_dto.users:
-            ProjectAccess.list_update(new_ml_model.id, [], ml_model_dto.users)
+        if dto.users:
+            ProjectAccess.list_update(new_ml_model.id, [], dto.users)
 
         return new_ml_model.id
 
@@ -81,7 +81,7 @@ class ProjectService:
             raise NotFound("No models exist")
 
     @staticmethod
-    def update_ml_model(updated_ml_model_dto: ProjectDTO) -> int:
+    def update_ml_model(dto: ProjectDTO) -> int:
         """
         Update an existing ML Model
         :params model_id
@@ -90,17 +90,15 @@ class ProjectService:
         :returns model_id
         """
 
-        ml_model = Project.get(updated_ml_model_dto.model_id)
+        ml_model = Project.get(dto.model_id)
 
         if ml_model:
-            ml_model.update(updated_ml_model_dto)
+            ml_model.update(dto)
 
-            if updated_ml_model_dto.users:
-                users = ProjectAccess.list(updated_ml_model_dto.model_id)
-                ProjectAccess.list_update(
-                    updated_ml_model_dto.model_id, users, updated_ml_model_dto.users
-                )
+            if dto.users:
+                users = ProjectAccess.list(dto.model_id)
+                ProjectAccess.list_update(dto.model_id, users, dto.users)
 
-            return updated_ml_model_dto.model_id
+            return dto.model_id
         else:
             raise NotFound("Model does not exist")

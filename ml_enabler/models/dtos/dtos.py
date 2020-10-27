@@ -90,6 +90,7 @@ class ProjectDTO(Model):
     archived = BooleanType()
     project_url = StringType(serialized_name="projectUrl")
     users = ListType(DictType(StringType), required=False)
+    notes = StringType()
 
 
 class PredictionDTO(Model):
