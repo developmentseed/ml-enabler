@@ -9,7 +9,7 @@
             <div class='col col--12 clearfix py6'>
                 <h2 @click='$router.push({ name: "home" })' class='fl cursor-pointer txt-underline-on-hover'>Projects</h2>
                 <h2 class='fl px6'>&gt;</h2>
-                <h2 class='fl cursor-pointer txt-underline-on-hover' v-text='project.name + " - " + project.source'></h2>
+                <h2 class='fl cursor-pointer txt-underline-on-hover' v-text='project.name'></h2>
 
                 <button @click='$router.push({ name: "home" })' class='btn fr round btn--stroke color-gray color-black-on-hover'>
                     <svg class='icon'><use href='#icon-close'/></svg>
