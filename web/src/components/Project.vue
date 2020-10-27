@@ -9,13 +9,13 @@
             <div class='col col--12 clearfix py6'>
                 <h2 @click='$router.push({ name: "home" })' class='fl cursor-pointer txt-underline-on-hover'>Projects</h2>
                 <h2 class='fl px6'>&gt;</h2>
-                <h2 class='fl cursor-pointer txt-underline-on-hover' v-text='model.name + " - " + model.source'></h2>
+                <h2 class='fl cursor-pointer txt-underline-on-hover' v-text='project.name + " - " + project.source'></h2>
 
                 <button @click='$router.push({ name: "home" })' class='btn fr round btn--stroke color-gray color-black-on-hover'>
                     <svg class='icon'><use href='#icon-close'/></svg>
                 </button>
 
-                <button v-if='model.projectUrl' @click='external(model.projectUrl)' class='mr12 btn fr round btn--stroke color-gray color-black-on-hover'>
+                <button v-if='project.projectUrl' @click='external(project.projectUrl)' class='mr12 btn fr round btn--stroke color-gray color-black-on-hover'>
                     <svg class='icon'><use href='#icon-link'/></svg>
                 </button>
 
@@ -27,6 +27,7 @@
                     <svg class='icon'><use href='#icon-refresh'/></svg>
                 </button>
             </div>
+
             <div class='border border--gray-light round col col--12 px12 py12 clearfix'>
                 <div class='col col--12 border-b border--gray-light clearfix'>
                     <h3 class='fl mt6 cursor-default'>Model Iterations:</h3>
@@ -126,12 +127,20 @@
                 </div>
 
                 <Integrations @integration='$router.push({ path: `/model/${$route.params.modelid}/integration/${$event.id}` })'/>
+
+                <template v-if='project.notes'>
+                    <div class='col col--12 border-b border--gray-light clearfix pt24'>
+                        <h3 class='fl mt6 cursor-default'>Project Notes:</h3>
+                    </div>
+
+                    <pre v-text='project.notes' class='pre'/>
+                </template>
             </div>
         </template>
         <template v-else>
             <router-view
                 :meta='meta'
-                :model='model'
+                :model='project'
                 :user='user'
                 @refresh='refresh'
                 @err='$emit("err", $event)'
@@ -149,14 +158,13 @@ export default {
     props: ['meta', 'stacks', 'user'],
     data: function() {
         return {
-            mode: 'model',
             predictions: [],
-            model: {},
+            project: {},
             imagery: [],
             integrations: [],
             integrationid: false,
             loading: {
-                model: true
+                project: true
             }
         }
     },
@@ -168,8 +176,6 @@ export default {
     },
     methods: {
         refresh: function() {
-            this.mode = 'model';
-
             this.getPredictions();
             this.getProject();
             this.getImagery();
@@ -205,7 +211,7 @@ export default {
             }
         },
         getProject: async function() {
-            this.loading.model = true;
+            this.loading.project = true;
 
             try {
                 const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}`, {
@@ -214,9 +220,9 @@ export default {
 
                 const body = await res.json();
 
-                this.loading.model = false;
+                this.loading.project = false;
                 if (!res.ok) throw new Error(body.message);
-                this.model = body;
+                this.project = body;
             } catch (err) {
                 this.$emit('err', err);
             }
