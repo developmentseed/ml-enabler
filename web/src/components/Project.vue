@@ -60,7 +60,7 @@
                             </div>
 
                             <div class='flex-parent flex-parent--center-main pt12 pb36'>
-                                <h1 class='flex-child txt-h4 cursor-default'>No Predictions Yet</h1>
+                                <h1 class='flex-child txt-h4 cursor-default'>No Iterations Yet</h1>
                             </div>
                         </div>
                     </template>
