@@ -7,14 +7,14 @@ import ml_enabler.config as CONFIG
 from ml_enabler.api.auth import has_project_read, has_project_write
 from flask_login import login_required
 
-task_bp = Blueprint(
-    'task_bp', __name__
+tasks_bp = Blueprint(
+    'tasks_bp', __name__
 )
 
 
 @login_required
 @has_project_read
-@task_bp.route('/v1/model/<int:model_id>/task', methods=['GET'])
+@tasks_bp.route('/v1/model/<int:model_id>/task', methods=['GET'])
 def list(model_id):
     """
     Return a list of currently running tasks for a given prediction
@@ -49,7 +49,7 @@ def list(model_id):
 
 @login_required
 @has_project_read
-@task_bp.route('/v1/model/<int:model_id>/task/<int:task_id>', methods=['GET'])
+@tasks_bp.route('/v1/model/<int:model_id>/task/<int:task_id>', methods=['GET'])
 def get(model_id, task_id):
     """
     Return a single task
@@ -75,7 +75,7 @@ def get(model_id, task_id):
 
 @login_required
 @has_project_read
-@task_bp.route('/v1/model/<int:model_id>/task/<int:task_id>/logs', methods=['GET'])
+@tasks_bp.route('/v1/model/<int:model_id>/task/<int:task_id>/logs', methods=['GET'])
 def logs(model_id, task_id):
     """
     Return a cloudwatch logs for a given task
@@ -101,7 +101,7 @@ def logs(model_id, task_id):
 
 @login_required
 @has_project_write
-@task_bp.route('/v1/model/<int:model_id>/task/<int:task_id>', methods=['DELETE'])
+@tasks_bp.route('/v1/model/<int:model_id>/task/<int:task_id>', methods=['DELETE'])
 def delete(model_id, task_id):
     """
     Delete a given task

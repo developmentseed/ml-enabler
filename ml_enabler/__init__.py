@@ -9,7 +9,7 @@ db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
 
-from ml_enabler.api import auth, task, imagery, integration, token, aoi, user, stacks
+from ml_enabler.api import auth, task, imagery, integration, token, aoi, user, stacks, projects
 
 def create_app(env=None, app_config='ml_enabler.config.EnvironmentConfig'):
     # create and configure the app
@@ -20,12 +20,13 @@ def create_app(env=None, app_config='ml_enabler.config.EnvironmentConfig'):
     migrate.init_app(app, db)
     login_manager.init_app(app)
 
+    app.register_blueprint(projects.projects_bp)
     app.register_blueprint(aoi.aoi_bp)
     app.register_blueprint(stacks.stacks_bp)
     app.register_blueprint(user.user_bp)
     app.register_blueprint(auth.auth_bp)
     app.register_blueprint(token.token_bp)
-    app.register_blueprint(task.task_bp)
+    app.register_blueprint(task.tasks_bp)
     app.register_blueprint(imagery.imagery_bp)
     app.register_blueprint(integration.integration_bp)
 
@@ -44,7 +45,7 @@ def init_routes(app):
     api = Api(app)
 
     # import apis
-    from ml_enabler.api.ml import StatusCheckAPI, ProjectAPI, GetAllModels, \
+    from ml_enabler.api.ml import StatusCheckAPI, \
         PredictionAPI, PredictionAssetAPI, PredictionTileAPI, PredictionImport, \
         GetAllPredictions, PredictionTileMVT, PredictionRetrain, PredictionTfrecords,\
         PredictionInfAPI, MapboxAPI, MetaAPI, PredictionExport, PredictionSingleAPI, \
@@ -58,11 +59,6 @@ def init_routes(app):
     api.add_resource(SwaggerDocsAPI,            '/v1/docs')
 
     api.add_resource(MapboxAPI,                 '/v1/mapbox', methods=['GET'])
-
-    api.add_resource(GetAllModels,              '/v1/model/all', methods=['GET'])
-    api.add_resource(ProjectAPI,                '/v1/model', endpoint="post", methods=['POST'])
-
-    api.add_resource(ProjectAPI,                '/v1/model/<int:model_id>', methods=['DELETE', 'GET', 'PUT'])
 
     api.add_resource(PredictionAPI,             '/v1/model/<int:model_id>/prediction', methods=['POST', 'GET'])
     api.add_resource(GetAllPredictions,         '/v1/model/<int:model_id>/prediction/all', methods=['GET'])

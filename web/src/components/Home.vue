@@ -150,7 +150,7 @@ export default {
             this.loading.projects = true;
             this.projects = [];
             try {
-                const url = new URL(window.api + '/v1/model/all');
+                const url = new URL(window.api + '/v1/model');
                 url.searchParams.append('filter', this.search);
                 url.searchParams.append('archived', this.archived);
 
