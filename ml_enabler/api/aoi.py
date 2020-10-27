@@ -11,10 +11,10 @@ aoi_bp = Blueprint("aoi_bp", __name__)
 
 @login_required
 @has_project_read
-@aoi_bp.route("/v1/model/<int:model_id>/aoi", methods=["GET"])
-def list(model_id):
+@aoi_bp.route("/v1/model/<int:project_id>/aoi", methods=["GET"])
+def list(project_id):
     """
-    Return a list of AOIs for a given model_id
+    Return a list of AOIs for a given project_id
     ---
     produces:
         - application/json
@@ -35,8 +35,8 @@ def list(model_id):
 
 @login_required
 @has_project_write
-@aoi_bp.route("/v1/model/<int:model_id>/aoi", methods=["POST"])
-def post(model_id):
+@aoi_bp.route("/v1/model/<int:project_id>/aoi", methods=["POST"])
+def post(project_id):
     """
     Create a new AOI for a given model
     ---

@@ -122,8 +122,8 @@ class ProjectAPI(Resource):
         try:
             model_dto = ProjectDTO(request.get_json())
             model_dto.validate()
-            model_id = ProjectService.subscribe_ml_model(model_dto)
-            return {"model_id": model_id}, 200
+            project_id = ProjectService.subscribe_ml_model(model_dto)
+            return {"project_id": project_id}, 200
         except DataError as e:
             current_app.logger.error(f"Error validating request: {str(e)}")
             return str(e), 400
@@ -135,7 +135,7 @@ class ProjectAPI(Resource):
 
     @login_required
     @has_project_admin
-    def delete(self, model_id):
+    def delete(self, project_id):
         """
         Deletes an existing model and it's predictions
         ---
@@ -143,7 +143,7 @@ class ProjectAPI(Resource):
             - application/json
         parameters:
             - in: path
-              name: model_id
+              name: project_id
               description: ID of the Model to be deleted
               required: true
               type: integer
@@ -156,7 +156,7 @@ class ProjectAPI(Resource):
                 description: Internal Server Error
         """
         try:
-            ProjectService.delete_ml_model(model_id)
+            ProjectService.delete_ml_model(project_id)
             return {"success": "model deleted"}, 200
         except NotFound:
             return err(404, "model not found"), 404
@@ -167,7 +167,7 @@ class ProjectAPI(Resource):
 
     @login_required
     @has_project_read
-    def get(self, model_id):
+    def get(self, project_id):
         """
         Get model information with the ID
         ---
@@ -175,7 +175,7 @@ class ProjectAPI(Resource):
             - application/json
         parameters:
             - in: path
-              name: model_id
+              name: project_id
               description: ID of the Model to be fetched
               required: true
               type: integer
@@ -188,7 +188,7 @@ class ProjectAPI(Resource):
                 description: Internal Server Error
         """
         try:
-            ml_model_dto = ProjectService.get_ml_model_by_id(model_id)
+            ml_model_dto = ProjectService.get_ml_model_by_id(project_id)
             return ml_model_dto.to_primitive(), 200
         except NotFound:
             return err(404, "model not found"), 404
@@ -199,7 +199,7 @@ class ProjectAPI(Resource):
 
     @login_required
     @has_project_admin
-    def put(self, model_id):
+    def put(self, project_id):
         """
         Update an existing model
         ---
@@ -207,7 +207,7 @@ class ProjectAPI(Resource):
             - application/json
         parameters:
             - in: path
-              name: model_id
+              name: project_id
               description: ID of the Model to update
               required: true
               type: integer
@@ -238,8 +238,8 @@ class ProjectAPI(Resource):
         try:
             updated_model_dto = ProjectDTO(request.get_json())
             updated_model_dto.validate()
-            model_id = ProjectService.update_ml_model(updated_model_dto)
-            return {"model_id": model_id}, 200
+            project_id = ProjectService.update_ml_model(updated_model_dto)
+            return {"project_id": project_id}, 200
         except NotFound:
             return err(404, "model not found"), 404
         except Exception as e:
@@ -292,7 +292,7 @@ class GetAllModels(Resource):
 class PredictionImport(Resource):
     @login_required
     @has_project_write
-    def post(self, model_id, prediction_id):
+    def post(self, project_id, prediction_id):
         """
         Import a file of GeoJSON inferences into the prediction
 
@@ -347,12 +347,12 @@ class PredictionExport(Resource):
 
     @login_required
     @has_project_read
-    def get(self, model_id, prediction_id):
+    def get(self, project_id, prediction_id):
         """
         Export Geospatial Predictions
         ---
         parameters:
-            - name: model_id
+            - name: project_id
               in: path
               schema:
                 type: integer
@@ -619,7 +619,7 @@ class PredictionInfAPI(Resource):
 
     @login_required
     @has_project_write
-    def delete(self, model_id, prediction_id):
+    def delete(self, project_id, prediction_id):
         """
         Empty the SQS queue of chips to inference
         ---
@@ -636,7 +636,7 @@ class PredictionInfAPI(Resource):
             queues = boto3.client("sqs").list_queues(
                 QueueNamePrefix="{stack}-models-{model}-prediction-{pred}-".format(
                     stack=CONFIG.EnvironmentConfig.STACK,
-                    model=model_id,
+                    model=project_id,
                     pred=prediction_id,
                 )
             )
@@ -655,7 +655,7 @@ class PredictionInfAPI(Resource):
 
     @login_required
     @has_project_read
-    def get(self, model_id, prediction_id):
+    def get(self, project_id, prediction_id):
         """
         Return metadata about messages currently in the inference queue
         ---
@@ -715,7 +715,7 @@ class PredictionInfAPI(Resource):
 
     @login_required
     @has_project_write
-    def post(self, model_id, prediction_id):
+    def post(self, project_id, prediction_id):
         """
         Given a GeoJSON, xyz list, or tile list, submit it to the SQS queue
         ---
@@ -840,7 +840,7 @@ class PredictionInfAPI(Resource):
 class PredictionTfrecords(Resource):
     @login_required
     @has_project_write
-    def post(self, model_id, prediction_id):
+    def post(self, project_id, prediction_id):
         """
         Create a TFRecords file with validated predictions
         ---
@@ -870,7 +870,7 @@ class PredictionTfrecords(Resource):
                 jobDefinition=CONFIG.EnvironmentConfig.STACK + "-tfrecords-job",
                 containerOverrides={
                     "environment": [
-                        {"name": "MODEL_ID", "value": str(model_id)},
+                        {"name": "MODEL_ID", "value": str(project_id)},
                         {"name": "PREDICTION_ID", "value": str(prediction_id)},
                         {"name": "TILE_ENDPOINT", "value": str(pred.imagery_id)},
                     ]
@@ -893,7 +893,7 @@ class PredictionTfrecords(Resource):
 class PredictionRetrain(Resource):
     @login_required
     @has_project_write
-    def post(self, model_id, prediction_id):
+    def post(self, project_id, prediction_id):
         """
         Retrain a model with validated predictions
         ---
@@ -925,7 +925,7 @@ class PredictionRetrain(Resource):
                 jobDefinition=CONFIG.EnvironmentConfig.STACK + "-retrain-job",
                 containerOverrides={
                     "environment": [
-                        {"name": "MODEL_ID", "value": str(model_id)},
+                        {"name": "MODEL_ID", "value": str(project_id)},
                         {"name": "PREDICTION_ID", "value": str(prediction_id)},
                         {"name": "TILE_ENDPOINT", "value": str(pred.imagery_id)},
                         {"name": "CONFIG_RETRAIN", "value": str(json.dumps(payload))},
@@ -951,7 +951,7 @@ class PredictionAssetAPI(Resource):
 
     @login_required
     @has_project_write
-    def post(self, model_id, prediction_id):
+    def post(self, project_id, prediction_id):
         """
         Attach a raw model to a given predition
         ---
@@ -977,7 +977,7 @@ class PredictionAssetAPI(Resource):
             return err(400, "Unsupported type param"), 400
 
         key = "models/{0}/prediction/{1}/{2}.zip".format(
-            model_id, prediction_id, modeltype
+            project_id, prediction_id, modeltype
         )
 
         try:
@@ -1089,7 +1089,7 @@ class PredictionAssetAPI(Resource):
 
     @login_required
     @has_project_write
-    def get(self, model_id, prediction_id):
+    def get(self, project_id, prediction_id):
         """
         Download a prediction Asset
         ---
@@ -1110,12 +1110,12 @@ class PredictionAssetAPI(Resource):
 
         if modeltype == "container":
             key = "models/{0}/prediction/{1}/docker-models-{0}-prediction-{1}.tar.gz".format(
-                model_id, prediction_id
+                project_id, prediction_id
             )
 
         else:
             key = "models/{0}/prediction/{1}/{2}.zip".format(
-                model_id, prediction_id, modeltype
+                project_id, prediction_id, modeltype
             )
 
         try:
@@ -1155,7 +1155,7 @@ class PredictionAssetAPI(Resource):
 class PredictionValidity(Resource):
     @login_required
     @has_project_write
-    def post(self, model_id, prediction_id):
+    def post(self, project_id, prediction_id):
         try:
             payload = request.get_json()
 
@@ -1192,14 +1192,14 @@ class PredictionValidity(Resource):
 class PredictionSingleAPI(Resource):
     @login_required
     @has_project_read
-    def get(self, model_id, prediction_id):
+    def get(self, project_id, prediction_id):
         try:
             prediction = PredictionService.get_prediction_by_id(prediction_id)
 
             pred = {
                 "predictionsId": prediction.id,
                 "hint": prediction.hint,
-                "modelId": prediction.model_id,
+                "modelId": prediction.project_id,
                 "version": prediction.version,
                 "dockerUrl": prediction.docker_url,
                 "tileZoom": prediction.tile_zoom,
@@ -1228,7 +1228,7 @@ class PredictionAPI(Resource):
 
     @login_required
     @has_project_write
-    def post(self, model_id):
+    def post(self, project_id):
         """
         Store predictions for an ML Model
         ---
@@ -1270,10 +1270,10 @@ class PredictionAPI(Resource):
             payload = request.get_json()
 
             # check if this model exists
-            ProjectService.get_ml_model_by_id(model_id)
+            ProjectService.get_ml_model_by_id(project_id)
 
             # check if the version is registered
-            prediction_id = PredictionService.create(model_id, payload)
+            prediction_id = PredictionService.create(project_id, payload)
 
             return {"prediction_id": prediction_id}, 200
         except NotFound:
@@ -1290,7 +1290,7 @@ class PredictionAPI(Resource):
 
     @login_required
     @has_project_write
-    def patch(self, model_id, prediction_id):
+    def patch(self, project_id, prediction_id):
         """
         Allow updating of links in model
         ---
@@ -1298,7 +1298,7 @@ class PredictionAPI(Resource):
             - application/json
         parameters:
             - in: path
-              name: model_id
+              name: project_id
               description: ID of the Model
               required: true
               type: integer
@@ -1323,7 +1323,7 @@ class PredictionAPI(Resource):
 
             prediction_id = PredictionService.patch(prediction_id, updated_prediction)
 
-            return {"model_id": model_id, "prediction_id": prediction_id}, 200
+            return {"model_id": project_id, "prediction_id": prediction_id}, 200
         except NotFound:
             return err(404, "prediction not found"), 404
         except Exception as e:
@@ -1335,7 +1335,7 @@ class PredictionAPI(Resource):
 class GetAllPredictions(Resource):
     @login_required
     @has_project_read
-    def get(self, model_id):
+    def get(self, project_id):
         """
         Fetch all predictions for a model
         ---
@@ -1343,7 +1343,7 @@ class GetAllPredictions(Resource):
             - application/json
         parameters:
             - in: path
-              name: model_id
+              name: project_id
               description: ID of the Model
               required: true
               type: integer
@@ -1357,9 +1357,9 @@ class GetAllPredictions(Resource):
         """
         try:
             # check if this model exists
-            ml_model_dto = ProjectService.get_ml_model_by_id(model_id)
+            ml_model_dto = ProjectService.get_ml_model_by_id(project_id)
 
-            predictions = PredictionService.get_all_by_model(ml_model_dto.model_id)
+            predictions = PredictionService.get_all_by_model(ml_model_dto.project_id)
             return predictions, 200
         except PredictionsNotFound:
             return err(404, "Predictions not found"), 404
@@ -1376,7 +1376,7 @@ class PredictionTileMVT(Resource):
 
     @login_required
     @has_project_read
-    def get(self, model_id, prediction_id, z, x, y):
+    def get(self, project_id, prediction_id, z, x, y):
         """
         Mapbox Vector Tile Response
         ---
@@ -1384,7 +1384,7 @@ class PredictionTileMVT(Resource):
             - application/x-protobuf
         parameters:
             - in: path
-              name: model_id
+              name: project_id
               description: ID of the Model
               required: true
               type: integer
@@ -1418,7 +1418,7 @@ class PredictionTileMVT(Resource):
         """
 
         try:
-            tile = PredictionTileService.mvt(model_id, prediction_id, z, x, y)
+            tile = PredictionTileService.mvt(project_id, prediction_id, z, x, y)
 
             response = make_response(tile)
             response.headers["content-type"] = "application/x-protobuf"
@@ -1439,7 +1439,7 @@ class PredictionTileAPI(Resource):
 
     @login_required
     @has_project_read
-    def get(self, model_id, prediction_id):
+    def get(self, project_id, prediction_id):
         """
         TileJSON response for the predictions
         ---
@@ -1447,7 +1447,7 @@ class PredictionTileAPI(Resource):
             - application/json
         parameters:
             - in: path
-              name: model_id
+              name: project_id
               description: ID of the Model
               required: true
               type: integer
@@ -1466,7 +1466,7 @@ class PredictionTileAPI(Resource):
         """
 
         try:
-            return PredictionTileService.tilejson(model_id, prediction_id)
+            return PredictionTileService.tilejson(project_id, prediction_id)
         except PredictionsNotFound:
             return err(404, "Prediction TileJSON not found"), 404
         except Exception as e:

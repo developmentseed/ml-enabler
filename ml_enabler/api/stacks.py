@@ -99,9 +99,9 @@ def list():
 @login_required
 @has_project_write
 @stacks_bp.route(
-    "/v1/model/<int:model_id>/prediction/<int:prediction_id>/stack", methods=["POST"]
+    "/v1/model/<int:project_id>/prediction/<int:prediction_id>/stack", methods=["POST"]
 )
-def post(model_id, prediction_id):
+def post(project_id, prediction_id):
     if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
         return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
 
@@ -144,7 +144,7 @@ def post(model_id, prediction_id):
                     "ParameterKey": "Inferences",
                     "ParameterValue": pred.inf_list,
                 },
-                {"ParameterKey": "ModelId", "ParameterValue": str(model_id)},
+                {"ParameterKey": "ModelId", "ParameterValue": str(project_id)},
                 {"ParameterKey": "PredictionId", "ParameterValue": str(prediction_id)},
                 {
                     "ParameterKey": "ImageryId",
@@ -177,9 +177,10 @@ def post(model_id, prediction_id):
 @login_required
 @has_project_write
 @stacks_bp.route(
-    "/v1/model/<int:model_id>/prediction/<int:prediction_id>/stack", methods=["DELETE"]
+    "/v1/model/<int:project_id>/prediction/<int:prediction_id>/stack",
+    methods=["DELETE"],
 )
-def delete(model_id, prediction_id):
+def delete(project_id, prediction_id):
     if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
         return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
 
@@ -207,9 +208,9 @@ def delete(model_id, prediction_id):
 @login_required
 @has_project_read
 @stacks_bp.route(
-    "/v1/model/<int:model_id>/prediction/<int:prediction_id>/stack", methods=["GET"]
+    "/v1/model/<int:project_id>/prediction/<int:prediction_id>/stack", methods=["GET"]
 )
-def get(model_id, prediction_id):
+def get(project_id, prediction_id):
     """
     Return status of a prediction stack
     ---

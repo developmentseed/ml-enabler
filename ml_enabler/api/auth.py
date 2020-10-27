@@ -17,7 +17,7 @@ auth_bp = Blueprint("auth_bp", __name__)
 def has_admin(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        model_id = kwargs.get("model_id")
+        project_id = kwargs.get("project_id")
 
         if current_user.is_authenticated and current_user.name == "machine":
             return f(*args, **kwargs)
@@ -33,16 +33,16 @@ def has_admin(f):
 def has_project_read(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        model_id = kwargs.get("model_id")
+        project_id = kwargs.get("project_id")
 
         if current_user.is_authenticated and current_user.name == "machine":
             return f(*args, **kwargs)
 
-        project = Project.get(model_id)
+        project = Project.get(project_id)
         if project.access == "public":
             return f(*args, **kwargs)
 
-        for user in ProjectAccess.list(model_id):
+        for user in ProjectAccess.list(project_id):
             if current_user.is_authenticated and current_user.id == user.get("uid"):
                 return f(*args, **kwargs)
 
@@ -54,12 +54,12 @@ def has_project_read(f):
 def has_project_write(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        model_id = kwargs.get("model_id")
+        project_id = kwargs.get("project_id")
 
         if current_user.is_authenticated and current_user.name == "machine":
             return f(*args, **kwargs)
 
-        for user in ProjectAccess.list(model_id):
+        for user in ProjectAccess.list(project_id):
             if (
                 current_user.is_authenticated
                 and current_user.id == user.get("uid")
@@ -75,12 +75,12 @@ def has_project_write(f):
 def has_project_admin(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        model_id = kwargs.get("model_id")
+        project_id = kwargs.get("project_id")
 
         if current_user.is_authenticated and current_user.name == "machine":
             return f(*args, **kwargs)
 
-        for user in ProjectAccess.list(model_id):
+        for user in ProjectAccess.list(project_id):
             if (
                 current_user.is_authenticated
                 and current_user.id == user.get("uid")
