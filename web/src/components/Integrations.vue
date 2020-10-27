@@ -49,7 +49,7 @@ export default {
                 const body = await res.json();
                 if (!res.ok) throw new Error(body.message);
                 this.integrations = body;
-                this.$emit('count', integrations.length);
+                this.$emit('count', this.integrations.length);
             } catch (err) {
                 this.$emit('err', err);
             }

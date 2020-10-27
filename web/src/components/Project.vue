@@ -34,7 +34,7 @@
                         <svg v-if='!folding.iterations' class='icon fl my6'><use xlink:href='#icon-chevron-down'/></svg>
                         <svg v-else class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg>
 
-                        <span class='fl pl6'>Model Iterations</span>
+                        <span class='fl pl6'>Iterations</span>
 
                     </button>
 
