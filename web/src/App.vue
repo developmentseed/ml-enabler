@@ -7,13 +7,13 @@
                     <h1 @click='$router.push({ path: "/" })' class='align-center txt-h3 cursor-default txt-underline-on-hover cursor-pointer'>ML Enabler</h1>
                 </div>
                 <div v-if='!loading.user && $route.path !== "/login"' class='col col--3'>
-                    <button v-if='user.name' @click='$router.push({ path: "/profile" })' class='dropdown btn fr h40 mr6 mb6 pb3 round btn--stroke color-gray color-blue-on-hover'>
+                    <button v-if='user.name' @click='$router.push({ path: "/profile" })' class='dropdown btn fr mr6 mb6 pb3 round btn--stroke color-gray color-blue-on-hover'>
                         <svg class='icon inline'><use href='#icon-chevron-down'/></svg>
                         <span v-text='user.name'/>
 
                         <div class='round dropdown-content color-black' style='top: 24px;'>
-                            <div @click='$router.push({ path: "/profile" })' class='round bg-gray-faint-on-hover'>Profile</div>
-                            <div @click='$router.push({ path: `/model/${$route.params.modelid}/training` })' class='round bg-gray-faint-on-hover'>Logout</div>
+                            <div @click.stop='$router.push({ path: "/profile" })' class='round bg-gray-faint-on-hover'>Profile</div>
+                            <div @click.stop='getLogout' class='round bg-gray-faint-on-hover'>Logout</div>
                         </div>
                     </button>
 
@@ -99,6 +99,20 @@ export default {
         external: function(url) {
             if (!url) return;
             window.open(url, "_blank")
+        },
+        getLogout: async function() {
+            try {
+                this.loading.user = true;
+                const res = await fetch(window.api + '/v1/user/logout', {
+                    method: 'GET'
+                });
+                const body = await res.json();
+                if (!res.ok) throw new Error(body.message);
+
+                window.location.href = window.api;
+            } catch (err) {
+                this.err = err;
+            }
         },
         getMeta: async function() {
             try {
