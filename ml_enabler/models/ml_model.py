@@ -9,11 +9,17 @@ from sqlalchemy.sql import func, text
 from sqlalchemy.sql.expression import cast
 import sqlalchemy
 from flask_login import UserMixin
-from ml_enabler.models.dtos.dtos import ProjectDTO, PredictionDTO, ProjectAccessDTO, UserDTO
+from ml_enabler.models.dtos.dtos import (
+    ProjectDTO,
+    PredictionDTO,
+    ProjectAccessDTO,
+    UserDTO,
+)
 from ml_enabler import db
 
+
 class User(UserMixin, db.Model):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, unique=True)
@@ -27,19 +33,24 @@ class User(UserMixin, db.Model):
         self.access = dto.access
         self.password = dto.password
 
-        results = db.session.execute(text('''
+        results = db.session.execute(
+            text(
+                """
             INSERT INTO users (name, email, access, password) VALUES (
                 :name,
                 :email,
                 :access,
                 crypt(:password, gen_salt('bf', 10))
             ) RETURNING id
-        '''), {
-            'name': self.name,
-            'email': self.email,
-            'access': self.access,
-            'password': self.password
-        }).fetchall()
+        """
+            ),
+            {
+                "name": self.name,
+                "email": self.email,
+                "access": self.access,
+                "password": self.password,
+            },
+        ).fetchall()
 
         db.session.commit()
 
@@ -52,7 +63,9 @@ class User(UserMixin, db.Model):
         Get all users in the database
         """
 
-        results = db.session.execute(text('''
+        results = db.session.execute(
+            text(
+                """
             SELECT
                 count(*) OVER() AS count,
                 id,
@@ -70,42 +83,43 @@ class User(UserMixin, db.Model):
                 :limit
             OFFSET
                 :page
-        '''), {
-            'limit': limit,
-            'page': page * limit,
-            'filter': user_filter
-        }).fetchall()
+        """
+            ),
+            {"limit": limit, "page": page * limit, "filter": user_filter},
+        ).fetchall()
 
         return {
-            'total': results[0][0] if len(results) > 0 else 0,
-            'users': [ {
-                'id': u[1],
-                'name': u[2],
-                'access': u[3],
-                'email': u[4]
-            } for u in results ]
+            "total": results[0][0] if len(results) > 0 else 0,
+            "users": [
+                {"id": u[1], "name": u[2], "access": u[3], "email": u[4]}
+                for u in results
+            ],
         }
 
         return results
 
     def password_check(self, test):
-        results = db.session.execute(text('''
+        results = db.session.execute(
+            text(
+                """
              SELECT
                 password = crypt(:test, password)
             FROM
                 users
             WHERE
                 id = :uid
-        '''), {
-            'test': test,
-            'uid': self.id
-        }).fetchall()
+        """
+            ),
+            {"test": test, "uid": self.id},
+        ).fetchall()
 
         return results[0][0]
 
+
 class Prediction(db.Model):
     """ Predictions from a model at a given time """
-    __tablename__ = 'predictions'
+
+    __tablename__ = "predictions"
 
     id = db.Column(db.Integer, primary_key=True)
     created = db.Column(db.DateTime, default=timestamp, nullable=False)
@@ -117,9 +131,7 @@ class Prediction(db.Model):
     imagery_id = db.Column(db.BigInteger, nullable=True)
 
     model_id = db.Column(
-        db.BigInteger,
-        db.ForeignKey('projects.id', name='fk_models'),
-        nullable=False
+        db.BigInteger, db.ForeignKey("projects.id", name="fk_models"), nullable=False
     )
 
     version = db.Column(db.String, nullable=False)
@@ -128,8 +140,8 @@ class Prediction(db.Model):
     tile_zoom = db.Column(db.Integer, nullable=False)
 
     log_link = db.Column(db.String)
-    model_link =  db.Column(db.String)
-    docker_link =  db.Column(db.String)
+    model_link = db.Column(db.String)
+    docker_link = db.Column(db.String)
     save_link = db.Column(db.String)
     tfrecord_link = db.Column(db.String)
     checkpoint_link = db.Column(db.String)
@@ -178,13 +190,17 @@ class Prediction(db.Model):
         db.session.commit()
 
     def export(self):
-        return db.session.query(
-            PredictionTile.id,
-            PredictionTile.quadkey,
-            ST_AsGeoJSON(PredictionTile.geom).label('geometry'),
-            PredictionTile.predictions,
-            PredictionTile.validity
-        ).filter(PredictionTile.prediction_id == self.id).yield_per(100)
+        return (
+            db.session.query(
+                PredictionTile.id,
+                PredictionTile.quadkey,
+                ST_AsGeoJSON(PredictionTile.geom).label("geometry"),
+                PredictionTile.predictions,
+                PredictionTile.validity,
+            )
+            .filter(PredictionTile.prediction_id == self.id)
+            .yield_per(100)
+        )
 
     @staticmethod
     def get(prediction_id: int):
@@ -211,7 +227,7 @@ class Prediction(db.Model):
             Prediction.inf_type,
             Prediction.inf_binary,
             Prediction.inf_supertile,
-            Prediction.imagery_id
+            Prediction.imagery_id,
         ).filter(Prediction.id == prediction_id)
 
         return Prediction.query.get(prediction_id)
@@ -241,7 +257,7 @@ class Prediction(db.Model):
             Prediction.inf_type,
             Prediction.inf_binary,
             Prediction.inf_supertile,
-            Prediction.imagery_id
+            Prediction.imagery_id,
         ).filter(Prediction.model_id == model_id)
 
         return query.all()
@@ -281,25 +297,26 @@ class Prediction(db.Model):
 
 class PredictionTile(db.Model):
     """ Store individual tile predictions """
-    __tablename__ = 'prediction_tiles'
+
+    __tablename__ = "prediction_tiles"
 
     id = db.Column(db.Integer, primary_key=True)
 
     prediction_id = db.Column(
         db.BigInteger,
-        db.ForeignKey('predictions.id', name='fk_predictions'),
-        nullable=False
+        db.ForeignKey("predictions.id", name="fk_predictions"),
+        nullable=False,
     )
 
     quadkey = db.Column(db.String, nullable=True)
-    geom = db.Column(Geometry('POLYGON', srid=4326), nullable=False)
+    geom = db.Column(Geometry("POLYGON", srid=4326), nullable=False)
     predictions = db.Column(postgresql.JSONB, nullable=False)
     validity = db.Column(MutableDict.as_mutable(postgresql.JSONB), nullable=True)
 
     prediction_tiles_quadkey_idx = db.Index(
-        'prediction_tiles_quadkey_idx',
-        'prediction_tiles.quadkey',
-        postgresql_ops={ 'quadkey': 'text_pattern_ops' }
+        "prediction_tiles_quadkey_idx",
+        "prediction_tiles.quadkey",
+        postgresql_ops={"quadkey": "text_pattern_ops"},
     )
 
     @staticmethod
@@ -320,16 +337,19 @@ class PredictionTile(db.Model):
 
     @staticmethod
     def inferences(prediction_id: int):
-        results = db.session.execute(text('''
+        results = db.session.execute(
+            text(
+                """
              SELECT
                 DISTINCT jsonb_object_keys(predictions)
             FROM
                 prediction_tiles
             WHERE
                 prediction_id = :pred
-        '''), {
-            'pred': prediction_id
-        }).fetchall()
+        """
+            ),
+            {"pred": prediction_id},
+        ).fetchall()
 
         inferences = []
         for res in results:
@@ -339,26 +359,31 @@ class PredictionTile(db.Model):
 
     @staticmethod
     def count(prediction_id: int):
-        return db.session.query(
-            func.count(PredictionTile.geom).label("count")
-        ).filter(PredictionTile.prediction_id == prediction_id).one()
+        return (
+            db.session.query(func.count(PredictionTile.geom).label("count"))
+            .filter(PredictionTile.prediction_id == prediction_id)
+            .one()
+        )
 
     @staticmethod
     def bbox(prediction_id: int):
-        result = db.session.execute(text('''
+        result = db.session.execute(
+            text(
+                """
             SELECT
                 ST_Extent(geom)
             FROM
                 prediction_tiles
             WHERE
                 prediction_id = :pred
-        '''), {
-            'pred': prediction_id
-        }).fetchone()
+        """
+            ),
+            {"pred": prediction_id},
+        ).fetchone()
 
         bbox = []
-        for corners in result[0].replace('BOX(', '').replace(')', '').split(' '):
-            for corner in corners.split(','):
+        for corners in result[0].replace("BOX(", "").replace(")", "").split(" "):
+            for corner in corners.split(","):
                 bbox.append(float(corner))
 
         return bbox
@@ -366,7 +391,9 @@ class PredictionTile(db.Model):
     def mvt(prediction_id: int, z: int, x: int, y: int):
         grid = mercantile.xy_bounds(x, y, z)
 
-        result = db.session.execute(text('''
+        result = db.session.execute(
+            text(
+                """
             SELECT
                 ST_AsMVT(q, 'data', 4096, 'geom', 'id') AS mvt
             FROM (
@@ -391,39 +418,61 @@ class PredictionTile(db.Model):
                     p.prediction_id = :pred
                     AND ST_Intersects(p.geom, ST_Transform(ST_MakeEnvelope(:minx, :miny, :maxx, :maxy, 3857), 4326))
             ) q
-        '''), {
-            'pred': prediction_id,
-            'minx': grid[0],
-            'miny': grid[1],
-            'maxx': grid[2],
-            'maxy': grid[3]
-        }).fetchone()
+        """
+            ),
+            {
+                "pred": prediction_id,
+                "minx": grid[0],
+                "miny": grid[1],
+                "maxx": grid[2],
+                "maxy": grid[3],
+            },
+        ).fetchone()
 
         return bytes(result.values()[0])
 
     @staticmethod
     def get_tiles_by_quadkey(prediction_id: int, quadkeys: tuple, zoom: int):
-        return db.session.query(
-            func.substr(PredictionTile.quadkey, 1, zoom).label('qaudkey'),
-            func.avg(cast(cast(PredictionTile.predictions['ml_prediction'], sqlalchemy.String), sqlalchemy.Float)).label('ml_prediction'),
-            func.avg(cast(cast(PredictionTile.predictions['osm_building_area'], sqlalchemy.String), sqlalchemy.Float)).label('osm_building_area')
-        ).filter(PredictionTile.prediction_id == prediction_id).filter(func.substr(PredictionTile.quadkey, 1, zoom).in_(quadkeys)).group_by(func.substr(PredictionTile.quadkey, 1, zoom)).all()
+        return (
+            db.session.query(
+                func.substr(PredictionTile.quadkey, 1, zoom).label("qaudkey"),
+                func.avg(
+                    cast(
+                        cast(
+                            PredictionTile.predictions["ml_prediction"],
+                            sqlalchemy.String,
+                        ),
+                        sqlalchemy.Float,
+                    )
+                ).label("ml_prediction"),
+                func.avg(
+                    cast(
+                        cast(
+                            PredictionTile.predictions["osm_building_area"],
+                            sqlalchemy.String,
+                        ),
+                        sqlalchemy.Float,
+                    )
+                ).label("osm_building_area"),
+            )
+            .filter(PredictionTile.prediction_id == prediction_id)
+            .filter(func.substr(PredictionTile.quadkey, 1, zoom).in_(quadkeys))
+            .group_by(func.substr(PredictionTile.quadkey, 1, zoom))
+            .all()
+        )
+
 
 class ProjectAccess(db.Model):
-    __tablename__ = 'projects_access'
+    __tablename__ = "projects_access"
 
     id = db.Column(db.Integer, primary_key=True)
 
     model_id = db.Column(
-        db.BigInteger,
-        db.ForeignKey('projects.id', name='fk_projects'),
-        nullable=False
+        db.BigInteger, db.ForeignKey("projects.id", name="fk_projects"), nullable=False
     )
 
     uid = db.Column(
-        db.BigInteger,
-        db.ForeignKey('users.id', name='fk_users'),
-        nullable=False
+        db.BigInteger, db.ForeignKey("users.id", name="fk_users"), nullable=False
     )
 
     access = db.Column(db.String, nullable=False)
@@ -446,8 +495,7 @@ class ProjectAccess(db.Model):
         """
 
         return ProjectAccess.query.filter(
-            ProjectAccess.id == access_id,
-            ProjectAccess.model_id == model_id
+            ProjectAccess.id == access_id, ProjectAccess.model_id == model_id
         ).one_or_none()
 
     @staticmethod
@@ -455,14 +503,14 @@ class ProjectAccess(db.Model):
         uids = []
 
         for user in new_users:
-            user['model_id'] = model_id
+            user["model_id"] = model_id
 
         # Update all new users
         for user in new_users:
-            uids.append(int(user.get('uid')))
-            user['model_id'] = model_id
+            uids.append(int(user.get("uid")))
+            user["model_id"] = model_id
 
-            access = ProjectAccess.get_uid(model_id, user.get('id'))
+            access = ProjectAccess.get_uid(model_id, user.get("id"))
 
             if not access:
                 access = ProjectAccess()
@@ -471,10 +519,9 @@ class ProjectAccess(db.Model):
                 access.update(user)
 
         for user in current_users:
-            if user.get('uid') not in uids:
-                access = ProjectAccess.get_uid(model_id, user.get('id'))
+            if user.get("uid") not in uids:
+                access = ProjectAccess.get_uid(model_id, user.get("id"))
                 access.delete()
-
 
     @staticmethod
     def list(model_id: int):
@@ -484,29 +531,28 @@ class ProjectAccess(db.Model):
             User.name,
             ProjectAccess.model_id,
             ProjectAccess.access,
-        ).filter(
-            ProjectAccess.model_id == model_id,
-            User.id == ProjectAccess.uid
-        )
+        ).filter(ProjectAccess.model_id == model_id, User.id == ProjectAccess.uid)
 
         users = []
         for access in query.all():
-            users.append({
-                "id": access[0],
-                "uid": access[1],
-                "name": access[2],
-                "model_id": access[3],
-                "access": access[4]
-            })
+            users.append(
+                {
+                    "id": access[0],
+                    "uid": access[1],
+                    "name": access[2],
+                    "model_id": access[3],
+                    "access": access[4],
+                }
+            )
 
         return users
 
     def create(self, dto: ProjectAccessDTO):
         """ Creates and saves the current project access dto to the DB """
 
-        self.model_id = dto.get('model_id')
-        self.uid = dto.get('uid')
-        self.access = dto.get('access')
+        self.model_id = dto.get("model_id")
+        self.uid = dto.get("uid")
+        self.access = dto.get("access")
 
         db.session.add(self)
         db.session.commit()
@@ -514,7 +560,7 @@ class ProjectAccess(db.Model):
 
     def update(self, dto: ProjectAccessDTO):
         """ Updates an project access """
-        self.access = dto['access']
+        self.access = dto["access"]
         db.session.commit()
 
     def delete(self):
@@ -522,9 +568,11 @@ class ProjectAccess(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+
 class Project(db.Model):
     """ Describes an ML model registered with the service """
-    __tablename__ = 'projects'
+
+    __tablename__ = "projects"
 
     id = db.Column(db.Integer, primary_key=True)
     created = db.Column(db.DateTime, default=timestamp, nullable=False)
@@ -536,10 +584,7 @@ class Project(db.Model):
     access = db.Column(db.String)
     notes = db.Column(db.String)
     predictions = db.relationship(
-        Prediction,
-        backref='projects',
-        cascade='all, delete-orphan',
-        lazy='dynamic'
+        Prediction, backref="projects", cascade="all, delete-orphan", lazy="dynamic"
     )
 
     def create(self, dto: ProjectDTO):
@@ -576,15 +621,12 @@ class Project(db.Model):
         Get all models in the database
         """
         return Project.query.filter(
-            Project.name.ilike(model_filter + '%'),
+            Project.name.ilike(model_filter + "%"),
             Project.archived == model_archived,
             or_(
                 Project.access == "public",
-                and_(
-                    ProjectAccess.uid == uid,
-                    ProjectAccess.model_id == Project.id
-                )
-            )
+                and_(ProjectAccess.uid == uid, ProjectAccess.model_id == Project.id),
+            ),
         ).all()
 
     def delete(self):
@@ -624,4 +666,3 @@ class Project(db.Model):
         self.notes = dto.notes
 
         db.session.commit()
-

@@ -3,37 +3,35 @@ from ml_enabler.models.dtos.dtos import AOIDTO
 from geoalchemy2 import Geometry
 import shapely
 
+
 class AOI(db.Model):
-    __tablename__ = 'model_aoi'
+    __tablename__ = "model_aoi"
 
     id = db.Column(db.Integer, primary_key=True)
 
     name = db.Column(db.String, nullable=False)
 
     model_id = db.Column(
-        db.BigInteger,
-        db.ForeignKey('projects.id', name='fk_projects'),
-        nullable=False
+        db.BigInteger, db.ForeignKey("projects.id", name="fk_projects"), nullable=False
     )
     pred_id = db.Column(
         db.BigInteger,
-        db.ForeignKey('predictions.id', name='fk_predictions'),
-        nullable=False
+        db.ForeignKey("predictions.id", name="fk_predictions"),
+        nullable=False,
     )
 
-    bounds = db.Column(Geometry('POLYGON', srid=4326), nullable=False)
+    bounds = db.Column(Geometry("POLYGON", srid=4326), nullable=False)
 
     def create(self, payload: dict):
-        self.model_id = payload['model_id']
-        self.pred_id = payload['pred_id']
-        self.name = payload['name']
+        self.model_id = payload["model_id"]
+        self.pred_id = payload["pred_id"]
+        self.name = payload["name"]
 
-        bounds = payload['bounds'].split(',')
-        self.bounds = "SRID=4326;POLYGON(({0} {1},{0} {3},{2} {3},{2} {1},{0} {1}))".format(
-            bounds[0],
-            bounds[1],
-            bounds[2],
-            bounds[3]
+        bounds = payload["bounds"].split(",")
+        self.bounds = (
+            "SRID=4326;POLYGON(({0} {1},{0} {3},{2} {3},{2} {1},{0} {1}))".format(
+                bounds[0], bounds[1], bounds[2], bounds[3]
+            )
         )
 
         db.session.add(self)
@@ -42,9 +40,7 @@ class AOI(db.Model):
         return self
 
     def list(model_id: int, pred_id: int):
-        filters = [
-            AOI.model_id == model_id
-        ]
+        filters = [AOI.model_id == model_id]
 
         if pred_id is not None:
             filters.append(AOI.pred_id == pred_id)
@@ -58,6 +54,8 @@ class AOI(db.Model):
         dto.model_id = self.model_id
         dto.name = self.name
 
-        dto.bounds = ','.join(map(str, shapely.wkb.loads(self.bounds.desc, hex=True).bounds))
+        dto.bounds = ",".join(
+            map(str, shapely.wkb.loads(self.bounds.desc, hex=True).bounds)
+        )
 
         return dto

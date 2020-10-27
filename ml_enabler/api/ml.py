@@ -16,12 +16,14 @@ from flask_restful import Resource, request, current_app
 from flask import Response
 from schematics.exceptions import DataError
 from ml_enabler.services.project_service import ProjectService
-from ml_enabler.services.prediction_service import PredictionService, PredictionTileService
+from ml_enabler.services.prediction_service import (
+    PredictionService,
+    PredictionTileService,
+)
 from ml_enabler.services.task_service import TaskService
 from ml_enabler.services.imagery_service import ImageryService
 from ml_enabler.utils import err
-from ml_enabler.models.utils import NotFound, VersionExists, \
-    PredictionsNotFound
+from ml_enabler.models.utils import NotFound, VersionExists, PredictionsNotFound
 from ml_enabler.utils import InvalidGeojson, NoValid
 from ml_enabler.api.auth import has_project_read, has_project_write
 from flask_login import login_required
@@ -32,14 +34,14 @@ import requests
 
 import logging
 from flask import Flask
+
 app = Flask(__name__)
-gunicorn_logger = logging.getLogger('gunicorn.error')
+gunicorn_logger = logging.getLogger("gunicorn.error")
 app.logger.handlers = gunicorn_logger.handlers
 app.logger.setLevel(gunicorn_logger.level)
 
 
 class MetaAPI(Resource):
-
     def get(self):
         """
         Return metadata about the API
@@ -53,10 +55,10 @@ class MetaAPI(Resource):
         # -- NOT AUTHENTICATED --
         # Do not put sensitive data in this response
         return {
-            'version': 1,
-            'stack': CONFIG.EnvironmentConfig.STACK,
-            'environment': CONFIG.EnvironmentConfig.ENVIRONMENT,
-            'security': 'authenticated'
+            "version": 1,
+            "stack": CONFIG.EnvironmentConfig.STACK,
+            "environment": CONFIG.EnvironmentConfig.ENVIRONMENT,
+            "security": "authenticated",
         }, 200
 
 
@@ -72,21 +74,19 @@ class StatusCheckAPI(Resource):
                 description: API status check success
         """
 
-        return {'hello': 'world'}, 200
+        return {"hello": "world"}, 200
 
 
 class MapboxAPI(Resource):
     @login_required
     def get(self):
-        return {
-            "token": CONFIG.EnvironmentConfig.MAPBOX_TOKEN
-        }, 200
+        return {"token": CONFIG.EnvironmentConfig.MAPBOX_TOKEN}, 200
 
 
 class PredictionImport(Resource):
     @login_required
     @has_project_write
-    def post(self, model_id, prediction_id):
+    def post(self, project_id, prediction_id):
         """
         Import a file of GeoJSON inferences into the prediction
 
@@ -114,7 +114,7 @@ class PredictionImport(Resource):
 
             infstream = io.BytesIO()
             inferences.save(infstream)
-            inferences = infstream.getvalue().decode('UTF-8').split('\n')
+            inferences = infstream.getvalue().decode("UTF-8").split("\n")
 
             data = []
             for inf in inferences:
@@ -129,7 +129,7 @@ class PredictionImport(Resource):
         except PredictionsNotFound:
             return err(404, "Predictions not found"), 404
         except Exception as e:
-            error_msg = f'Unhandled error: {str(e)}'
+            error_msg = f"Unhandled error: {str(e)}"
             current_app.logger.error(error_msg)
             return err(500, error_msg), 500
 
@@ -141,12 +141,12 @@ class PredictionExport(Resource):
 
     @login_required
     @has_project_read
-    def get(self, model_id, prediction_id):
+    def get(self, project_id, prediction_id):
         """
         Export Geospatial Predictions
         ---
         parameters:
-            - name: model_id
+            - name: project_id
               in: path
               schema:
                 type: integer
@@ -190,9 +190,9 @@ class PredictionExport(Resource):
             200:
                 description: Exported Data
         """
-        req_format = request.args.get('format', 'geojson')
-        req_inferences = request.args.get('inferences', 'all')
-        req_threshold = request.args.get('threshold', '0')
+        req_format = request.args.get("format", "geojson")
+        req_inferences = request.args.get("inferences", "all")
+        req_threshold = request.args.get("threshold", "0")
         req_threshold = float(req_threshold)
 
         stream = PredictionService.export(prediction_id)
@@ -205,7 +205,7 @@ class PredictionExport(Resource):
 
         first = False
 
-        if req_inferences != 'all':
+        if req_inferences != "all":
             inferences = [req_inferences]
 
         def generate_npz():
@@ -217,58 +217,69 @@ class PredictionExport(Resource):
 
             # get chip list csv as dataframe to match up chip-lst name + geometry with geometry in the predictions database
 
-            labels_dict ={}
+            labels_dict = {}
             for row in stream:
-                if req_inferences != 'all' and row[3].get(req_inferences) is None:
+                if req_inferences != "all" and row[3].get(req_inferences) is None:
                     continue
 
-                if req_inferences != 'all' and row[3].get(req_inferences) <= req_threshold:
+                if (
+                    req_inferences != "all"
+                    and row[3].get(req_inferences) <= req_threshold
+                ):
                     continue
 
                 # set labels.npz key to be x-y-z tile either from quadkey or wkt geometry
-                if i_info['fmt'] == "wms":
+                if i_info["fmt"] == "wms":
                     if row[1]:
-                        t = '-'.join([str(i) for i in mercantile.quadkey_to_tile(row[1])])
+                        t = "-".join(
+                            [str(i) for i in mercantile.quadkey_to_tile(row[1])]
+                        )
                     else:
                         s = shape(json.loads(row[2])).centroid
-                        t = '-'.join([str(i) for i in mercantile.tile(s.x, s.y, z)])
-                if i_info['fmt'] == "list":
-                    r = requests.get(c_list['url'])
+                        t = "-".join([str(i) for i in mercantile.tile(s.x, s.y, z)])
+                if i_info["fmt"] == "list":
+                    r = requests.get(c_list["url"])
                     df = pd.read_csv(io.StringIO(r.text))
-                    df['c'] = df['bounds'].apply(lambda x: box(*[float(n) for n in x.split(',')]))
-                    gdf = gpd.GeoDataFrame(df, crs="EPSG:4326", geometry=df['c'])
+                    df["c"] = df["bounds"].apply(
+                        lambda x: box(*[float(n) for n in x.split(",")])
+                    )
+                    gdf = gpd.GeoDataFrame(df, crs="EPSG:4326", geometry=df["c"])
                     # get tile name that where chip-list geom and geom in prediction row match
                     pred_centroid = shape(json.loads(row[2]))
-                    gdf_2 = gpd.GeoDataFrame({'geometry': [shape(json.loads(row[2]))]}, crs="EPSG:4326")
+                    gdf_2 = gpd.GeoDataFrame(
+                        {"geometry": [shape(json.loads(row[2]))]}, crs="EPSG:4326"
+                    )
                     # To-DO account for no overlap case
-                    i = gpd.overlay(gdf, gdf_2, how='intersection')
-                    tiles_intersection = i['name'].tolist()
+                    i = gpd.overlay(gdf, gdf_2, how="intersection")
+                    tiles_intersection = i["name"].tolist()
 
                 # convert raw predictions into 0 or 1 based on threshold
                 raw_pred = []
                 i_lst = pred.inf_list.split(",")
                 for num, inference in enumerate(i_lst):
                     raw_pred.append(row[3][inference])
-                if  req_inferences == 'all':
-                    req_threshold = request.args.get('threshold', '0.5')
+                if req_inferences == "all":
+                    req_threshold = request.args.get("threshold", "0.5")
                     req_threshold = float(req_threshold)
                 l = [1 if score >= req_threshold else 0 for score in raw_pred]
 
                 # special case for training and not predictions
-                if hint == 'training':
-                    if i_info['fmt'] == "list":
+                if hint == "training":
+                    if i_info["fmt"] == "list":
                         for chip_name in tiles_intersection:
                             labels_dict.update({chip_name: l})
                     else:
                         labels_dict.update({t: l})
                 elif row[4]:
-                    t = '-'.join([str(i) for i in mercantile.quadkey_to_tile(row[1])])
+                    t = "-".join([str(i) for i in mercantile.quadkey_to_tile(row[1])])
 
                     # special case for binary
                     if pred.inf_binary and len(i_lst) != 2:
                         return err(400, "binary models must have two catagories"), 400
                     if len(i_lst) == 2 and pred.inf_binary:
-                        if list(row[4].values())[0]:  # validated and true, keep original
+                        if list(row[4].values())[
+                            0
+                        ]:  # validated and true, keep original
                             labels_dict.update({t: l})
                         else:
                             if l == [1, 0]:
@@ -304,10 +315,13 @@ class PredictionExport(Resource):
                 csv.writer(output, quoting=csv.QUOTE_NONNUMERIC).writerow(rowdata)
                 yield output.getvalue()
             for row in stream:
-                if req_inferences != 'all' and row[3].get(req_inferences) is None:
+                if req_inferences != "all" and row[3].get(req_inferences) is None:
                     continue
 
-                if req_inferences != 'all' and row[3].get(req_inferences) <= req_threshold:
+                if (
+                    req_inferences != "all"
+                    and row[3].get(req_inferences) <= req_threshold
+                ):
                     continue
 
                 if req_format == "geojson" or req_format == "geojsonld":
@@ -315,7 +329,7 @@ class PredictionExport(Resource):
                     if row[4]:
                         properties_dict = row[3]
                         valid_dict = {}
-                        valid_dict.update({'validity': row[4]})
+                        valid_dict.update({"validity": row[4]})
                         properties_dict.update(valid_dict)
                     else:
                         properties_dict = row[3]
@@ -324,16 +338,16 @@ class PredictionExport(Resource):
                         "quadkey": row[1],
                         "type": "Feature",
                         "properties": properties_dict,
-                        "geometry": json.loads(row[2])
+                        "geometry": json.loads(row[2]),
                     }
                     if req_format == "geojsonld":
-                        yield json.dumps(feat) + '\n'
+                        yield json.dumps(feat) + "\n"
                     elif req_format == "geojson":
-                        if first == False:
+                        if first is False:
                             first = True
-                            yield '\n' + json.dumps(feat)
+                            yield "\n" + json.dumps(feat)
                         else:
-                            yield ',\n' + json.dumps(feat)
+                            yield ",\n" + json.dumps(feat)
                 elif req_format == "csv":
                     output = io.StringIO()
                     rowdata = [row[0], row[1], row[2]]
@@ -342,10 +356,16 @@ class PredictionExport(Resource):
                     csv.writer(output, quoting=csv.QUOTE_NONNUMERIC).writerow(rowdata)
                     yield output.getvalue()
                 else:
-                    return err(501, "not a valid export type, valid export types are: geojson, csv, and npz"), 501
+                    return (
+                        err(
+                            501,
+                            "not a valid export type, valid export types are: geojson, csv, and npz",
+                        ),
+                        501,
+                    )
 
             if req_format == "geojson":
-                yield ']}'
+                yield "]}"
 
         if req_format == "csv":
             mime = "text/csv"
@@ -357,25 +377,34 @@ class PredictionExport(Resource):
             mime = "application/npz"
         if req_format == "npz":
             try:
-                npz = generate_npz()
                 return Response(
-                response=generate_npz(),
-                mimetype=mime,
-                status=200,
-                headers={
-                    "Content-Disposition": 'attachment; filename="export.' + req_format + '"'
-                }
-            )
+                    response=generate_npz(),
+                    mimetype=mime,
+                    status=200,
+                    headers={
+                        "Content-Disposition": 'attachment; filename="export.'
+                        + req_format
+                        + '"'
+                    },
+                )
             except NoValid:
-                return err(400, "Can only return npz if predictions are validated. Currently there are no valid predictions"), 400
+                return (
+                    err(
+                        400,
+                        "Can only return npz if predictions are validated. Currently there are no valid predictions",
+                    ),
+                    400,
+                )
         else:
             return Response(
                 generate(),
                 mimetype=mime,
                 status=200,
                 headers={
-                    "Content-Disposition": 'attachment; filename="export.' + req_format + '"'
-                }
+                    "Content-Disposition": 'attachment; filename="export.'
+                    + req_format
+                    + '"'
+                },
             )
 
 
@@ -384,7 +413,7 @@ class PredictionInfAPI(Resource):
 
     @login_required
     @has_project_write
-    def delete(self, model_id, prediction_id):
+    def delete(self, project_id, prediction_id):
         """
         Empty the SQS queue of chips to inference
         ---
@@ -398,37 +427,29 @@ class PredictionInfAPI(Resource):
             return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
 
         try:
-            queues = boto3.client('sqs').list_queues(
+            queues = boto3.client("sqs").list_queues(
                 QueueNamePrefix="{stack}-models-{model}-prediction-{pred}-".format(
                     stack=CONFIG.EnvironmentConfig.STACK,
-                    model=model_id,
-                    pred=prediction_id
+                    model=project_id,
+                    pred=prediction_id,
                 )
             )
 
-            for queue in queues['QueueUrls']:
-                boto3.client('sqs').purge_queue(
-                    QueueUrl=queue
-                )
+            for queue in queues["QueueUrls"]:
+                boto3.client("sqs").purge_queue(QueueUrl=queue)
 
-            return {
-                "status": 200,
-                "message": "queue purged"
-            }, 200
+            return {"status": 200, "message": "queue purged"}, 200
         except Exception as e:
             if str(e).find("does not exist") != -1:
-                return {
-                    "name": stack,
-                    "status": "None"
-                }, 200
+                return {"name": CONFIG.EnvironmentConfig.STACK, "status": "None"}, 200
             else:
-                error_msg = f'Prediction Stack Info Error: {str(e)}'
+                error_msg = f"Prediction Stack Info Error: {str(e)}"
                 current_app.logger.error(error_msg)
                 return err(500, "Failed to get stack info"), 500
 
     @login_required
     @has_project_read
-    def get(self, model_id, prediction_id):
+    def get(self, project_id, prediction_id):
         """
         Return metadata about messages currently in the inference queue
         ---
@@ -443,56 +464,52 @@ class PredictionInfAPI(Resource):
             return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
 
         try:
-            queues = boto3.client('sqs').list_queues(
+            queues = boto3.client("sqs").list_queues(
                 QueueNamePrefix="{stack}-models-{model}-prediction-{pred}-".format(
                     stack=CONFIG.EnvironmentConfig.STACK,
                     model=model_id,
-                    pred=prediction_id
+                    pred=prediction_id,
                 )
             )
 
             active = ""
             dead = ""
-            for queue in queues['QueueUrls']:
+            for queue in queues["QueueUrls"]:
                 if "-dead-queue" in queue:
                     dead = queue
                 elif "-queue" in queue:
                     active = queue
 
-            active = boto3.client('sqs').get_queue_attributes(
+            active = boto3.client("sqs").get_queue_attributes(
                 QueueUrl=active,
                 AttributeNames=[
-                    'ApproximateNumberOfMessages',
-                    'ApproximateNumberOfMessagesNotVisible'
-                ]
+                    "ApproximateNumberOfMessages",
+                    "ApproximateNumberOfMessagesNotVisible",
+                ],
             )
 
-            dead = boto3.client('sqs').get_queue_attributes(
-                QueueUrl=dead,
-                AttributeNames=[
-                    'ApproximateNumberOfMessages'
-                ]
+            dead = boto3.client("sqs").get_queue_attributes(
+                QueueUrl=dead, AttributeNames=["ApproximateNumberOfMessages"]
             )
 
             return {
-                "queued": int(active['Attributes']['ApproximateNumberOfMessages']),
-                "inflight": int(active['Attributes']['ApproximateNumberOfMessagesNotVisible']),
-                "dead": int(dead['Attributes']['ApproximateNumberOfMessages'])
+                "queued": int(active["Attributes"]["ApproximateNumberOfMessages"]),
+                "inflight": int(
+                    active["Attributes"]["ApproximateNumberOfMessagesNotVisible"]
+                ),
+                "dead": int(dead["Attributes"]["ApproximateNumberOfMessages"]),
             }, 200
         except Exception as e:
             if str(e).find("does not exist") != -1:
-                return {
-                    "name": stack,
-                    "status": "None"
-                }, 200
+                return {"name": CONFIG.EnvironmentConfig.STACK, "status": "None"}, 200
             else:
-                error_msg = f'Prediction Stack Info Error: {str(e)}'
+                error_msg = f"Prediction Stack Info Error: {str(e)}"
                 current_app.logger.error(error_msg)
                 return err(500, "Failed to get stack info"), 500
 
     @login_required
     @has_project_write
-    def post(self, model_id, prediction_id):
+    def post(self, project_id, prediction_id):
         """
         Given a GeoJSON, xyz list, or tile list, submit it to the SQS queue
         ---
@@ -517,28 +534,28 @@ class PredictionInfAPI(Resource):
             queue_name = "{stack}-models-{model}-prediction-{prediction}-queue".format(
                 stack=CONFIG.EnvironmentConfig.STACK,
                 model=model_id,
-                prediction=prediction_id
+                prediction=prediction_id,
             )
 
-            queue = boto3.resource('sqs').get_queue_by_name(
-                QueueName=queue_name
-            )
+            queue = boto3.resource("sqs").get_queue_by_name(QueueName=queue_name)
 
             tiles = []
             payloadjson = json.loads(payload)
-            if imagery['fmt'] == "wms":
+            if imagery["fmt"] == "wms":
                 if type(payloadjson) is list:
                     for tile in payloadjson:
-                        tile = tile.split('-')
-                        tiles.append(mercantile.Tile(int(tile[0]), int(tile[1]), int(tile[2])))
+                        tile = tile.split("-")
+                        tiles.append(
+                            mercantile.Tile(int(tile[0]), int(tile[1]), int(tile[2]))
+                        )
                 else:
 
                     poly = shape(geojson.loads(payload))
 
                     project = partial(
                         pyproj.transform,
-                        pyproj.Proj(init='epsg:4326'),
-                        pyproj.Proj(init='epsg:3857')
+                        pyproj.Proj(init="epsg:4326"),
+                        pyproj.Proj(init="epsg:3857"),
                     )
 
                     poly = transform(project, poly)
@@ -547,65 +564,69 @@ class PredictionInfAPI(Resource):
 
                 cache = []
                 for tile in tiles:
-                    cache.append({
-                        "Id": str(tile.z) + "-" + str(tile.x) + "-" + str(tile.y),
-                        "MessageBody": json.dumps({
-                            "name": "{x}-{y}-{z}".format(x=tile.x, y=tile.y, z=tile.z),
-                            "url": imagery['url'].format(x=tile.x, y=tile.y, z=tile.z),
-                            "bounds": mercantile.bounds(tile.x, tile.y, tile.z),
-                            "x": tile.x,
-                            "y": tile.y,
-                            "z": tile.z
-                        })
-                    })
+                    cache.append(
+                        {
+                            "Id": str(tile.z) + "-" + str(tile.x) + "-" + str(tile.y),
+                            "MessageBody": json.dumps(
+                                {
+                                    "name": "{x}-{y}-{z}".format(
+                                        x=tile.x, y=tile.y, z=tile.z
+                                    ),
+                                    "url": imagery["url"].format(
+                                        x=tile.x, y=tile.y, z=tile.z
+                                    ),
+                                    "bounds": mercantile.bounds(tile.x, tile.y, tile.z),
+                                    "x": tile.x,
+                                    "y": tile.y,
+                                    "z": tile.z,
+                                }
+                            ),
+                        }
+                    )
 
                     if len(cache) == 10:
-                        queue.send_messages(
-                            Entries=cache
-                        )
+                        queue.send_messages(Entries=cache)
 
                         cache = []
 
                 if len(cache) > 0:
-                    queue.send_messages(
-                        Entries=cache
-                    )
+                    queue.send_messages(Entries=cache)
 
                 return {}, 200
-            elif imagery['fmt'] == "list":
+            elif imagery["fmt"] == "list":
 
-                r = requests.get(imagery['url'])
+                r = requests.get(imagery["url"])
                 r.raise_for_status()
 
                 f = StringIO(r.text)
                 cache = []
-                for row in csv.reader(f, delimiter=','):
-                    cache.append({
-                        "Id": row[0],
-                        "MessageBody": json.dumps({
-                            'name': row[0],
-                            'url': row[1],
-                            'bounds': row[2].split(',')
-                        })
-                    })
+                for row in csv.reader(f, delimiter=","):
+                    cache.append(
+                        {
+                            "Id": row[0],
+                            "MessageBody": json.dumps(
+                                {
+                                    "name": row[0],
+                                    "url": row[1],
+                                    "bounds": row[2].split(","),
+                                }
+                            ),
+                        }
+                    )
 
                     if len(cache) == 10:
-                        queue.send_messages(
-                            Entries=cache
-                        )
+                        queue.send_messages(Entries=cache)
                         cache = []
 
                 if len(cache) > 0:
-                    queue.send_messages(
-                        Entries=cache
-                    )
+                    queue.send_messages(Entries=cache)
 
                 return {}, 200
 
             else:
                 return err(400, "Unknown imagery type"), 400
         except Exception as e:
-            error_msg = f'Prediction Tiler Error: {str(e)}'
+            error_msg = f"Prediction Tiler Error: {str(e)}"
             current_app.logger.error(error_msg)
             return err(500, error_msg), 500
 
@@ -613,7 +634,7 @@ class PredictionInfAPI(Resource):
 class PredictionTfrecords(Resource):
     @login_required
     @has_project_write
-    def post(self, model_id, prediction_id):
+    def post(self, project_id, prediction_id):
         """
         Create a TFRecords file with validated predictions
         ---
@@ -631,32 +652,34 @@ class PredictionTfrecords(Resource):
 
         try:
             batch = boto3.client(
-                service_name='batch',
-                region_name='us-east-1',
-                endpoint_url='https://batch.us-east-1.amazonaws.com'
+                service_name="batch",
+                region_name="us-east-1",
+                endpoint_url="https://batch.us-east-1.amazonaws.com",
             )
 
             # Submit to AWS Batch to convert to ECR image
             job = batch.submit_job(
-                jobName=CONFIG.EnvironmentConfig.STACK + '-tfrecords',
-                jobQueue=CONFIG.EnvironmentConfig.STACK + '-queue',
-                jobDefinition=CONFIG.EnvironmentConfig.STACK + '-tfrecords-job',
+                jobName=CONFIG.EnvironmentConfig.STACK + "-tfrecords",
+                jobQueue=CONFIG.EnvironmentConfig.STACK + "-queue",
+                jobDefinition=CONFIG.EnvironmentConfig.STACK + "-tfrecords-job",
                 containerOverrides={
-                    'environment': [
-                        {'name': 'MODEL_ID', 'value': str(model_id)},
-                        {'name': 'PREDICTION_ID', 'value': str(prediction_id)},
-                        {'name': 'TILE_ENDPOINT', 'value': str(pred.imagery_id)},
+                    "environment": [
+                        {"name": "MODEL_ID", "value": str(project_id)},
+                        {"name": "PREDICTION_ID", "value": str(prediction_id)},
+                        {"name": "TILE_ENDPOINT", "value": str(pred.imagery_id)},
                     ]
-                }
+                },
             )
 
-            TaskService.create({
-                'pred_id': prediction_id,
-                'type': 'tfrecords',
-                'batch_id': job.get('jobId')
-            })
+            TaskService.create(
+                {
+                    "pred_id": prediction_id,
+                    "type": "tfrecords",
+                    "batch_id": job.get("jobId"),
+                }
+            )
         except Exception as e:
-            error_msg = f'Batch GPU Error: {str(e)}'
+            error_msg = f"Batch GPU Error: {str(e)}"
             current_app.logger.error(error_msg)
             return err(500, "Failed to start GPU Retrain"), 500
 
@@ -664,7 +687,7 @@ class PredictionTfrecords(Resource):
 class PredictionRetrain(Resource):
     @login_required
     @has_project_write
-    def post(self, model_id, prediction_id):
+    def post(self, project_id, prediction_id):
         """
         Retrain a model with validated predictions
         ---
@@ -684,33 +707,35 @@ class PredictionRetrain(Resource):
 
         try:
             batch = boto3.client(
-                service_name='batch',
-                region_name='us-east-1',
-                endpoint_url='https://batch.us-east-1.amazonaws.com'
+                service_name="batch",
+                region_name="us-east-1",
+                endpoint_url="https://batch.us-east-1.amazonaws.com",
             )
 
             # Submit to AWS Batch to convert to ECR image
             job = batch.submit_job(
-                jobName=CONFIG.EnvironmentConfig.STACK + '-retrain',
-                jobQueue=CONFIG.EnvironmentConfig.STACK + '-gpu-queue',
-                jobDefinition=CONFIG.EnvironmentConfig.STACK + '-retrain-job',
+                jobName=CONFIG.EnvironmentConfig.STACK + "-retrain",
+                jobQueue=CONFIG.EnvironmentConfig.STACK + "-gpu-queue",
+                jobDefinition=CONFIG.EnvironmentConfig.STACK + "-retrain-job",
                 containerOverrides={
-                    'environment': [
-                        {'name': 'MODEL_ID', 'value': str(model_id)},
-                        {'name': 'PREDICTION_ID', 'value': str(prediction_id)},
-                        {'name': 'TILE_ENDPOINT', 'value': str(pred.imagery_id)},
-                        {'name': 'CONFIG_RETRAIN', 'value': str(json.dumps(payload))}
+                    "environment": [
+                        {"name": "MODEL_ID", "value": str(project_id)},
+                        {"name": "PREDICTION_ID", "value": str(prediction_id)},
+                        {"name": "TILE_ENDPOINT", "value": str(pred.imagery_id)},
+                        {"name": "CONFIG_RETRAIN", "value": str(json.dumps(payload))},
                     ]
-                }
+                },
             )
 
-            TaskService.create({
-                'pred_id': prediction_id,
-                'type': 'retrain',
-                'batch_id': job.get('jobId')
-            })
+            TaskService.create(
+                {
+                    "pred_id": prediction_id,
+                    "type": "retrain",
+                    "batch_id": job.get("jobId"),
+                }
+            )
         except Exception as e:
-            error_msg = f'Batch GPU Error: {str(e)}'
+            error_msg = f"Batch GPU Error: {str(e)}"
             current_app.logger.error(error_msg)
             return err(500, "Failed to start GPU Retrain"), 500
 
@@ -720,7 +745,7 @@ class PredictionAssetAPI(Resource):
 
     @login_required
     @has_project_write
-    def post(self, model_id, prediction_id):
+    def post(self, project_id, prediction_id):
         """
         Attach a raw model to a given predition
         ---
@@ -741,22 +766,19 @@ class PredictionAssetAPI(Resource):
         if CONFIG.EnvironmentConfig.ASSET_BUCKET is None:
             return err(501, "Not Configured"), 501
 
-        modeltype = request.args.get('type', 'model')
+        modeltype = request.args.get("type", "model")
         if modeltype not in ["model", "tfrecord", "checkpoint"]:
             return err(400, "Unsupported type param"), 400
 
         key = "models/{0}/prediction/{1}/{2}.zip".format(
-            model_id,
-            prediction_id,
-            modeltype
+            project_id, prediction_id, modeltype
         )
 
         try:
-            boto3.client('s3').head_object(
-                Bucket=CONFIG.EnvironmentConfig.ASSET_BUCKET,
-                Key=key
+            boto3.client("s3").head_object(
+                Bucket=CONFIG.EnvironmentConfig.ASSET_BUCKET, Key=key
             )
-        except:
+        except Exception:
             files = list(request.files.keys())
             if len(files) == 0:
                 return err(400, "Model not found in request"), 400
@@ -765,73 +787,93 @@ class PredictionAssetAPI(Resource):
 
             # Save the model to S3
             try:
-                boto3.resource('s3').Bucket(CONFIG.EnvironmentConfig.ASSET_BUCKET).put_object(
-                    Key=key,
-                    Body=model.stream
-                )
+                boto3.resource("s3").Bucket(
+                    CONFIG.EnvironmentConfig.ASSET_BUCKET
+                ).put_object(Key=key, Body=model.stream)
             except Exception as e:
-                error_msg = f'S3 Upload Error: {str(e)}'
+                error_msg = f"S3 Upload Error: {str(e)}"
                 current_app.logger.error(error_msg)
                 return err(500, "Failed to upload model to S3"), 500
 
             if modeltype == "checkpoint":
                 try:
-                    PredictionService.patch(prediction_id, {
-                        "checkpointLink": CONFIG.EnvironmentConfig.ASSET_BUCKET + '/' + key
-                    })
+                    PredictionService.patch(
+                        prediction_id,
+                        {
+                            "checkpointLink": CONFIG.EnvironmentConfig.ASSET_BUCKET
+                            + "/"
+                            + key
+                        },
+                    )
                 except Exception as e:
-                    error_msg = f'SaveLink Error: {str(e)}'
+                    error_msg = f"SaveLink Error: {str(e)}"
                     current_app.logger.error(error_msg)
                     return err(500, "Failed to save checkpoint state to DB"), 500
 
             if modeltype == "tfrecord":
                 try:
-                    PredictionService.patch(prediction_id, {
-                        "tfrecordLink": CONFIG.EnvironmentConfig.ASSET_BUCKET + '/' + key
-                    })
+                    PredictionService.patch(
+                        prediction_id,
+                        {
+                            "tfrecordLink": CONFIG.EnvironmentConfig.ASSET_BUCKET
+                            + "/"
+                            + key
+                        },
+                    )
                 except Exception as e:
-                    error_msg = f'SaveLink Error: {str(e)}'
+                    error_msg = f"SaveLink Error: {str(e)}"
                     current_app.logger.error(error_msg)
                     return err(500, "Failed to save checkpoint state to DB"), 500
 
             if modeltype == "model":
                 # Save the model link to ensure UI shows upload success
                 try:
-                    PredictionService.patch(prediction_id, {
-                        "modelLink": CONFIG.EnvironmentConfig.ASSET_BUCKET + '/' + key
-                    })
+                    PredictionService.patch(
+                        prediction_id,
+                        {
+                            "modelLink": CONFIG.EnvironmentConfig.ASSET_BUCKET
+                            + "/"
+                            + key
+                        },
+                    )
                 except Exception as e:
-                    error_msg = f'SaveLink Error: {str(e)}'
+                    error_msg = f"SaveLink Error: {str(e)}"
                     current_app.logger.error(error_msg)
                     return err(500, "Failed to save model state to DB"), 500
 
                 try:
                     batch = boto3.client(
-                        service_name='batch',
-                        region_name='us-east-1',
-                        endpoint_url='https://batch.us-east-1.amazonaws.com'
+                        service_name="batch",
+                        region_name="us-east-1",
+                        endpoint_url="https://batch.us-east-1.amazonaws.com",
                     )
 
                     # Submit to AWS Batch to convert to ECR image
                     job = batch.submit_job(
-                        jobName=CONFIG.EnvironmentConfig.STACK + 'ecr-build',
-                        jobQueue=CONFIG.EnvironmentConfig.STACK + '-queue',
-                        jobDefinition=CONFIG.EnvironmentConfig.STACK + '-build-job',
+                        jobName=CONFIG.EnvironmentConfig.STACK + "ecr-build",
+                        jobQueue=CONFIG.EnvironmentConfig.STACK + "-queue",
+                        jobDefinition=CONFIG.EnvironmentConfig.STACK + "-build-job",
                         containerOverrides={
-                            'environment': [{
-                                'name': 'MODEL',
-                                'value': CONFIG.EnvironmentConfig.ASSET_BUCKET + '/' + key
-                            }]
-                        }
+                            "environment": [
+                                {
+                                    "name": "MODEL",
+                                    "value": CONFIG.EnvironmentConfig.ASSET_BUCKET
+                                    + "/"
+                                    + key,
+                                }
+                            ]
+                        },
                     )
 
-                    TaskService.create({
-                        'pred_id': prediction_id,
-                        'type': 'ecr',
-                        'batch_id': job.get('jobId')
-                    })
+                    TaskService.create(
+                        {
+                            "pred_id": prediction_id,
+                            "type": "ecr",
+                            "batch_id": job.get("jobId"),
+                        }
+                    )
                 except Exception as e:
-                    error_msg = f'Batch Error: {str(e)}'
+                    error_msg = f"Batch Error: {str(e)}"
                     current_app.logger.error(error_msg)
                     return err(500, "Failed to start ECR build"), 500
 
@@ -841,7 +883,7 @@ class PredictionAssetAPI(Resource):
 
     @login_required
     @has_project_write
-    def get(self, model_id, prediction_id):
+    def get(self, project_id, prediction_id):
         """
         Download a prediction Asset
         ---
@@ -856,27 +898,23 @@ class PredictionAssetAPI(Resource):
         if CONFIG.EnvironmentConfig.ASSET_BUCKET is None:
             return err(501, "Not Configured"), 501
 
-        modeltype = request.args.get('type', 'model')
+        modeltype = request.args.get("type", "model")
         if modeltype not in ["model", "tfrecord", "checkpoint", "container"]:
             return err(400, "Unsupported type param"), 400
 
         if modeltype == "container":
             key = "models/{0}/prediction/{1}/docker-models-{0}-prediction-{1}.tar.gz".format(
-                model_id,
-                prediction_id
+                project_id, prediction_id
             )
 
         else:
             key = "models/{0}/prediction/{1}/{2}.zip".format(
-                model_id,
-                prediction_id,
-                modeltype
+                project_id, prediction_id, modeltype
             )
 
         try:
-            stream = boto3.resource('s3').Object(
-                CONFIG.EnvironmentConfig.ASSET_BUCKET,
-                key
+            stream = boto3.resource("s3").Object(
+                CONFIG.EnvironmentConfig.ASSET_BUCKET, key
             )
 
             if modeltype == "model":
@@ -894,16 +932,16 @@ class PredictionAssetAPI(Resource):
 
             resp = stream.get()
             return Response(
-                resp['Body'],
+                resp["Body"],
                 mimetype=mime,
                 status=200,
                 headers={
-                    "Content-Length": resp['ContentLength'],
-                    "Content-Disposition": 'attachment; filename="export.' + fmt + '"'
-                }
+                    "Content-Length": resp["ContentLength"],
+                    "Content-Disposition": 'attachment; filename="export.' + fmt + '"',
+                },
             )
         except Exception as e:
-            error_msg = f'Asset Download Error: {str(e)}'
+            error_msg = f"Asset Download Error: {str(e)}"
             current_app.logger.error(error_msg)
             return err(500, "Failed to download asset from S3"), 500
 
@@ -911,7 +949,7 @@ class PredictionAssetAPI(Resource):
 class PredictionValidity(Resource):
     @login_required
     @has_project_write
-    def post(self, model_id, prediction_id):
+    def post(self, project_id, prediction_id):
         try:
             payload = request.get_json()
 
@@ -940,7 +978,7 @@ class PredictionValidity(Resource):
 
             return current, 200
         except Exception as e:
-            error_msg = f'Unhandled error: {str(e)}'
+            error_msg = f"Unhandled error: {str(e)}"
             current_app.logger.error(error_msg)
             return (500, error_msg), 500
 
@@ -948,14 +986,14 @@ class PredictionValidity(Resource):
 class PredictionSingleAPI(Resource):
     @login_required
     @has_project_read
-    def get(self, model_id, prediction_id):
+    def get(self, project_id, prediction_id):
         try:
             prediction = PredictionService.get_prediction_by_id(prediction_id)
 
             pred = {
                 "predictionsId": prediction.id,
                 "hint": prediction.hint,
-                "modelId": prediction.model_id,
+                "modelId": prediction.project_id,
                 "version": prediction.version,
                 "dockerUrl": prediction.docker_url,
                 "tileZoom": prediction.tile_zoom,
@@ -969,12 +1007,12 @@ class PredictionSingleAPI(Resource):
                 "infList": prediction.inf_list,
                 "infBinary": prediction.inf_binary,
                 "infType": prediction.inf_type,
-                "imagery_id": prediction.imagery_id
+                "imagery_id": prediction.imagery_id,
             }
 
             return pred, 200
         except Exception as e:
-            error_msg = f'Unhandled error: {str(e)}'
+            error_msg = f"Unhandled error: {str(e)}"
             current_app.logger.error(error_msg)
             return err(500, error_msg), 500
 
@@ -984,7 +1022,7 @@ class PredictionAPI(Resource):
 
     @login_required
     @has_project_write
-    def post(self, model_id):
+    def post(self, project_id):
         """
         Store predictions for an ML Model
         ---
@@ -1026,10 +1064,10 @@ class PredictionAPI(Resource):
             payload = request.get_json()
 
             # check if this model exists
-            ProjectService.get_ml_model_by_id(model_id)
+            ProjectService.get_ml_model_by_id(project_id)
 
             # check if the version is registered
-            prediction_id = PredictionService.create(model_id, payload)
+            prediction_id = PredictionService.create(project_id, payload)
 
             return {"prediction_id": prediction_id}, 200
         except NotFound:
@@ -1037,16 +1075,16 @@ class PredictionAPI(Resource):
         except VersionExists:
             return err(400, "Version Exists"), 400
         except DataError as e:
-            current_app.logger.error(f'Error validating request: {str(e)}')
+            current_app.logger.error(f"Error validating request: {str(e)}")
             return err(400, str(4)), 400
         except Exception as e:
-            error_msg = f'Unhandled error: {str(e)}'
+            error_msg = f"Unhandled error: {str(e)}"
             current_app.logger.error(error_msg)
             return err(500, error_msg), 500
 
     @login_required
     @has_project_write
-    def patch(self, model_id, prediction_id):
+    def patch(self, project_id, prediction_id):
         """
         Allow updating of links in model
         ---
@@ -1054,7 +1092,7 @@ class PredictionAPI(Resource):
             - application/json
         parameters:
             - in: path
-              name: model_id
+              name: project_id
               description: ID of the Model
               required: true
               type: integer
@@ -1079,14 +1117,11 @@ class PredictionAPI(Resource):
 
             prediction_id = PredictionService.patch(prediction_id, updated_prediction)
 
-            return {
-                "model_id": model_id,
-                "prediction_id": prediction_id
-            }, 200
+            return {"model_id": project_id, "prediction_id": prediction_id}, 200
         except NotFound:
             return err(404, "prediction not found"), 404
         except Exception as e:
-            error_msg = f'Unhandled error: {str(e)}'
+            error_msg = f"Unhandled error: {str(e)}"
             current_app.logger.error(error_msg)
             return err(500, error_msg), 500
 
@@ -1094,7 +1129,7 @@ class PredictionAPI(Resource):
 class GetAllPredictions(Resource):
     @login_required
     @has_project_read
-    def get(self, model_id):
+    def get(self, project_id):
         """
         Fetch all predictions for a model
         ---
@@ -1102,7 +1137,7 @@ class GetAllPredictions(Resource):
             - application/json
         parameters:
             - in: path
-              name: model_id
+              name: project_id
               description: ID of the Model
               required: true
               type: integer
@@ -1119,11 +1154,12 @@ class GetAllPredictions(Resource):
             dto = ProjectService.get_ml_model_by_id(model_id)
 
             predictions = PredictionService.get_all_by_model(dto.model_id)
+
             return predictions, 200
         except PredictionsNotFound:
             return err(404, "Predictions not found"), 404
         except Exception as e:
-            error_msg = f'Unhandled error: {str(e)}'
+            error_msg = f"Unhandled error: {str(e)}"
             current_app.logger.error(error_msg)
             return err(500, error_msg), 500
 
@@ -1135,7 +1171,7 @@ class PredictionTileMVT(Resource):
 
     @login_required
     @has_project_read
-    def get(self, model_id, prediction_id, z, x, y):
+    def get(self, project_id, prediction_id, z, x, y):
         """
         Mapbox Vector Tile Response
         ---
@@ -1143,7 +1179,7 @@ class PredictionTileMVT(Resource):
             - application/x-protobuf
         parameters:
             - in: path
-              name: model_id
+              name: project_id
               description: ID of the Model
               required: true
               type: integer
@@ -1177,16 +1213,16 @@ class PredictionTileMVT(Resource):
         """
 
         try:
-            tile = PredictionTileService.mvt(model_id, prediction_id, z, x, y)
+            tile = PredictionTileService.mvt(project_id, prediction_id, z, x, y)
 
             response = make_response(tile)
-            response.headers['content-type'] = 'application/x-protobuf'
+            response.headers["content-type"] = "application/x-protobuf"
 
             return response
         except PredictionsNotFound:
             return err(404, "Prediction tile not found"), 404
         except Exception as e:
-            error_msg = f'Unhandled error: {str(e)}'
+            error_msg = f"Unhandled error: {str(e)}"
             current_app.logger.error(error_msg)
             return err(500, error_msg), 500
 
@@ -1198,7 +1234,7 @@ class PredictionTileAPI(Resource):
 
     @login_required
     @has_project_read
-    def get(self, model_id, prediction_id):
+    def get(self, project_id, prediction_id):
         """
         TileJSON response for the predictions
         ---
@@ -1206,7 +1242,7 @@ class PredictionTileAPI(Resource):
             - application/json
         parameters:
             - in: path
-              name: model_id
+              name: project_id
               description: ID of the Model
               required: true
               type: integer
@@ -1225,11 +1261,11 @@ class PredictionTileAPI(Resource):
         """
 
         try:
-            return PredictionTileService.tilejson(model_id, prediction_id)
+            return PredictionTileService.tilejson(project_id, prediction_id)
         except PredictionsNotFound:
             return err(404, "Prediction TileJSON not found"), 404
         except Exception as e:
-            error_msg = f'Unhandled error: {str(e)}'
+            error_msg = f"Unhandled error: {str(e)}"
             current_app.logger.error(error_msg)
             return err(500, error_msg), 500
 
@@ -1284,7 +1320,7 @@ class PredictionTileAPI(Resource):
         """
         try:
             data = request.get_json()
-            if len(data['predictions']) == 0:
+            if len(data["predictions"]) == 0:
                 return err(400, "Error validating request"), 400
 
             PredictionTileService.create(data)
@@ -1293,6 +1329,6 @@ class PredictionTileAPI(Resource):
         except PredictionsNotFound:
             return err(404, "Prediction not found"), 404
         except Exception as e:
-            error_msg = f'Unhandled error: {str(e)}'
+            error_msg = f"Unhandled error: {str(e)}"
             current_app.logger.error(error_msg)
             return err(500, error_msg), 500

@@ -1,9 +1,10 @@
 from ml_enabler.models.imagery import Imagery
 from ml_enabler.models.utils import ImageryNotFound
 
-class ImageryService():
+
+class ImageryService:
     @staticmethod
-    def create(model_id: int,  payload: dict) -> int:
+    def create(model_id: int, payload: dict) -> int:
         """
         Validate and add imagery from a model to the database
 
@@ -49,7 +50,7 @@ class ImageryService():
 
             return imagery.id
         else:
-            raise ImageryNotFound('Imagery Not Found')
+            raise ImageryNotFound("Imagery Not Found")
 
     @staticmethod
     def list(model_id: int):
@@ -78,5 +79,4 @@ class ImageryService():
         if imagery:
             return imagery.as_dto().to_primitive()
         else:
-            raise ImageryNotFound('Imagery Not Found')
-
+            raise ImageryNotFound("Imagery Not Found")

@@ -1,5 +1,13 @@
 from schematics import Model
-from schematics.types import StringType, IntType, DateTimeType, ListType, BooleanType, DictType
+from schematics.types import (
+    StringType,
+    IntType,
+    DateTimeType,
+    ListType,
+    BooleanType,
+    DictType,
+)
+
 
 class UserDTO(Model):
     """ Describes JSON of an Integration Source """
@@ -10,6 +18,7 @@ class UserDTO(Model):
     password = StringType(required=True)
     access = StringType(required=True)
 
+
 class AOIDTO(Model):
     """ Describes JSON of an Integration Source """
 
@@ -18,6 +27,7 @@ class AOIDTO(Model):
     model_id = StringType(required=True)
     pred_id = IntType()
     bounds = StringType(required=True)
+
 
 class TokenDTO(Model):
     """ Describes JSON of an Integration Source """
@@ -28,6 +38,7 @@ class TokenDTO(Model):
     token = StringType()
     created = DateTimeType(required=True)
 
+
 class IntegrationDTO(Model):
     """ Describes JSON of an Integration Source """
 
@@ -36,6 +47,7 @@ class IntegrationDTO(Model):
     integration = StringType(required=True)
     name = StringType(required=True)
     url = StringType(required=True)
+
 
 class ImageryDTO(Model):
     """ Describes JSON of an Imagery Source """
@@ -46,6 +58,7 @@ class ImageryDTO(Model):
     url = StringType(required=True)
     fmt = StringType(required=True)
 
+
 class TaskDTO(Model):
     """ Describes JSON of an Task """
 
@@ -55,6 +68,7 @@ class TaskDTO(Model):
     created = DateTimeType()
     batch_id = IntType()
 
+
 class ProjectAccessDTO(Model):
     """ Describes JSON of a ProjectAccess """
 
@@ -63,35 +77,37 @@ class ProjectAccessDTO(Model):
     uid = StringType(required=True)
     access = StringType(required=True)
 
+
 class ProjectDTO(Model):
     """ Describes JSON of an Project """
 
-    model_id = IntType(serialized_name='modelId')
+    model_id = IntType(serialized_name="modelId")
     created = DateTimeType()
     access = StringType(required=True)
     name = StringType(required=True)
     tags = ListType(DictType(StringType), required=True)
     source = StringType(required=True)
     archived = BooleanType()
-    project_url = StringType(serialized_name='projectUrl')
+    project_url = StringType(serialized_name="projectUrl")
     users = ListType(DictType(StringType), required=False)
     notes = StringType()
+
 
 class PredictionDTO(Model):
     """ Describes JSON of a set of predictions from a model """
 
-    prediction_id = IntType(serialized_name='predictionsId')
+    prediction_id = IntType(serialized_name="predictionsId")
     hint = StringType(required=True)
     created = DateTimeType()
-    model_id = IntType(serialized_name='modelId', required=True)
-    version = StringType(serialized_name='version', required=True)
-    docker_url = StringType(serialized_name='dockerUrl')
-    tile_zoom = IntType(serialized_name='tileZoom', required=True)
-    inf_list = StringType(serialized_name='infList', required=True)
-    inf_type = StringType(serialized_name='infType', required=True)
-    inf_binary = BooleanType(serialized_name='infBinary', required=True)
-    inf_supertile = BooleanType(serialized_name='infSupertile', required=True)
-    imagery_id = IntType(serialized_name='imagery_id', required=True)
+    model_id = IntType(serialized_name="modelId", required=True)
+    version = StringType(serialized_name="version", required=True)
+    docker_url = StringType(serialized_name="dockerUrl")
+    tile_zoom = IntType(serialized_name="tileZoom", required=True)
+    inf_list = StringType(serialized_name="infList", required=True)
+    inf_type = StringType(serialized_name="infType", required=True)
+    inf_binary = BooleanType(serialized_name="infBinary", required=True)
+    inf_supertile = BooleanType(serialized_name="infSupertile", required=True)
+    imagery_id = IntType(serialized_name="imagery_id", required=True)
 
     """ Asset Status
         log_link - store a link to the AWS CloudWatch Console
@@ -100,7 +116,7 @@ class PredictionDTO(Model):
         save_link - download the TFServing container
     """
 
-    log_link = StringType(serialized_name='logLink')
-    model_link = StringType(serialized_name='modelLink')
-    docker_link = StringType(serialized_name='dockerLink')
-    save_link = StringType(serialized_name='saveLink')
+    log_link = StringType(serialized_name="logLink")
+    model_link = StringType(serialized_name="modelLink")
+    docker_link = StringType(serialized_name="dockerLink")
+    save_link = StringType(serialized_name="saveLink")

@@ -13,7 +13,7 @@ class BaseTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         super(BaseTestCase, cls).setUpClass()
-        cls.app = create_app(app_config='ml_enabler.config.TestConfig')
+        cls.app = create_app(app_config="ml_enabler.config.TestConfig")
         cls.db = db
         cls.db.app = cls.app
         cls.db.create_all()

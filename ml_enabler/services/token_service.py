@@ -2,7 +2,7 @@ from ml_enabler.models.token import Token
 from ml_enabler.models.utils import NotFound
 
 
-class TokenService():
+class TokenService:
     @staticmethod
     def create(payload: dict) -> int:
         """
@@ -28,11 +28,9 @@ class TokenService():
         if token:
             token.delete()
 
-            return {
-                'status': 'deleted'
-            }
+            return {"status": "deleted"}
         else:
-            raise NotFound('Token Not Found')
+            raise NotFound("Token Not Found")
 
     @staticmethod
     def list(uid: int):
@@ -60,5 +58,4 @@ class TokenService():
         if token:
             return token.to_primitive()
         else:
-            raise NotFound('Token Not Found')
-
+            raise NotFound("Token Not Found")

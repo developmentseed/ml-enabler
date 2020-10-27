@@ -7,12 +7,11 @@ from ml_enabler.services.token_service import TokenService
 from flask import jsonify
 from flask_login import current_user
 
-token_bp = Blueprint(
-    'token_bp', __name__
-)
+token_bp = Blueprint("token_bp", __name__)
+
 
 @login_required
-@token_bp.route('/v1/user/token', methods=['GET'])
+@token_bp.route("/v1/user/token", methods=["GET"])
 def list():
     """
     List tokens for the given user session
@@ -27,12 +26,13 @@ def list():
         tokens = TokenService.list(current_user.id)
         return jsonify(tokens), 200
     except Exception as e:
-        error_msg = f'Unhandled error: {str(e)}'
+        error_msg = f"Unhandled error: {str(e)}"
         current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
+
 @login_required
-@token_bp.route('/v1/user/token', methods=['POST'])
+@token_bp.route("/v1/user/token", methods=["POST"])
 def post():
     """
     Create a new Token
@@ -44,16 +44,17 @@ def post():
             description: Token
     """
     try:
-        token_payload = request.get_json();
-        token_payload['uid'] = current_user.id
+        token_payload = request.get_json()
+        token_payload["uid"] = current_user.id
         return TokenService.create(token_payload), 200
     except Exception as e:
-        error_msg = f'Unhandled error: {str(e)}'
+        error_msg = f"Unhandled error: {str(e)}"
         current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
+
 @login_required
-@token_bp.route('/v1/user/token/<int:token_id>', methods=['GET'])
+@token_bp.route("/v1/user/token/<int:token_id>", methods=["GET"])
 def get(token_id):
     """
     Get a specific Token
@@ -69,12 +70,13 @@ def get(token_id):
     except NotFound:
         return err(404, "No Token Found"), 404
     except Exception as e:
-        error_msg = f'Unhandled error: {str(e)}'
+        error_msg = f"Unhandled error: {str(e)}"
         current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
+
 @login_required
-@token_bp.route('/v1/user/token/<int:token_id>', methods=['DELETE'])
+@token_bp.route("/v1/user/token/<int:token_id>", methods=["DELETE"])
 def delete(token_id):
     """
     Delete a specific Token
@@ -90,6 +92,6 @@ def delete(token_id):
     except NotFound:
         return err(404, "No Token Found"), 404
     except Exception as e:
-        error_msg = f'Unhandled error: {str(e)}'
+        error_msg = f"Unhandled error: {str(e)}"
         current_app.logger.error(error_msg)
         return err(500, error_msg), 500

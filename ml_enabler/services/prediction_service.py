@@ -9,7 +9,8 @@ from ml_enabler.models.utils import PredictionsNotFound, NotFound, VersionExists
 from psycopg2.errors import UniqueViolation
 from ml_enabler import db
 
-class PredictionService():
+
+class PredictionService:
     @staticmethod
     def create(model_id: int, payload: dict) -> int:
         """
@@ -20,7 +21,7 @@ class PredictionService():
         :returns ID of the prediction
         """
 
-        version = payload['version']
+        version = payload["version"]
         try:
             semver.VersionInfo.parse(version)
         except Exception as e:
@@ -28,14 +29,14 @@ class PredictionService():
 
         prediction_dto = PredictionDTO()
         prediction_dto.model_id = model_id
-        prediction_dto.hint = payload.get('hint', 'prediction')
-        prediction_dto.version = payload['version']
-        prediction_dto.tile_zoom = payload['tileZoom']
-        prediction_dto.inf_list = payload['infList']
-        prediction_dto.inf_type = payload['infType']
-        prediction_dto.inf_binary = payload['infBinary']
-        prediction_dto.inf_supertile = payload['infSupertile']
-        prediction_dto.imagery_id = payload['imagery_id']
+        prediction_dto.hint = payload.get("hint", "prediction")
+        prediction_dto.version = payload["version"]
+        prediction_dto.tile_zoom = payload["tileZoom"]
+        prediction_dto.inf_list = payload["infList"]
+        prediction_dto.inf_type = payload["infType"]
+        prediction_dto.inf_binary = payload["infBinary"]
+        prediction_dto.inf_supertile = payload["infSupertile"]
+        prediction_dto.imagery_id = payload["imagery_id"]
         prediction_dto.validate()
 
         new_prediction = Prediction()
@@ -58,7 +59,7 @@ class PredictionService():
 
             return stream
         else:
-            raise NotFound('Prediction does not exist')
+            raise NotFound("Prediction does not exist")
 
     @staticmethod
     def inferences(prediction_id):
@@ -70,7 +71,6 @@ class PredictionService():
         """
 
         return PredictionTile.inferences(prediction_id)
-
 
     @staticmethod
     def patch(prediction_id: int, update: dict) -> int:
@@ -88,7 +88,7 @@ class PredictionService():
 
             return prediction_id
         else:
-            raise NotFound('Prediction does not exist')
+            raise NotFound("Prediction does not exist")
 
     @staticmethod
     def get_prediction_by_id(prediction_id: int):
@@ -121,24 +121,24 @@ class PredictionService():
         return prediction_dtos
 
 
-class PredictionTileService():
+class PredictionTileService:
     @staticmethod
     def create_geojson(pred, features):
         data = []
         for feat in features:
-            if feat.get('type') != "Feature":
-                raise InvalidGeojson('All Geometries must be a GeoJSON Feature')
-            elif feat.get('properties') is None:
-                raise InvalidGeojson('Feature must have properties object')
-            elif feat.get('properties').get('predictions') is None:
-                raise InvalidGeojson('Feature must have properties.predictions object')
+            if feat.get("type") != "Feature":
+                raise InvalidGeojson("All Geometries must be a GeoJSON Feature")
+            elif feat.get("properties") is None:
+                raise InvalidGeojson("Feature must have properties object")
+            elif feat.get("properties").get("predictions") is None:
+                raise InvalidGeojson("Feature must have properties.predictions object")
 
             predtile = {
-                'prediction_id': pred.id,
-                'quadkey': None,
-                'geom': 'SRID=4326;' + shape(feat.get('geometry')).wkt,
-                'predictions': feat.get('properties').get('predictions'),
-                'validity': {}
+                "prediction_id": pred.id,
+                "quadkey": None,
+                "geom": "SRID=4326;" + shape(feat.get("geometry")).wkt,
+                "predictions": feat.get("properties").get("predictions"),
+                "validity": {},
             }
 
             data.append(predtile)
@@ -154,28 +154,33 @@ class PredictionTileService():
         :returns None
         """
 
-        for prediction in data['predictions']:
-            if prediction.get('geom') is not None:
-                polygon = prediction.get('geom')
-                bounds = [polygon['coordinates'][0][0][0], polygon['coordinates'][0][0][1], polygon['coordinates'][0][2][0], polygon['coordinates'][0][2][1]]
+        for prediction in data["predictions"]:
+            if prediction.get("geom") is not None:
+                polygon = prediction.get("geom")
+                bounds = [
+                    polygon["coordinates"][0][0][0],
+                    polygon["coordinates"][0][0][1],
+                    polygon["coordinates"][0][2][0],
+                    polygon["coordinates"][0][2][1],
+                ]
 
-                prediction["geom"] = "SRID=4326;POLYGON(({0} {1},{0} {3},{2} {3},{2} {1},{0} {1}))".format(
-                    bounds[0],
-                    bounds[1],
-                    bounds[2],
-                    bounds[3]
+                prediction[
+                    "geom"
+                ] = "SRID=4326;POLYGON(({0} {1},{0} {3},{2} {3},{2} {1},{0} {1}))".format(
+                    bounds[0], bounds[1], bounds[2], bounds[3]
                 )
             else:
-                bounds = mercantile.bounds(mercantile.quadkey_to_tile(prediction.get('quadkey')))
-                prediction["geom"] = "SRID=4326;POLYGON(({0} {1},{0} {3},{2} {3},{2} {1},{0} {1}))".format(
-                    bounds[0],
-                    bounds[1],
-                    bounds[2],
-                    bounds[3]
+                bounds = mercantile.bounds(
+                    mercantile.quadkey_to_tile(prediction.get("quadkey"))
+                )
+                prediction[
+                    "geom"
+                ] = "SRID=4326;POLYGON(({0} {1},{0} {3},{2} {3},{2} {1},{0} {1}))".format(
+                    bounds[0], bounds[1], bounds[2], bounds[3]
                 )
 
         connection = db.engine.connect()
-        connection.execute(PredictionTile.__table__.insert(), data['predictions'])
+        connection.execute(PredictionTile.__table__.insert(), data["predictions"])
 
     @staticmethod
     def get(predictiontile_id):
@@ -211,7 +216,7 @@ class PredictionTileService():
         tiles = PredictionTile.count(prediction_id)
 
         if tiles.count == 0:
-            raise PredictionsNotFound('No Prediction Tiles exist')
+            raise PredictionsNotFound("No Prediction Tiles exist")
 
         ml_model = Project.get(model_id)
         prediction = Prediction.get(prediction_id)
@@ -227,11 +232,13 @@ class PredictionTileService():
             "scheme": "xyz",
             "type": "vector",
             "tiles": [
-                "/v1/model/{0}/prediction/{1}/tiles/{{z}}/{{x}}/{{y}}.mvt".format(model_id, prediction_id)
+                "/v1/model/{0}/prediction/{1}/tiles/{{z}}/{{x}}/{{y}}.mvt".format(
+                    model_id, prediction_id
+                )
             ],
             "minzoom": 0,
             "maxzoom": prediction.tile_zoom,
-            "bounds": PredictionTile.bbox(prediction_id)
+            "bounds": PredictionTile.bbox(prediction_id),
         }
 
         return tilejson
