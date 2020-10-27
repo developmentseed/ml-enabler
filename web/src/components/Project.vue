@@ -197,7 +197,6 @@ export default {
             project: {},
             imagery: [],
             integrations: 0,
-            integrationid: false,
             loading: {
                 project: true
             },
@@ -207,6 +206,11 @@ export default {
                 iterations: false,
                 notes: false
             }
+        }
+    },
+    watch: {
+        '$route': function() {
+            this.refresh();
         }
     },
     components: {
