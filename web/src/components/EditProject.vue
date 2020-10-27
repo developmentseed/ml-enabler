@@ -35,6 +35,12 @@
                     <label>Project Url</label>
                     <input v-model='project.projectUrl' class='input' placeholder='External URL'/>
                 </div>
+
+                <div class='col col--12 py6'>
+                    <label>Project Readme</label>
+                    <textarea v-model='project.notes' class='textarea w-full' placeholder='README'/>
+                </div>
+
                 <template v-if='!showUser'>
                     <div class='col col--12'>
                         <button @click='showUser = !showUser' class='btn btn--white color-gray px0'><svg class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg><span class='fl pl6'>User Access</span></button>
@@ -138,6 +144,7 @@ export default {
             },
             project: {
                 name: '',
+                notes: '',
                 access: false,
                 source: '',
                 projectUrl: '',
@@ -186,6 +193,7 @@ export default {
                     body: JSON.stringify({
                         modelId: !this.newProject ? this.$route.params.modelid : undefined,
                         name: this.project.name,
+                        notes: this.project.notes,
                         access: this.project.access ? 'public' : 'private',
                         source: this.project.source,
                         projectUrl: this.project.projectUrl,
