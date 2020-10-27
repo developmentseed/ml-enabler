@@ -98,7 +98,9 @@ def list():
 
 @login_required
 @has_project_write
-@stacks_bp.route('/v1/model/<int:project_id>/prediction/<int:prediction_id>/stack', methods=['POST'])
+@stacks_bp.route(
+    "/v1/model/<int:project_id>/prediction/<int:prediction_id>/stack", methods=["POST"]
+)
 def post(project_id, prediction_id):
     if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
         return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
@@ -107,8 +109,7 @@ def post(project_id, prediction_id):
 
     pred = PredictionService.get_prediction_by_id(prediction_id)
     image = "models-{model}-prediction-{prediction}".format(
-        model=model_id,
-        prediction=prediction_id
+        model=model_id, prediction=prediction_id
     )
 
     stack = "{stack}-{image}".format(stack=CONFIG.EnvironmentConfig.STACK, image=image)
@@ -121,45 +122,48 @@ def post(project_id, prediction_id):
         boto3.client("cloudformation").create_stack(
             StackName=stack,
             TemplateBody=template,
-            Tags = payload.get("tags", []),
-            Parameters=[{
-                'ParameterKey': 'GitSha',
-                'ParameterValue': CONFIG.EnvironmentConfig.GitSha,
-            },{
-                'ParameterKey': 'MachineAuth',
-                'ParameterValue': CONFIG.EnvironmentConfig.MACHINE_AUTH
-            },{
-                'ParameterKey': 'StackName',
-                'ParameterValue': CONFIG.EnvironmentConfig.STACK,
-            },{
-                'ParameterKey': 'ImageTag',
-                'ParameterValue': image,
-            },{
-                'ParameterKey': 'Inferences',
-                'ParameterValue': pred.inf_list,
-            },{
-                'ParameterKey': 'ModelId',
-                'ParameterValue': str(project_id)
-            },{
-                'ParameterKey': 'PredictionId',
-                'ParameterValue': str(prediction_id)
-            },{
-                'ParameterKey': 'ImageryId',
-                'ParameterValue': str(pred.imagery_id),
-            },{
-                'ParameterKey': 'MaxSize',
-                'ParameterValue': payload.get("maxSize", "1"),
-            },{
-                'ParameterKey': 'MaxConcurrency',
-                'ParameterValue': payload.get("maxConcurrency", "50"),
-            },{
-                'ParameterKey': 'InfSupertile',
-                'ParameterValue': str(pred.inf_supertile),
-
-            }],
-            Capabilities=[
-                'CAPABILITY_NAMED_IAM'
+            Tags=payload.get("tags", []),
+            Parameters=[
+                {
+                    "ParameterKey": "GitSha",
+                    "ParameterValue": CONFIG.EnvironmentConfig.GitSha,
+                },
+                {
+                    "ParameterKey": "MachineAuth",
+                    "ParameterValue": CONFIG.EnvironmentConfig.MACHINE_AUTH,
+                },
+                {
+                    "ParameterKey": "StackName",
+                    "ParameterValue": CONFIG.EnvironmentConfig.STACK,
+                },
+                {
+                    "ParameterKey": "ImageTag",
+                    "ParameterValue": image,
+                },
+                {
+                    "ParameterKey": "Inferences",
+                    "ParameterValue": pred.inf_list,
+                },
+                {"ParameterKey": "ModelId", "ParameterValue": str(project_id)},
+                {"ParameterKey": "PredictionId", "ParameterValue": str(prediction_id)},
+                {
+                    "ParameterKey": "ImageryId",
+                    "ParameterValue": str(pred.imagery_id),
+                },
+                {
+                    "ParameterKey": "MaxSize",
+                    "ParameterValue": payload.get("maxSize", "1"),
+                },
+                {
+                    "ParameterKey": "MaxConcurrency",
+                    "ParameterValue": payload.get("maxConcurrency", "50"),
+                },
+                {
+                    "ParameterKey": "InfSupertile",
+                    "ParameterValue": str(pred.inf_supertile),
+                },
             ],
+            Capabilities=["CAPABILITY_NAMED_IAM"],
             OnFailure="ROLLBACK",
         )
 
@@ -172,7 +176,10 @@ def post(project_id, prediction_id):
 
 @login_required
 @has_project_write
-@stacks_bp.route('/v1/model/<int:project_id>/prediction/<int:prediction_id>/stack', methods=['DELETE'])
+@stacks_bp.route(
+    "/v1/model/<int:project_id>/prediction/<int:prediction_id>/stack",
+    methods=["DELETE"],
+)
 def delete(project_id, prediction_id):
     if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
         return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
@@ -200,7 +207,9 @@ def delete(project_id, prediction_id):
 
 @login_required
 @has_project_read
-@stacks_bp.route('/v1/model/<int:project_id>/prediction/<int:prediction_id>/stack', methods=['GET'])
+@stacks_bp.route(
+    "/v1/model/<int:project_id>/prediction/<int:prediction_id>/stack", methods=["GET"]
+)
 def get(project_id, prediction_id):
     """
     Return status of a prediction stack

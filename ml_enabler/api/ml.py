@@ -869,10 +869,10 @@ class PredictionTfrecords(Resource):
                 jobQueue=CONFIG.EnvironmentConfig.STACK + "-queue",
                 jobDefinition=CONFIG.EnvironmentConfig.STACK + "-tfrecords-job",
                 containerOverrides={
-                    'environment': [
-                        {'name': 'MODEL_ID', 'value': str(project_id)},
-                        {'name': 'PREDICTION_ID', 'value': str(prediction_id)},
-                        {'name': 'TILE_ENDPOINT', 'value': str(pred.imagery_id)},
+                    "environment": [
+                        {"name": "MODEL_ID", "value": str(project_id)},
+                        {"name": "PREDICTION_ID", "value": str(prediction_id)},
+                        {"name": "TILE_ENDPOINT", "value": str(pred.imagery_id)},
                     ]
                 },
             )
@@ -924,11 +924,11 @@ class PredictionRetrain(Resource):
                 jobQueue=CONFIG.EnvironmentConfig.STACK + "-gpu-queue",
                 jobDefinition=CONFIG.EnvironmentConfig.STACK + "-retrain-job",
                 containerOverrides={
-                    'environment': [
-                        {'name': 'MODEL_ID', 'value': str(project_id)},
-                        {'name': 'PREDICTION_ID', 'value': str(prediction_id)},
-                        {'name': 'TILE_ENDPOINT', 'value': str(pred.imagery_id)},
-                        {'name': 'CONFIG_RETRAIN', 'value': str(json.dumps(payload))}
+                    "environment": [
+                        {"name": "MODEL_ID", "value": str(project_id)},
+                        {"name": "PREDICTION_ID", "value": str(prediction_id)},
+                        {"name": "TILE_ENDPOINT", "value": str(pred.imagery_id)},
+                        {"name": "CONFIG_RETRAIN", "value": str(json.dumps(payload))},
                     ]
                 },
             )
@@ -977,9 +977,7 @@ class PredictionAssetAPI(Resource):
             return err(400, "Unsupported type param"), 400
 
         key = "models/{0}/prediction/{1}/{2}.zip".format(
-            project_id,
-            prediction_id,
-            modeltype
+            project_id, prediction_id, modeltype
         )
 
         try:
@@ -1112,15 +1110,12 @@ class PredictionAssetAPI(Resource):
 
         if modeltype == "container":
             key = "models/{0}/prediction/{1}/docker-models-{0}-prediction-{1}.tar.gz".format(
-                project_id,
-                prediction_id
+                project_id, prediction_id
             )
 
         else:
             key = "models/{0}/prediction/{1}/{2}.zip".format(
-                project_id,
-                prediction_id,
-                modeltype
+                project_id, prediction_id, modeltype
             )
 
         try:
@@ -1328,10 +1323,7 @@ class PredictionAPI(Resource):
 
             prediction_id = PredictionService.patch(prediction_id, updated_prediction)
 
-            return {
-                "model_id": project_id,
-                "prediction_id": prediction_id
-            }, 200
+            return {"model_id": project_id, "prediction_id": prediction_id}, 200
         except NotFound:
             return err(404, "prediction not found"), 404
         except Exception as e:

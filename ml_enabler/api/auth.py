@@ -17,7 +17,7 @@ auth_bp = Blueprint("auth_bp", __name__)
 def has_admin(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        project_id = kwargs.get('project_id')
+        project_id = kwargs.get("project_id")
 
         if current_user.is_authenticated and current_user.name == "machine":
             return f(*args, **kwargs)
@@ -33,7 +33,7 @@ def has_admin(f):
 def has_project_read(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        project_id = kwargs.get('project_id')
+        project_id = kwargs.get("project_id")
 
         if current_user.is_authenticated and current_user.name == "machine":
             return f(*args, **kwargs)
@@ -43,7 +43,7 @@ def has_project_read(f):
             return f(*args, **kwargs)
 
         for user in ProjectAccess.list(project_id):
-            if current_user.is_authenticated and current_user.id == user.get('uid'):
+            if current_user.is_authenticated and current_user.id == user.get("uid"):
                 return f(*args, **kwargs)
 
         return {"status": 403, "error": "Authentication Insufficient"}, 403
@@ -54,13 +54,17 @@ def has_project_read(f):
 def has_project_write(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        project_id = kwargs.get('project_id')
+        project_id = kwargs.get("project_id")
 
         if current_user.is_authenticated and current_user.name == "machine":
             return f(*args, **kwargs)
 
         for user in ProjectAccess.list(project_id):
-            if current_user.is_authenticated and current_user.id == user.get('uid') and (user.get('access') == 'write' or user.get('access') == 'admin'):
+            if (
+                current_user.is_authenticated
+                and current_user.id == user.get("uid")
+                and (user.get("access") == "write" or user.get("access") == "admin")
+            ):
                 return f(*args, **kwargs)
 
         return {"status": 403, "error": "Authentication Insufficient"}, 403
@@ -71,13 +75,17 @@ def has_project_write(f):
 def has_project_admin(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        project_id = kwargs.get('project_id')
+        project_id = kwargs.get("project_id")
 
         if current_user.is_authenticated and current_user.name == "machine":
             return f(*args, **kwargs)
 
         for user in ProjectAccess.list(project_id):
-            if current_user.is_authenticated and current_user.id == user.get('uid') and user.get('access') == 'admin':
+            if (
+                current_user.is_authenticated
+                and current_user.id == user.get("uid")
+                and user.get("access") == "admin"
+            ):
                 return f(*args, **kwargs)
 
         return {"status": 403, "error": "Authentication Insufficient"}, 403

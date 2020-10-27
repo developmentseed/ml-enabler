@@ -12,7 +12,7 @@ imagery_bp = Blueprint("imagery_bp", __name__)
 
 @login_required
 @has_project_read
-@imagery_bp.route('/v1/model/<int:project_id>/imagery', methods=['GET'])
+@imagery_bp.route("/v1/model/<int:project_id>/imagery", methods=["GET"])
 def list(project_id):
     """
     List imagery sources for a given model
@@ -37,7 +37,9 @@ def list(project_id):
 
 @login_required
 @has_project_read
-@imagery_bp.route('/v1/model/<int:project_id>/imagery/<int:imagery_id>', methods=['GET'])
+@imagery_bp.route(
+    "/v1/model/<int:project_id>/imagery/<int:imagery_id>", methods=["GET"]
+)
 def get(project_id, imagery_id):
     """
     Get a specific imagery source
@@ -61,7 +63,9 @@ def get(project_id, imagery_id):
 
 @login_required
 @has_project_write
-@imagery_bp.route('/v1/model/<int:project_id>/imagery/<int:imagery_id>', methods=['PATCH'])
+@imagery_bp.route(
+    "/v1/model/<int:project_id>/imagery/<int:imagery_id>", methods=["PATCH"]
+)
 def patch(project_id, imagery_id):
     """
     Patch a specific imagery source
@@ -80,7 +84,9 @@ def patch(project_id, imagery_id):
 
 @login_required
 @has_project_write
-@imagery_bp.route('/v1/model/<int:project_id>/imagery/<int:imagery_id>', methods=['DELETE'])
+@imagery_bp.route(
+    "/v1/model/<int:project_id>/imagery/<int:imagery_id>", methods=["DELETE"]
+)
 def delete(project_id, imagery_id):
     """
     Delete a specific imagery source
@@ -98,7 +104,7 @@ def delete(project_id, imagery_id):
 
 @login_required
 @has_project_write
-@imagery_bp.route('/v1/model/<int:project_id>/imagery', methods=['POST'])
+@imagery_bp.route("/v1/model/<int:project_id>/imagery", methods=["POST"])
 def post(project_id):
     """
     Create a new imagery source
@@ -113,10 +119,7 @@ def post(project_id):
         imagery = request.get_json()
         imagery_id = ImageryService.create(project_id, imagery)
 
-        return {
-            "model_id": project_id,
-            "imagery_id": imagery_id
-        }, 200
+        return {"model_id": project_id, "imagery_id": imagery_id}, 200
     except Exception as e:
         error_msg = f"Imagery Post: {str(e)}"
         current_app.logger.error(error_msg)
