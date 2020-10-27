@@ -3,8 +3,7 @@ import factory.faker
 import factory.fuzzy
 from factory.alchemy import SQLAlchemyModelFactory
 from ml_enabler import db
-from ml_enabler.models.ml_model import Prediction, MLModel, \
-    MLModelVersion
+from ml_enabler.models.ml_model import Prediction, MLModel, MLModelVersion
 
 
 class MLModelFactory(SQLAlchemyModelFactory):
@@ -12,7 +11,7 @@ class MLModelFactory(SQLAlchemyModelFactory):
         model = MLModel
         sqlalchemy_session = db.session
 
-    name = factory.faker.Faker('name')
+    name = factory.faker.Faker("name")
     source = factory.fuzzy.FuzzyText(length=25)
     project_url = factory.fuzzy.FuzzyText(length=20)
 
@@ -33,5 +32,5 @@ class PredictionFactory(SQLAlchemyModelFactory):
         sqlalchemy_session = db.session
 
     docker_url = factory.fuzzy.FuzzyText(length=25)
-    bbox = 'SRID=4326;POLYGON((10.048885 53.5225,10.048885 53.540843,10.013795 53.540843,10.013795 53.5225,10.048885 53.5225))'
+    bbox = "SRID=4326;POLYGON((10.048885 53.5225,10.048885 53.540843,10.013795 53.540843,10.013795 53.5225,10.048885 53.5225))"
     tile_zoom = 18

@@ -1,21 +1,21 @@
 from ml_enabler import db
 from ml_enabler.models.dtos.dtos import IntegrationDTO
 
+
 class Integration(db.Model):
     """ Store an integration for a given model """
-    __tablename__ = 'integration'
+
+    __tablename__ = "integration"
 
     id = db.Column(db.Integer, primary_key=True)
 
     model_id = db.Column(
-        db.BigInteger,
-        db.ForeignKey('projects.id', name='fk_projects'),
-        nullable=False
+        db.BigInteger, db.ForeignKey("projects.id", name="fk_projects"), nullable=False
     )
 
     integration = db.Column(db.String, nullable=False)
     name = db.Column(db.String, nullable=False)
-    url =  db.Column(db.String, nullable=False)
+    url = db.Column(db.String, nullable=False)
     auth = db.Column(db.String, nullable=True)
 
     def create(self, model_id: int, integration: dict):
@@ -48,7 +48,7 @@ class Integration(db.Model):
             Integration.name,
             Integration.integration,
             Integration.url,
-            Integration.model_id
+            Integration.model_id,
         ).filter(Integration.id == integration_id)
 
         return Integration.query.get(integration_id)
@@ -60,7 +60,7 @@ class Integration(db.Model):
             Integration.name,
             Integration.integration,
             Integration.url,
-            Integration.model_id
+            Integration.model_id,
         ).filter(Integration.id == integration_id)
 
         return Integration.query.get(integration_id)
@@ -72,20 +72,19 @@ class Integration(db.Model):
 
     def list(model_id: int):
         query = db.session.query(
-            Integration.id,
-            Integration.name,
-            Integration.url,
-            Integration.integration
+            Integration.id, Integration.name, Integration.url, Integration.integration
         ).filter(Integration.model_id == model_id)
 
         integrations = []
         for integration in query.all():
-            integrations.append({
-                "id": integration[0],
-                "name": integration[1],
-                "url": integration[2],
-                "integration": integration[3]
-            })
+            integrations.append(
+                {
+                    "id": integration[0],
+                    "name": integration[1],
+                    "url": integration[2],
+                    "integration": integration[3],
+                }
+            )
 
         return integrations
 
@@ -98,4 +97,3 @@ class Integration(db.Model):
             self.url = update["url"]
 
         db.session.commit()
-

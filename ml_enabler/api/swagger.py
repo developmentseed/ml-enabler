@@ -10,22 +10,16 @@ class SwaggerDocsAPI(Resource):
 
     def get(self):
         template = swagger(current_app)
-        template['info']['title'] = "ML-Enabler API"
-        template['info']['description'] = "API endpoints for ML-Enabler"
-        template['info']['version'] = "1.0.0"
+        template["info"]["title"] = "ML-Enabler API"
+        template["info"]["description"] = "API endpoints for ML-Enabler"
+        template["info"]["version"] = "1.0.0"
 
-        template['components'] = {
-            'securitySchemes': {
-                'TokenAuth': {
-                    "type": "apiKey",
-                    "in": "query",
-                    "name": "token"
-                }
+        template["components"] = {
+            "securitySchemes": {
+                "TokenAuth": {"type": "apiKey", "in": "query", "name": "token"}
             }
         }
 
-        template["security"] = {
-            "TokenAuth": []
-        }
+        template["security"] = {"TokenAuth": []}
 
         return jsonify(template)

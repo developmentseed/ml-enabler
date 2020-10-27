@@ -7,9 +7,7 @@ from ml_enabler.api.auth import has_project_read, has_project_write
 from flask_login import login_required
 from flask import jsonify
 
-imagery_bp = Blueprint(
-    'imagery_bp', __name__
-)
+imagery_bp = Blueprint("imagery_bp", __name__)
 
 
 @login_required
@@ -32,7 +30,7 @@ def list(project_id):
     except ImageryNotFound:
         return err(404, "Imagery not found"), 404
     except Exception as e:
-        error_msg = f'Unhandled error: {str(e)}'
+        error_msg = f"Unhandled error: {str(e)}"
         current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
@@ -56,7 +54,7 @@ def get(project_id, imagery_id):
     except ImageryNotFound:
         return err(404, "Imagery not found"), 404
     except Exception as e:
-        error_msg = f'Unhandled error: {str(e)}'
+        error_msg = f"Unhandled error: {str(e)}"
         current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
@@ -74,13 +72,10 @@ def patch(project_id, imagery_id):
         200:
             description: Imagery Source
     """
-    imagery = request.get_json();
+    imagery = request.get_json()
     imagery_id = ImageryService.patch(project_id, imagery_id, imagery)
 
-    return {
-        "project_id": project_id,
-        "imagery_id": imagery_id
-    }, 200
+    return {"model_id": project_id, "imagery_id": imagery_id}, 200
 
 
 @login_required
@@ -119,11 +114,10 @@ def post(project_id):
         imagery_id = ImageryService.create(project_id, imagery)
 
         return {
-            "project_id": project_id,
+            "model_id": project_id,
             "imagery_id": imagery_id
         }, 200
     except Exception as e:
-        error_msg = f'Imagery Post: {str(e)}'
+        error_msg = f"Imagery Post: {str(e)}"
         current_app.logger.error(error_msg)
         return err(500, "Failed to save imagery source to DB"), 500
-

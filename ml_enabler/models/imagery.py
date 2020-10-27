@@ -1,20 +1,20 @@
 from ml_enabler import db
 from ml_enabler.models.dtos.dtos import ImageryDTO
 
+
 class Imagery(db.Model):
     """ Store an imagery source for a given model """
-    __tablename__ = 'imagery'
+
+    __tablename__ = "imagery"
 
     id = db.Column(db.Integer, primary_key=True)
 
     model_id = db.Column(
-        db.BigInteger,
-        db.ForeignKey('projects.id', name='fk_projects'),
-        nullable=False
+        db.BigInteger, db.ForeignKey("projects.id", name="fk_projects"), nullable=False
     )
 
     name = db.Column(db.String, nullable=False)
-    url =  db.Column(db.String, nullable=False)
+    url = db.Column(db.String, nullable=False)
     fmt = db.Column(db.String, nullable=False)
 
     def create(self, model_id: int, imagery: dict):
@@ -42,11 +42,7 @@ class Imagery(db.Model):
 
     def get(imagery_id: int):
         query = db.session.query(
-            Imagery.id,
-            Imagery.name,
-            Imagery.url,
-            Imagery.fmt,
-            Imagery.model_id
+            Imagery.id, Imagery.name, Imagery.url, Imagery.fmt, Imagery.model_id
         ).filter(Imagery.id == imagery_id)
 
         return Imagery.query.get(imagery_id)
@@ -58,20 +54,12 @@ class Imagery(db.Model):
 
     def list(model_id: int):
         query = db.session.query(
-            Imagery.id,
-            Imagery.name,
-            Imagery.url,
-            Imagery.fmt
+            Imagery.id, Imagery.name, Imagery.url, Imagery.fmt
         ).filter(Imagery.model_id == model_id)
 
         imagery = []
         for img in query.all():
-            imagery.append({
-                "id": img[0],
-                "name": img[1],
-                "url": img[2],
-                "fmt": img[3]
-            })
+            imagery.append({"id": img[0], "name": img[1], "url": img[2], "fmt": img[3]})
 
         return imagery
 
@@ -84,4 +72,3 @@ class Imagery(db.Model):
             self.fmt = update["fmt"]
 
         db.session.commit()
-
