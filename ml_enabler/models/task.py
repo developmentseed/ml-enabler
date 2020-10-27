@@ -3,19 +3,17 @@ from ml_enabler import db
 from ml_enabler.models.dtos.dtos import TaskDTO
 from sqlalchemy.sql.expression import any_
 
+
 class Task(db.Model):
-    __tablename__ = 'tasks'
+    __tablename__ = "tasks"
 
     id = db.Column(db.Integer, primary_key=True)
     pred_id = db.Column(
         db.BigInteger,
-        db.ForeignKey('predictions.id', name='fk_predictions'),
-        nullable=False
+        db.ForeignKey("predictions.id", name="fk_predictions"),
+        nullable=False,
     )
-    type = db.Column(
-        db.String,
-        nullable=False
-    )
+    type = db.Column(db.String, nullable=False)
     created = db.Column(db.DateTime, default=timestamp, nullable=False)
     batch_id = db.Column(db.String)
 

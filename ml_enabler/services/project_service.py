@@ -12,7 +12,7 @@ class ProjectServiceError(Exception):
             current_app.logger.error(message)
 
 
-class ProjectService():
+class ProjectService:
     @staticmethod
     def subscribe_ml_model(ml_model_dto: ProjectDTO) -> int:
         """
@@ -41,7 +41,7 @@ class ProjectService():
         if ml_model:
             ml_model.delete()
         else:
-            raise NotFound('Model does not exist')
+            raise NotFound("Model does not exist")
 
     @staticmethod
     def get_ml_model_by_id(model_id: int):
@@ -60,7 +60,7 @@ class ProjectService():
             model = ml_model.as_dto(users=users)
             return model
         else:
-            raise NotFound('Model does not exist')
+            raise NotFound("Model does not exist")
 
     @staticmethod
     def get_all(uid: int, model_filter: str, model_archived: bool):
@@ -78,7 +78,7 @@ class ProjectService():
                 model_collection.append(model.as_dto().to_primitive())
             return model_collection
         else:
-            raise NotFound('No models exist')
+            raise NotFound("No models exist")
 
     @staticmethod
     def update_ml_model(updated_ml_model_dto: ProjectDTO) -> int:
@@ -97,8 +97,10 @@ class ProjectService():
 
             if updated_ml_model_dto.users:
                 users = ProjectAccess.list(updated_ml_model_dto.model_id)
-                ProjectAccess.list_update(updated_ml_model_dto.model_id, users, updated_ml_model_dto.users)
+                ProjectAccess.list_update(
+                    updated_ml_model_dto.model_id, users, updated_ml_model_dto.users
+                )
 
             return updated_ml_model_dto.model_id
         else:
-            raise NotFound('Model does not exist')
+            raise NotFound("Model does not exist")

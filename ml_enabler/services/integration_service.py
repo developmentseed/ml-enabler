@@ -5,9 +5,10 @@ from ml_enabler.services.prediction_service import PredictionService
 from ml_enabler.models.utils import IntegrationNotFound
 from urllib.parse import urlparse
 
-class IntegrationService():
+
+class IntegrationService:
     @staticmethod
-    def create(model_id: int,  payload: dict) -> int:
+    def create(model_id: int, payload: dict) -> int:
         """
         Validate and add integration from a model to the database
 
@@ -40,7 +41,7 @@ class IntegrationService():
 
             return integration.id
 
-        raise IntegrationNotFound('Integration Not Found')
+        raise IntegrationNotFound("Integration Not Found")
 
     @staticmethod
     def patch(model_id: int, integration_id: int, update: dict) -> int:
@@ -59,7 +60,7 @@ class IntegrationService():
 
             return integration.id
 
-        raise IntegrationNotFound('Integration Not Found')
+        raise IntegrationNotFound("Integration Not Found")
 
     @staticmethod
     def list(model_id: int):
@@ -88,7 +89,7 @@ class IntegrationService():
         if integration:
             return integration.as_dto().to_primitive()
 
-        raise IntegrationNotFound('Integration Not Found')
+        raise IntegrationNotFound("Integration Not Found")
 
     @staticmethod
     def get_secrets(integration_id: int):
@@ -105,32 +106,38 @@ class IntegrationService():
         if integration:
             return integration
 
-        raise IntegrationNotFound('Integration Not Found')
+        raise IntegrationNotFound("Integration Not Found")
 
     @staticmethod
     def payload(integration_id: int, payload: dict):
         integration = IntegrationService.get_secrets(integration_id)
 
         if integration is None:
-            raise IntegrationNotFound('Integration Not Found')
+            raise IntegrationNotFound("Integration Not Found")
 
         if integration.integration != "maproulette":
             raise Exception("Only MapRoulette Integrations supported")
 
-        for ele in ['prediction', 'project', 'project_desc', 'challenge', 'challenge_instr', 'threshold', 'inferences']:
+        for ele in [
+            "prediction",
+            "project",
+            "project_desc",
+            "challenge",
+            "challenge_instr",
+            "threshold",
+            "inferences",
+        ]:
             if payload.get(ele) is None:
-                raise Exception('Missing ' + ele + ' key in body')
+                raise Exception("Missing " + ele + " key in body")
 
         auth = integration.auth
-        if payload.get('auth') is not None:
-            auth = payload.get('auth')
+        if payload.get("auth") is not None:
+            auth = payload.get("auth")
 
         parsed = urlparse(integration.url)
 
         config = maproulette.Configuration(
-            api_key=auth,
-            hostname=parsed.netloc,
-            protocol=parsed.scheme
+            api_key=auth, hostname=parsed.netloc, protocol=parsed.scheme
         )
 
         project_api = maproulette.Project(config)
@@ -138,74 +145,67 @@ class IntegrationService():
 
         try:
             project = project_api.get_project_by_name(
-                project_name=payload.get('project')
+                project_name=payload.get("project")
             )
         except:
             project = project_api.create_project(
                 data={
-                    "name": payload.get('project'),
-                    "display_name": payload.get('project'),
-                    "description": payload.get('project_desc'),
-                    "enabled": True
+                    "name": payload.get("project"),
+                    "display_name": payload.get("project"),
+                    "description": payload.get("project_desc"),
+                    "enabled": True,
                 }
             )
 
         try:
             challenge = challenge_api.create_challenge(
                 data={
-                    'name': payload.get('challenge'),
-                    'parent': project['data']['id'],
-                    'instruction': payload.get('challenge_instr')
+                    "name": payload.get("challenge"),
+                    "parent": project["data"]["id"],
+                    "instruction": payload.get("challenge_instr"),
                 }
             )
         except Exception as e:
             raise e
 
-        req_inferences = payload.get('inferences', 'all')
-        req_threshold = float(payload.get('threshold', '0'))
+        req_inferences = payload.get("inferences", "all")
+        req_threshold = float(payload.get("threshold", "0"))
 
-        stream = PredictionService.export(int(payload.get('prediction')))
-        inferences = PredictionService.inferences(int(payload.get('prediction')))
-        pred = PredictionService.get_prediction_by_id(int(payload.get('prediction')))
+        stream = PredictionService.export(int(payload.get("prediction")))
+        inferences = PredictionService.inferences(int(payload.get("prediction")))
+        pred = PredictionService.get_prediction_by_id(int(payload.get("prediction")))
 
-        if req_inferences != 'all':
-            inferences = [ req_inferences ]
+        if req_inferences != "all":
+            inferences = [req_inferences]
 
-        feats = {
-            'type': 'FeatureCollection',
-            'features': []
-        }
+        feats = {"type": "FeatureCollection", "features": []}
 
         for row in stream:
-            if req_inferences != 'all' and row[3].get(req_inferences) is None:
+            if req_inferences != "all" and row[3].get(req_inferences) is None:
                 continue
-            if req_inferences != 'all' and row[3].get(req_inferences) <= req_threshold:
+            if req_inferences != "all" and row[3].get(req_inferences) <= req_threshold:
                 continue
 
             properties_dict = {}
             if row[4]:
                 properties_dict = row[3]
                 valid_dict = {}
-                valid_dict.update({'validity': row[4]})
+                valid_dict.update({"validity": row[4]})
                 properties_dict.update(valid_dict)
 
-            properties_dict['mle:id'] = row[0]
+            properties_dict["mle:id"] = row[0]
 
             feat = {
                 "quadkey": row[1],
                 "type": "Feature",
                 "properties": properties_dict,
-                "geometry": json.loads(row[2])
+                "geometry": json.loads(row[2]),
             }
 
-            feats['features'].append(feat)
+            feats["features"].append(feat)
 
         challenge_api.add_tasks_to_challenge(
-            challenge_id=challenge['data']['id'],
-            data=feats
+            challenge_id=challenge["data"]["id"], data=feats
         )
 
-        return {
-            "project": project['data']['id'],
-            "challenge": challenge['data']['id']
-        }
+        return {"project": project["data"]["id"], "challenge": challenge["data"]["id"]}
