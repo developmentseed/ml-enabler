@@ -144,7 +144,7 @@ export default {
             this.loading = true;
 
             try {
-                const res = await fetch(`${window.location.origin}/v1/user/token`, {
+                const res = await fetch(`${window.api}/v1/user/token`, {
                     method: 'GET',
                     credentials: 'same-origin'
                 });
@@ -164,7 +164,7 @@ export default {
             }
         },
         deleteToken: function(token_id) {
-            fetch(`${window.location.origin}/v1/user/token/${token_id}`, {
+            fetch(`${window.api}/v1/user/token/${token_id}`, {
                 method: 'DELETE',
                 credentials: 'same-origin'
             }).then((res) => {

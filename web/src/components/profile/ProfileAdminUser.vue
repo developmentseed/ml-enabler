@@ -173,7 +173,7 @@ export default {
         getUsers: function() {
             this.loading = true;
 
-            const url = new URL(`${window.location.origin}/v1/user`);
+            const url = new URL(`${window.api}/v1/user`);
             url.searchParams.append('limit', this.perpage)
             url.searchParams.append('page', this.page)
             url.searchParams.append('filter', this.filter)
@@ -200,7 +200,7 @@ export default {
             });
         },
         createUser: function() {
-            fetch(`${window.location.origin}/v1/user`, {
+            fetch(`${window.api}/v1/user`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
