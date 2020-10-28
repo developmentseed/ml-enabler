@@ -209,7 +209,7 @@ class Prediction(db.Model):
         :param prediction_id
         :return prediction if found otherwise None
         """
-        query = db.session.query(
+        db.session.query(
             Prediction.id,
             Prediction.hint,
             Prediction.created,
@@ -322,7 +322,7 @@ class PredictionTile(db.Model):
     @staticmethod
     def get(predictiontile_id: int):
 
-        query = db.session.query(
+        db.session.query(
             PredictionTile.id,
             PredictionTile.prediction_id,
             PredictionTile.validity,

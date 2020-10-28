@@ -1,3 +1,5 @@
+import traceback
+
 from flask import Blueprint
 from flask_restful import request, current_app
 from ml_enabler.utils import err
@@ -29,8 +31,9 @@ def list(project_id):
     except IntegrationNotFound:
         return err(404, "Integration not found"), 404
     except Exception as e:
+        current_app.logger.error(traceback.format_exc())
+
         error_msg = f"Unhandled error: {str(e)}"
-        current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
 
@@ -55,8 +58,9 @@ def get(project_id, integration_id):
     except IntegrationNotFound:
         return err(404, "Integration not found"), 404
     except Exception as e:
+        current_app.logger.error(traceback.format_exc())
+
         error_msg = f"Unhandled error: {str(e)}"
-        current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
 
@@ -119,9 +123,9 @@ def post(project_id):
         integration_id = IntegrationService.create(project_id, integration)
 
         return {"model_id": project_id, "integration_id": integration_id}, 200
-    except Exception as e:
-        error_msg = f"Integration Post: {str(e)}"
-        current_app.logger.error(error_msg)
+    except Exception:
+        current_app.logger.error(traceback.format_exc())
+
         return err(500, "Failed to save integration source to DB"), 500
 
 
@@ -147,8 +151,9 @@ def use(project_id, integration_id):
     except IntegrationNotFound:
         return err(404, "Integration not found"), 404
     except Exception as e:
+        current_app.logger.error(traceback.format_exc())
+
         error_msg = f"Unhandled error: {str(e)}"
-        current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
     return {"status": "created"}, 200

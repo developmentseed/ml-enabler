@@ -247,7 +247,6 @@ class PredictionExport(Resource):
                     )
                     gdf = gpd.GeoDataFrame(df, crs="EPSG:4326", geometry=df["c"])
                     # get tile name that where chip-list geom and geom in prediction row match
-                    pred_centroid = shape(json.loads(row[2]))
                     gdf_2 = gpd.GeoDataFrame(
                         {"geometry": [shape(json.loads(row[2]))]}, crs="EPSG:4326"
                     )
@@ -263,15 +262,15 @@ class PredictionExport(Resource):
                 if req_inferences == "all":
                     req_threshold = request.args.get("threshold", "0.5")
                     req_threshold = float(req_threshold)
-                l = [1 if score >= req_threshold else 0 for score in raw_pred]
+                binary_pred_list = [1 if score >= req_threshold else 0 for score in raw_pred]
 
                 # special case for training and not predictions
                 if hint == "training":
                     if i_info["fmt"] == "list":
                         for chip_name in tiles_intersection:
-                            labels_dict.update({chip_name: l})
+                            labels_dict.update({chip_name: binary_pred_list})
                     else:
-                        labels_dict.update({t: l})
+                        labels_dict.update({t: binary_pred_list})
                 elif row[4]:
                     t = "-".join([str(i) for i in mercantile.quadkey_to_tile(row[1])])
 
@@ -282,23 +281,23 @@ class PredictionExport(Resource):
                         if list(row[4].values())[
                             0
                         ]:  # validated and true, keep original
-                            labels_dict.update({t: l})
+                            labels_dict.update({t: binary_pred_list})
                         else:
-                            if l == [1, 0]:
-                                l = [0, 1]
+                            if binary_pred_list == [1, 0]:
+                                binary_pred_list = [0, 1]
                             else:
-                                l = [1, 0]
-                            labels_dict.update({t: l})
+                                binary_pred_list = [1, 0]
+                            labels_dict.update({t: binary_pred_list})
                     else:
                         # for multi-label
                         for key in list(row[4].keys()):
                             i = i_lst.index(key)
                             if not row[4][key]:
-                                if l[i] == 0:
-                                    l[i] = 1
+                                if binary_pred_list[i] == 0:
+                                    binary_pred_list[i] = 1
                                 else:
-                                    l[i] = 0
-                            labels_dict.update({t: l})
+                                    binary_pred_list[i] = 0
+                            labels_dict.update({t: binary_pred_list})
             if not labels_dict:
                 raise NoValid
 
@@ -447,7 +446,6 @@ class PredictionInfAPI(Resource):
             else:
                 current_app.logger.error(traceback.format_exc())
 
-                error_msg = f"Prediction Stack Info Error: {str(e)}"
                 return err(500, "Failed to get stack info"), 500
 
     @login_required
@@ -508,7 +506,6 @@ class PredictionInfAPI(Resource):
             else:
                 current_app.logger.error(traceback.format_exc())
 
-                error_msg = f"Prediction Stack Info Error: {str(e)}"
                 return err(500, "Failed to get stack info"), 500
 
     @login_required
@@ -683,10 +680,9 @@ class PredictionTfrecords(Resource):
                     "batch_id": job.get("jobId"),
                 }
             )
-        except Exception as e:
+        except Exception:
             current_app.logger.error(traceback.format_exc())
 
-            error_msg = f"Batch GPU Error: {str(e)}"
             return err(500, "Failed to start GPU Retrain"), 500
 
 
@@ -740,10 +736,9 @@ class PredictionRetrain(Resource):
                     "batch_id": job.get("jobId"),
                 }
             )
-        except Exception as e:
+        except Exception:
             current_app.logger.error(traceback.format_exc())
 
-            error_msg = f"Batch GPU Error: {str(e)}"
             return err(500, "Failed to start GPU Retrain"), 500
 
 
@@ -797,10 +792,9 @@ class PredictionAssetAPI(Resource):
                 boto3.resource("s3").Bucket(
                     CONFIG.EnvironmentConfig.ASSET_BUCKET
                 ).put_object(Key=key, Body=model.stream)
-            except Exception as e:
+            except Exception:
                 current_app.logger.error(traceback.format_exc())
 
-                error_msg = f"S3 Upload Error: {str(e)}"
                 return err(500, "Failed to upload model to S3"), 500
 
             if modeltype == "checkpoint":
@@ -813,10 +807,9 @@ class PredictionAssetAPI(Resource):
                             + key
                         },
                     )
-                except Exception as e:
+                except Exception:
                     current_app.logger.error(traceback.format_exc())
 
-                    error_msg = f"SaveLink Error: {str(e)}"
                     return err(500, "Failed to save checkpoint state to DB"), 500
 
             if modeltype == "tfrecord":
@@ -829,10 +822,9 @@ class PredictionAssetAPI(Resource):
                             + key
                         },
                     )
-                except Exception as e:
+                except Exception:
                     current_app.logger.error(traceback.format_exc())
 
-                    error_msg = f"SaveLink Error: {str(e)}"
                     return err(500, "Failed to save checkpoint state to DB"), 500
 
             if modeltype == "model":
@@ -846,10 +838,9 @@ class PredictionAssetAPI(Resource):
                             + key
                         },
                     )
-                except Exception as e:
+                except Exception:
                     current_app.logger.error(traceback.format_exc())
 
-                    error_msg = f"SaveLink Error: {str(e)}"
                     return err(500, "Failed to save model state to DB"), 500
 
                 try:
@@ -883,10 +874,9 @@ class PredictionAssetAPI(Resource):
                             "batch_id": job.get("jobId"),
                         }
                     )
-                except Exception as e:
+                except Exception:
                     current_app.logger.error(traceback.format_exc())
 
-                    error_msg = f"Batch Error: {str(e)}"
                     return err(500, "Failed to start ECR build"), 500
 
             return {"status": "model uploaded"}, 200
@@ -952,10 +942,9 @@ class PredictionAssetAPI(Resource):
                     "Content-Disposition": 'attachment; filename="export.' + fmt + '"',
                 },
             )
-        except Exception as e:
+        except Exception:
             current_app.logger.error(traceback.format_exc())
 
-            error_msg = f"Asset Download Error: {str(e)}"
             return err(500, "Failed to download asset from S3"), 500
 
 
@@ -992,7 +981,7 @@ class PredictionValidity(Resource):
             return current, 200
         except Exception as e:
             current_app.logger.error(traceback.format_exc())
-            
+
             error_msg = f"Unhandled error: {str(e)}"
             return (500, error_msg), 500
 

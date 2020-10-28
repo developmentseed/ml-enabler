@@ -1,3 +1,5 @@
+import traceback
+
 from flask import Blueprint
 from flask_restful import request, current_app
 from ml_enabler.utils import err
@@ -26,8 +28,9 @@ def list():
         tokens = TokenService.list(current_user.id)
         return jsonify(tokens), 200
     except Exception as e:
+        current_app.logger.error(traceback.format_exc())
+
         error_msg = f"Unhandled error: {str(e)}"
-        current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
 
@@ -48,8 +51,9 @@ def post():
         token_payload["uid"] = current_user.id
         return TokenService.create(token_payload), 200
     except Exception as e:
+        current_app.logger.error(traceback.format_exc())
+
         error_msg = f"Unhandled error: {str(e)}"
-        current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
 
@@ -70,8 +74,9 @@ def get(token_id):
     except NotFound:
         return err(404, "No Token Found"), 404
     except Exception as e:
+        current_app.logger.error(traceback.format_exc())
+
         error_msg = f"Unhandled error: {str(e)}"
-        current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
 
@@ -92,6 +97,7 @@ def delete(token_id):
     except NotFound:
         return err(404, "No Token Found"), 404
     except Exception as e:
+        current_app.logger.error(traceback.format_exc())
+
         error_msg = f"Unhandled error: {str(e)}"
-        current_app.logger.error(error_msg)
         return err(500, error_msg), 500

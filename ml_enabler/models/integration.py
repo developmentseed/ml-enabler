@@ -43,7 +43,7 @@ class Integration(db.Model):
         return integration_dto
 
     def get(integration_id: int):
-        query = db.session.query(
+        db.session.query(
             Integration.id,
             Integration.name,
             Integration.integration,
@@ -54,7 +54,7 @@ class Integration(db.Model):
         return Integration.query.get(integration_id)
 
     def get_secrets(integration_id: int):
-        query = db.session.query(
+        db.session.query(
             Integration.id,
             Integration.auth,
             Integration.name,

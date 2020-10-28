@@ -1,3 +1,5 @@
+import traceback
+
 from flask import Blueprint
 from flask_restful import request, current_app
 from ml_enabler.utils import err
@@ -7,14 +9,12 @@ import ml_enabler.config as CONFIG
 from ml_enabler.api.auth import has_project_read, has_project_write
 from flask_login import login_required
 
-tasks_bp = Blueprint(
-    'tasks_bp', __name__
-)
+tasks_bp = Blueprint("tasks_bp", __name__)
 
 
 @login_required
 @has_project_read
-@tasks_bp.route('/v1/model/<int:project_id>/task', methods=['GET'])
+@tasks_bp.route("/v1/model/<int:project_id>/task", methods=["GET"])
 def list(project_id):
     """
     Return a list of currently running tasks for a given prediction
@@ -42,14 +42,15 @@ def list(project_id):
     except NotFound:
         return err(404, "task not found"), 404
     except Exception as e:
+        current_app.logger.error(traceback.format_exc())
+
         error_msg = f"Unhandled error: {str(e)}"
-        current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
 
 @login_required
 @has_project_read
-@tasks_bp.route('/v1/model/<int:project_id>/task/<int:task_id>', methods=['GET'])
+@tasks_bp.route("/v1/model/<int:project_id>/task/<int:task_id>", methods=["GET"])
 def get(project_id, task_id):
     """
     Return a single task
@@ -68,14 +69,15 @@ def get(project_id, task_id):
     except NotFound:
         return err(404, "task not found"), 404
     except Exception as e:
+        current_app.logger.error(traceback.format_exc())
+
         error_msg = f"Unhandled error: {str(e)}"
-        current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
 
 @login_required
 @has_project_read
-@tasks_bp.route('/v1/model/<int:project_id>/task/<int:task_id>/logs', methods=['GET'])
+@tasks_bp.route("/v1/model/<int:project_id>/task/<int:task_id>/logs", methods=["GET"])
 def logs(project_id, task_id):
     """
     Return a cloudwatch logs for a given task
@@ -94,14 +96,15 @@ def logs(project_id, task_id):
     except NotFound:
         return err(404, "task not found"), 404
     except Exception as e:
+        current_app.logger.error(traceback.format_exc())
+
         error_msg = f"Unhandled error: {str(e)}"
-        current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
 
 @login_required
 @has_project_write
-@tasks_bp.route('/v1/model/<int:project_id>/task/<int:task_id>', methods=['DELETE'])
+@tasks_bp.route("/v1/model/<int:project_id>/task/<int:task_id>", methods=["DELETE"])
 def delete(project_id, task_id):
     """
     Delete a given task
@@ -120,6 +123,7 @@ def delete(project_id, task_id):
     except NotFound:
         return err(404, "task not found"), 404
     except Exception as e:
+        current_app.logger.error(traceback.format_exc())
+
         error_msg = f"Unhandled error: {str(e)}"
-        current_app.logger.error(error_msg)
         return err(500, error_msg), 500

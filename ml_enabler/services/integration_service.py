@@ -147,7 +147,7 @@ class IntegrationService:
             project = project_api.get_project_by_name(
                 project_name=payload.get("project")
             )
-        except:
+        except Exception:
             project = project_api.create_project(
                 data={
                     "name": payload.get("project"),
@@ -172,11 +172,6 @@ class IntegrationService:
         req_threshold = float(payload.get("threshold", "0"))
 
         stream = PredictionService.export(int(payload.get("prediction")))
-        inferences = PredictionService.inferences(int(payload.get("prediction")))
-        pred = PredictionService.get_prediction_by_id(int(payload.get("prediction")))
-
-        if req_inferences != "all":
-            inferences = [req_inferences]
 
         feats = {"type": "FeatureCollection", "features": []}
 

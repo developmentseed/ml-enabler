@@ -1,7 +1,8 @@
 import ml_enabler.config as CONFIG
 from shapely.geometry import shape
 import sqlalchemy
-import mercantile, semver
+import mercantile
+import semver
 from ml_enabler.models.ml_model import Project, PredictionTile, Prediction
 from ml_enabler.models.dtos.dtos import PredictionDTO
 from ml_enabler.utils import InvalidGeojson
@@ -24,7 +25,7 @@ class PredictionService:
         version = payload["version"]
         try:
             semver.VersionInfo.parse(version)
-        except Exception as e:
+        except Exception:
             raise "Version Must be SemVer"
 
         prediction_dto = PredictionDTO()

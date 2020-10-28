@@ -1,3 +1,5 @@
+import traceback
+
 import boto3
 from flask import Blueprint
 from flask_restful import request, current_app
@@ -27,8 +29,6 @@ def list():
     stacks = []
 
     def getList():
-        token = False
-
         stack_res = boto3.client("cloudformation").list_stacks(
             StackStatusFilter=[
                 "CREATE_IN_PROGRESS",
@@ -90,9 +90,9 @@ def list():
 
         return res, 200
 
-    except Exception as e:
-        error_msg = f"Prediction Stack List Error: {str(e)}"
-        current_app.logger.error(error_msg)
+    except Exception:
+        current_app.logger.error(traceback.format_exc())
+
         return err(500, "Failed to get stack list"), 500
 
 
@@ -168,9 +168,9 @@ def post(project_id, prediction_id):
         )
 
         return {"status": "Stack Creation Initiated"}
-    except Exception as e:
-        error_msg = f"Prediction Stack Creation Error: {str(e)}"
-        current_app.logger.error(error_msg)
+    except Exception:
+        current_app.logger.error(traceback.format_exc())
+
         return err(500, "Failed to create stack info"), 500
 
 
@@ -200,8 +200,8 @@ def delete(project_id, prediction_id):
         if str(e).find("does not exist") != -1:
             return {"name": stack, "status": "None"}, 200
         else:
-            error_msg = f"Prediction Stack Info Error: {str(e)}"
-            current_app.logger.error(error_msg)
+            current_app.logger.error(traceback.format_exc())
+
             return err(500, "Failed to get stack info"), 500
 
 
@@ -248,6 +248,6 @@ def get(project_id, prediction_id):
         if str(e).find("does not exist") != -1:
             return {"name": stack, "status": "None"}, 200
         else:
-            error_msg = f"Prediction Stack Info Error: {str(e)}"
-            current_app.logger.error(error_msg)
+            current_app.logger.error(traceback.format_exc())
+
             return err(500, "Failed to get stack info"), 500

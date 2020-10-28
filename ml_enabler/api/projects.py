@@ -1,4 +1,5 @@
 import traceback
+
 from flask import Blueprint
 from flask_login import current_user
 from flask_restful import request, current_app
@@ -12,13 +13,11 @@ from flask_login import login_required
 from schematics.exceptions import DataError
 from flask import jsonify
 
-projects_bp = Blueprint(
-    'projects_bp', __name__
-)
+projects_bp = Blueprint("projects_bp", __name__)
 
 
 @login_required
-@projects_bp.route('/v1/model', methods=['POST'])
+@projects_bp.route("/v1/model", methods=["POST"])
 def post():
     """
     Create a new Project
@@ -65,7 +64,7 @@ def post():
 
 @login_required
 @has_project_admin
-@projects_bp.route('/v1/model/<int:project_id>', methods=['DELETE'])
+@projects_bp.route("/v1/model/<int:project_id>", methods=["DELETE"])
 def delete(project_id):
     """
     Deletes an existing model and it's predictions
@@ -94,13 +93,13 @@ def delete(project_id):
     except Exception as e:
         current_app.logger.error(traceback.format_exc())
 
-        error_msg = f'Unhandled error: {str(e)}'
+        error_msg = f"Unhandled error: {str(e)}"
         return err(500, error_msg), 500
 
 
 @login_required
 @has_project_read
-@projects_bp.route('/v1/model/<int:project_id>', methods=['GET'])
+@projects_bp.route("/v1/model/<int:project_id>", methods=["GET"])
 def get(project_id):
     """
     Get model information with the ID
@@ -129,13 +128,13 @@ def get(project_id):
     except Exception as e:
         current_app.logger.error(traceback.format_exc())
 
-        error_msg = f'Unhandled error: {str(e)}'
+        error_msg = f"Unhandled error: {str(e)}"
         return err(500, error_msg), 500
 
 
 @login_required
 @has_project_admin
-@projects_bp.route('/v1/model/<int:project_id>', methods=['PUT'])
+@projects_bp.route("/v1/model/<int:project_id>", methods=["PUT"])
 def put(project_id):
     """
     Update an existing model
@@ -183,12 +182,12 @@ def put(project_id):
     except Exception as e:
         current_app.logger.error(traceback.format_exc())
 
-        error_msg = f'Unhandled error: {str(e)}'
+        error_msg = f"Unhandled error: {str(e)}"
         return err(500, error_msg), 500
 
 
 @login_required
-@projects_bp.route('/v1/model', methods=['GET'])
+@projects_bp.route("/v1/model", methods=["GET"])
 def list():
     """
     Get all ML models
@@ -203,23 +202,25 @@ def list():
         500:
             description: Internal Server Error
     """
-    model_filter = request.args.get('filter', '')
-    model_archived = request.args.get('archived', 'false')
+    model_filter = request.args.get("filter", "")
+    model_archived = request.args.get("archived", "false")
 
-    if model_archived == 'false':
+    if model_archived == "false":
         model_archived = False
-    elif model_archived == 'true':
+    elif model_archived == "true":
         model_archived = True
     else:
         return err(400, "archived param must be 'true' or 'false'"), 400
 
     try:
-        ml_models = ProjectService.get_all(current_user.id, model_filter, model_archived)
+        ml_models = ProjectService.get_all(
+            current_user.id, model_filter, model_archived
+        )
         return jsonify(ml_models), 200
     except NotFound:
         return err(404, "no models found"), 404
     except Exception as e:
         current_app.logger.error(traceback.format_exc())
 
-        error_msg = f'Unhandled error: {str(e)}'
+        error_msg = f"Unhandled error: {str(e)}"
         return err(500, error_msg), 500
