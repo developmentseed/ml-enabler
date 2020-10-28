@@ -34,7 +34,7 @@ CMD service nginx restart \
     && echo "CREATE EXTENSION POSTGIS" | psql postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_ENDPOINT}:${POSTGRES_PORT}/${POSTGRES_DB} || true \
     && echo "CREATE EXTENSION PGCRYPTO" | psql postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_ENDPOINT}:${POSTGRES_PORT}/${POSTGRES_DB} || true \
     && flask db upgrade || true \
-    && echo "INSERT INTO users (name, password) VALUES ('machine', crypt('$MACHINE_AUTH', gen_salt('bf', 10)))" | psql postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_ENDPOINT}:${POSTGRES_PORT}/${POSTGRES_DB} || true \
+    && echo "INSERT INTO users (name, password, access) VALUES ('machine', crypt('$MACHINE_AUTH', gen_salt('bf', 10)), 'admin')" | psql postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_ENDPOINT}:${POSTGRES_PORT}/${POSTGRES_DB} || true \
     && echo "UPDATE users SET password = crypt('$MACHINE_AUTH', gen_salt('bf', 10)) WHERE name = 'machine'" | psql postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_ENDPOINT}:${POSTGRES_PORT}/${POSTGRES_DB} || true \
     && gunicorn \
         --bind 0.0.0.0:4000 \
