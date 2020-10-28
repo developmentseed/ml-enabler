@@ -181,9 +181,9 @@ class IntegrationService:
             if req_inferences != "all" and row[3].get(req_inferences) <= req_threshold:
                 continue
 
-            properties_dict = {}
+            properties_dict = row[3]
+
             if row[4]:
-                properties_dict = row[3]
                 valid_dict = {}
                 valid_dict.update({"validity": row[4]})
                 properties_dict.update(valid_dict)
