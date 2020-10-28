@@ -39,5 +39,6 @@ CMD service nginx restart \
     && gunicorn \
         --bind 0.0.0.0:4000 \
         --timeout 120 \
+        --workers 24 \
         'ml_enabler:create_app()' \
         --access-logfile -
