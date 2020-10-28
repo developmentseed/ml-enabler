@@ -1,13 +1,13 @@
+import traceback
+
 from flask import Blueprint
 from functools import wraps
 from flask import request
 from flask_login import current_user, logout_user, login_user
-from flask_restful import request
+from flask_restful import current_app
 from ml_enabler.models.ml_model import User, Project, ProjectAccess
 from ml_enabler.models.token import Token
 from ml_enabler import login_manager
-from functools import wraps
-from flask import request
 
 import base64
 
@@ -17,8 +17,6 @@ auth_bp = Blueprint("auth_bp", __name__)
 def has_admin(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        project_id = kwargs.get("project_id")
-
         if current_user.is_authenticated and current_user.name == "machine":
             return f(*args, **kwargs)
 
@@ -122,8 +120,9 @@ def login():
 
         login_user(user)
         return {"status": 200, "message": "Logged In"}, 200
-    except Exception as e:
-        print(e)
+    except Exception:
+        current_app.logger.error(traceback.format_exc())
+
         return {"status": 500, "error": "Internal Server Error"}, 500
 
 

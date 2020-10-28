@@ -41,7 +41,7 @@ class Imagery(db.Model):
         return imagery_dto
 
     def get(imagery_id: int):
-        query = db.session.query(
+        db.session.query(
             Imagery.id, Imagery.name, Imagery.url, Imagery.fmt, Imagery.model_id
         ).filter(Imagery.id == imagery_id)
 

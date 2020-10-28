@@ -1,4 +1,6 @@
-import mercantile, geojson, json
+import mercantile
+import geojson
+import json
 from shapely.geometry import box, Point, shape
 
 

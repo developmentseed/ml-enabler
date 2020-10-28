@@ -1,4 +1,5 @@
-import random, string
+import random
+import string
 
 from ml_enabler.models.ml_model import User
 from ml_enabler.models.dtos.dtos import UserDTO

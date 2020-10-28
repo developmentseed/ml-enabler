@@ -1,3 +1,5 @@
+import traceback
+
 from flask import Blueprint
 from flask_restful import request, current_app
 from ml_enabler.utils import err
@@ -49,8 +51,9 @@ def list():
 
         return users, 200
     except Exception as e:
+        current_app.logger.error(traceback.format_exc())
+
         error_msg = f"Unhandled error: {str(e)}"
-        current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
 
@@ -71,6 +74,7 @@ def post():
         user = request.get_json()
         return UserService.create(user)
     except Exception as e:
+        current_app.logger.error(traceback.format_exc())
+
         error_msg = f"Unhandled error: {str(e)}"
-        current_app.logger.error(error_msg)
         return err(500, error_msg), 500

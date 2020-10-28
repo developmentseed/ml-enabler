@@ -1,3 +1,5 @@
+import traceback
+
 from flask import Blueprint
 from flask_restful import request, current_app
 from ml_enabler.utils import err
@@ -30,8 +32,9 @@ def list(project_id):
     except ImageryNotFound:
         return err(404, "Imagery not found"), 404
     except Exception as e:
+        current_app.logger.error(traceback.format_exc())
+
         error_msg = f"Unhandled error: {str(e)}"
-        current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
 
@@ -56,8 +59,9 @@ def get(project_id, imagery_id):
     except ImageryNotFound:
         return err(404, "Imagery not found"), 404
     except Exception as e:
+        current_app.logger.error(traceback.format_exc())
+
         error_msg = f"Unhandled error: {str(e)}"
-        current_app.logger.error(error_msg)
         return err(500, error_msg), 500
 
 
@@ -120,7 +124,7 @@ def post(project_id):
         imagery_id = ImageryService.create(project_id, imagery)
 
         return {"model_id": project_id, "imagery_id": imagery_id}, 200
-    except Exception as e:
-        error_msg = f"Imagery Post: {str(e)}"
-        current_app.logger.error(error_msg)
+    except Exception:
+        current_app.logger.error(traceback.format_exc())
+
         return err(500, "Failed to save imagery source to DB"), 500

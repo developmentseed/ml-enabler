@@ -98,12 +98,6 @@ class TaskService:
         if task["logs"] is False:
             logs.append({"id": 1, "message": "No Logs in LogStream"})
         else:
-            batch = boto3.client(
-                service_name="batch",
-                region_name="us-east-1",
-                endpoint_url="https://batch.us-east-1.amazonaws.com",
-            )
-
             cwl = boto3.client("logs")
 
             rawlogs = cwl.get_log_events(
