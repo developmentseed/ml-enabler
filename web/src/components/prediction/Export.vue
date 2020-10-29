@@ -200,6 +200,14 @@ export default {
                 url.searchParams.set('threshold', this.params.threshold / 100);
             }
 
+            if (this.params.validation.validated && !this.params.validation.unvalidated) {
+                url.searchParams.set('validation', 'validated');
+            } else if (!this.params.validation.validated && this.params.validation.unvalidated) {
+                url.searchParams.set('validation', 'unvalidated');
+            } else {
+                url.searchParams.set('validation', 'both');
+            }
+
             this.external(url);
         },
         createIntegration: async function() {
