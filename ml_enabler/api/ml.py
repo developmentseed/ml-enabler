@@ -206,7 +206,10 @@ class PredictionExport(Resource):
         if req_validated not in ["both", "validated", "unvalidated"]:
             return err(400, "validated param must be true or false"), 400
         if req_validated != "both" and req_inferences == "all":
-            return err(400, "validated param cannot be used with inferences=all param"), 400
+            return (
+                err(400, "validated param cannot be used with inferences=all param"),
+                400,
+            )
 
         req_threshold = float(req_threshold)
 
@@ -275,7 +278,9 @@ class PredictionExport(Resource):
                 if req_inferences == "all":
                     req_threshold = request.args.get("threshold", "0.5")
                     req_threshold = float(req_threshold)
-                binary_pred_list = [1 if score >= req_threshold else 0 for score in raw_pred]
+                binary_pred_list = [
+                    1 if score >= req_threshold else 0 for score in raw_pred
+                ]
 
                 # special case for training and not predictions
                 if hint == "training":

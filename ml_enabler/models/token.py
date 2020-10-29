@@ -44,12 +44,9 @@ class Token(db.Model):
         return dto
 
     def get(uid: int, token_id: int):
-        db.session.query(
-            Token.id,
-            Token.uid,
-            Token.name,
-            Token.created,
-        ).filter(Token.uid == uid).filter(Token.id == token_id)
+        db.session.query(Token.id, Token.uid, Token.name, Token.created,).filter(
+            Token.uid == uid
+        ).filter(Token.id == token_id)
 
         return Token.query.all()[0]
 
