@@ -50,11 +50,25 @@
                             <div class='select-arrow'></div>
                         </div>
                     </div>
-                    <div class='col col--12 py12'>
+                    <div class='col col--8 py12'>
                         <label>Threshold (<span v-text='params.threshold'/>%)</label>
                         <div class='range range--s color-gray'>
                             <input :disabled='params.inferences === "all"' v-on:input='params.threshold = parseInt($event.target.value)' type='range' min=0 max=100 />
                         </div>
+                    </div>
+
+                    <div class='col col--4 py12'>
+                        <label>Validation</label>
+
+                        <div class='col col--12'>
+                            <button @click='params.validation.validated = !params.validation.validated' class='btn btn--s btn--gray round mr12' :class='{
+                                "btn--stroke": !params.validation.validated
+                            }'>Validated</button>
+                            <button @click='params.validation.unvalidated = !params.validation.unvalidated' class='btn btn--gray btn--s round' :class='{
+                                "btn--stroke": !params.validation.unvalidated
+                            }'>Unvalidated</button>
+                        </div>
+
                     </div>
 
                     <div class='col col--12 clearfix py6'>
@@ -163,7 +177,11 @@ export default {
             params: {
                 format: 'geojson',
                 inferences: 'all',
-                threshold: 50
+                threshold: 50,
+                validation: {
+                    validated: true,
+                    unvalidated: true
+                }
             }
         };
     },

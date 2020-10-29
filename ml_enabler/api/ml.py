@@ -139,8 +139,6 @@ class PredictionImport(Resource):
 class PredictionExport(Resource):
     """ Export Prediction Inferences to common formats """
 
-    # ?threshold=0->1                   [default 0]
-
     @login_required
     @has_project_read
     def get(self, project_id, prediction_id):
@@ -173,6 +171,13 @@ class PredictionExport(Resource):
                   - csv
               description: The format to provide records in
 
+            - name: validated
+              in: query
+              schema:
+                type: string
+                default: validated,unvalidated
+              description: Allow "validated", "unvalidated", or "both" when returning a single inference
+
             - name: inferences
               in: query
               schema:
@@ -188,6 +193,7 @@ class PredictionExport(Resource):
                 minimum: 0
                 maximum: 1
               description: The confidence threshold to apply to exported inferences
+
         responses:
             200:
                 description: Exported Data
@@ -195,6 +201,13 @@ class PredictionExport(Resource):
         req_format = request.args.get("format", "geojson")
         req_inferences = request.args.get("inferences", "all")
         req_threshold = request.args.get("threshold", "0")
+        req_validated = request.args.get("validated", "both")
+
+        if req_validated not in ["both", "validated", "unvalidated"]:
+            return err(400, "validated param must be true or false"), 400
+        if req_validated != "both" and req_inferences == "all":
+            return err(400, "validated param cannot be used with inferences=all param"), 400
+
         req_threshold = float(req_threshold)
 
         stream = PredictionService.export(prediction_id)
