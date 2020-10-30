@@ -50,26 +50,37 @@
                             <div class='select-arrow'></div>
                         </div>
                     </div>
-                    <div class='col col--8 py12'>
-                        <label>Threshold (<span v-text='params.threshold'/>%)</label>
-                        <div class='range range--s color-gray'>
-                            <input :disabled='params.inferences === "all"' v-on:input='params.threshold = parseInt($event.target.value)' type='range' min=0 max=100 />
-                        </div>
+
+                    <div class='col col--12'>
+                        <button @click='folding.single = !folding.single' class='btn btn--white color-gray px0'>
+                            <svg v-if='!folding.single' class='icon fl my6'><use xlink:href='#icon-chevron-down'/></svg>
+                            <svg v-else class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg>
+
+                            <span class='fl pl6'>Single Inference Options</span>
+                        </button>
                     </div>
 
-                    <div class='col col--4 py12'>
-                        <label>Validation</label>
-
-                        <div class='col col--12'>
-                            <button @click='params.validation.validated = !params.validation.validated' class='btn btn--s btn--gray round mr12' :class='{
-                                "btn--stroke": !params.validation.validated
-                            }'>Validated</button>
-                            <button @click='params.validation.unvalidated = !params.validation.unvalidated' class='btn btn--gray btn--s round' :class='{
-                                "btn--stroke": !params.validation.unvalidated
-                            }'>Unvalidated</button>
+                    <template v-if='!folding.single'>
+                        <div class='col col--8 py12'>
+                            <label>Threshold (<span v-text='params.threshold'/>%)</label>
+                            <div class='range range--s color-gray'>
+                                <input :disabled='params.inferences === "all"' v-on:input='params.threshold = parseInt($event.target.value)' type='range' min=0 max=100 />
+                            </div>
                         </div>
 
-                    </div>
+                        <div class='col col--4 py12'>
+                            <label>Validation</label>
+
+                            <div class='col col--12'>
+                                <button :disabled='params.inferences === "all"' @click='params.validation.validated = !params.validation.validated' class='btn btn--s btn--gray round mr12' :class='{
+                                    "btn--stroke": !params.validation.validated
+                                }'>Validated</button>
+                                <button :disabled='params.inferences === "all"' @click='params.validation.unvalidated = !params.validation.unvalidated' class='btn btn--gray btn--s round' :class='{
+                                    "btn--stroke": !params.validation.unvalidated
+                                }'>Unvalidated</button>
+                            </div>
+                        </div>
+                    </template>
 
                     <div class='col col--12 clearfix py6'>
                         <button @click='getExport' class='fr btn btn--stroke color-gray color-green-on-hover round'>Export</button>
@@ -166,6 +177,9 @@ export default {
             mode: 'download',
             loading: false,
             integration: false,
+            folding: {
+                single: true
+            },
             mr: {
                 project: '',
                 project_desc: '',
@@ -189,6 +203,11 @@ export default {
         this.mr.project = this.model.name;
         this.mr.challenge = `${this.model.name} - v${this.prediction.version}`;
     },
+    watch: {
+        'params.inferences': function() {
+            this.folding.single = this.params.inferences === 'all';
+        }
+    },
     methods: {
         getExport: function() {
             const url = new URL(`${window.api}/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/export`);
@@ -198,14 +217,14 @@ export default {
 
             if (this.params.inferences !== 'all') {
                 url.searchParams.set('threshold', this.params.threshold / 100);
-            }
 
-            if (this.params.validation.validated && !this.params.validation.unvalidated) {
-                url.searchParams.set('validation', 'validated');
-            } else if (!this.params.validation.validated && this.params.validation.unvalidated) {
-                url.searchParams.set('validation', 'unvalidated');
-            } else {
-                url.searchParams.set('validation', 'both');
+                if (this.params.validation.validated && !this.params.validation.unvalidated) {
+                    url.searchParams.set('validity', 'validated');
+                } else if (!this.params.validation.validated && this.params.validation.unvalidated) {
+                    url.searchParams.set('validity', 'unvalidated');
+                } else {
+                    url.searchParams.set('validity', 'both');
+                }
             }
 
             this.external(url);

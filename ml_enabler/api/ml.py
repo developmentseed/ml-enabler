@@ -171,7 +171,7 @@ class PredictionExport(Resource):
                   - csv
               description: The format to provide records in
 
-            - name: validated
+            - name: validity
               in: query
               schema:
                 type: string
@@ -201,11 +201,11 @@ class PredictionExport(Resource):
         req_format = request.args.get("format", "geojson")
         req_inferences = request.args.get("inferences", "all")
         req_threshold = request.args.get("threshold", "0")
-        req_validated = request.args.get("validated", "both")
+        req_validity = request.args.get("validity", "both")
 
-        if req_validated not in ["both", "validated", "unvalidated"]:
+        if req_validity not in ["both", "validated", "unvalidated"]:
             return err(400, "validated param must be true or false"), 400
-        if req_validated != "both" and req_inferences == "all":
+        if req_validity != "both" and req_inferences == "all":
             return (
                 err(400, "validated param cannot be used with inferences=all param"),
                 400,
@@ -238,6 +238,11 @@ class PredictionExport(Resource):
             labels_dict = {}
             for row in stream:
                 if req_inferences != "all" and row[3].get(req_inferences) is None:
+                    continue
+
+                if req_validity == "unvalidated" and row[4] is not None and row[4].get(req_inferences) is not None:
+                    continue
+                elif req_validity == "validated" and (row[4] is None or row[4].get(req_inferences) is None):
                     continue
 
                 if (
@@ -335,6 +340,11 @@ class PredictionExport(Resource):
                 yield output.getvalue()
             for row in stream:
                 if req_inferences != "all" and row[3].get(req_inferences) is None:
+                    continue
+
+                if req_validity == "unvalidated" and row[4] is not None and row[4].get(req_inferences) is not None:
+                    continue
+                elif req_validity == "validated" and (row[4] is None or row[4].get(req_inferences) is None):
                     continue
 
                 if (
