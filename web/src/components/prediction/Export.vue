@@ -111,14 +111,6 @@
                         </div>
                         <div class='grid grid--gut12 col col--12 border border--gray-light round ml12'>
                             <div class='col col--12 pt12 pr12'>
-                                <label>Project Name</label>
-                                <input type='text' v-model='mr.project' class='input'/>
-                            </div>
-                            <div class='col col--12 pt12 pr12'>
-                                <label>Project Description</label>
-                                <textarea v-model='mr.project_desc' class='textarea'></textarea>
-                            </div>
-                            <div class='col col--12 pt12 pr12'>
                                 <label>Challenge Name</label>
                                 <input type='text' v-model='mr.challenge' class='input'/>
                             </div>
@@ -126,6 +118,7 @@
                                 <label>Challenge Instructions</label>
                                 <textarea v-model='mr.challenge_instr' class='textarea'></textarea>
                             </div>
+
                             <div class='col col--6 py12'>
                                 <label>Threshold (<span v-text='mr.threshold'/>%)</label>
                                 <div class='range range--s color-gray'>
@@ -143,6 +136,27 @@
                                     <div class='select-arrow'></div>
                                 </div>
                             </div>
+
+                            <div class='col col--12'>
+                                <button @click='folding.integration = !folding.integration' class='btn btn--white color-gray px0'>
+                                    <svg v-if='!folding.integration' class='icon fl my6'><use xlink:href='#icon-chevron-down'/></svg>
+                                    <svg v-else class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg>
+
+                                    <span class='fl pl6'>Advanced Options</span>
+                                </button>
+                            </div>
+
+                            <template v-if='!folding.integration'>
+                                <div class='col col--12 pt12 pr12'>
+                                    <label>Project Name</label>
+                                    <input type='text' v-model='mr.project' class='input'/>
+                                </div>
+                                <div class='col col--12 pt12 pr12'>
+                                    <label>Project Description</label>
+                                    <textarea v-model='mr.project_desc' class='textarea'></textarea>
+                                </div>
+                            </template>
+
                             <div class='col col--12 clearfix pt6 pb12 pr12'>
                                 <button @click='createIntegration' class='fr btn btn--stroke color-gray color-green-on-hover round'>Submit</button>
                             </div>
@@ -178,7 +192,8 @@ export default {
             loading: false,
             integration: false,
             folding: {
-                single: true
+                single: true,
+                integration: true
             },
             mr: {
                 project: '',
@@ -201,6 +216,7 @@ export default {
     },
     mounted: function() {
         this.mr.project = this.model.name;
+        this.mr.project_desc = this.model.name;
         this.mr.challenge = `${this.model.name} - v${this.prediction.version}`;
     },
     watch: {
