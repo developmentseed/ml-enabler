@@ -110,20 +110,9 @@
                             </button>
                         </div>
                         <div class='grid grid--gut12 col col--12 border border--gray-light round ml12'>
-                            <div class='col col--12 pt12 pr12'>
+                            <div class='col col--6 pt12 pr12'>
                                 <label>Challenge Name</label>
                                 <input type='text' v-model='mr.challenge' class='input'/>
-                            </div>
-                            <div class='col col--12 pt12 pr12'>
-                                <label>Challenge Instructions</label>
-                                <textarea v-model='mr.challenge_instr' class='textarea'></textarea>
-                            </div>
-
-                            <div class='col col--6 py12'>
-                                <label>Threshold (<span v-text='mr.threshold'/>%)</label>
-                                <div class='range range--s color-gray'>
-                                    <input :disabled='mr.inferences === "all"' v-on:input='mr.threshold = parseInt($event.target.value)' type='range' min=0 max=100 />
-                                </div>
                             </div>
 
                             <div class='col col--6 py12 pr12'>
@@ -136,6 +125,42 @@
                                     <div class='select-arrow'></div>
                                 </div>
                             </div>
+
+                            <div class='col col--12 pt12 pr12'>
+                                <label>Challenge Instructions</label>
+                                <textarea v-model='mr.challenge_instr' class='textarea'></textarea>
+                            </div>
+
+                            <div class='col col--12'>
+                                <button @click='folding.single = !folding.single' class='btn btn--white color-gray px0'>
+                                    <svg v-if='!folding.single' class='icon fl my6'><use xlink:href='#icon-chevron-down'/></svg>
+                                    <svg v-else class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg>
+
+                                    <span class='fl pl6'>Single Inference Options</span>
+                                </button>
+                            </div>
+
+                            <template v-if='!folding.single'>
+                                <div class='col col--8 py12'>
+                                    <label>Threshold (<span v-text='mr.threshold'/>%)</label>
+                                    <div class='range range--s color-gray'>
+                                        <input :disabled='mr.inferences === "all"' v-on:input='params.threshold = parseInt($event.target.value)' type='range' min=0 max=100 />
+                                    </div>
+                                </div>
+
+                                <div class='col col--4 py12'>
+                                    <label>Validation</label>
+
+                                    <div class='col col--12'>
+                                        <button :disabled='mr.inferences === "all"' @click='mr.validation.validated = !mr.validation.validated' class='btn btn--s btn--gray round mr12' :class='{
+                                            "btn--stroke": !mr.validation.validated
+                                        }'>Validated</button>
+                                        <button :disabled='mr.inferences === "all"' @click='mr.validation.unvalidated = !mr.validation.unvalidated' class='btn btn--gray btn--s round' :class='{
+                                            "btn--stroke": !mr.validation.unvalidated
+                                        }'>Unvalidated</button>
+                                    </div>
+                                </div>
+                            </template>
 
                             <div class='col col--12'>
                                 <button @click='folding.integration = !folding.integration' class='btn btn--white color-gray px0'>
@@ -201,7 +226,11 @@ export default {
                 challenge: '',
                 challenge_instr: '',
                 inferences: 'all',
-                threshold: 50
+                threshold: 50,
+                validation: {
+                    validated: true,
+                    unvalidated: true
+                }
             },
             params: {
                 format: 'geojson',
@@ -222,6 +251,9 @@ export default {
     watch: {
         'params.inferences': function() {
             this.folding.single = this.params.inferences === 'all';
+        },
+        'mr.inferences': function() {
+            this.folding.single = this.mr.inferences === 'all';
         }
     },
     methods: {
