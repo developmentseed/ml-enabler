@@ -284,6 +284,19 @@ export default {
                 if (!this.mr.challenge) throw new Error('Challenge Name Required');
                 if (!this.mr.challenge_instr) throw new Error('Challenge Description Required');
 
+
+                let validity = undefined;
+                if (this.mr.inferences !== 'all') {
+                    if (this.mr.validation.validated && !this.mr.validation.unvalidated) {
+                        validity = 'validated';
+                    } else if (!this.mr.validation.validated && this.mr.validation.unvalidated) {
+                        validity = 'unvalidated';
+                    } else {
+                        validity = 'both';
+                    }
+                }
+                console.error(validity)
+
                 this.loading = true;
                 const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/integration/${this.integration.id}`, {
                     method: 'POST',
@@ -297,6 +310,7 @@ export default {
                         challenge: this.mr.challenge,
                         challenge_instr: this.mr.challenge_instr,
                         inferences: this.mr.inferences,
+                        validity: validity,
                         threshold: this.mr.threshold / 100
                     })
                 });
