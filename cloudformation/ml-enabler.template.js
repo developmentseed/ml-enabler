@@ -914,12 +914,12 @@ module.exports = cf.merge({
     Mappings,
     Conditions,
     Outputs,
-    alarms({
-        prefix: 'MLEnabler',
-        email: 'ingalls@developmentseed.org',
-        cluster: cf.ref('MLEnablerECSCluster'),
-        service: cf.getAtt('MLEnablerService', 'Name'),
-        loadbalancer: cf.getAtt('MLEnablerELB', 'LoadBalancerFullName'),
-        targetgroup: cf.getAtt('MLEnablerTargetGroup', 'TargetGroupFullName')
-    })
-}, batch);
+},
+alarms({
+    prefix: 'MLEnabler',
+    email: 'ingalls@developmentseed.org',
+    cluster: cf.ref('MLEnablerECSCluster'),
+    service: cf.getAtt('MLEnablerService', 'Name'),
+    loadbalancer: cf.getAtt('MLEnablerELB', 'LoadBalancerFullName'),
+    targetgroup: cf.getAtt('MLEnablerTargetGroup', 'TargetGroupFullName')
+}), batch);
