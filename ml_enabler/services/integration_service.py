@@ -1,4 +1,5 @@
 import maproulette
+from ml_enabler.utils import err
 import json
 from ml_enabler.models.integration import Integration
 from ml_enabler.services.prediction_service import PredictionService
@@ -171,6 +172,16 @@ class IntegrationService:
         req_inferences = payload.get("inferences", "all")
         req_threshold = float(payload.get("threshold", "0"))
 
+        req_validity = payload.get("validity", "both")
+
+        if req_validity not in ["both", "validated", "unvalidated"]:
+            return err(400, "validated param must be true or false"), 400
+        if req_validity != "both" and req_inferences == "all":
+            return (
+                err(400, "validated param cannot be used with inferences=all param"),
+                400,
+            )
+
         stream = PredictionService.export(int(payload.get("prediction")))
 
         feats = {"type": "FeatureCollection", "features": []}
@@ -179,6 +190,17 @@ class IntegrationService:
             if req_inferences != "all" and row[3].get(req_inferences) is None:
                 continue
             if req_inferences != "all" and row[3].get(req_inferences) <= req_threshold:
+                continue
+
+            if (
+                req_validity == "unvalidated"
+                and row[4] is not None
+                and row[4].get(req_inferences) is not None
+            ):
+                continue
+            elif req_validity == "validated" and (
+                row[4] is None or row[4].get(req_inferences) is None
+            ):
                 continue
 
             properties_dict = row[3]

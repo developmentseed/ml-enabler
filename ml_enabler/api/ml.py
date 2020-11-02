@@ -240,9 +240,15 @@ class PredictionExport(Resource):
                 if req_inferences != "all" and row[3].get(req_inferences) is None:
                     continue
 
-                if req_validity == "unvalidated" and row[4] is not None and row[4].get(req_inferences) is not None:
+                if (
+                    req_validity == "unvalidated"
+                    and row[4] is not None
+                    and row[4].get(req_inferences) is not None
+                ):
                     continue
-                elif req_validity == "validated" and (row[4] is None or row[4].get(req_inferences) is None):
+                elif req_validity == "validated" and (
+                    row[4] is None or row[4].get(req_inferences) is None
+                ):
                     continue
 
                 if (
@@ -342,9 +348,15 @@ class PredictionExport(Resource):
                 if req_inferences != "all" and row[3].get(req_inferences) is None:
                     continue
 
-                if req_validity == "unvalidated" and row[4] is not None and row[4].get(req_inferences) is not None:
+                if (
+                    req_validity == "unvalidated"
+                    and row[4] is not None
+                    and row[4].get(req_inferences) is not None
+                ):
                     continue
-                elif req_validity == "validated" and (row[4] is None or row[4].get(req_inferences) is None):
+                elif req_validity == "validated" and (
+                    row[4] is None or row[4].get(req_inferences) is None
+                ):
                     continue
 
                 if (
