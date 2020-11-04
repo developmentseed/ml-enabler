@@ -50,12 +50,37 @@
                             <div class='select-arrow'></div>
                         </div>
                     </div>
-                    <div class='col col--12 py12'>
-                        <label>Threshold (<span v-text='params.threshold'/>%)</label>
-                        <div class='range range--s color-gray'>
-                            <input :disabled='params.inferences === "all"' v-on:input='params.threshold = parseInt($event.target.value)' type='range' min=0 max=100 />
-                        </div>
+
+                    <div class='col col--12'>
+                        <button @click='folding.single = !folding.single' class='btn btn--white color-gray px0'>
+                            <svg v-if='!folding.single' class='icon fl my6'><use xlink:href='#icon-chevron-down'/></svg>
+                            <svg v-else class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg>
+
+                            <span class='fl pl6'>Single Inference Options</span>
+                        </button>
                     </div>
+
+                    <template v-if='!folding.single'>
+                        <div class='col col--8 py12'>
+                            <label>Threshold (<span v-text='params.threshold'/>%)</label>
+                            <div class='range range--s color-gray'>
+                                <input :disabled='params.inferences === "all"' v-on:input='params.threshold = parseInt($event.target.value)' type='range' min=0 max=100 />
+                            </div>
+                        </div>
+
+                        <div class='col col--4 py12'>
+                            <label>Validation</label>
+
+                            <div class='col col--12'>
+                                <button :disabled='params.inferences === "all"' @click='params.validation.validated = !params.validation.validated' class='btn btn--s btn--gray round mr12' :class='{
+                                    "btn--stroke": !params.validation.validated
+                                }'>Validated</button>
+                                <button :disabled='params.inferences === "all"' @click='params.validation.unvalidated = !params.validation.unvalidated' class='btn btn--gray btn--s round' :class='{
+                                    "btn--stroke": !params.validation.unvalidated
+                                }'>Unvalidated</button>
+                            </div>
+                        </div>
+                    </template>
 
                     <div class='col col--12 clearfix py6'>
                         <button @click='getExport' class='fr btn btn--stroke color-gray color-green-on-hover round'>Export</button>
@@ -85,27 +110,9 @@
                             </button>
                         </div>
                         <div class='grid grid--gut12 col col--12 border border--gray-light round ml12'>
-                            <div class='col col--12 pt12 pr12'>
-                                <label>Project Name</label>
-                                <input type='text' v-model='mr.project' class='input'/>
-                            </div>
-                            <div class='col col--12 pt12 pr12'>
-                                <label>Project Description</label>
-                                <textarea v-model='mr.project_desc' class='textarea'></textarea>
-                            </div>
-                            <div class='col col--12 pt12 pr12'>
+                            <div class='col col--6 pt12 pr12'>
                                 <label>Challenge Name</label>
                                 <input type='text' v-model='mr.challenge' class='input'/>
-                            </div>
-                            <div class='col col--12 pt12 pr12'>
-                                <label>Challenge Instructions</label>
-                                <textarea v-model='mr.challenge_instr' class='textarea'></textarea>
-                            </div>
-                            <div class='col col--6 py12'>
-                                <label>Threshold (<span v-text='mr.threshold'/>%)</label>
-                                <div class='range range--s color-gray'>
-                                    <input :disabled='mr.inferences === "all"' v-on:input='mr.threshold = parseInt($event.target.value)' type='range' min=0 max=100 />
-                                </div>
                             </div>
 
                             <div class='col col--6 py12 pr12'>
@@ -118,6 +125,63 @@
                                     <div class='select-arrow'></div>
                                 </div>
                             </div>
+
+                            <div class='col col--12 pt12 pr12'>
+                                <label>Challenge Instructions</label>
+                                <textarea v-model='mr.challenge_instr' class='textarea'></textarea>
+                            </div>
+
+                            <div class='col col--12'>
+                                <button @click='folding.single = !folding.single' class='btn btn--white color-gray px0'>
+                                    <svg v-if='!folding.single' class='icon fl my6'><use xlink:href='#icon-chevron-down'/></svg>
+                                    <svg v-else class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg>
+
+                                    <span class='fl pl6'>Single Inference Options</span>
+                                </button>
+                            </div>
+
+                            <template v-if='!folding.single'>
+                                <div class='col col--8 py12'>
+                                    <label>Threshold (<span v-text='mr.threshold'/>%)</label>
+                                    <div class='range range--s color-gray'>
+                                        <input :disabled='mr.inferences === "all"' v-on:input='params.threshold = parseInt($event.target.value)' type='range' min=0 max=100 />
+                                    </div>
+                                </div>
+
+                                <div class='col col--4 py12'>
+                                    <label>Validation</label>
+
+                                    <div class='col col--12'>
+                                        <button :disabled='mr.inferences === "all"' @click='mr.validation.validated = !mr.validation.validated' class='btn btn--s btn--gray round mr12' :class='{
+                                            "btn--stroke": !mr.validation.validated
+                                        }'>Validated</button>
+                                        <button :disabled='mr.inferences === "all"' @click='mr.validation.unvalidated = !mr.validation.unvalidated' class='btn btn--gray btn--s round' :class='{
+                                            "btn--stroke": !mr.validation.unvalidated
+                                        }'>Unvalidated</button>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <div class='col col--12'>
+                                <button @click='folding.integration = !folding.integration' class='btn btn--white color-gray px0'>
+                                    <svg v-if='!folding.integration' class='icon fl my6'><use xlink:href='#icon-chevron-down'/></svg>
+                                    <svg v-else class='icon fl my6'><use xlink:href='#icon-chevron-right'/></svg>
+
+                                    <span class='fl pl6'>Advanced Options</span>
+                                </button>
+                            </div>
+
+                            <template v-if='!folding.integration'>
+                                <div class='col col--12 pt12 pr12'>
+                                    <label>Project Name</label>
+                                    <input type='text' v-model='mr.project' class='input'/>
+                                </div>
+                                <div class='col col--12 pt12 pr12'>
+                                    <label>Project Description</label>
+                                    <textarea v-model='mr.project_desc' class='textarea'></textarea>
+                                </div>
+                            </template>
+
                             <div class='col col--12 clearfix pt6 pb12 pr12'>
                                 <button @click='createIntegration' class='fr btn btn--stroke color-gray color-green-on-hover round'>Submit</button>
                             </div>
@@ -152,24 +216,45 @@ export default {
             mode: 'download',
             loading: false,
             integration: false,
+            folding: {
+                single: true,
+                integration: true
+            },
             mr: {
                 project: '',
                 project_desc: '',
                 challenge: '',
                 challenge_instr: '',
                 inferences: 'all',
-                threshold: 50
+                threshold: 50,
+                validation: {
+                    validated: true,
+                    unvalidated: true
+                }
             },
             params: {
                 format: 'geojson',
                 inferences: 'all',
-                threshold: 50
+                threshold: 50,
+                validation: {
+                    validated: true,
+                    unvalidated: true
+                }
             }
         };
     },
     mounted: function() {
         this.mr.project = this.model.name;
+        this.mr.project_desc = this.model.name;
         this.mr.challenge = `${this.model.name} - v${this.prediction.version}`;
+    },
+    watch: {
+        'params.inferences': function() {
+            this.folding.single = this.params.inferences === 'all';
+        },
+        'mr.inferences': function() {
+            this.folding.single = this.mr.inferences === 'all';
+        }
     },
     methods: {
         getExport: function() {
@@ -180,6 +265,14 @@ export default {
 
             if (this.params.inferences !== 'all') {
                 url.searchParams.set('threshold', this.params.threshold / 100);
+
+                if (this.params.validation.validated && !this.params.validation.unvalidated) {
+                    url.searchParams.set('validity', 'validated');
+                } else if (!this.params.validation.validated && this.params.validation.unvalidated) {
+                    url.searchParams.set('validity', 'unvalidated');
+                } else {
+                    url.searchParams.set('validity', 'both');
+                }
             }
 
             this.external(url);
@@ -190,6 +283,19 @@ export default {
                 if (!this.mr.project_desc) throw new Error('Project Description Required');
                 if (!this.mr.challenge) throw new Error('Challenge Name Required');
                 if (!this.mr.challenge_instr) throw new Error('Challenge Description Required');
+
+
+                let validity = undefined;
+                if (this.mr.inferences !== 'all') {
+                    if (this.mr.validation.validated && !this.mr.validation.unvalidated) {
+                        validity = 'validated';
+                    } else if (!this.mr.validation.validated && this.mr.validation.unvalidated) {
+                        validity = 'unvalidated';
+                    } else {
+                        validity = 'both';
+                    }
+                }
+                console.error(validity)
 
                 this.loading = true;
                 const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/integration/${this.integration.id}`, {
@@ -204,6 +310,7 @@ export default {
                         challenge: this.mr.challenge,
                         challenge_instr: this.mr.challenge_instr,
                         inferences: this.mr.inferences,
+                        validity: validity,
                         threshold: this.mr.threshold / 100
                     })
                 });
