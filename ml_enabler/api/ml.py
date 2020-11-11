@@ -642,7 +642,7 @@ class PredictionInfAPI(Resource):
                     FunctionName=CONFIG.EnvironmentConfig.STACK + '-pop',
                     InvocationType='Event',
                     Payload=json.dumps({
-                        'url': imagery['ur'],
+                        'url': imagery['url'],
                         'queue': queue_name
                     })
                 )
