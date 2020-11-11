@@ -1,6 +1,6 @@
 """Example AWS Lambda function for chip-n-scale"""
 
-import os, requests
+import os, boto3, requests
 from typing import Dict, Any
 from pop.custom_types import SQSEvent
 
