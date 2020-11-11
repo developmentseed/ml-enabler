@@ -15,7 +15,12 @@ jobs:
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   aws-region: us-east-1
 
-            - name: Build Lambdas
+            - name: Build Lambda
               run: |
                 cd ./lambda
+                ./upload-lambda.sh
+
+            - name: Build Lambda-Pop
+              run: |
+                cd ./lambda-pop
                 ./upload-lambda.sh

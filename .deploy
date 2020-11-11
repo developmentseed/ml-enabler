@@ -7,7 +7,8 @@
             "{{project}}:task-retrain-{{gitsha}}"
         ],
         "lambda": [
-            "devseed-artifacts/ml-enabler/lambda-{{gitsha}}.zip"
+            "devseed-artifacts/ml-enabler/lambda-{{gitsha}}.zip",
+            "devseed-artifacts/ml-enabler/lambda-pop-{{gitsha}}.zip"
         ]
     }
 }
