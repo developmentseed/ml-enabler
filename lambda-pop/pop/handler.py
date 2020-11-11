@@ -5,11 +5,8 @@ from typing import Dict, Any
 from pop.custom_types import SQSEvent
 
 def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
-    print(event)
-    payload = event['Records'][0]['body']
-
-    queue_name = payload['QUEUE_NAME']
-    url = payload['TILE_URL']
+    queue_name = event['queue']
+    url = event['url']
     assert(queue_name)
     assert(url)
 
