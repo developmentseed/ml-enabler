@@ -5,10 +5,10 @@ from typing import Dict, Any
 from pop.custom_types import SQSEvent
 
 def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
-    # read all our environment variables to throw errors early
+    payload = event['Records'][0]['body']
 
-    queue_name = os.getenv('QUEUE_NAME')
-    url = os.getenv('TILE_URL')
+    queue_name = payload['QUEUE_NAME']
+    url = payload['TILE_URL']
     assert(queue_name)
     assert(url)
 

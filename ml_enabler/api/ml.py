@@ -636,6 +636,16 @@ class PredictionInfAPI(Resource):
                 return {}, 200
             elif imagery["fmt"] == "list":
                 # TODO CREATE LAMBDA CALL
+                awslambda = boto3.client('lambda')
+
+                awslambda.invoke(
+                    FunctionName=CONFIG.EnvironmentConfig.STACK + '-pop',
+                    InvocationType='Event',
+                    Payload=json.dumps({
+                        'url': imagery['ur'],
+                        'queue': queue_name
+                    })
+                )
 
                 return {}, 200
 
