@@ -1,6 +1,6 @@
 <template>
     <div class="col col--12">
-        <template v-if='loading.model'>
+        <template v-if='loading.project'>
             <div class='flex-parent flex-parent--center-main w-full py24'>
                 <div class='flex-child loading py24'></div>
             </div>
