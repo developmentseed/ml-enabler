@@ -1,3 +1,6 @@
+gdal==3.1.0
+numpy==1.19.0
+rasterio==1.1.5
 mercantile==1.1.5
 requests==2.25.0
 geojson==2.5.0
