@@ -1,14 +1,15 @@
 FROM lambgeo/lambda:gdal3.1-py3.7
 
-ENV PACKAGE_PREFIX=/var/task
+ENV PYTHONUSERBASE=/var/task
 
 ################################################################################
 #                            CREATE PACKAGE                                    #
 ################################################################################
-COPY download_and_predict download_and_predict
-COPY setup.py setup.py
+COPY download_and_predict $PYTHONUSERBASE/download_and_predict
+COPY requirements.txt $PYTHONUSERBASE/requirements.txt
 
-RUN pip install numpy rasterio mercantile --no-binary :all: -t ${PACKAGE_PREFIX}/ \
-    && pip install . -t $PACKAGE_PREFIX -U
+RUN pip install -r requirements.txt --no-binary numpy,rasterio,gdal -t ${PACKAGE_PREFIX}/
 
-RUN cd $PACKAGE_PREFIX && zip -r9q /tmp/package.zip *
+RUN mv ${PYTHONUSERBASE}/lib/python3.7/site-packages/* ${PYTHONUSERBASE}/ \
+    && rm -rf ${PYTHONUSERBASE}/lib \
+    && cp $PYTHONUSERBASE && zip -r9q /tmp/package.zip *
