@@ -6,7 +6,10 @@ ENV PACKAGE_PREFIX=/var/task
 #                            CREATE PACKAGE                                    #
 ################################################################################
 COPY download_and_predict download_and_predict
-RUN pip install numpy rasterio mercantile --no-binary :all: -t ${PACKAGE_PREFIX}/
+COPY setup.py setup.py
+
+RUN pip install numpy rasterio mercantile --no-binary :all: -t ${PACKAGE_PREFIX}/ \
+    && pip install . -t $PACKAGE_PREFIX -U
 
 ################################################################################
 #                            REDUCE PACKAGE SIZE                               #
