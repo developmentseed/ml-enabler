@@ -1,21 +1,12 @@
-FROM developmentseed/geolambda:1.2.0-python
+FROM lambgeo/lambda:gdal3.1-py3.7
 
-WORKDIR /tmp
-
-ENV PACKAGE_PREFIX /tmp/python
+ENV PACKAGE_PREFIX=/var/task
 
 ################################################################################
 #                            CREATE PACKAGE                                    #
 ################################################################################
 COPY download_and_predict download_and_predict
-COPY setup.py setup.py
-
-ENV \
-  LANG=en_US.UTF-8 \
-  LC_ALL=en_US.UTF-8 \
-  CFLAGS="--std=c99"
-
-RUN pip3 install . --no-binary numpy -t $PACKAGE_PREFIX -U
+RUN pip install numpy rasterio mercantile --no-binary :all: -t ${PACKAGE_PREFIX}/
 
 ################################################################################
 #                            REDUCE PACKAGE SIZE                               #
@@ -28,15 +19,16 @@ RUN rm -rdf $PACKAGE_PREFIX/boto3/ \
   && rm -rdf $PACKAGE_PREFIX/s3transfer/ \
   && rm -rdf $PACKAGE_PREFIX/numpy/doc/
 
-# Leave module precompiles for faster Lambda startup
-RUN find $PACKAGE_PREFIX -type f -name '*.pyc' | while read f; do n=$(echo $f | sed 's/__pycache__\///' | sed 's/.cpython-[2-3][0-9]//'); cp $f $n; done;
-RUN find $PACKAGE_PREFIX -type d -a -name '__pycache__' -print0 | xargs -0 rm -rf
-RUN find $PACKAGE_PREFIX -type f -a -name '*.py' -print0 | xargs -0 rm -f
+RUN rm -rdf $PREFIX/share/doc \
+  && rm -rdf $PREFIX/share/man \
+  && rm -rdf $PREFIX/share/hdf*
+
+# Strip shared libraries
+RUN cd $PREFIX && find lib -name \*.so\* -exec strip {} \;
 
 ################################################################################
 #                              CREATE ARCHIVE                                  #
 ################################################################################
 RUN cd $PACKAGE_PREFIX && zip -r9q /tmp/package.zip *
-
-# Cleanup
-RUN rm -rf $PACKAGE_PREFIX
+RUN cd $PREFIX && zip -r9q --symlinks /tmp/package.zip lib/*.so* share
+RUN cd $PREFIX && zip -r9q --symlinks /tmp/package.zip bin/gdal* bin/ogr* bin/geos* bin/nearblack

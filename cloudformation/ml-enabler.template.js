@@ -648,7 +648,7 @@ const Resources = {
     PopLambdaFunction: {
         Type: 'AWS::Lambda::Function',
         Properties: {
-            Layers: [ 'arn:aws:lambda:us-east-1:552188055668:layer:geolambda:2' ],
+            Layers: [ 'arn:aws:lambda:us-east-1:524387336408:layer:gdal31:1' ],
             Code: {
                 S3Bucket: 'devseed-artifacts',
                 S3Key: cf.join(['ml-enabler/lambda-pop-', cf.ref('GitSha'), '.zip'])
