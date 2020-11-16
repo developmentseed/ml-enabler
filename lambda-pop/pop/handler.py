@@ -18,7 +18,12 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
 
     f = StringIO(r.text)
     cache = []
+    first = True;
     for row in csv.reader(f, delimiter=","):
+        if first == True:
+            first = False
+            continue
+
         cache.append({
             "Id": row[0],
             "MessageBody": json.dumps({
