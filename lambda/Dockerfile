@@ -7,8 +7,8 @@ ENV PACKAGE_PREFIX /tmp/python
 ################################################################################
 #                            CREATE PACKAGE                                    #
 ################################################################################
-COPY pop pop
-COPY setup.py setup.py
+COPY download_and_predict download_and_predict
+COPY requirements.txt requirements.txt
 
 ENV \
   LANG=en_US.UTF-8 \
