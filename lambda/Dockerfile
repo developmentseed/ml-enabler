@@ -15,7 +15,7 @@ ENV \
   LC_ALL=en_US.UTF-8 \
   CFLAGS="--std=c99"
 
-RUN pip3 install -r requirements.txt --no-binary numpy -t $PACKAGE_PREFIX -U
+RUN pip3 install -r requirements.txt --no-binary rasterio,shapely,numpy -t $PACKAGE_PREFIX -U
 
 ################################################################################
 #                            REDUCE PACKAGE SIZE                               #
