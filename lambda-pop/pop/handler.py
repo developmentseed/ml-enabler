@@ -24,7 +24,7 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
             "MessageBody": json.dumps({
                 "name": row[0],
                 "url": row[1],
-                "bounds": row[2].split(","),
+                "bounds": list(map(lambda x: float(x), row[2].split(",")))
             }),
         })
 
