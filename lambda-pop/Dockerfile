@@ -7,15 +7,15 @@ ENV PACKAGE_PREFIX /tmp/python
 ################################################################################
 #                            CREATE PACKAGE                                    #
 ################################################################################
-COPY download_and_predict download_and_predict
-COPY requirements.txt requirements.txt
+COPY pop pop
+COPY setup.py setup.py
 
 ENV \
   LANG=en_US.UTF-8 \
   LC_ALL=en_US.UTF-8 \
   CFLAGS="--std=c99"
 
-RUN pip3 install -r requirements.txt --no-binary rasterio,shapely,numpy -t $PACKAGE_PREFIX -U
+RUN pip3 install . --no-binary numpy -t $PACKAGE_PREFIX -U
 
 ################################################################################
 #                            REDUCE PACKAGE SIZE                               #
@@ -36,9 +36,7 @@ RUN find $PACKAGE_PREFIX -type f -a -name '*.py' -print0 | xargs -0 rm -f
 ################################################################################
 #                              CREATE ARCHIVE                                  #
 ################################################################################
-RUN zip -r9q /tmp/package.zip download_and_predict \
-    && cd $PACKAGE_PREFIX \
-    && zip -r9q /tmp/package.zip *
+RUN cd $PACKAGE_PREFIX && zip -r9q /tmp/package.zip *
 
 # Cleanup
 RUN rm -rf $PACKAGE_PREFIX

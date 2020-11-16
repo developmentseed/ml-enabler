@@ -635,32 +635,17 @@ class PredictionInfAPI(Resource):
 
                 return {}, 200
             elif imagery["fmt"] == "list":
+                # TODO CREATE LAMBDA CALL
+                awslambda = boto3.client('lambda')
 
-                r = requests.get(imagery["url"])
-                r.raise_for_status()
-
-                f = StringIO(r.text)
-                cache = []
-                for row in csv.reader(f, delimiter=","):
-                    cache.append(
-                        {
-                            "Id": row[0],
-                            "MessageBody": json.dumps(
-                                {
-                                    "name": row[0],
-                                    "url": row[1],
-                                    "bounds": row[2].split(","),
-                                }
-                            ),
-                        }
-                    )
-
-                    if len(cache) == 10:
-                        queue.send_messages(Entries=cache)
-                        cache = []
-
-                if len(cache) > 0:
-                    queue.send_messages(Entries=cache)
+                awslambda.invoke(
+                    FunctionName=CONFIG.EnvironmentConfig.STACK + '-pop',
+                    InvocationType='Event',
+                    Payload=json.dumps({
+                        'url': imagery['url'],
+                        'queue': queue_name
+                    })
+                )
 
                 return {}, 200
 

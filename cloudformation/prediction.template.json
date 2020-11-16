@@ -111,6 +111,8 @@
                 "Timeout": 240,
                 "Environment": {
                     "Variables": {
+                        "GDAL_DATA": "/opt/share/gdal",
+                        "PROJ_LIB": "/opt/share/proj",
                         "MACHINE_AUTH": { "Ref": "MachineAuth" },
                         "StackName": { "Ref": "AWS::StackName" },
                         "INFERENCES": { "Ref": "Inferences" },

@@ -151,7 +151,7 @@
                 <div class='col col--12 pt12'>
                     Imagery Chip Submission
 
-                    <div class='fr'>
+                    <div v-if='imagery.fmt !== "list"' class='fr'>
                         <button @click='mode = "bbox"' :class='{
                             "btn--stroke": mode !== "bbox"
                         }' class="btn btn--pill btn--pill-stroke btn--s btn--pill-hl round">BBox</button>
