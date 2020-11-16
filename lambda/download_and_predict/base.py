@@ -127,6 +127,7 @@ class DownloadAndPredict(object):
             for j in range(len(preds[i])):
                 pred_dict[inferences[j]] = preds[i][j]
 
+            print('BOUNDS', chips[i].get('bounds'))
             body = {
                 "geom": shapely.geometry.mapping(box(*chips[i].get('bounds'))),
                 "predictions": pred_dict,
