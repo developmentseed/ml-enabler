@@ -299,6 +299,7 @@ const Resources = {
                             'elasticloadbalancingv2:CreateTargetGroup',
                             'ecs:RegisterTaskDefinition',
                             'lambda:CreateFunction',
+                            'lambda:InvokeFunction',
                             'ec2:DescribeSecurityGroups'
                         ],
                         Resource: [ '*' ]
@@ -341,7 +342,7 @@ const Resources = {
                             'sqs:ChangeMessageVisibility',
                             'sqs:ListQueues',
                             'sqs:GetQueueUrl',
-                            'sqs:GetQueueAttributes'
+                            'sqs:GetQueueAttributes',
                         ],
                         Resource: [ cf.join(['arn:aws:sqs:', cf.region, ':', cf.accountId, ':*']) ]
                     },{
