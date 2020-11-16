@@ -36,7 +36,9 @@ RUN find $PACKAGE_PREFIX -type f -a -name '*.py' -print0 | xargs -0 rm -f
 ################################################################################
 #                              CREATE ARCHIVE                                  #
 ################################################################################
-RUN cd $PACKAGE_PREFIX && zip -r9q /tmp/package.zip *
+RUN zip -r9q /tmp/package.zip download_and_predict \
+    && cd $PACKAGE_PREFIX \
+    && zip -r9q /tmp/package.zip *
 
 # Cleanup
 RUN rm -rf $PACKAGE_PREFIX
