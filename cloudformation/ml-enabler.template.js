@@ -34,6 +34,10 @@ const Parameters = {
             'db.m4.xlarge'
         ]
     },
+    SecretKey: {
+        Type: 'String',
+        Description: 'Secret Key For Signing Cookies'
+    },
     DatabaseUser: {
         Type: 'String',
         Description: 'Database Username'
@@ -401,49 +405,23 @@ const Resources = {
                 PortMappings: [{
                     ContainerPort: 5000
                 }],
-                Environment: [{
-                    Name:'POSTGRES_DB',
-                    Value: 'mlenabler'
-                },{
-                    Name: 'ENVIRONMENT',
-                    Value: 'aws'
-                },{
-                    Name: 'MACHINE_AUTH',
-                    Value: cf.ref('MachineAuth')
-                },{
-                    Name:'POSTGRES_USER',
-                    Value: cf.ref('DatabaseUser')
-                },{
-                    Name:'POSTGRES_PASSWORD',
-                    Value: cf.ref('DatabasePassword')
-                },{
-                    Name:'POSTGRES_ENDPOINT',
-                    Value: cf.getAtt('MLEnablerRDS', 'Endpoint.Address')
-                },{
-                    Name:'POSTGRES_PORT',
-                    Value: '5432'
-                },{
-                    Name: 'FLASK_APP',
-                    Value: 'ml_enabler'
-                },{
-                    Name: 'ECS_LOG_LEVEL',
-                    Value: 'debug'
-                },{
-                    Name: 'GitSha',
-                    Value: cf.ref('GitSha')
-                },{
-                    Name: 'STACK',
-                    Value: cf.stackName
-                },{
-                    Name: 'MAPBOX_TOKEN',
-                    Value: cf.ref('MapboxAccessToken')
-                },{
-                    Name: 'ASSET_BUCKET',
-                    Value: cf.ref('MLEnablerBucket')
-                },{
-                    Name: 'INTERACTIVE',
-                    Value: 'false'
-                }],
+                Environment: [
+                    { Name: 'POSTGRES_DB', Value: 'mlenabler' },
+                    { Name: 'ENVIRONMENT', Value: 'aws' },
+                    { Name: 'MACHINE_AUTH', Value: cf.ref('MachineAuth') },
+                    { Name: 'POSTGRES_USER', Value: cf.ref('DatabaseUser') },
+                    { Name: 'POSTGRES_PASSWORD', Value: cf.ref('DatabasePassword') },
+                    { Name: 'POSTGRES_ENDPOINT', Value: cf.getAtt('MLEnablerRDS', 'Endpoint.Address') },
+                    { Name: 'POSTGRES_PORT', Value: '5432' },
+                    { Name: 'FLASK_APP', Value: 'ml_enabler' },
+                    { Name: 'ECS_LOG_LEVEL', Value: 'debug' },
+                    { Name: 'GitSha', Value: cf.ref('GitSha') },
+                    { Name: 'STACK', Value: cf.stackName },
+                    { Name: 'SECRET_KEY', Value: cf.ref('SecretKey') },
+                    { Name: 'MAPBOX_TOKEN', Value: cf.ref('MapboxAccessToken') },
+                    { Name: 'ASSET_BUCKET', Value: cf.ref('MLEnablerBucket') },
+                    { Name: 'INTERACTIVE', Value: 'false' }
+                ],
                 LogConfiguration: {
                     LogDriver: 'awslogs',
                     Options: {
