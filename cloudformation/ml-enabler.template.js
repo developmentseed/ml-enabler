@@ -31,7 +31,11 @@ const Parameters = {
         Description: 'Database size to create',
         AllowedValues: [
             'db.t3.micro',
-            'db.m4.xlarge'
+            'db.t3.small',
+            'db.t3.medium',
+            'db.t3.large',
+            'db.t3.xlarge',
+            'db.t3.2xlarge'
         ]
     },
     DatabaseUser: {
@@ -611,11 +615,11 @@ const Resources = {
         Properties: {
             Engine: 'postgres',
             DBName: 'mlenabler',
-            EngineVersion: '12.2',
+            EngineVersion: '12.4',
             MasterUsername: cf.ref('DatabaseUser'),
             MasterUserPassword: cf.ref('DatabasePassword'),
-            AllocatedStorage: 10,
-            MaxAllocatedStorage: 100,
+            AllocatedStorage: 100,
+            MaxAllocatedStorage: 1000,
             BackupRetentionPeriod: 10,
             StorageType: 'gp2',
             DBInstanceClass: cf.ref('DatabaseType'),
