@@ -21,7 +21,7 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
 
         cache = []
         first = True;
-        for row in reader
+        for row in reader:
             if first == True:
                 first = False
                 continue
