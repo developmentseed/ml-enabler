@@ -17,6 +17,7 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
     with closing(requests.get(url, stream=True)) as r:
         r.raise_for_status()
 
+        r.encoding = 'utf-8'
         reader = csv.reader(r.iter_lines(decode_unicode=True), delimiter=',', quotechar='"')
 
         cache = []
