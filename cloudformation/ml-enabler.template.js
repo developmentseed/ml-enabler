@@ -663,7 +663,7 @@ const Resources = {
             Handler: "pop.handler.handler",
             MemorySize: 512,
             Runtime: 'python3.7',
-            Timeout: 240,
+            Timeout: 900,
        }
     },
     PredLambdaFunctionRole: {
