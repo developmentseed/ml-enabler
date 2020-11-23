@@ -4,7 +4,7 @@
         "docker": [
             "{{project}}:{{gitsha}}",
             "{{project}}:task-build-{{gitsha}}",
-            "{{project}}:task-retrain-{{gitsha}}"
+            "{{project}}:task-retrain-{{gitsha}}",
             "{{project}}:task-pop-{{gitsha}}"
         ],
         "lambda": [

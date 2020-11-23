@@ -60,13 +60,6 @@ const Resources = {
             RetentionInDays: 7
         }
     },
-    PopLambdaLogs: {
-        Type: "AWS::Logs::LogGroup",
-        Properties: {
-            LogGroupName: cf.join([ '/aws/lambda/', cf.stackName, '-pop' ]),
-            RetentionInDays: 7
-        }
-    },
     MLEnablerVPC: {
         Type: 'AWS::EC2::VPC',
         Properties: {
@@ -647,68 +640,6 @@ const Resources = {
                 EC2SecurityGroupId: cf.getAtt('MLEnablerServiceSecurityGroup', 'GroupId')
             },{
                   CIDRIP: '0.0.0.0/0'
-            }]
-        }
-    },
-    PopLambdaFunction: {
-        Type: 'AWS::Lambda::Function',
-        Properties: {
-            Layers: [ 'arn:aws:lambda:us-east-1:524387336408:layer:gdal31:1' ],
-            Code: {
-                S3Bucket: 'devseed-artifacts',
-                S3Key: cf.join(['ml-enabler/lambda-pop-', cf.ref('GitSha'), '.zip'])
-            },
-            FunctionName: cf.join('-', [cf.stackName, 'pop']),
-            Role: cf.getAtt('PredLambdaFunctionRole', 'Arn'),
-            Handler: "pop.handler.handler",
-            MemorySize: 512,
-            Runtime: 'python3.7',
-            Timeout: 900,
-       }
-    },
-    PredLambdaFunctionRole: {
-        Type: 'AWS::IAM::Role',
-        Properties: {
-            RoleName: cf.join('-', [ cf.ref('AWS::StackName'), 'queue-role' ]),
-            AssumeRolePolicyDocument: {
-                Version: '2012-10-17',
-                Statement: [{
-                    Effect: 'Allow',
-                    Principal: {
-                        Service: 'lambda.amazonaws.com'
-                    },
-                    Action: 'sts:AssumeRole'
-                }]
-            },
-            Path: '/',
-            Policies: [{
-                PolicyName: cf.join('-', [ cf.ref('AWS::StackName'), 'queue-policy' ]),
-                PolicyDocument: {
-                    Version: '2012-10-17',
-                    Statement: [{
-                        Effect: 'Allow',
-                        Action: [
-                            'lambda:GetFunction',
-                            'lambda:invokeFunction',
-                            'logs:CreateLogGroup',
-                            'logs:CreateLogStream',
-                            'logs:DescribeLogStreams',
-                            'logs:PutLogEvents'
-                        ],
-                        Resource: '*'
-                    },{
-                        Effect: 'Allow',
-                        Action: [
-                            'sqs:SendMessage',
-                            'sqs:ReceiveMessage',
-                            'sqs:ChangeMessageVisibility',
-                            'sqs:DeleteMessage',
-                            'sqs:GetQueueUrl',
-                            'sqs:GetQueueAttributes'
-                        ],
-                        Resource: '*'
-                    }]
-                }
             }]
         }
     },
