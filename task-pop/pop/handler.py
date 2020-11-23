@@ -6,7 +6,7 @@ from typing import Dict, Any
 from pop.custom_types import SQSEvent
 from contextlib import closing
 
-def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
+def handler(event: SQSEvent) -> bool:
     queue_name = event['queue']
     url = event['url']
     assert(queue_name)
@@ -47,4 +47,9 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
     print('ok - {} messages delivered', total)
 
     return True
+
+if __name__ == '__main__':
+    event = json.loads(os.getenv('TASK'))
+
+    handler(event)
 

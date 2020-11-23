@@ -5,10 +5,10 @@
             "{{project}}:{{gitsha}}",
             "{{project}}:task-build-{{gitsha}}",
             "{{project}}:task-retrain-{{gitsha}}"
+            "{{project}}:task-pop-{{gitsha}}"
         ],
         "lambda": [
-            "devseed-artifacts/ml-enabler/lambda-{{gitsha}}.zip",
-            "devseed-artifacts/ml-enabler/lambda-pop-{{gitsha}}.zip"
+            "devseed-artifacts/ml-enabler/lambda-{{gitsha}}.zip"
         ]
     }
 }
