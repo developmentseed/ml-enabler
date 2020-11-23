@@ -7,7 +7,6 @@ import geojson
 import boto3
 import traceback
 import mercantile
-from io import StringIO
 from tiletanic import tilecover, tileschemes
 from shapely.geometry import shape, box
 from shapely.ops import transform
@@ -648,10 +647,14 @@ class PredictionInfAPI(Resource):
                     jobDefinition=CONFIG.EnvironmentConfig.STACK + "-pop-job",
                     containerOverrides={
                         "environment": [
-                            {"name": "TASK", "value": str(json.dumps({
-                                'url': imagery['url'],
-                                'queue': queue_name
-                            }))}
+                            {
+                                "name": "TASK",
+                                "value": str(
+                                    json.dumps(
+                                        {"url": imagery["url"], "queue": queue_name}
+                                    )
+                                ),
+                            }
                         ]
                     },
                 )
