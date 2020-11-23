@@ -160,7 +160,7 @@ export default {
             }
 
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/task?pred_id=${this.$route.params.predid}&type=retrain,tfrecords,ecr`, {
+                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/task?pred_id=${this.$route.params.predid}&type=retrain,tfrecords,ecr,populate`, {
                     method: 'GET'
                 });
 

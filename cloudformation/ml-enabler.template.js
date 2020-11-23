@@ -643,6 +643,52 @@ const Resources = {
             }]
         }
     },
+    PredLambdaFunctionRole: {
+        Type: 'AWS::IAM::Role',
+        Properties: {
+            RoleName: cf.join('-', [ cf.ref('AWS::StackName'), 'queue-role' ]),
+            AssumeRolePolicyDocument: {
+                Version: '2012-10-17',
+                Statement: [{
+                    Effect: 'Allow',
+                    Principal: {
+                        Service: 'lambda.amazonaws.com'
+                    },
+                    Action: 'sts:AssumeRole'
+                }]
+            },
+            Path: '/',
+            Policies: [{
+                PolicyName: cf.join('-', [ cf.ref('AWS::StackName'), 'queue-policy' ]),
+                PolicyDocument: {
+                    Version: '2012-10-17',
+                    Statement: [{
+                        Effect: 'Allow',
+                        Action: [
+                            'lambda:GetFunction',
+                            'lambda:invokeFunction',
+                            'logs:CreateLogGroup',
+                            'logs:CreateLogStream',
+                            'logs:DescribeLogStreams',
+                            'logs:PutLogEvents'
+                        ],
+                        Resource: '*'
+                    },{
+                        Effect: 'Allow',
+                        Action: [
+                            'sqs:SendMessage',
+                            'sqs:ReceiveMessage',
+                            'sqs:ChangeMessageVisibility',
+                            'sqs:DeleteMessage',
+                            'sqs:GetQueueUrl',
+                            'sqs:GetQueueAttributes'
+                        ],
+                        Resource: '*'
+                    }]
+                }
+            }]
+        }
+    },
     PredServiceScalingRole: {
         Type: 'AWS::IAM::Role',
         Properties: {

@@ -99,6 +99,17 @@ const stack = {
                                 's3:PutObjectAcl'
                             ],
                             Resource: [ cf.join(['arn:aws:s3:::', cf.ref('MLEnablerBucket'), '/*']) ]
+                        },{
+                            Effect: 'Allow',
+                            Action: [
+                                'sqs:SendMessage',
+                                'sqs:ReceiveMessage',
+                                'sqs:ChangeMessageVisibility',
+                                'sqs:DeleteMessage',
+                                'sqs:GetQueueUrl',
+                                'sqs:GetQueueAttributes'
+                            ],
+                            Resource: '*'
                         }]
                     }
                 }],
@@ -201,6 +212,9 @@ const stack = {
                 },
                 Parameters: { },
                 ContainerProperties: {
+                    Environment: [
+                        { Name: 'AWS_DEFAULT_REGION' , Value: cf.region },
+                    ],
                     Memory: 512,
                     Privileged: true,
                     JobRoleArn: cf.getAtt('BatchJobRole', 'Arn'),
