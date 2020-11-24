@@ -7,7 +7,6 @@ import geojson
 import boto3
 import traceback
 import mercantile
-from io import StringIO
 from tiletanic import tilecover, tileschemes
 from shapely.geometry import shape, box
 from shapely.ops import transform
@@ -635,16 +634,37 @@ class PredictionInfAPI(Resource):
 
                 return {}, 200
             elif imagery["fmt"] == "list":
-                # TODO CREATE LAMBDA CALL
-                awslambda = boto3.client('lambda')
+                batch = boto3.client(
+                    service_name="batch",
+                    region_name="us-east-1",
+                    endpoint_url="https://batch.us-east-1.amazonaws.com",
+                )
 
-                awslambda.invoke(
-                    FunctionName=CONFIG.EnvironmentConfig.STACK + '-pop',
-                    InvocationType='Event',
-                    Payload=json.dumps({
-                        'url': imagery['url'],
-                        'queue': queue_name
-                    })
+                # Submit to AWS Batch to convert to ECR image
+                job = batch.submit_job(
+                    jobName=CONFIG.EnvironmentConfig.STACK + "-pop",
+                    jobQueue=CONFIG.EnvironmentConfig.STACK + "-queue",
+                    jobDefinition=CONFIG.EnvironmentConfig.STACK + "-pop-job",
+                    containerOverrides={
+                        "environment": [
+                            {
+                                "name": "TASK",
+                                "value": str(
+                                    json.dumps(
+                                        {"url": imagery["url"], "queue": queue_name}
+                                    )
+                                ),
+                            }
+                        ]
+                    },
+                )
+
+                TaskService.create(
+                    {
+                        "pred_id": prediction_id,
+                        "type": "populate",
+                        "batch_id": job.get("jobId"),
+                    }
                 )
 
                 return {}, 200

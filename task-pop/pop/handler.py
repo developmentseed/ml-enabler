@@ -6,7 +6,7 @@ from typing import Dict, Any
 from pop.custom_types import SQSEvent
 from contextlib import closing
 
-def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
+def handler(event: SQSEvent) -> bool:
     queue_name = event['queue']
     url = event['url']
     assert(queue_name)
@@ -21,10 +21,10 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
         reader = csv.reader(r.iter_lines(decode_unicode=True), delimiter=',', quotechar='"')
 
         cache = []
-        first = True;
+        total = -1;
         for row in reader:
-            if first == True:
-                first = False
+            if total == -1:
+                total += 1
                 continue
 
             cache.append({
@@ -35,6 +35,7 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
                     "bounds": list(map(lambda x: float(x), row[2].split(",")))
                 }),
             })
+            total += 1
 
             if len(cache) == 10:
                 queue.send_messages(Entries=cache)
@@ -43,5 +44,12 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
         if len(cache) > 0:
             queue.send_messages(Entries=cache)
 
+    print('ok - {} messages delivered', total)
+
     return True
+
+if __name__ == '__main__':
+    event = json.loads(os.getenv('TASK'))
+
+    handler(event)
 

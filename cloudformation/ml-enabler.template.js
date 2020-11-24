@@ -60,13 +60,6 @@ const Resources = {
             RetentionInDays: 7
         }
     },
-    PopLambdaLogs: {
-        Type: "AWS::Logs::LogGroup",
-        Properties: {
-            LogGroupName: cf.join([ '/aws/lambda/', cf.stackName, '-pop' ]),
-            RetentionInDays: 7
-        }
-    },
     MLEnablerVPC: {
         Type: 'AWS::EC2::VPC',
         Properties: {
@@ -649,22 +642,6 @@ const Resources = {
                   CIDRIP: '0.0.0.0/0'
             }]
         }
-    },
-    PopLambdaFunction: {
-        Type: 'AWS::Lambda::Function',
-        Properties: {
-            Layers: [ 'arn:aws:lambda:us-east-1:524387336408:layer:gdal31:1' ],
-            Code: {
-                S3Bucket: 'devseed-artifacts',
-                S3Key: cf.join(['ml-enabler/lambda-pop-', cf.ref('GitSha'), '.zip'])
-            },
-            FunctionName: cf.join('-', [cf.stackName, 'pop']),
-            Role: cf.getAtt('PredLambdaFunctionRole', 'Arn'),
-            Handler: "pop.handler.handler",
-            MemorySize: 512,
-            Runtime: 'python3.7',
-            Timeout: 900,
-       }
     },
     PredLambdaFunctionRole: {
         Type: 'AWS::IAM::Role',

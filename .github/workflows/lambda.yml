@@ -19,8 +19,3 @@ jobs:
               run: |
                 cd ./lambda
                 ./upload-lambda.sh
-
-            - name: Build Lambda-Pop
-              run: |
-                cd ./lambda-pop
-                ./upload-lambda.sh

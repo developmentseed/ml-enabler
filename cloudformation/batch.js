@@ -99,6 +99,17 @@ const stack = {
                                 's3:PutObjectAcl'
                             ],
                             Resource: [ cf.join(['arn:aws:s3:::', cf.ref('MLEnablerBucket'), '/*']) ]
+                        },{
+                            Effect: 'Allow',
+                            Action: [
+                                'sqs:SendMessage',
+                                'sqs:ReceiveMessage',
+                                'sqs:ChangeMessageVisibility',
+                                'sqs:DeleteMessage',
+                                'sqs:GetQueueUrl',
+                                'sqs:GetQueueAttributes'
+                            ],
+                            Resource: '*'
                         }]
                     }
                 }],
@@ -189,6 +200,28 @@ const stack = {
                 'State': 'ENABLED',
                 'Priority': 1,
                 'JobQueueName': cf.join('-', [cf.stackName, 'gpu-queue'])
+            }
+        },
+        BatchPopJobDefinition: {
+            Type: 'AWS::Batch::JobDefinition',
+            Properties: {
+                Type: 'container',
+                JobDefinitionName: cf.join('-', [cf.stackName, 'pop-job']),
+                RetryStrategy: {
+                    Attempts: 1
+                },
+                Parameters: { },
+                ContainerProperties: {
+                    Environment: [
+                        { Name: 'AWS_DEFAULT_REGION' , Value: cf.region },
+                    ],
+                    Memory: 512,
+                    Privileged: true,
+                    JobRoleArn: cf.getAtt('BatchJobRole', 'Arn'),
+                    ReadonlyRootFilesystem: false,
+                    Vcpus: 1,
+                    Image: cf.join([cf.ref('AWS::AccountId'), '.dkr.ecr.', cf.ref('AWS::Region'), '.amazonaws.com/ml-enabler:task-pop-', cf.ref('GitSha')])
+                }
             }
         },
         BatchBuildJobDefinition: {
