@@ -70,6 +70,7 @@ def model_estimator(params, model_dir, run_config, retraining_weights, model_id)
 
     # Get (potentially decaying) learning rate
     optimizer = get_optimizer(params['optimizer'], params['learning_rate'])
+    loss = get_loss(params['loss'])
     model.compile(optimizer=optimizer,
                   loss=params['loss'], metrics=params['metrics'])
 
@@ -96,3 +97,10 @@ def get_optimizer(opt_name, lr, momentum=0.9):
     if opt_name == 'rmsprop':
         return RMSprop(learning_rate=lr, momentum=momentum)
     raise ValueError('`opt_name`: {} not understood.'.format(opt_name))
+
+def get_loss(name):
+    if name == 'binary_crossentropy':
+        return tf.keras.losses.BinaryCrossentropy()
+    if name == 'focal_loss':
+       return sigmoid_focal_crossentropy
+    raise ValueError('`loss name`: {} not understood.'.format(name))
