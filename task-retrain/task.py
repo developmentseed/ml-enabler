@@ -29,6 +29,7 @@ api = os.getenv('API_URL')
 imagery = os.getenv('TILE_ENDPOINT')
 retrain_config = os.getenv('CONFIG_RETRAIN')
 
+
 assert(stack)
 assert(auth)
 assert(model_id)
@@ -147,7 +148,7 @@ print(n_val_samps)
 
 # conduct re-training,
 sample_config = json.loads(retrain_config)
-config = RetrainConfig(sample_config)
+config = RetrainConfig(sample_config) 
 if supertile:
      config.x_feature_shape = [-1, 512, 512, 3]
 else:
@@ -161,6 +162,7 @@ config.n_val_samps=n_val_samps
 #validate re-training config user uploaded
 config.validate
 
+print('config loss is: ', config.loss)
 # env variable dervied from json user uploads via UI
 train(config)
 
