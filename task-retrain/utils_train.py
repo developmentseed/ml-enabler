@@ -70,12 +70,17 @@ def model_estimator(params, model_dir, run_config, retraining_weights, model_id)
 
     # Get (potentially decaying) learning rate
     optimizer = get_optimizer(params['optimizer'], params['learning_rate'])
+    loss = get_loss(params['loss'])
     model.compile(optimizer=optimizer,
-                  loss=params['loss'], metrics=params['metrics'])
+                  loss=loss, metrics=params['metrics'])
 
     if retraining_weights:
         print('in retraining weights')
-        retraining_weights_ckpt = '/tmp/checkpoint/keras/'  + 'keras_model.ckpt'
+        if os.path.isdir('/tmp/checkpoint/keras'): # for user initial round of user uploading 
+            retraining_weights_ckpt = '/tmp/checkpoint/keras/'  + 'keras_model.ckpt'
+        else: 
+            # for subsequent re-training uploading
+            retraining_weights_ckpt = '/tmp/checkpoint/'  + 'keras_model.ckpt'
         print(retraining_weights_ckpt)
         model.load_weights(retraining_weights_ckpt)
 
@@ -96,3 +101,10 @@ def get_optimizer(opt_name, lr, momentum=0.9):
     if opt_name == 'rmsprop':
         return RMSprop(learning_rate=lr, momentum=momentum)
     raise ValueError('`opt_name`: {} not understood.'.format(opt_name))
+
+def get_loss(name):
+    if name == 'binary_crossentropy':
+        return tf.keras.losses.BinaryCrossentropy()
+    if name == 'focal_loss':
+       return sigmoid_focal_crossentropy
+    raise ValueError('`loss name`: {} not understood.'.format(name))

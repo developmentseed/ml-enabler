@@ -30,6 +30,7 @@ class RetrainConfig():
         self.tf_dense_activation = payload.get('tf_dense_activation', 'relu')
         self.tf_learning_rate = payload.get('tf_learning_rate', 0.00001)
         self.tf_optimizer = payload.get('tf_optimizer', 'adam')
+        self.loss = payload.get('loss', 'focal_loss')
 
 
     def validate(self, payload:dict):
@@ -48,7 +49,8 @@ class RetrainConfig():
         'tf_dense_dropout_rate': {'type': 'float',  'min': 0.1, 'max': 0.5},
         'tf_dense_activation': {'type': 'string'},
         'tf_learning_rate':  {'type': 'float', 'min': 0.00001, 'max': 0.001},
-        'tf_optimizer': {'type': 'string', 'allowed': ['sdg', 'rsmprop', 'adam']}
+        'tf_optimizer': {'type': 'string', 'allowed': ['sdg', 'rsmprop', 'adam']},
+        'loss': {'type': 'string', 'allowed': ['binary_crossentropy', 'focal_loss']}
         }
         v = Validator(schema)
         valid = v.validate(payload) #should be the user input geojson

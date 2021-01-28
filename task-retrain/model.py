@@ -92,7 +92,7 @@ def train(config: RetrainConfig):
                 "metrics": [tf.keras.metrics.Precision(), tf.keras.metrics.Recall(),
                             FBetaScore(num_classes=2, beta=2.0, average='weighted')],
                 "learning_rate": config.tf_learning_rate,
-                "loss": tf.keras.losses.BinaryCrossentropy(), # to-do figure out how to accomidate loss in config
+                "loss": config.loss, # to-do figure out how to accomidate loss in config
                 "class_names": config.class_names,
                 "n_train_samps": config.n_train_samps,
                 "n_val_samps": config.n_val_samps}
