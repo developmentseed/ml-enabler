@@ -22,7 +22,7 @@ from tensorflow.keras.optimizers import Adam, SGD, RMSprop
 
 from utils_metrics import FBetaScore
 from utils_readtfrecords import parse_and_augment_fn, parse_fn, get_dataset_feeder
-from utils_loss import sigmoid_focal_crossentropy
+from utils_loss import binary_focal_loss
 
 from sklearn.metrics import precision_score, recall_score, fbeta_score
 
@@ -76,9 +76,9 @@ def model_estimator(params, model_dir, run_config, retraining_weights, model_id)
 
     if retraining_weights:
         print('in retraining weights')
-        if os.path.isdir('/tmp/checkpoint/keras'): # for user initial round of user uploading 
+        if os.path.isdir('/tmp/checkpoint/keras'): # for user initial round of user uploading
             retraining_weights_ckpt = '/tmp/checkpoint/keras/'  + 'keras_model.ckpt'
-        else: 
+        else:
             # for subsequent re-training uploading
             retraining_weights_ckpt = '/tmp/checkpoint/'  + 'keras_model.ckpt'
         print(retraining_weights_ckpt)
@@ -106,5 +106,5 @@ def get_loss(name):
     if name == 'binary_crossentropy':
         return tf.keras.losses.BinaryCrossentropy()
     if name == 'focal_loss':
-       return sigmoid_focal_crossentropy
+       return binary_focal_loss
     raise ValueError('`loss name`: {} not understood.'.format(name))

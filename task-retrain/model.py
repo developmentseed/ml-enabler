@@ -25,7 +25,7 @@ from sklearn.metrics import precision_score, recall_score, fbeta_score
 
 from utils_metrics import FBetaScore, precision_m, recall_m, fbeta_m
 from utils_readtfrecords import parse_and_augment_fn, parse_fn, get_dataset_feeder
-from utils_loss import sigmoid_focal_crossentropy
+from utils_loss import binary_focal_loss
 from utils_train import zip_model_export, zip_chekpoint, model_estimator, get_optimizer
 from model_config import RetrainConfig
 
