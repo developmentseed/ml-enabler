@@ -7,6 +7,8 @@ from __future__ import print_function
 import tensorflow as tf
 import tensorflow.keras.backend as K
 
+_EPSILON = tf.keras.backend.epsilon()
+
 
 class SigmoidFocalCrossEntropy(tf.keras.losses.Loss):
     """Implements the focal loss function.
