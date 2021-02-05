@@ -144,7 +144,7 @@
                                 <div class='col col--8 py12'>
                                     <label>Threshold (<span v-text='mr.threshold'/>%)</label>
                                     <div class='range range--s color-gray'>
-                                        <input :disabled='mr.inferences === "all"' v-on:input='params.threshold = parseInt($event.target.value)' type='range' min=0 max=100 />
+                                        <input :disabled='mr.inferences === "all"' v-on:input='mr.threshold = parseInt($event.target.value)' type='range' min=0 max=100 />
                                     </div>
                                 </div>
 
