@@ -124,44 +124,17 @@ def post(project_id, prediction_id):
             TemplateBody=template,
             Tags=payload.get("tags", []),
             Parameters=[
-                {
-                    "ParameterKey": "GitSha",
-                    "ParameterValue": CONFIG.EnvironmentConfig.GitSha,
-                },
-                {
-                    "ParameterKey": "MachineAuth",
-                    "ParameterValue": CONFIG.EnvironmentConfig.MACHINE_AUTH,
-                },
-                {
-                    "ParameterKey": "StackName",
-                    "ParameterValue": CONFIG.EnvironmentConfig.STACK,
-                },
-                {
-                    "ParameterKey": "ImageTag",
-                    "ParameterValue": image,
-                },
-                {
-                    "ParameterKey": "Inferences",
-                    "ParameterValue": pred.inf_list,
-                },
-                {"ParameterKey": "ModelId", "ParameterValue": str(project_id)},
-                {"ParameterKey": "PredictionId", "ParameterValue": str(prediction_id)},
-                {
-                    "ParameterKey": "ImageryId",
-                    "ParameterValue": str(pred.imagery_id),
-                },
-                {
-                    "ParameterKey": "MaxSize",
-                    "ParameterValue": payload.get("maxSize", "1"),
-                },
-                {
-                    "ParameterKey": "MaxConcurrency",
-                    "ParameterValue": payload.get("maxConcurrency", "50"),
-                },
-                {
-                    "ParameterKey": "InfSupertile",
-                    "ParameterValue": str(pred.inf_supertile),
-                },
+                { "ParameterKey": "GitSha",         "ParameterValue": CONFIG.EnvironmentConfig.GitSha },
+                { "ParameterKey": "MachineAuth",    "ParameterValue": CONFIG.EnvironmentConfig.MACHINE_AUTH },
+                { "ParameterKey": "StackName",      "ParameterValue": CONFIG.EnvironmentConfig.STACK },
+                { "ParameterKey": "ImageTag",       "ParameterValue": image, },
+                { "ParameterKey": "Inferences",     "ParameterValue": pred.inf_list },
+                { "ParameterKey": "ModelId",        "ParameterValue": str(project_id)} ,
+                { "ParameterKey": "PredictionId",   "ParameterValue": str(prediction_id) },
+                { "ParameterKey": "ImageryId",      "ParameterValue": str(pred.imagery_id) },
+                { "ParameterKey": "MaxSize",        "ParameterValue": payload.get("maxSize", "1") },
+                { "ParameterKey": "MaxConcurrency", "ParameterValue": payload.get("maxConcurrency", "50") },
+                { "ParameterKey": "InfSupertile",   "ParameterValue": str(pred.inf_supertile) },
             ],
             Capabilities=["CAPABILITY_NAMED_IAM"],
             OnFailure="ROLLBACK",
