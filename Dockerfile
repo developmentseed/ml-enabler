@@ -1,4 +1,4 @@
-FROM python:3.6.3-jessie
+FROM python:3.7-buster
 
 EXPOSE 5000
 
@@ -23,9 +23,9 @@ RUN curl 'https://nodejs.org/dist/v13.8.0/node-v13.8.0-linux-x64.tar.gz' | tar -
     && cd ..
 
 RUN \
-  pip install --upgrade pip \
-  pip install gunicorn; \
-  pip install -r requirements.txt
+    pip install --upgrade pip \
+    pip install gunicorn; \
+    pip install -r requirements.txt
 
 RUN cp ./cloudformation/nginx.conf /etc/nginx/sites-enabled/default
 
@@ -37,8 +37,8 @@ CMD service nginx restart \
     && echo "INSERT INTO users (name, password, access) VALUES ('machine', crypt('$MACHINE_AUTH', gen_salt('bf', 10)), 'admin')" | psql postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_ENDPOINT}:${POSTGRES_PORT}/${POSTGRES_DB} || true \
     && echo "UPDATE users SET password = crypt('$MACHINE_AUTH', gen_salt('bf', 10)) WHERE name = 'machine'" | psql postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_ENDPOINT}:${POSTGRES_PORT}/${POSTGRES_DB} || true \
     && gunicorn \
-        --bind 0.0.0.0:4000 \
-        --timeout 120 \
-        --workers 24 \
-        'ml_enabler:create_app()' \
-        --access-logfile -
+    --bind 0.0.0.0:4000 \
+    --timeout 120 \
+    --workers 24 \
+    'ml_enabler:create_app()' \
+    --access-logfile -
