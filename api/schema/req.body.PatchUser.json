@@ -1,0 +1,12 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "flags": {
+            "type": "object"
+        },
+        "access": {
+            "$ref": "./util/access.json"
+        }
+    }
+}
