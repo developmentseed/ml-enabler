@@ -1,0 +1,10 @@
+{
+    "type": "object",
+    "additionalParameters": false,
+    "properties": {
+        "level": {
+            "type": "boolean",
+            "description": "If true, refresh the user's level from OpenCollective"
+        }
+    }
+}

@@ -1,0 +1,18 @@
+{
+    "type": "object",
+    "required": [
+        "token",
+        "password"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "token": {
+            "type": "string",
+            "description": "Email provided reset token"
+        },
+        "password": {
+            "type": "string",
+            "description": "The new user password"
+        }
+    }
+}

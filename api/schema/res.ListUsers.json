@@ -1,0 +1,46 @@
+{
+    "type": "object",
+    "required": [
+        "total",
+        "users"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "total": {
+            "type": "integer",
+            "description": "Total number of users with the service"
+        },
+        "users": {
+            "type": "object",
+            "required": [
+                "id",
+                "username",
+                "email",
+                "access",
+                "level",
+                "flags"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "access": {
+                    "$ref": "./util/access.json"
+                },
+                "level": {
+                    "$ref": "./util/level.json"
+                },
+                "flags": {
+                    "type": "object"
+                }
+            }
+        }
+    }
+}

@@ -54,6 +54,7 @@ function configure(args, cb) {
 async function server(args, config, cb) {
     // these must be run after lib/config
     //const Map = require('./lib/map');
+    const schemas = new (require('./lib/schema'))();
 
     let postgres = process.env.POSTGRES;
 
@@ -640,12 +641,12 @@ async function server(args, config, cb) {
         });
     });
 
-    const srv = app.listen(4999, (err) => {
+    const srv = app.listen(8000, (err) => {
         if (err) return err;
 
         if (cb) return cb(srv, pool);
 
-        console.log('ok - http://localhost:4999');
+        console.log('ok - http://localhost:8000');
     });
 }
 

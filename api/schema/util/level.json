@@ -1,0 +1,9 @@
+{
+    "type": "string",
+    "enum": [
+        "basic",
+        "backer",
+        "sponsor"
+    ],
+    "description": "The level of donation of a given user"
+}

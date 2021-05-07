@@ -1,0 +1,32 @@
+{
+    "type": "object",
+    "required": [
+        "uid",
+        "username",
+        "email",
+        "access",
+        "level",
+        "flags"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "uid": {
+            "type": "integer"
+        },
+        "username": {
+            "type": "string"
+        },
+        "email": {
+            "type": "string"
+        },
+        "access": {
+            "$ref": "./util/access.json"
+        },
+        "level": {
+            "$ref": "./util/level.json"
+        },
+        "flags": {
+            "type": "object"
+        }
+    }
+}

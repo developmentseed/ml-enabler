@@ -1,0 +1,34 @@
+{
+    "type": "object",
+    "required": [
+        "total",
+        "tokens"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "total": {
+            "type": "integer",
+            "description": "Total number of users with the service"
+        },
+        "tokens": {
+            "type": "object",
+            "required": [
+                "id",
+                "created",
+                "name"
+            ],
+            "additionalProperties": false,
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "created": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
