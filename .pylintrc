@@ -1,4 +1,0 @@
-[MASTER]
-good-names=id
-
-load-plugins=pylint_flask,pylint_flask_sqlalchemy

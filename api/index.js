@@ -90,16 +90,6 @@ async function server(args, config, cb) {
         }
     } while (!pool);
 
-    try {
-        await pool.query(String(fs.readFileSync(path.resolve(__dirname, 'schema.sql'))));
-
-        if (args.populate) {
-            await Map.populate(pool);
-        }
-    } catch (err) {
-        throw new Error(err);
-    }
-
     const user = new (require('./lib/user'))(pool);
     const token = new (require('./lib/token'))(pool);
 
