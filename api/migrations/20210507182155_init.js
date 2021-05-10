@@ -2,6 +2,15 @@ exports.up = function(knex) {
     return knex.schema.raw(`
         CREATE EXTENSION POSTGIS;
 
+        CREATE TABLE IF NOT EXISTS session (
+            sid         VARCHAR NOT NULL COLLATE "default",
+            sess        JSON NOT NULL,
+            expire      TIMESTAMP(6) NOT NULL,
+
+            UNIQUE (sid) NOT DEFERRABLE INITIALLY IMMEDIATE
+        ) WITH (OIDS=FALSE);
+        CREATE INDEX IF NOT EXISTS idx_session_expire ON session ("expire");
+
         CREATE TABLE users (
             id                  BIGSERIAL PRIMARY KEY,
             email               TEXT UNIQUE NOT NULL,

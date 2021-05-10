@@ -23,6 +23,7 @@ const pgSession = require('connect-pg-simple')(session);
 const Param = util.Param;
 const { Pool } = require('pg');
 
+const Project = require('./lib/project');
 const Config = require('./lib/config');
 
 if (require.main === module) {
