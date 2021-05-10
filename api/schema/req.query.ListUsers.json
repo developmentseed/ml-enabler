@@ -1,0 +1,28 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "limit": {
+            "type": "integer",
+            "default": 100,
+            "maximum": 100,
+            "description": "Limit number of returned runs"
+        },
+        "page": {
+            "type": "integer",
+            "default": 100,
+            "description": "The offset based on limit to return"
+        },
+        "filter": {
+            "type": "string",
+            "default": "",
+            "description": "Filter a complete or partial username/email"
+        },
+        "access": {
+            "$ref": "./util/access.json"
+        },
+        "level": {
+            "$ref": "./util/level.json"
+        }
+    }
+}

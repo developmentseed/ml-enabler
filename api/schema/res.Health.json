@@ -1,0 +1,18 @@
+{
+    "type": "object",
+    "required": [
+        "healthy",
+        "message"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "healthy": {
+            "type": "boolean",
+            "description": "Is the service healthy?"
+        },
+        "message": {
+            "type": "string",
+            "description": "The service on how it is doing"
+        }
+    }
+}
