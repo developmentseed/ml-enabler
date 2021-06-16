@@ -149,7 +149,6 @@ def make_datanpz(dest_folder, imagery, supertile,
     y_vals = []
 
     for tile in tiles:
-        print(tile)
         image_file = glob.glob(dest_folder + '/' + 'tiles/' + tile + '*')[0]
         try:
             img = Image.open(image_file)
@@ -163,8 +162,7 @@ def make_datanpz(dest_folder, imagery, supertile,
         np_image = np.array(img)
 
         if np_image.shape == (256, 256, 2):
-            print('bad tile')
-            print(tile)
+            print("bad tile: {}".format(tile))
 
         img.close()
 
