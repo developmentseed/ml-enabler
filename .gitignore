@@ -1,5 +1,5 @@
 venv/
-v-env/
+venv-*/
 node_modules/
 web/dist/
 

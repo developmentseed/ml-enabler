@@ -1,13 +1,11 @@
 import ml_enabler.config as CONFIG
 import io
-import pyproj
 import json
 import csv
 import geojson
 import boto3
 import traceback
 import mercantile
-from tiletanic import tilecover, tileschemes
 from shapely.geometry import shape, box
 from shapely.ops import transform
 from functools import partial
@@ -563,114 +561,54 @@ class PredictionInfAPI(Resource):
         if CONFIG.EnvironmentConfig.ENVIRONMENT != "aws":
             return err(501, "stack must be in 'aws' mode to use this endpoint"), 501
 
-        payload = request.data
-
-        tiler = tileschemes.WebMercator()
-
         try:
             prediction = PredictionService.get_prediction_by_id(prediction_id)
             imagery = ImageryService.get(prediction.imagery_id)
 
-            queue_name = "{stack}-models-{model}-prediction-{prediction}-queue".format(
+            batch = boto3.client(
+                service_name="batch",
+                region_name="us-east-1",
+                endpoint_url="https://batch.us-east-1.amazonaws.com",
+            )
+
+            task = {
+                "fmt": imagery["fmt"]
+            }
+
+            if imagery["fmt"] == "wms":
+                task["payload"] = request.data
+            elif imagery["fmt"] == "list":
+                task["url"] = imagery["url"]
+            else:
+                return err(400, "Unknown imagery type"), 400
+
+            task["queue"] = "{stack}-models-{model}-prediction-{prediction}-queue".format(
                 stack=CONFIG.EnvironmentConfig.STACK,
                 model=project_id,
                 prediction=prediction_id,
             )
 
-            queue = boto3.resource("sqs").get_queue_by_name(QueueName=queue_name)
+            # Submit to AWS Batch to convert to ECR image
+            job = batch.submit_job(
+                jobName=CONFIG.EnvironmentConfig.STACK + "-pop",
+                jobQueue=CONFIG.EnvironmentConfig.STACK + "-queue",
+                jobDefinition=CONFIG.EnvironmentConfig.STACK + "-pop-job",
+                containerOverrides={
+                    "environment": [{
+                        "name": "TASK",
+                        "value": str(json.dumps(task))
+                    }]
+                }
+            )
 
-            tiles = []
-            payloadjson = json.loads(payload)
-            if imagery["fmt"] == "wms":
-                if type(payloadjson) is list:
-                    for tile in payloadjson:
-                        tile = tile.split("-")
-                        tiles.append(
-                            mercantile.Tile(int(tile[0]), int(tile[1]), int(tile[2]))
-                        )
-                else:
+            TaskService.create({
+                "pred_id": prediction_id,
+                "type": "populate",
+                "batch_id": job.get("jobId"),
+            })
 
-                    poly = shape(geojson.loads(payload))
+            return {}, 200
 
-                    project = partial(
-                        pyproj.transform,
-                        pyproj.Proj(init="epsg:4326"),
-                        pyproj.Proj(init="epsg:3857"),
-                    )
-
-                    poly = transform(project, poly)
-
-                    tiles = tilecover.cover_geometry(tiler, poly, prediction.tile_zoom)
-
-                cache = []
-                for tile in tiles:
-                    cache.append(
-                        {
-                            "Id": str(tile.z) + "-" + str(tile.x) + "-" + str(tile.y),
-                            "MessageBody": json.dumps(
-                                {
-                                    "name": "{x}-{y}-{z}".format(
-                                        x=tile.x, y=tile.y, z=tile.z
-                                    ),
-                                    "url": imagery["url"].format(
-                                        x=tile.x, y=tile.y, z=tile.z
-                                    ),
-                                    "bounds": mercantile.bounds(tile.x, tile.y, tile.z),
-                                    "x": tile.x,
-                                    "y": tile.y,
-                                    "z": tile.z,
-                                }
-                            ),
-                        }
-                    )
-
-                    if len(cache) == 10:
-                        queue.send_messages(Entries=cache)
-
-                        cache = []
-
-                if len(cache) > 0:
-                    queue.send_messages(Entries=cache)
-
-                return {}, 200
-            elif imagery["fmt"] == "list":
-                batch = boto3.client(
-                    service_name="batch",
-                    region_name="us-east-1",
-                    endpoint_url="https://batch.us-east-1.amazonaws.com",
-                )
-
-                # Submit to AWS Batch to convert to ECR image
-                job = batch.submit_job(
-                    jobName=CONFIG.EnvironmentConfig.STACK + "-pop",
-                    jobQueue=CONFIG.EnvironmentConfig.STACK + "-queue",
-                    jobDefinition=CONFIG.EnvironmentConfig.STACK + "-pop-job",
-                    containerOverrides={
-                        "environment": [
-                            {
-                                "name": "TASK",
-                                "value": str(
-                                    json.dumps(
-                                        {"url": imagery["url"], "queue": queue_name}
-                                    )
-                                ),
-                            }
-                        ]
-                    },
-                )
-
-                TaskService.create(
-                    {
-                        "pred_id": prediction_id,
-                        "type": "populate",
-                        "batch_id": job.get("jobId"),
-                    }
-                )
-
-                return {}, 200
-
-            else:
-                return err(400, "Unknown imagery type"), 400
         except Exception as e:
             current_app.logger.error(traceback.format_exc())
 
