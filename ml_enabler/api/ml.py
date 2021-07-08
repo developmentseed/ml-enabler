@@ -574,7 +574,7 @@ class PredictionInfAPI(Resource):
             }
 
             if imagery["fmt"] == "wms":
-                task["payload"] = request.data
+                task["payload"] = json.loads(request.data)
                 task['zoom'] = prediction.tile_zoom
                 task['imagery'] = imagery['url']
             elif imagery["fmt"] == "list":
