@@ -7,8 +7,6 @@ import boto3
 import traceback
 import mercantile
 from shapely.geometry import shape, box
-from shapely.ops import transform
-from functools import partial
 from flask import make_response
 from flask_restful import Resource, request, current_app
 from flask import Response
@@ -577,6 +575,8 @@ class PredictionInfAPI(Resource):
 
             if imagery["fmt"] == "wms":
                 task["payload"] = request.data
+                task['zoom'] = prediction.tile_zoom
+                task['imagery'] = imagery['url']
             elif imagery["fmt"] == "list":
                 task["url"] = imagery["url"]
             else:

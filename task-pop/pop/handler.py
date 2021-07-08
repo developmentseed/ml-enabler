@@ -63,6 +63,8 @@ def handler(event: SQSEvent) -> bool:
 
     elif fmt == "wms":
         payload = event['payload']
+        zoom = event['zoom']
+        imagery = event['imagery']
 
         tiles = []
         payloadjson = json.loads(payload)
@@ -85,7 +87,7 @@ def handler(event: SQSEvent) -> bool:
 
             poly = transform(project, poly)
 
-            tiles = tilecover.cover_geometry(tiler, poly, prediction.tile_zoom)
+            tiles = tilecover.cover_geometry(tiler, poly, zoom)
 
         cache = []
         for tile in tiles:
@@ -97,7 +99,7 @@ def handler(event: SQSEvent) -> bool:
                             "name": "{x}-{y}-{z}".format(
                                 x=tile.x, y=tile.y, z=tile.z
                             ),
-                            "url": imagery["url"].format(
+                            "url": imagery.format(
                                 x=tile.x, y=tile.y, z=tile.z
                             ),
                             "bounds": mercantile.bounds(tile.x, tile.y, tile.z),
