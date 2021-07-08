@@ -67,17 +67,16 @@ def handler(event: SQSEvent) -> bool:
         imagery = event['imagery']
 
         tiles = []
-        payloadjson = json.loads(payload)
 
-        if type(payloadjson) is list:
-            for tile in payloadjson:
+        if type(payload) is list:
+            for tile in payload:
                 tile = tile.split("-")
                 tiles.append(
                     mercantile.Tile(int(tile[0]), int(tile[1]), int(tile[2]))
                 )
 
         else:
-            poly = shape(geojson.loads(payload))
+            poly = shape(geojson.loads(json.dumps(payload)))
 
             project = partial(
                 pyproj.transform,
