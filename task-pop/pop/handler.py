@@ -1,16 +1,22 @@
 """Example AWS Lambda function for chip-n-scale"""
 
-from io import StringIO
-from shapely.geometry import shape, box
+import os
+import boto3
+import requests
+import csv
+import json
+import pyproj
+import mercantile
+import geojson
+from shapely.geometry import shape
 from shapely.ops import transform
 from functools import partial
-import os, boto3, requests, csv, json, pyproj, mercantile
 from tiletanic import tilecover, tileschemes
-from typing import Dict, Any
 from pop.custom_types import SQSEvent
 from contextlib import closing
 
 tiler = tileschemes.WebMercator()
+
 
 def handler(event: SQSEvent) -> bool:
     queue_name = event['queue']
@@ -30,7 +36,7 @@ def handler(event: SQSEvent) -> bool:
             reader = csv.reader(r.iter_lines(decode_unicode=True), delimiter=',', quotechar='"')
 
             cache = []
-            total = -1;
+            total = -1
             for row in reader:
                 if total == -1:
                     total += 1
@@ -113,8 +119,8 @@ def handler(event: SQSEvent) -> bool:
 
     return True
 
+
 if __name__ == '__main__':
     event = json.loads(os.getenv('TASK'))
 
     handler(event)
-
