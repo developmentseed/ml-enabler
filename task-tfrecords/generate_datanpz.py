@@ -160,18 +160,22 @@ def make_datanpz(dest_folder, imagery, supertile,
             continue
 
         np_image = np.array(img)
+
+        if np_image.shape == (256, 256, 2):
+            print("bad tile: {}".format(tile))
+
         img.close()
 
-        if not supertile:
+        if not supertile and not np_image.shape == (256, 256, 2):
             try:
                 np_image = np_image.reshape((256, 256, 3)) # 4 channels returned from some endpoints, but not all
+                x_vals.append(np_image)
+                y_vals.append(labels[tile])
             except ValueError:
                 np_image = np_image.reshape((256, 256, 4))
                 np_image = np_image[:, :, :3]
-
-        #focusing just on classification
-        x_vals.append(np_image)
-        y_vals.append(labels[tile])
+                x_vals.append(np_image)
+                y_vals.append(labels[tile])
 
     # Convert lists to numpy arrays
     x_vals = np.array(x_vals, dtype=np.uint8)
