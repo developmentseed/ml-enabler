@@ -59,8 +59,8 @@ export default {
             this.loading = true;
 
             try {
-                const res = await fetch(window.api + `/v1/user/login`, {
-                    method: 'post',
+                const res = await fetch(window.api + `/api/login`, {
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
