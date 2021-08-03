@@ -14,7 +14,6 @@
     },
     "dependencies": {
         "aws-sdk": "^2.904.0",
-        "batch-alarms": "^1.1.0",
         "bcrypt": "^5.0.0",
         "body-parser": "^1.19.0",
         "busboy": "^0.3.1",
