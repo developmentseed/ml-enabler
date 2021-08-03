@@ -80,8 +80,6 @@ def init_routes(app):
 
     api.add_resource(StatusCheckAPI, "/v1/health")
 
-    api.add_resource(MetaAPI, "/v1/meta", methods=["GET"])
-
     api.add_resource(SwaggerDocsAPI, "/v1/docs")
 
     api.add_resource(MapboxAPI, "/v1/mapbox", methods=["GET"])

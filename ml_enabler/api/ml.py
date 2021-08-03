@@ -36,43 +36,6 @@ gunicorn_logger = logging.getLogger("gunicorn.error")
 app.logger.handlers = gunicorn_logger.handlers
 app.logger.setLevel(gunicorn_logger.level)
 
-
-class MetaAPI(Resource):
-    def get(self):
-        """
-        Return metadata about the API
-        ---
-        produces:
-            - application/json
-        responses:
-            200:
-                description: API status check success
-        """
-        # -- NOT AUTHENTICATED --
-        # Do not put sensitive data in this response
-        return {
-            "version": 1,
-            "stack": CONFIG.EnvironmentConfig.STACK,
-            "environment": CONFIG.EnvironmentConfig.ENVIRONMENT,
-            "security": "authenticated",
-        }, 200
-
-
-class StatusCheckAPI(Resource):
-    def get(self):
-        """
-        Healthcheck method
-        ---
-        produces:
-            - application/json
-        responses:
-            200:
-                description: API status check success
-        """
-
-        return {"hello": "world"}, 200
-
-
 class MapboxAPI(Resource):
     @login_required
     def get(self):

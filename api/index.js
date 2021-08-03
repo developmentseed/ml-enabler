@@ -78,7 +78,10 @@ async function server(args, config, cb) {
      */
     app.get('/api', (req, res) => {
         return res.json({
-            version: pkg.version
+            version: pkg.version,
+            stack: config.Stack,
+            environment: config.Environment,
+            security: 'authenticated'
         });
     });
 

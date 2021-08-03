@@ -11,6 +11,8 @@ class Config {
 
         this.url = 'http://localhost:2001'
 
+        this.Environment = process.env.ENVIRONMENT || 'docker';
+
         try {
             if (!process.env.AWS_DEFAULT_REGION) {
                 console.error('ok - set env AWS_DEFAULT_REGION: us-east-1');
@@ -19,7 +21,7 @@ class Config {
 
             if (!process.env.StackName || process.env.StackName === 'test') {
                 console.error('ok - set env StackName: test');
-                process.env.StackName = 'test';
+                this.Stack = 'test';
 
                 this.octo = false;
                 this.CookieSecret = '123';
@@ -29,6 +31,7 @@ class Config {
 
                 this.CookieSecret = secrets.CookieSecret;
                 this.SharedSecret = process.env.SharedSecret;
+                this.Stack = process.env.StackName;
             }
 
             if (!process.env.MAPBOX_TOKEN) {

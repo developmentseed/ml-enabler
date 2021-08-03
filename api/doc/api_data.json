@@ -61,6 +61,36 @@
             "optional": false,
             "field": "version",
             "description": "<p>The version of the API</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": true,
+            "field": "stack",
+            "description": "<p>The name of the deployed stack</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"docker\"",
+              "\"aws\""
+            ],
+            "optional": true,
+            "field": "environment",
+            "defaultValue": "docker",
+            "description": "<p>Environment in which MLEnabler is deployed</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"authenticated\""
+            ],
+            "optional": true,
+            "field": "security",
+            "defaultValue": "authenticated",
+            "description": "<p>Level of authentication required to use the service</p>"
           }
         ]
       }
