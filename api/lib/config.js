@@ -9,6 +9,8 @@ class Config {
             exports: 300
         };
 
+        this.url = 'http://localhost:2001'
+
         try {
             if (!process.env.AWS_DEFAULT_REGION) {
                 console.error('ok - set env AWS_DEFAULT_REGION: us-east-1');

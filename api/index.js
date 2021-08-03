@@ -1,5 +1,7 @@
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
 const Err = require('./lib/error');
 const Schema = require('./lib/schema');
 const Cacher = require('./lib/cacher');
@@ -39,10 +41,6 @@ function configure(args, cb) {
  *   The user must be a server admin to use this endpoint
  */
 /**
- * @apiDefine orgadmin Org Admin
- *   The user must be an org admin (or server admin) to use this endpoint
- */
-/**
  * @apiDefine user User
  *   A user must be logged in to use this endpoint
  */
@@ -60,9 +58,6 @@ async function server(args, config, cb) {
     const email = new (require('./lib/email'))(config);
     const user = new (require('./lib/user'))(config);
     const Token = new require('./lib/token');
-    const Org = new require('./lib/org');
-    const OrgUser = new require('./lib/org/user');
-    const OrgInvite = new require('./lib/org/invite');
 
     const app = express();
     const schema = new Schema(express.Router());
@@ -115,7 +110,7 @@ async function server(args, config, cb) {
         });
     });
 
-    app.use('/api', router);
+    app.use('/api', schema.router);
     app.use('/docs', express.static('./doc'));
     app.use('/*', express.static('web/dist'));
 
@@ -161,7 +156,7 @@ async function server(args, config, cb) {
         return next();
     });
 
-    router.use((err, req, res, next) => {
+    schema.router.use((err, req, res, next) => {
         if (err instanceof ValidationError) {
             let errs = [];
 
@@ -187,7 +182,7 @@ async function server(args, config, cb) {
         }
     });
 
-    router.all('*', (req, res) => {
+    schema.router.all('*', (req, res) => {
         return res.status(404).json({
             status: 404,
             message: 'API endpoint does not exist!'

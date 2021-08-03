@@ -34,15 +34,15 @@
         "tilebase": "^1.3.2"
     },
     "devDependencies": {
-        "ajv": "^6.12.6",
-        "apidoc": "^0.27.1",
+        "ajv": "^8.6.2",
+        "apidoc": "^0.29.0",
         "apidoc-plugin-schema": "^0.1.8",
         "codecov": "^3.8.2",
         "eslint": "^7.26.0",
         "eslint-plugin-node": "^11.0.0",
         "nodemon": "^2.0.7",
         "nyc": "^15.1.0",
-        "path-to-regexp": "^0.1.7",
+        "path-to-regexp": "^6.2.0",
         "tap-dot": "^2.0.0",
         "tape": "^5.2.0"
     },
