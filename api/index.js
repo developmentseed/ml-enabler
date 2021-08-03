@@ -4,13 +4,10 @@ const fs = require('fs');
 const path = require('path');
 const Err = require('./lib/error');
 const Schema = require('./lib/schema');
-const Cacher = require('./lib/cacher');
 const jwt = require('jsonwebtoken');
-const Miss = Cacher.Miss;
 const { ValidationError } = require('express-json-validator-middleware');
 const Busboy = require('busboy');
 const morgan = require('morgan');
-const util = require('./lib/util');
 const express = require('express');
 const pkg = require('./package.json');
 const minify = require('express-minify');
@@ -20,8 +17,8 @@ const args = require('minimist')(process.argv, {
     string: ['postgres']
 });
 
-const Param = util.Param;
 const Config = require('./lib/config');
+const UserToken = new require('./lib/token');
 
 if (require.main === module) {
     configure(args);
@@ -50,21 +47,15 @@ function configure(args, cb) {
  */
 
 async function server(args, config, cb) {
-    // these must be run after lib/config
-    // const Map = require('./lib/map');
-
-    const cacher = new Cacher(args['no-cache'], config.silent);
-
-    const email = new (require('./lib/email'))(config);
     const user = new (require('./lib/user'))(config);
-    const Token = new require('./lib/token');
 
     const app = express();
+
     const schema = new Schema(express.Router());
 
     app.disable('x-powered-by');
-    app.use(minify());
 
+    app.use(minify());
     app.use(express.static('web/dist'));
 
     // Load dynamic routes directory
