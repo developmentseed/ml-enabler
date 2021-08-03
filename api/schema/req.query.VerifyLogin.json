@@ -1,0 +1,13 @@
+{
+    "type": "object",
+    "additionalParameters": false,
+    "required": [
+        "token"
+    ],
+    "properties": {
+        "token": {
+            "type": "string",
+            "description": "The validation token which was emailed to you"
+        }
+    }
+}
