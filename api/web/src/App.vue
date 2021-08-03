@@ -117,7 +117,7 @@ export default {
         getMeta: async function() {
             try {
                 this.loading.meta = true;
-                const res = await fetch(window.api + '/v1/meta', {
+                const res = await fetch(window.api + '/api', {
                     method: 'GET'
                 });
                 const body = await res.json();
