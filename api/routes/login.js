@@ -50,9 +50,8 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Login.json} apiSuccess
      */
     await schema.post('/login', {
-        body: 'req.body.CreateLogin.json',
-        res: 'res.Login.json'
     }, async (req, res) => {
+        console.error('LOGIN', req);
         try {
             if (req.body.username && req.body.password) {
                 req.auth = await user.login({

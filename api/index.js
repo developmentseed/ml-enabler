@@ -58,12 +58,6 @@ async function server(args, config, cb) {
     app.use(minify());
     app.use(express.static('web/dist'));
 
-    // Load dynamic routes directory
-    for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
-        if (!config.silent) console.error(`ok - loaded routes/${r}`);
-        await require('./routes/' + r)(schema, config);
-    }
-
     /**
      * @api {get} /api Get Metadata
      * @apiVersion 1.0.0
@@ -111,6 +105,12 @@ async function server(args, config, cb) {
     schema.router.use(bodyparser.urlencoded({ extended: true }));
     schema.router.use(morgan('combined'));
     schema.router.use(bodyparser.json({ limit: '50mb' }));
+
+    // Load dynamic routes directory
+    for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
+        if (!config.silent) console.error(`ok - loaded routes/${r}`);
+        await require('./routes/' + r)(schema, config);
+    }
 
     schema.router.use(async (req, res, next) => {
         if (req.header('authorization')) {

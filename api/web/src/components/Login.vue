@@ -72,9 +72,10 @@ export default {
                 });
 
                 const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
 
                 this.loading = false;
+
+                if (!res.ok) throw new Error(body.message);
 
                 this.$emit('auth');
                 this.$router.push('/')
