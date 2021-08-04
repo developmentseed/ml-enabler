@@ -5,8 +5,7 @@
         "username",
         "email",
         "access",
-        "level",
-        "flags"
+        "level"
     ],
     "additionalProperties": false,
     "properties": {
@@ -24,9 +23,6 @@
         },
         "level": {
             "$ref": "./util/level.json"
-        },
-        "flags": {
-            "type": "object"
         }
     }
 }

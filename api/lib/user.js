@@ -5,16 +5,21 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const { promisify } = require('util');
 const randomBytes = promisify(crypto.randomBytes);
+const jwt = require('jsonwebtoken');
+const { sql } = require('slonik');
 
+/**
+ * @class
+ */
 class User {
-    constructor(pool) {
-        this.pool = pool;
+    constructor(config) {
+        this.config = config;
 
         this.attrs = Object.keys(require('../schema/req.body.PatchUser.json').properties);
     }
 
     async is_auth(req) {
-        if (!req.auth || !req.auth.access || !['session', 'token', 'secret'].includes(req.auth.type)) {
+        if (!req.auth || !req.auth.access || !req.auth.uid) {
             throw new Err(401, null, 'Authentication Required');
         }
 
@@ -25,54 +30,31 @@ class User {
         return true;
     }
 
-    async is_level(req, level) {
-        await this.is_auth(req);
-
-        if (level === 'basic') {
-            return true;
-        } else if (level === 'backer' && ['backer', 'sponsor'].includes(req.auth.level)) {
-            return true;
-        } else if (level === 'sponsor' && req.auth.level === 'sponsor') {
-            return true;
-        }
-
-        throw new Err(401, null, 'Please donate to use this feature');
-    }
-
-    async is_flag(req, flag) {
-        await this.is_auth(req);
-
-        if ((!req.auth.flags || !req.auth.flags[flag]) && req.auth.access !== 'admin' && req.auth.type !== 'secret') {
-            throw new Err(401, null, `${flag} flag required`);
-        }
-
-        return true;
-    }
-
     async is_admin(req) {
-        if (!req.auth || !req.auth.access || req.auth.access !== 'admin') {
+        await this.is_auth(req);
+
+        if (req.auth.access !== 'admin') {
             throw new Err(401, null, 'Admin token required');
         }
 
         return true;
     }
 
-
     async verify(token) {
         if (!token) throw new Err(400, null, 'token required');
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.config.pool.query(sql`
                 SELECT
                     uid
                 FROM
                     users_reset
                 WHERE
                     expires > NOW()
-                    AND token = $1
+                    AND token = ${token}
                     AND action = 'verify'
-            `, [token]);
+            `);
         } catch (err) {
             throw new Err(500, err, 'User Verify Error');
         }
@@ -82,16 +64,16 @@ class User {
         }
 
         try {
-            await this.pool.query(`
+            await this.config.pool.query(sql`
                 DELETE FROM users_reset
-                    WHERE uid = $1
-            `, [pgres.rows[0].uid]);
+                    WHERE uid = ${pgres.rows[0].uid}
+            `);
 
-            await this.pool.query(`
+            await this.config.pool.query(sql`
                 UPDATE users
                     SET validated = True
-                    WHERE id = $1
-            `, [pgres.rows[0].uid]);
+                    WHERE id = ${pgres.rows[0].uid}
+            `);
 
             return {
                 status: 200,
@@ -108,16 +90,16 @@ class User {
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.config.pool.query(sql`
                 SELECT
                     uid
                 FROM
                     users_reset
                 WHERE
                     expires > NOW()
-                    AND token = $1
+                    AND token = ${user.token}
                     AND action = 'reset'
-            `, [user.token]);
+            `);
         } catch (err) {
             throw new Err(500, err, 'User Reset Error');
         }
@@ -131,25 +113,20 @@ class User {
         try {
             const userhash = await bcrypt.hash(user.password, 10);
 
-            await this.pool.query(`
+            await this.config.pool.query(sql`
                 UPDATE users
                     SET
-                        password = $1,
+                        password = ${userhash},
                         validated = True
 
                     WHERE
-                        id = $2
-            `, [
-                userhash,
-                uid
-            ]);
+                        id = ${uid}
+            `);
 
-            await this.pool.query(`
+            await this.config.pool.query(sql`
                 DELETE FROM users_reset
-                    WHERE uid = $1
-            `, [
-                uid
-            ]);
+                    WHERE uid = ${uid}
+            `);
 
             return {
                 status: 200,
@@ -172,7 +149,7 @@ class User {
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.config.pool.query(sql`
                 SELECT
                     id,
                     username,
@@ -180,9 +157,9 @@ class User {
                 FROM
                     users
                 WHERE
-                    username = $1
-                    OR email = $1
-            `, [user]);
+                    username = ${user}
+                    OR email = ${user}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
@@ -192,13 +169,13 @@ class User {
         u.id = parseInt(u.id);
 
         try {
-            await this.pool.query(`
+            await this.config.pool.query(sql`
                 DELETE FROM
                     users_reset
                 WHERE
-                    uid = $1
-                    AND action = $2
-            `, [u.id, action]);
+                    uid = ${u.id}
+                    AND action = ${action}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
@@ -206,16 +183,16 @@ class User {
         try {
             const buffer = await randomBytes(40);
 
-            await this.pool.query(`
+            await this.config.pool.query(sql`
                 INSERT INTO
                     users_reset (uid, expires, token, action)
                 VALUES (
-                    $1,
+                    ${u.id},
                     NOW() + interval '1 hour',
-                    $2,
-                    $3
+                    ${buffer.toString('hex')},
+                    ${action}
                 )
-            `, [u.id, buffer.toString('hex'), action]);
+            `);
 
             return {
                 uid: u.id,
@@ -226,26 +203,6 @@ class User {
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
-    }
-
-    async level(email, level) {
-        let pgres;
-        try {
-            pgres = await this.pool.query(`
-                UPDATE users
-                    SET
-                        level = $2
-                    WHERE
-                        email = $1
-            `, [
-                email,
-                level
-            ]);
-        } catch (err) {
-            throw new Err(500, err, 'Internal User Error');
-        }
-
-        return !!pgres.rows.length;
     }
 
     async patch(uid, patch) {
@@ -259,46 +216,37 @@ class User {
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.config.pool.query(sql`
                 UPDATE users
                     SET
-                        flags = $2,
-                        access = $3
+                        access = ${user.access},
+                        validated = ${user.validated},
+                        name_first = ${user.name_first},
+                        name_last = ${user.name_last},
+                        phone = ${user.phone},
+                        country = ${user.country},
+                        address = ${user.address},
+                        title = ${user.title}
                     WHERE
-                        id = $1
+                        id = ${uid}
                     RETURNING *
-            `, [
-                uid,
-                user.flags,
-                user.access
-            ]);
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
 
-        try {
-            // Force relogin on account changes
-            await this.pool.query(`
-                DELETE FROM
-                    session
-                WHERE
-                    (sess->'auth'->>'uid')::BIGINT = $1
-            `, [
-                uid
-            ]);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to reset sessions');
-        }
-
-        const row = pgres.rows[0];
-
         return {
-            id: parseInt(row.id),
-            level:  row.level,
-            username: row.username,
-            email: row.email,
-            access: row.access,
-            flags: row.flags
+            id: parseInt(pgres.rows[0].id),
+            username: pgres.rows[0].username,
+            email: pgres.rows[0].email,
+            validated: pgres.rows[0].validated,
+            access: pgres.rows[0].access,
+            name_first: pgres.rows[0].name_first,
+            name_last: pgres.rows[0].name_last,
+            phone: pgres.rows[0].phone,
+            country: pgres.rows[0].country,
+            address: pgres.rows[0].address,
+            title: pgres.rows[0].title
         };
     }
 
@@ -309,49 +257,54 @@ class User {
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page of users to return
      * @param {String} [query.filter=] - Username or Email fragment to filter by
-     * @param {String} [query.level=] - Donor level to filter by
      * @param {String} [query.access=] - User Access to filter by
+     * @param {Number} [query.org=] - User Org to filter by
+     * @param {String} [query.sort=created] Field to sort by
+     * @param {String} [query.order=asc] Sort Order (asc/desc)
      */
     async list(query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
         if (!query.filter) query.filter = '';
+        if (!query.access) query.access = null;
+        if (!query.org) query.org = null;
 
-        const where = [];
-
-        query.page = query.page * query.limit;
-
-        if (query.access) where.push(`access = '${query.access}'`);
-        if (query.level) where.push(`level = '${query.level}'`);
+        if (!query.sort) query.sort = 'created';
+        if (!query.order || query.order === 'asc') {
+            query.order = sql`asc`;
+        } else {
+            query.order = sql`desc`;
+        }
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.config.pool.query(sql`
                 SELECT
                     count(*) OVER() AS count,
-                    id,
-                    username,
-                    level,
-                    access,
-                    email,
-                    flags
+                    users.id,
+                    users.username,
+                    users.validated,
+                    users.access,
+                    users.email,
+                    Json_Agg(users_orgs_ref.org_id) AS orgs
                 FROM
                     users
+                        LEFT JOIN users_orgs_ref
+                        ON users.id = users_orgs_ref.uid
                 WHERE
-                    (username ~ $3 OR email ~ $3)
-                    ${where.length ? 'AND ' + where.join(' AND ') : ''}
+                    (users.username ~ ${query.filter} OR users.email ~* ${query.filter})
+                    AND (${query.access}::TEXT IS NULL OR users.access = ${query.access})
+                    AND (${query.org}::BIGINT IS NULL OR users_orgs_ref.org_id = ${query.org})
+                GROUP BY
+                    users.id
                 ORDER BY
-                    created DESC
+                    ${sql.identifier(['users', query.sort])} ${query.order}
                 LIMIT
-                    $1
+                    ${query.limit}
                 OFFSET
-                    $2
-            `, [
-                query.limit,
-                query.page,
-                query.filter
-            ]);
+                    ${query.limit * query.page}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
@@ -361,11 +314,13 @@ class User {
             users: pgres.rows.map((row) => {
                 return {
                     id: parseInt(row.id),
-                    level: row.level,
                     username: row.username,
+                    validated: row.validated,
                     email: row.email,
                     access: row.access,
-                    flags: row.flags
+                    orgs: row.orgs.filter((o) =>{
+                        return !!o;
+                    })
                 };
             })
         };
@@ -374,21 +329,18 @@ class User {
     async user(uid) {
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.config.pool.query(sql`
                 SELECT
                     id,
-                    level,
                     username,
+                    validated,
                     access,
-                    email,
-                    flags
+                    email
                 FROM
                     users
                 WHERE
-                    id = $1
-            `, [
-                uid
-            ]);
+                    id = ${uid}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
@@ -399,46 +351,49 @@ class User {
 
         return {
             uid: parseInt(pgres.rows[0].id),
-            level: pgres.rows[0].level,
             username: pgres.rows[0].username,
             email: pgres.rows[0].email,
-            access: pgres.rows[0].access,
-            flags: pgres.rows[0].flags
+            validated: pgres.rows[0].validated,
+            access: pgres.rows[0].access
         };
     }
 
     async login(user) {
-        if (!user.username) throw new Err(400, null, 'username required');
-        if (!user.password) throw new Err(400, null, 'password required');
-
-        if (user.username === 'internal') throw new Err(400, null, '"internal" is not a valid username');
+        if (!user.auth0) {
+            if (!user.username) throw new Err(400, null, 'username required');
+            if (!user.password) throw new Err(400, null, 'password or auth0 token required');
+        } else if (user.auth0 && (user.username || user.password)) {
+            throw new Err(400, null, 'Auth0 Login cannot be combined with password');
+        } else if (user.auth0) {
+            user.username = user.auth0.email;
+        }
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await this.config.pool.query(sql`
                 SELECT
                     id,
                     username,
-                    level,
                     access,
                     email,
                     password,
-                    flags,
                     validated
                 FROM
                     users
                 WHERE
-                    username = $1 OR
-                    email = $1;
-            `, [
-                user.username
-            ]);
+                    username = ${user.username} OR
+                    email = ${user.username};
+            `);
         } catch (err) {
             throw new Err(500, err, 'Internal Login Error');
         }
 
         if (pgres.rows.length === 0) {
             throw new Err(403, null, 'Invalid Username or Pass');
+        }
+
+        if (!user.password) {
+            throw new Err(403, null, 'User must signin via password');
         }
 
         if (!await bcrypt.compare(user.password, pgres.rows[0].password)) {
@@ -453,45 +408,40 @@ class User {
             throw new Err(403, null, 'Account Disabled - Please Contact Us');
         }
 
+        const token = jwt.sign({
+            u: parseInt(pgres.rows[0].id)
+        }, this.config.signing_secret);
+
         return {
             uid: parseInt(pgres.rows[0].id),
-            level: pgres.rows[0].level,
             username: pgres.rows[0].username,
             access: pgres.rows[0].access,
             email: pgres.rows[0].email,
-            flags: pgres.rows[0].flags
+            token: token
         };
     }
 
     async register(user) {
         if (!user.username) throw new Err(400, null, 'username required');
-        if (!user.password) throw new Err(400, null, 'password required');
         if (!user.email) throw new Err(400, null, 'email required');
-
-        if (user.username === 'internal') throw new Err(400, null, '"internal" is not a valid username');
+        if (user.validated === undefined) user.validated = false;
 
         try {
-            const uhash = await bcrypt.hash(user.password, 10);
-
-            const pgres = await this.pool.query(`
+            const pgres = await this.config.pool.query(sql`
                 INSERT INTO users (
                     username,
                     email,
                     password,
+                    validated,
                     access,
-                    flags
                 ) VALUES (
-                    $1,
-                    $2,
-                    $3,
-                    'user',
-                    '{}'::JSONB
+                    ${user.username},
+                    ${user.email},
+                    ${await bcrypt.hash(user.password, 10)},
+                    ${user.validated},
+                    'user'
                 ) RETURNING *
-            `, [
-                user.username,
-                user.email,
-                uhash
-            ]);
+            `);
 
             const row = pgres.rows[0];
 
@@ -499,11 +449,11 @@ class User {
                 id: parseInt(row.id),
                 username: row.username,
                 email: row.email,
-                access: row.access,
-                flags: row.flags
+                validated: row.validated,
+                access: row.access
             };
         } catch (err) {
-            if (err.code && err.code === '23505') {
+            if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
                 throw new Err(400, null, 'User already exists');
             }
 

@@ -51,7 +51,6 @@ async function router(schema, config) {
      */
     await schema.post('/login', {
     }, async (req, res) => {
-        console.error('LOGIN', req);
         try {
             if (req.body.username && req.body.password) {
                 req.auth = await user.login({

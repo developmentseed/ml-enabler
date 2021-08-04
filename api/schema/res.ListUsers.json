@@ -16,9 +16,7 @@
                 "id",
                 "username",
                 "email",
-                "access",
-                "level",
-                "flags"
+                "access"
             ],
             "additionalProperties": false,
             "properties": {
@@ -33,12 +31,6 @@
                 },
                 "access": {
                     "$ref": "./util/access.json"
-                },
-                "level": {
-                    "$ref": "./util/level.json"
-                },
-                "flags": {
-                    "type": "object"
                 }
             }
         }
