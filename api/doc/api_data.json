@@ -81,13 +81,6 @@
             "optional": false,
             "field": "level",
             "description": "<p>The level of donation of a given user</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Object",
-            "optional": false,
-            "field": "flags",
-            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -208,13 +201,6 @@
             "optional": false,
             "field": "level",
             "description": "<p>The level of donation of a given user</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Object",
-            "optional": false,
-            "field": "flags",
-            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -429,6 +415,24 @@
     },
     "filename": "./index.js",
     "groupTitle": "Server"
+  },
+  {
+    "type": "get",
+    "url": "/api/stack",
+    "title": "List Stacks",
+    "version": "1.0.0",
+    "name": "ListSacks",
+    "group": "Stacks",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return a list of all currently deployed stacks</p>",
+    "filename": "./routes/stacks.js",
+    "groupTitle": "Stacks"
   },
   {
     "type": "post",
@@ -666,25 +670,6 @@
             "optional": false,
             "field": "users.access",
             "description": "<p>The access level of a given user</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "allowedValues": [
-              "\"basic\"",
-              "\"backer\"",
-              "\"sponsor\""
-            ],
-            "optional": false,
-            "field": "users.level",
-            "description": "<p>The level of donation of a given user</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Object",
-            "optional": false,
-            "field": "users.flags",
-            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -719,13 +704,6 @@
           }
         ],
         "Body": [
-          {
-            "group": "Body",
-            "type": "Object",
-            "optional": true,
-            "field": "flags",
-            "description": "<p>undefined</p>"
-          },
           {
             "group": "Body",
             "type": "String",
