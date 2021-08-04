@@ -11,7 +11,7 @@ const api = require('../index');
 const Knex = require('knex');
 const KnexConfig = require('../knexfile');
 const drop = require('./drop');
-const pathparse = require('path-to-regexp');
+const { pathToRegexp } = require('path-to-regexp');
 const Ajv = require('ajv');
 const ajv = new Ajv({
     allErrors: true
@@ -46,7 +46,7 @@ class Flight {
             this.routes = {};
 
             for (const route of Object.keys(this.schema)) {
-                this.routes[route] = new RegExp(pathparse(route.split(' ').join(' /api')));
+                this.routes[route] = new RegExp(pathToRegexp(route.split(' ').join(' /api')));
             }
 
             t.end();
@@ -90,12 +90,19 @@ class Flight {
 
         t.equals(res.statusCode, 200, 'statusCode: 200');
 
-        schema(res.body);
+        if (res.statusCode === 200) {
 
-        if (!schema.errors) return res;
+            schema(res.body);
 
-        for (const error of schema.errors) {
-            t.fail(`${error.schemaPath}: ${error.message}`);
+            if (!schema.errors) return res;
+
+            for (const error of schema.errors) {
+                t.fail(`${error.schemaPath}: ${error.message}`);
+            }
+        } else {
+            // Just print the body instead of spewing
+            // 100 schema validation errors for an error response
+            t.fail(JSON.stringify(res.body));
         }
 
         return res;
@@ -142,12 +149,7 @@ class Flight {
                 }
             });
 
-            if (new_user.statusCode !== 200) throw new Error(new_user.body);
-
-            await this.config.pool.query(sql`
-                 UPDATE users
-                    SET validated = True
-            `);
+            if (new_user.statusCode !== 200) throw new Error(new_user.body.message);
 
             if (admin) {
                 await this.config.pool.query(sql`

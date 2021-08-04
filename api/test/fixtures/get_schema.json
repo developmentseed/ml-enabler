@@ -1,7 +1,37 @@
 {
+    "GET /login": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "POST /login": {
+        "body": false,
+        "query": false,
+        "res": false
+    },
+    "GET /login/verify": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "POST /login/forgot": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "POST /login/reset": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
     "GET /schema": {
         "body": true,
         "query": true,
+        "res": false
+    },
+    "GET /stack": {
+        "body": false,
+        "query": false,
         "res": false
     },
     "GET /user": {
@@ -15,101 +45,6 @@
         "res": true
     },
     "PATCH /user/:uid": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "GET /login": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "POST /login": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "POST /login/forgot": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "POST /login/reset": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "GET /token": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "POST /token": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "GET /token/:token_id": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "DELETE /token/:token_id": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "POST /org": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "PATCH /org/:org_id": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "GET /org/:org_id": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "GET /org/:org_id/user": {
-        "body": false,
-        "query": true,
-        "res": true
-    },
-    "POST /org/:org_id/user": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "POST /org/:org_id/user/invite": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "POST /org/accept": {
-        "body": true,
-        "query": false,
-        "res": true
-    },
-    "GET /org/:org_id/user/invite": {
-        "body": false,
-        "query": true,
-        "res": true
-    },
-    "DELETE /org/:org_id/user/invite/:invite_id": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "DELETE /org/:org_id/user/:uid": {
-        "body": false,
-        "query": false,
-        "res": true
-    },
-    "PATCH /org/:org_id/user/:uid": {
         "body": true,
         "query": false,
         "res": true
