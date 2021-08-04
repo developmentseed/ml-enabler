@@ -1,6 +1,7 @@
 exports.up = function(knex) {
     return knex.schema.raw(`
         CREATE EXTENSION IF NOT EXISTS POSTGIS;
+        CREATE EXTENSION IF NOT EXISTS PGCRYPTO
 
         CREATE TABLE users (
             id                  BIGSERIAL PRIMARY KEY,
