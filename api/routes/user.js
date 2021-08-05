@@ -50,35 +50,21 @@ async function router(schema, config) {
         res: 'res.User.json'
     }, async (req, res) => {
         try {
-            if (req.body.auth0) {
-                const auth0 = await user.auth0(req.body.auth0);
+            const usr = await user.register(req.body);
 
-                console.error(auth0);
+            const forgot = await user.forgot(usr.username, 'verify');
 
-                const usr = await user.register({
-                    username: req.body.username,
-                    email: auth0.email,
-                    validated: true
-                }, auth0.sub.split('|')[0]);
-
-                return res.json(usr);
-            } else {
-                const usr = await user.register(req.body);
-
-                const forgot = await user.forgot(usr.username, 'verify');
-
-                if (config.args.email) {
-                    await email.verify({
-                        username: usr.username,
-                        email: usr.email,
-                        token: forgot.token
-                    });
-                } else if (!config.args.validate) {
-                    await user.verify(forgot.token);
-                }
-
-                return res.json(usr);
+            if (config.args.email) {
+                await email.verify({
+                    username: usr.username,
+                    email: usr.email,
+                    token: forgot.token
+                });
+            } else if (!config.args.validate) {
+                await user.verify(forgot.token);
             }
+
+            return res.json(usr);
         } catch (err) {
             return Err.respond(err, res);
         }

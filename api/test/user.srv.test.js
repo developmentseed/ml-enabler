@@ -6,7 +6,9 @@ const { sql } = require('slonik');
 
 const flight = new Flight();
 flight.init(test);
-flight.takeoff(test);
+flight.takeoff(test, {
+    validate: true
+});
 
 test('GET: api/user (no auth)', async (t) => {
     try {
@@ -85,7 +87,9 @@ test('POST: api/login (not confirmed)', async (t) => {
 
         t.equals(res.statusCode, 403, 'http: 403');
         t.deepEquals(res.body, {
-            status: 403, message: 'User has not confirmed email', messages: []
+            status: 403,
+            message: 'User has not confirmed email',
+            messages: []
         });
 
     } catch (err) {
@@ -103,8 +107,38 @@ test('META: Validate User', async (t) => {
     t.end();
 });
 
+test('POST: api/login (success: email)', async (t) => {
+    try {
+        const res = await flight.request({
+            url: '/api/login',
+            method: 'POST',
+            json: true,
+            body: {
+                username: 'ingalls@example.com',
+                password: 'password123'
+            }
+        }, t);
+
+        t.equals(res.statusCode, 200, 'http: 200');
+
+        t.ok(res.body.token, '.token');
+        delete res.body.token;
+
+        t.deepEquals(res.body, {
+            uid: 1,
+            username: 'ingalls',
+            email: 'ingalls@example.com',
+            access: 'user'
+        });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
 let token;
-test('POST: api/login (success)', async (t) => {
+test('POST: api/login (success: username)', async (t) => {
     try {
         const res = await flight.request({
             url: '/api/login',
@@ -312,8 +346,7 @@ test('GET: api/user', async (t) => {
                 username: 'ingalls',
                 email: 'ingalls@example.com',
                 access: 'admin',
-                validated: true,
-                orgs: []
+                validated: true
             }]
         });
     } catch (err) {
@@ -363,8 +396,7 @@ test('GET: api/user?filter=ingalls', async (t) => {
                 username: 'ingalls',
                 email: 'ingalls@example.com',
                 access: 'admin',
-                validated: true,
-                orgs: []
+                validated: true
             }]
         });
     } catch (err) {
@@ -414,8 +446,7 @@ test('GET: api/user?filter=ingalls&access=admin', async (t) => {
                 username: 'ingalls',
                 email: 'ingalls@example.com',
                 access: 'admin',
-                validated: true,
-                orgs: []
+                validated: true
             }]
         });
     } catch (err) {
@@ -452,6 +483,84 @@ test('POST: api/user', async (t) => {
     }
 });
 
+test('GET: api/user?order=desc', async (t) => {
+    try {
+        const res = await flight.request({
+            url: '/api/user?order=desc',
+            method: 'GET',
+            auth: {
+                bearer: token
+            },
+            json: true
+        }, t);
+
+        t.deepEquals(res.body, {
+            total: 2,
+            users: [{
+                id: 2, username: 'ingalls-sub', validated: false, email: 'ingalls-sub@example.com', access: 'user'
+            },{
+                id: 1, username: 'ingalls', validated: true, email: 'ingalls@example.com', access: 'admin'
+            }]
+        });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
+test('GET: api/user?order=asc', async (t) => {
+    try {
+        const res = await flight.request({
+            url: '/api/user?order=asc',
+            method: 'GET',
+            auth: {
+                bearer: token
+            },
+            json: true
+        }, t);
+
+        t.deepEquals(res.body, {
+            total: 2,
+            users: [{
+                id: 1, username: 'ingalls', validated: true, email: 'ingalls@example.com', access: 'admin' 
+            },{
+                id: 2, username: 'ingalls-sub', validated: false, email: 'ingalls-sub@example.com', access: 'user'
+            }]
+        });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
+test('GET: api/user?sort=username&order=desc', async (t) => {
+    try {
+        const res = await flight.request({
+            url: '/api/user?sort=username&order=desc',
+            method: 'GET',
+            auth: {
+                bearer: token
+            },
+            json: true
+        }, t);
+
+        t.deepEquals(res.body, {
+            total: 2,
+            users: [{
+                id: 2, username: 'ingalls-sub', validated: false, email: 'ingalls-sub@example.com', access: 'user'
+            },{
+                id: 1, username: 'ingalls', validated: true, email: 'ingalls@example.com', access: 'admin'
+            }]
+        });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
 test('PATCH: api/user/2', async (t) => {
     try {
         const res = await flight.request({
@@ -480,5 +589,31 @@ test('PATCH: api/user/2', async (t) => {
         t.error(err, 'no error');
     }
 });
+
+test('POST: api/user (duplicate)', async (t) => {
+    try {
+        const res = await flight.request({
+            url: '/api/user',
+            method: 'POST',
+            json: true,
+            body: {
+                username: 'ingalls',
+                password: 'password123',
+                email: 'ingalls@example.com'
+            }
+        });
+
+        t.deepEquals(res.body, {
+            status: 400,
+            message: 'User already exists',
+            messages: []
+        }, 'user');
+
+        t.end();
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+});
+
 
 flight.landing(test);

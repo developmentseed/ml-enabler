@@ -220,13 +220,7 @@ class User {
                 UPDATE users
                     SET
                         access = ${user.access},
-                        validated = ${user.validated},
-                        name_first = ${user.name_first},
-                        name_last = ${user.name_last},
-                        phone = ${user.phone},
-                        country = ${user.country},
-                        address = ${user.address},
-                        title = ${user.title}
+                        validated = ${user.validated}
                     WHERE
                         id = ${uid}
                     RETURNING *
@@ -240,13 +234,7 @@ class User {
             username: pgres.rows[0].username,
             email: pgres.rows[0].email,
             validated: pgres.rows[0].validated,
-            access: pgres.rows[0].access,
-            name_first: pgres.rows[0].name_first,
-            name_last: pgres.rows[0].name_last,
-            phone: pgres.rows[0].phone,
-            country: pgres.rows[0].country,
-            address: pgres.rows[0].address,
-            title: pgres.rows[0].title
+            access: pgres.rows[0].access
         };
     }
 
@@ -258,7 +246,6 @@ class User {
      * @param {Number} [query.page=0] - Page of users to return
      * @param {String} [query.filter=] - Username or Email fragment to filter by
      * @param {String} [query.access=] - User Access to filter by
-     * @param {Number} [query.org=] - User Org to filter by
      * @param {String} [query.sort=created] Field to sort by
      * @param {String} [query.order=asc] Sort Order (asc/desc)
      */
@@ -286,16 +273,12 @@ class User {
                     users.username,
                     users.validated,
                     users.access,
-                    users.email,
-                    Json_Agg(users_orgs_ref.org_id) AS orgs
+                    users.email
                 FROM
                     users
-                        LEFT JOIN users_orgs_ref
-                        ON users.id = users_orgs_ref.uid
                 WHERE
                     (users.username ~ ${query.filter} OR users.email ~* ${query.filter})
                     AND (${query.access}::TEXT IS NULL OR users.access = ${query.access})
-                    AND (${query.org}::BIGINT IS NULL OR users_orgs_ref.org_id = ${query.org})
                 GROUP BY
                     users.id
                 ORDER BY
@@ -317,10 +300,7 @@ class User {
                     username: row.username,
                     validated: row.validated,
                     email: row.email,
-                    access: row.access,
-                    orgs: row.orgs.filter((o) =>{
-                        return !!o;
-                    })
+                    access: row.access
                 };
             })
         };
@@ -359,14 +339,8 @@ class User {
     }
 
     async login(user) {
-        if (!user.auth0) {
-            if (!user.username) throw new Err(400, null, 'username required');
-            if (!user.password) throw new Err(400, null, 'password or auth0 token required');
-        } else if (user.auth0 && (user.username || user.password)) {
-            throw new Err(400, null, 'Auth0 Login cannot be combined with password');
-        } else if (user.auth0) {
-            user.username = user.auth0.email;
-        }
+        if (!user.username) throw new Err(400, null, 'username required');
+        if (!user.password) throw new Err(400, null, 'password required');
 
         let pgres;
         try {
@@ -390,10 +364,6 @@ class User {
 
         if (pgres.rows.length === 0) {
             throw new Err(403, null, 'Invalid Username or Pass');
-        }
-
-        if (!user.password) {
-            throw new Err(403, null, 'User must signin via password');
         }
 
         if (!await bcrypt.compare(user.password, pgres.rows[0].password)) {
@@ -424,7 +394,6 @@ class User {
     async register(user) {
         if (!user.username) throw new Err(400, null, 'username required');
         if (!user.email) throw new Err(400, null, 'email required');
-        if (user.validated === undefined) user.validated = false;
 
         try {
             const pgres = await this.config.pool.query(sql`
@@ -432,13 +401,11 @@ class User {
                     username,
                     email,
                     password,
-                    validated,
-                    access,
+                    access
                 ) VALUES (
                     ${user.username},
                     ${user.email},
                     ${await bcrypt.hash(user.password, 10)},
-                    ${user.validated},
                     'user'
                 ) RETURNING *
             `);

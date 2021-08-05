@@ -3,15 +3,10 @@
     "additionalProperties": false,
     "properties": {
         "limit": {
-            "type": "integer",
-            "default": 100,
-            "maximum": 100,
-            "description": "Limit number of returned runs"
+            "$ref": "./util/limit.json"
         },
         "page": {
-            "type": "integer",
-            "default": 100,
-            "description": "The offset based on limit to return"
+            "$ref": "./util/page.json"
         },
         "filter": {
             "type": "string",
@@ -20,6 +15,22 @@
         },
         "access": {
             "$ref": "./util/access.json"
+        },
+        "order": {
+            "$ref": "./util/order.json"
+        },
+        "sort": {
+            "type": "string",
+            "default": "created",
+            "enum": [
+                "id",
+                "created",
+                "username",
+                "access",
+                "validated",
+                "email"
+            ],
+            "description": "Field to sort order by"
         }
     }
 }

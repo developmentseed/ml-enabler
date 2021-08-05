@@ -11,26 +11,36 @@
             "description": "Total number of users with the service"
         },
         "users": {
-            "type": "object",
-            "required": [
-                "id",
-                "username",
-                "email",
-                "access"
-            ],
-            "additionalProperties": false,
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "username": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "access": {
-                    "$ref": "./util/access.json"
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "username",
+                    "email",
+                    "access",
+                    "validated"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "Unique ID of User"
+                    },
+                    "username": {
+                        "type": "string",
+                        "description": "Unique Username"
+                    },
+                    "email": {
+                        "type": "string",
+                        "description": "Unique Email"
+                    },
+                    "access": {
+                        "$ref": "./util/access.json"
+                    },
+                    "validated": {
+                        "$ref": "./util/validated.json"
+                    }
                 }
             }
         }

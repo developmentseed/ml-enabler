@@ -54,18 +54,10 @@ async function router(schema, config) {
         res: 'res.Login.json'
     }, async (req, res) => {
         try {
-            if (req.body.username && req.body.password) {
-                req.auth = await user.login({
-                    username: req.body.username,
-                    password: req.body.password
-                });
-            } else if (req.body.auth0) {
-                const auth0 = await user.auth0(req.body.auth0);
-
-                req.auth = await user.login({ auth0 });
-            } else {
-                throw new Err(400, null, 'Invalid Login Body');
-            }
+            req.auth = await user.login({
+                username: req.body.username,
+                password: req.body.password
+            });
 
             return res.json({
                 uid: req.auth.uid,

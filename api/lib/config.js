@@ -6,6 +6,8 @@ const { sql, createPool } = require('slonik');
 
 class Config {
     static async env(args = {}) {
+        this.args = args;
+        
         this.limits = args.limit || {
             exports: 300
         };
@@ -13,6 +15,7 @@ class Config {
         this.url = 'http://localhost:2001'
         this.postgres = args.postgres || process.env.POSTGRES || 'postgres://postgres@localhost:5432/mlenabler';
         this.Environment = process.env.ENVIRONMENT || 'docker';
+        this.signing_secret = process.env.SIGNING_SECRET || '123';
 
         try {
             if (!process.env.AWS_DEFAULT_REGION) {

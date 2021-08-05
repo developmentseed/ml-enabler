@@ -106,12 +106,6 @@ async function server(args, config, cb) {
     schema.router.use(morgan('combined'));
     schema.router.use(bodyparser.json({ limit: '50mb' }));
 
-    // Load dynamic routes directory
-    for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
-        if (!config.silent) console.error(`ok - loaded routes/${r}`);
-        await require('./routes/' + r)(schema, config);
-    }
-
     schema.router.use(async (req, res, next) => {
         if (req.header('authorization')) {
             const authorization = req.header('authorization').split(' ');
@@ -129,7 +123,7 @@ async function server(args, config, cb) {
                 });
             }
 
-            if (authorization[1].split('.')[0] === 'bri') {
+            if (authorization[1].split('.')[0] === 'mle') {
                 try {
                     req.auth = await Token.validate(config.pool, authorization[1]);
                 } catch (err) {
@@ -149,6 +143,13 @@ async function server(args, config, cb) {
 
         return next();
     });
+
+
+    // Load dynamic routes directory
+    for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
+        if (!config.silent) console.error(`ok - loaded routes/${r}`);
+        await require('./routes/' + r)(schema, config);
+    }
 
     schema.router.use((err, req, res, next) => {
         if (err instanceof ValidationError) {

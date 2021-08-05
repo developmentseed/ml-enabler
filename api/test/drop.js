@@ -1,10 +1,11 @@
 'use strict';
 
 const { Pool } = require('pg');
+const config = require('../knexfile');
 
 async function drop() {
     const pool = new Pool({
-        connectionString: process.env.POSTGRES || 'postgres://postgres@localhost:5432/bri'
+        connectionString: config.connection
     });
 
     const pgres = await pool.query(`

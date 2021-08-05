@@ -34,7 +34,6 @@ class Flight {
         test('start: database', async (t) => {
             try {
                 await drop();
-                KnexConfig.connection = process.env.POSTGRES || 'postgres://postgres@localhost:5432/bri';
                 const knex = Knex(KnexConfig);
                 await knex.migrate.latest();
                 await knex.destroy();
