@@ -198,6 +198,7 @@ class Token {
     /**
      * Validate a token
      *
+     * @param {Pool} pool - Postgres Pool instance
      * @param {String} token Token to validate
      */
     static async validate(pool, token) {

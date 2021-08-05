@@ -3,6 +3,8 @@
 const Err = require('../lib/error');
 
 async function router(schema, config) {
+    const user = new (require('../lib/user'))(config);
+
     /**
      * @api {get} /api/stack List Stacks
      * @apiVersion 1.0.0
@@ -16,12 +18,12 @@ async function router(schema, config) {
      * @ apiSchema {jsonschema=../schema/res.ListStacks.json} apiSuccess
      */
     await schema.get('/stack', {
-        //res: 'res.ListStacks.json'
+        // res: 'res.ListStacks.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
 
-            //@TODO
+            // @TODO
         } catch (err) {
             return Err.respond(err, res);
         }

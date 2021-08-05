@@ -1,6 +1,5 @@
 'use strict';
 
-const pkg = require('../package.json');
 const Err = require('./error');
 
 class Param {

@@ -1,18 +1,17 @@
 'use strict';
 
 const AWS = require('aws-sdk');
-const pkg = require('../package.json');
 const { sql, createPool } = require('slonik');
 
 class Config {
     static async env(args = {}) {
         this.args = args;
-        
+
         this.limits = args.limit || {
             exports: 300
         };
 
-        this.url = 'http://localhost:2001'
+        this.url = 'http://localhost:2001';
         this.postgres = args.postgres || process.env.POSTGRES || 'postgres://postgres@localhost:5432/mlenabler';
         this.Environment = process.env.ENVIRONMENT || 'docker';
         this.signing_secret = process.env.SIGNING_SECRET || '123';

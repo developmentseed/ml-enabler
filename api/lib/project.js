@@ -1,6 +1,7 @@
 'use strict';
 
 const Err = require('./error');
+const { sql } = require('slonik');
 
 /**
  * @class
@@ -10,7 +11,7 @@ class Project {
         this.id = false;
         this.created = false;
         this.source = '';
-        this.project_url = ''
+        this.project_url = '';
         this.archived = false;
         this.tags = {};
         this.access = false;
@@ -21,12 +22,12 @@ class Project {
     }
 
     static deserialize(dbrow) {
-        dbrow.id = BigInt(dbrow.id);
+        dbrow.id = parseInt(dbrow.id);
 
         const prj = new Project();
 
-        for (const key of Object.keys(pgres.rows[0])) {
-            prj[key] = pgres.rows[0][key];
+        for (const key of Object.keys(dbrow)) {
+            prj[key] = dbrow[key];
         }
 
         return prj;
@@ -47,17 +48,17 @@ class Project {
 
     static async from(pool, id) {
         try {
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 SELECT
                     *
                 FROM
                     project
                 WHERE
-                    id = $1
-            `, [id]);
+                    id = ${id}
+            `);
 
             if (!pgres.rows.length) {
-                return reject(new Err(404, null, 'Project not found'));
+                throw new Err(404, null, 'Project not found');
             }
             return Project.serialize(pgres.rows[0]);
         } catch (err) {
@@ -77,26 +78,18 @@ class Project {
         if (this.id === false) throw new Err(500, null, 'Project.id must be populated');
 
         try {
-            await pool.query(`
+            await pool.query(sql`
                 UPDATE project
                     SET
-                        source      = COALESCE($2, source),
-                        project_url = COALESCE($3, project_url)
-                        archived    = COALESCE($4, archived),
-                        tags        = COALESCE($5::JSONB, tags)
-                        access      = COALESCE($6, access),
-                        notes       = COALESCE($7, notes)
+                        source      = ${this.source},
+                        project_url = ${this.project_url},
+                        archived    = ${this.archived},
+                        tags        = ${JSON.stringify(this.tags)}::JSONB,
+                        access      = ${this.access},
+                        notes       = ${this.notes}
                     WHERE
-                        id = $1
-            `, [
-                this.id,
-                this.source,
-                this.project_url,
-                this.archived,
-                JSON.stringify(this.tags),
-                this.access = this.access,
-                this.notes = this.notes
-            ]);
+                        id = ${this.id}
+            `);
 
             return this;
         } catch (err) {
@@ -106,7 +99,7 @@ class Project {
 
     async generate(pool, prj) {
         try {
-            const pgres = await pool.query(`
+            const pgres = await pool.query(sql`
                 INSERT INTO project (
                     name,
                     source,
@@ -115,21 +108,14 @@ class Project {
                     access,
                     notes
                 ) VALUES (
-                    $1,
-                    $2,
-                    $3,
-                    $4,
-                    $5,
-                    $6
+                    ${prj.name},
+                    ${prj.source},
+                    ${prj.project_url},
+                    ${JSON.stringify(prj.tags)}::JSONB,
+                    ${prj.access},
+                    ${prj.notes}
                 ) RETURNING *
-            `, [
-                prj.name,
-                prj.source,
-                prj.project_url,
-                JSON.stringify(prj.tags),
-                prj.access,
-                prj.notes
-            ]);
+            `);
 
             return Project.deserialize(pgres.rows[0]);
         } catch (err) {

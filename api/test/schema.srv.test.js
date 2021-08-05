@@ -28,7 +28,7 @@ test('GET: api/schema', async (t) => {
         }
 
         t.deepEquals(res.body, JSON.parse(fs.readFileSync(fixture)));
-    } catch(err) {
+    } catch (err) {
         t.error(err, 'no error');
     }
 
@@ -51,7 +51,7 @@ test('GET: api/schema?method=FAKE', async (t) => {
                 message: 'should be equal to one of the allowed values'
             }]
         });
-    } catch(err) {
+    } catch (err) {
         t.error(err, 'no error');
     }
 
@@ -73,7 +73,7 @@ test('GET: api/schema?method=GET', async (t) => {
             messages: []
         });
 
-    } catch(err) {
+    } catch (err) {
         t.error(err, 'no error');
     }
 
@@ -123,20 +123,20 @@ test('GET: api/schema?method=POST&url=/login', async (t) => {
             query: null,
             res: {
                 type: 'object',
-                required: [ 'uid', 'username', 'email', 'access' ],
+                required: ['uid', 'username', 'email', 'access'],
                 additionalProperties: false,
                 properties: {
                     uid: { type: 'integer' },
                     username: { type: 'string' },
                     email: { type: 'string' },
-                    access: { type: 'string', enum: [ 'user' , 'disabled', 'admin' ], description: 'The access level of a given user' },
+                    access: { type: 'string', enum: ['user' , 'disabled', 'admin'], description: 'The access level of a given user' },
                     validated: { type: 'boolean', description: 'Has the user\'s email address been validated' },
                     token: { type: 'string', description: 'JSON Web Token to use for subsequent auth' }
                 }
             }
         });
 
-    } catch(err) {
+    } catch (err) {
         t.error(err, 'no error');
     }
 
@@ -167,7 +167,7 @@ test('POST: api/login', async (t) => {
                 message: 'should have required property \'password\''
             }]
         });
-    } catch(err) {
+    } catch (err) {
         t.error(err, 'no error');
     }
 

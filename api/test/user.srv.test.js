@@ -523,7 +523,7 @@ test('GET: api/user?order=asc', async (t) => {
         t.deepEquals(res.body, {
             total: 2,
             users: [{
-                id: 1, username: 'ingalls', validated: true, email: 'ingalls@example.com', access: 'admin' 
+                id: 1, username: 'ingalls', validated: true, email: 'ingalls@example.com', access: 'admin'
             },{
                 id: 2, username: 'ingalls-sub', validated: false, email: 'ingalls-sub@example.com', access: 'user'
             }]

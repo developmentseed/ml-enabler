@@ -6,7 +6,6 @@ const Err = require('./lib/error');
 const Schema = require('./lib/schema');
 const jwt = require('jsonwebtoken');
 const { ValidationError } = require('express-json-validator-middleware');
-const Busboy = require('busboy');
 const morgan = require('morgan');
 const express = require('express');
 const pkg = require('./package.json');
