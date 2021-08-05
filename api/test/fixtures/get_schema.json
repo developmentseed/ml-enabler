@@ -34,6 +34,26 @@
         "query": false,
         "res": false
     },
+    "GET /token": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "POST /token": {
+        "body": true,
+        "query": false,
+        "res": true
+    },
+    "GET /token/:token_id": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
+    "DELETE /token/:token_id": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
     "GET /user": {
         "body": false,
         "query": false,

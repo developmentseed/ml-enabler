@@ -125,7 +125,7 @@ async function server(args, config, cb) {
 
             if (authorization[1].split('.')[0] === 'mle') {
                 try {
-                    req.auth = await Token.validate(config.pool, authorization[1]);
+                    req.auth = await UserToken.validate(config.pool, authorization[1]);
                 } catch (err) {
                     return Err.respond(err, res);
                 }

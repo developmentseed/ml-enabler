@@ -11,22 +11,25 @@
             "description": "Total number of users with the service"
         },
         "tokens": {
-            "type": "object",
-            "required": [
-                "id",
-                "created",
-                "name"
-            ],
-            "additionalProperties": false,
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "created": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "created",
+                    "name"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "created": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
                 }
             }
         }

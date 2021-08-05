@@ -4,62 +4,221 @@ const Err = require('./error');
 const crypto = require('crypto');
 const { promisify } = require('util');
 const randomBytes = promisify(crypto.randomBytes);
+const { sql } = require('slonik');
 
+/**
+ * @class Token
+ */
 class Token {
-    constructor(pool) {
-        this.pool = pool;
+    /**
+     * @constructor
+     */
+    constructor() {
+        this.id = false;
+        this.uid = false;
+        this.created = false;
+        this.name = false;
+        this.token = false;
+
+        this.attrs = Object.keys(require('../schema/req.body.PatchToken.json').properties);
     }
 
-    async delete(auth, token_id) {
-        if (!auth.uid) {
-            throw new Err(500, null, 'Server could not determine user id');
-        }
+    /**
+     * Deserialize from PG Row
+     *
+     * @param {Object} row - Postgres Row
+     * @returns {Token}
+     */
+    static pg(row) {
+        const token = new Token();
+        token.id = parseInt(row.id);
+        token.uid = parseInt(row.uid);
+        Object.assign(token, row);
+        return token;
+    }
+
+    /**
+     * Serialize to json
+     *
+     * @param {boolean} secret - Show the token
+     *
+     * @returns {Object}
+     */
+    json(secret) {
+        const token = {
+            id: parseInt(this.id),
+            created: this.created,
+            name: this.name
+        };
+
+        if (secret) token.token = this.token;
+
+        return token;
+    }
+
+    /**
+     * List & Filter Tokens
+     *
+     * @param {Pool} pool - Postgres Pool instance
+     * @param {Object} query - Query object
+     * @param {Number} query.uid - Limit to a specific UID
+     * @param {String} [query.filter=] - Filter tokens by name
+     * @param {Number} [query.limit=100] - Max number of results to return
+     * @param {Number} [query.page=0] - Page to return
+     */
+    static async list(pool, query) {
+        if (!query) query = {};
+        if (!query.filter) query.filter = '';
+        if (!query.limit) query.limit = 100;
+        if (!query.page) query.page = 0;
 
         try {
-            await this.pool.query(`
+            const pgres = await pool.query(sql`
+                SELECT
+                    count(*) OVER() AS count,
+                    id,
+                    created,
+                    name
+                FROM
+                    users_tokens
+                WHERE
+                    name ~ ${query.filter}
+                    AND (${query.uid}::BIGINT IS NULL OR uid = ${query.uid})
+                ORDER BY
+                    id DESC
+                LIMIT
+                    ${query.limit}
+                OFFSET
+                    ${query.limit * query.page}
+            `);
+
+            return {
+                total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
+                tokens: pgres.rows.map((token) => {
+                    return {
+                        id: parseInt(token.id),
+                        created: token.created,
+                        name: token.name
+                    };
+                })
+            };
+        } catch (err) {
+            throw new Err(500, err, 'Failed to list tokens');
+        }
+    }
+
+    /**
+     * Get Token from ID
+     *
+     * @param {Pool} pool - Postgres Pool instance
+     * @param {Number} id - Token ID
+     *
+     * @returns {Token}
+     */
+    static async from(pool, id) {
+        let pgres;
+
+        try {
+            pgres = await pool.query(sql`
+                SELECT
+                    id,
+                    uid,
+                    created,
+                    name,
+                    token
+                FROM
+                    users_tokens
+                WHERE
+                    id = ${id}
+            `);
+        } catch (err) {
+            throw new Err(500, err , 'Failed to fetch token');
+        }
+
+        if (!pgres.rows.length) throw new Err(404, null, 'Token not found');
+
+        return Token.pg(pgres.rows[0]);
+    }
+
+    /**
+     * Patch supported params from a body
+     *
+     * @param {Object} patch
+     */
+    patch(patch) {
+        for (const attr of this.attrs) {
+            if (patch[attr] !== undefined) {
+                this[attr] = patch[attr];
+            }
+        }
+    }
+
+    /**
+     * Commit a token to the database
+     *
+     * @param {Pool} pool - Postgres Pool instance
+     */
+    async commit(pool) {
+        try {
+            await pool.query(sql`
+                UPDATE users_tokens
+                    SET
+                        name = ${this.name}
+                    WHERE
+                        id = ${this.id}
+            `);
+        } catch (err) {
+            throw new Err(500, err, 'failed to save token');
+        }
+    }
+
+    /**
+     * Delete a token
+     *
+     * @param {Pool} pool - Postgres Pool instance
+     */
+    async delete(pool) {
+        try {
+            await pool.query(sql`
                 DELETE FROM
                     users_tokens
                 WHERE
-                    uid = $1
-                    AND id = $2
-            `, [
-                auth.uid,
-                token_id
-            ]);
+                    id = ${this.id}
+            `);
 
             return {
                 status: 200,
                 message: 'Token Deleted'
             };
-
         } catch (err) {
             throw new Err(500, err, 'Failed to delete token');
         }
     }
 
-    async validate(token) {
-        if (token.split('.').length !== 2 || token.split('.')[0] !== 'oa' || token.length !== 67) {
+    /**
+     * Validate a token
+     *
+     * @param {String} token Token to validate
+     */
+    static async validate(pool, token) {
+        if (token.split('.').length !== 2 || token.split('.')[0] !== 'mle' || token.length !== 68) {
             throw new Err(401, null, 'Invalid token');
         }
 
         let pgres;
         try {
-            pgres = await this.pool.query(`
+            pgres = await pool.query(sql`
                 SELECT
                     users.id AS uid,
-                    users.level,
                     users.username,
                     users.access,
-                    users.email,
-                    users.flags
+                    users.email
                 FROM
                     users_tokens INNER JOIN users
                         ON users.id = users_tokens.uid
                 WHERE
-                    users_tokens.token = $1
-            `, [
-                token
-            ]);
+                    users_tokens.token = ${token}
+            `);
         } catch (err) {
             throw new Err(500, err, 'Failed to validate token');
         }
@@ -72,79 +231,39 @@ class Token {
 
         return {
             uid: parseInt(pgres.rows[0].uid),
-            level: pgres.rows[0].level,
             username: pgres.rows[0].username,
             access: pgres.rows[0].access,
             email: pgres.rows[0].email
         };
     }
 
-    async list(auth) {
-        if (!auth.uid) {
-            throw new Err(500, null, 'Server could not determine user id');
-        }
-
+    /**
+     * Create a new Token
+     *
+     * @param {Pool} pool - Postgres Pool instance
+     * @param {Object} params - Create Params
+     * @param {Number} params.uid - User ID to assign token to
+     * @param {String} params.name - Name of Token
+     *
+     * @returns {Token}
+     */
+    static async gen(pool, params = {}) {
         try {
-            const pgres = await this.pool.query(`
-                SELECT
-                    id,
-                    created,
-                    name
-                FROM
-                    users_tokens
-                WHERE
-                    uid = $1
-            `, [
-                auth.uid
-            ]);
-
-            return {
-                total: pgres.rows.length,
-                tokens: pgres.rows.map((token) => {
-                    token.id = parseInt(token.id);
-
-                    return token;
-                })
-            };
-        } catch (err) {
-            throw new Err(500, err, 'Failed to list tokens');
-        }
-    }
-
-    async generate(auth, name) {
-        if (auth.type !== 'session') {
-            throw new Err(400, null, 'Only a user session can create a token');
-        } else if (!auth.uid) {
-            throw new Err(500, null, 'Server could not determine user id');
-        } else if (!name || !name.trim()) {
-            throw new Err(400, null, 'Token name required');
-        }
-
-        try {
-            const pgres = await this.pool.query(`
+            const pgres = await pool.query(sql`
                 INSERT INTO users_tokens (
                     token,
                     created,
                     uid,
                     name
                 ) VALUES (
-                    $1,
+                    ${'mle.' + (await randomBytes(32)).toString('hex')},
                     NOW(),
-                    $2,
-                    $3
+                    ${params.uid},
+                    ${params.name}
                 ) RETURNING *
-            `, [
-                'oa.' + (await randomBytes(32)).toString('hex'),
-                auth.uid,
-                name
-            ]);
+            `);
 
-            return {
-                id: parseInt(pgres.rows[0].id),
-                name: pgres.rows[0].name,
-                token: pgres.rows[0].token,
-                created: pgres.rows[0].created
-            };
+            return Token.pg(pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Failed to generate token');
         }
