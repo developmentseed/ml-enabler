@@ -12,7 +12,7 @@ const pkg = require('./package.json');
 const minify = require('express-minify');
 const bodyparser = require('body-parser');
 const args = require('minimist')(process.argv, {
-    boolean: ['help', 'populate', 'email', 'no-cache', 'silent'],
+    boolean: ['help', 'populate', 'email', 'no-cache', 'silent', 'validate'],
     string: ['postgres']
 });
 

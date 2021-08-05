@@ -18,7 +18,10 @@ test('GET: api', async (t) => {
 
         t.equals(res.statusCode, 200, 'http: 200');
         t.deepEquals(res.body, {
-            version: '1.0.0'
+            version: '3.0.0',
+            stack: 'test',
+            environment: 'docker',
+            security: 'authenticated'
         });
     } catch (err) {
         t.error(err, 'no error');

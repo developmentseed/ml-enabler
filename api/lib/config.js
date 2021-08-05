@@ -7,6 +7,8 @@ class Config {
     static async env(args = {}) {
         this.args = args;
 
+        this.silent = !!args.silent;
+
         this.limits = args.limit || {
             exports: 300
         };
@@ -18,12 +20,12 @@ class Config {
 
         try {
             if (!process.env.AWS_DEFAULT_REGION) {
-                console.error('ok - set env AWS_DEFAULT_REGION: us-east-1');
+                if (!this.silent) console.error('ok - set env AWS_DEFAULT_REGION: us-east-1');
                 process.env.AWS_DEFAULT_REGION = 'us-east-1';
             }
 
             if (!process.env.StackName || process.env.StackName === 'test') {
-                console.error('ok - set env StackName: test');
+                if (!this.silent) console.error('ok - set env StackName: test');
                 this.Stack = 'test';
 
                 this.octo = false;
@@ -42,7 +44,7 @@ class Config {
             }
 
             if (!process.env.GithubSecret) {
-                console.error('ok - set env GithubSecret: no-secret');
+                if (!this.silent) console.error('ok - set env GithubSecret: no-secret');
                 process.env.GithubSecret = 'no-secret';
             }
         } catch (err) {
