@@ -25,7 +25,7 @@
                         "type": "integer"
                     },
                     "created": {
-                        "type": "string"
+                        "type": "integer"
                     },
                     "name": {
                         "type": "string"

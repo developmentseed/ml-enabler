@@ -47,7 +47,7 @@ class Token {
     json(secret) {
         const token = {
             id: parseInt(this.id),
-            created: this.created,
+            created: parseInt(this.created),
             name: this.name
         };
 
@@ -97,7 +97,7 @@ class Token {
                 tokens: pgres.rows.map((token) => {
                     return {
                         id: parseInt(token.id),
-                        created: token.created,
+                        created: parseInt(token.created),
                         name: token.name
                     };
                 })

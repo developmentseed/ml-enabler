@@ -3,7 +3,6 @@
     "required": [
         "id",
         "name",
-        "token",
         "created"
     ],
     "additionalProperties": false,
@@ -14,9 +13,6 @@
         "name": {
             "type": "string",
             "description": "Human Readable name of the API Token"
-        },
-        "token": {
-            "type": "string"
         },
         "created": {
             "type": "integer"

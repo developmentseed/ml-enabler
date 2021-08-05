@@ -71,10 +71,10 @@ async function router(schema, config) {
      * @apiDescription
      *     Get information about a single token
      *
-     * @apiSchema {jsonschema=../schema/res.GetToken.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.Token.json} apiSuccess
      */
     await schema.get('/token/:token_id', {
-        res: 'res.GetToken.json'
+        res: 'res.Token.json'
     }, async (req, res) => {
         try {
             await Param.int(req, 'token_id');
