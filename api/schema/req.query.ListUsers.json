@@ -20,9 +20,6 @@
         },
         "access": {
             "$ref": "./util/access.json"
-        },
-        "level": {
-            "$ref": "./util/level.json"
         }
     }
 }

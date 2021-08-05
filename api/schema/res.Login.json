@@ -4,8 +4,7 @@
         "uid",
         "username",
         "email",
-        "access",
-        "level"
+        "access"
     ],
     "additionalProperties": false,
     "properties": {
@@ -21,8 +20,12 @@
         "access": {
             "$ref": "./util/access.json"
         },
-        "level": {
-            "$ref": "./util/level.json"
+        "validated": {
+            "$ref": "./util/validated.json"
+        },
+        "token": {
+            "type": "string",
+            "description": "JSON Web Token to use for subsequent auth"
         }
     }
 }

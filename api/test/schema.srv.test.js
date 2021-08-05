@@ -123,15 +123,15 @@ test('GET: api/schema?method=POST&url=/login', async (t) => {
             query: null,
             res: {
                 type: 'object',
-                required: ['uid', 'username', 'email', 'access'],
+                required: [ 'uid', 'username', 'email', 'access' ],
                 additionalProperties: false,
                 properties: {
                     uid: { type: 'integer' },
                     username: { type: 'string' },
                     email: { type: 'string' },
-                    access: { type: 'string', enum: ['user', 'disabled', 'admin'], description: 'The access level of a given user' },
-                    token: { type: 'string', description: 'JSON Web Token to use for subsequent auth' },
-                    validated: { type: 'boolean', description: 'Has the user\'s email address been validated' }
+                    access: { type: 'string', enum: [ 'user' , 'disabled', 'admin' ], description: 'The access level of a given user' },
+                    validated: { type: 'boolean', description: 'Has the user\'s email address been validated' },
+                    token: { type: 'string', description: 'JSON Web Token to use for subsequent auth' }
                 }
             }
         });
