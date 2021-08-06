@@ -16,7 +16,7 @@
                 <button @click='refresh' class='btn round btn--stroke color-gray color-blue-on-hover mr12'>
                     <svg class='icon'><use href='#icon-refresh'/></svg>
                 </button>
-                <button @click='$router.push({ name: "newmodel" })' class='btn round btn--stroke color-gray color-green-on-hover'>
+                <button @click='$router.push({ name: "newproject" })' class='btn round btn--stroke color-gray color-green-on-hover'>
                     <svg class='icon'><use href='#icon-plus'/></svg>
                 </button>
             </div>
@@ -50,7 +50,7 @@
                 </div>
             </template>
             <template v-else>
-                <div @click='$router.push({ name: "model", params: { modelid: project.modelId } })' :key='project.modelId' v-for='project in projects.slice(page * 10, page * 10 + 10)'>
+                <div @click='$router.push({ name: "project", params: { projectid: project.id } })' :key='project.modelId' v-for='project in projects.slice(page * 10, page * 10 + 10)'>
                     <div class='cursor-pointer bg-darken10-on-hover col col--12 py12'>
                         <div class='col col--12 grid py6 px12'>
                             <div class='col col--6'>
@@ -58,7 +58,7 @@
                                     <svg v-if='project.access === "private"' class='fl icon color-gray h24 w24'><use xlink:href='#icon-lock'/></svg>
 
                                     <h3 class='txt-h4 fl' v-text='project.name'></h3>
-                                    <svg @click.prevent.stop='$router.push({ name: "editmodel", params: { modelid: project.modelId } })' class='fl my6 mx6 icon cursor-pointer color-gray-light color-gray-on-hover'><use href='#icon-pencil'/></svg>
+                                    <svg @click.prevent.stop='$router.push({ name: "editproject", params: { projectid: project.id } })' class='fl my6 mx6 icon cursor-pointer color-gray-light color-gray-on-hover'><use href='#icon-pencil'/></svg>
                                 </div>
                                 <div class='col col--12'>
                                     <h3 class='txt-xs' v-text='project.source'></h3>

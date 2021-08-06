@@ -8,7 +8,7 @@
                 <svg class='icon'><use href='#icon-close'/></svg>
             </button>
 
-            <button v-if='!newProject' @click='deleteProject($route.params.modelid)' class='mr12 btn fr round btn--stroke color-gray color-red-on-hover'>
+            <button v-if='!newProject' @click='deleteProject($route.params.projectid)' class='mr12 btn fr round btn--stroke color-gray color-red-on-hover'>
                 <svg class='icon'><use href='#icon-trash'/></svg>
             </button>
         </div>
@@ -135,7 +135,7 @@ export default {
     props: ['meta', 'user'],
     data: function() {
         return {
-            newProject: this.$route.name === 'newmodel',
+            newProject: this.$route.params.projectid !== 'new',
             showUser: false,
             showAdvanced: false,
             search: {
@@ -156,7 +156,7 @@ export default {
     mounted: function() {
         this.getUsers();
 
-        if (this.$route.name === "newmodel") {
+        if (this.newProject) {
             this.project.users.push({
                 uid: this.user.id,
                 name: this.user.name,
@@ -185,8 +185,8 @@ export default {
         },
         postProject: async function(archive) {
             try {
-                const body = await window.std(`/api/model${!this.newProject ? '/' + this.$route.params.modelid : ''}`, {
-                    method: this.$route.params.modelid ? 'PUT' : 'POST',
+                const body = await window.std(`/api/project${!this.newProject ? '/' + this.$route.params.projectid : ''}`, {
+                    method: this.$route.params.projectid ? 'PUT' : 'POST',
                     body: {
                         name: this.project.name,
                         notes: this.project.notes,
@@ -202,7 +202,7 @@ export default {
                 if (this.newProject) {
                     this.$router.push({ path: `/model/${body.id}` });
                 } else {
-                    this.$router.push({ path: `/model/${this.$route.params.modelid}` });
+                    this.$router.push({ path: `/model/${this.$route.params.projectid}` });
                 }
             } catch (err) {
                 this.$emit('err', err);
@@ -210,7 +210,7 @@ export default {
         },
         getProject: async function() {
             try {
-                this.project = await window.std(`/v1/model/${this.$route.params.modelid}`)
+                this.project = await window.std(`/api/project/${this.$route.params.projectid}`)
                 this.project.access = this.project.access === 'public' ? true : false;
             } catch (err) {
                 this.$emit('err', err);
@@ -218,7 +218,7 @@ export default {
         },
         deleteProject: async function() {
             try {
-                await window.std(`/api/project/${this.$route.params.modelid}`, {
+                await window.std(`/api/project/${this.$route.params.projectid}`, {
                     method: 'DELETE'
                 });
                 this.$router.push({ path: '/' });

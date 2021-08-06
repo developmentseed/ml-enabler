@@ -32,44 +32,40 @@ const router = new VueRouter({
         { path: '/login', name: 'login', component: Login },
         { path: '/profile', name: 'profile', component: Profile },
 
-        { path: '/model/new', name: 'newmodel', component: EditProject },
+        { path: '/project/new', name: 'newproject', component: EditProject },
 
         {
-            path: '/model/:modelid',
-            name: 'model',
+            path: '/project/:projectid',
+            name: 'project',
             component: Project,
             children: [{
                 path: 'edit',
-                name: 'editmodel',
+                name: 'editproject',
                 component: EditProject,
             },{
-                path: '/model/:modelid/training',
+                path: '/project/:projectid/training',
                 name: 'createTraining',
                 component: CreatePrediction,
             },{
-                path: '/model/:modelid/prediction',
+                path: '/project/:projectid/prediction',
                 name: 'createPrediction',
                 component: CreatePrediction,
             },{
-                path: '/model/:modelid/imagery',
+                path: '/project/:projectid/imagery',
                 name: 'createImagery',
                 component: Imagery,
             },{
-                path: '/model/:modelid/imagery/:imageryid',
+                path: '/project/:projectid/imagery/:imageryid',
                 name: 'editImagery',
                 component: Imagery,
             },{
-                path: '/model/:modelid/integration',
-                name: 'createImagery',
-                component: Integration,
-            },{
-                path: '/model/:modelid/integration/:integrationid',
+                path: '/project/:projectid/integration/:integrationid',
                 name: 'editImagery',
                 component: Integration,
             },{
                 name: 'prediction',
-                path: '/model/:modelid/prediction/:predid',
-                redirect: '/model/:modelid/prediction/:predid/assets',
+                path: '/project/:projectid/prediction/:predid',
+                redirect: '/project/:projectid/prediction/:predid/assets',
                 component: Prediction,
                 children: [{
                     name: 'config',
