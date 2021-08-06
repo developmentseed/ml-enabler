@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import VueRouter from  'vue-router'
-
 import App from './App.vue'
+
+import std from './std.js';
+std();
 
 import Home from './components/Home.vue';
 import Login from './components/Login.vue';
@@ -24,7 +26,7 @@ Vue.use(VueRouter);
 Vue.config.productionTip = false
 
 const router = new VueRouter({
-    mode: 'history',
+    mode: 'hash',
     routes: [
         { path: '/', name: 'home', component: Home },
         { path: '/login', name: 'login', component: Login },
@@ -99,7 +101,7 @@ const router = new VueRouter({
     ]
 });
 
-window.api = window.location.href.replace(/\/#.*/, '');
+window.api = window.location.origin
 
 new Vue({
     router,

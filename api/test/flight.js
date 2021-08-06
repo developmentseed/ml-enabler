@@ -154,7 +154,10 @@ class Flight {
             if (admin) {
                 await this.config.pool.query(sql`
                      UPDATE users
-                        SET access = 'admin';
+                        SET
+                            access = 'admin'
+                        WHERE
+                            id = ${new_user.body.id}
                 `);
             }
 

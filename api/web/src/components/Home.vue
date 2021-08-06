@@ -149,25 +149,13 @@ export default {
         getProjects: async function() {
             this.loading.projects = true;
             this.projects = [];
+
             try {
-                const url = new URL(window.api + '/v1/model');
+                const url = new URL('/api/project', window.api);
                 url.searchParams.append('filter', this.search);
                 url.searchParams.append('archived', this.archived);
-
-                const res = await fetch(url, {
-                    method: 'GET'
-                });
-
-                const body = await res.json();
-                if (res.status === 404) {
-                    this.projects = [];
-                    this.loading.projects = false;
-                } else if (!res.ok) {
-                    throw new Error(body.message);
-                } else {
-                    this.projects = body;
-                    this.loading.projects = false;
-                }
+                this.projects = await window.std(url);
+                this.loading.projects = false;
             } catch (err) {
                 this.$emit('err', err);
             }

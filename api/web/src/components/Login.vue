@@ -59,25 +59,17 @@ export default {
             this.loading = true;
 
             try {
-                const res = await fetch(window.api + `/api/login`, {
+                const body = await window.std('/api/login', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({
+                    body: {
                         username: this.username,
                         password: this.password
-                    })
+                    }
                 });
-
-                const body = await res.json();
 
                 this.loading = false;
 
-                if (!res.ok) throw new Error(body.message);
-
-                this.$emit('auth');
+                this.$emit('auth', body.token);
                 this.$router.push('/')
             } catch (err) {
                 this.$emit('err', err);

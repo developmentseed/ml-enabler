@@ -1,0 +1,28 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "source": {
+            "type": "string"
+        },
+        "project_url": {
+            "type": "string"
+        },
+        "archived": {
+            "type": "boolean"
+        },
+        "tags": {
+            "type": "object"
+        },
+        "access": {
+            "type": "string",
+            "enum": [
+                "private",
+                "public"
+            ]
+        },
+        "notes": {
+            "type": "string"
+        }
+    }
+}

@@ -7,9 +7,9 @@
                     <h1 @click='$router.push({ path: "/" })' class='align-center txt-h3 cursor-default txt-underline-on-hover cursor-pointer'>ML Enabler</h1>
                 </div>
                 <div v-if='!loading.user && $route.path !== "/login"' class='col col--3'>
-                    <button v-if='user.name' @click='$router.push({ path: "/profile" })' class='dropdown btn fr mr6 mb6 pb3 round btn--stroke color-gray color-blue-on-hover'>
+                    <button v-if='user.username' @click='$router.push({ path: "/profile" })' class='dropdown btn fr mr6 mb6 pb3 round btn--stroke color-gray color-blue-on-hover'>
                         <svg class='icon inline'><use href='#icon-chevron-down'/></svg>
-                        <span v-text='user.name'/>
+                        <span v-text='user.username'/>
 
                         <div class='round dropdown-content color-black' style='top: 24px;'>
                             <div @click.stop='$router.push({ path: "/profile" })' class='round bg-gray-faint-on-hover'>Profile</div>
@@ -29,7 +29,7 @@
                     <div class='flex-child py24'>Loading MLEnabler</div>
                 </div>
             </template>
-            <template v-else-if='meta.security === "authenticated" && !user.name && $route.path !== "/login"'>
+            <template v-else-if='meta.security === "authenticated" && !user.username && $route.path !== "/login"'>
                 <div class='flex-parent flex-parent--center-main pt36'>
                     <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-alert'/></svg>
                 </div>
@@ -47,7 +47,7 @@
                     :meta='meta'
                     :stacks='stacks'
                     @err='err = $event'
-                    @auth='refresh'
+                    @auth='refresh($event)'
                 />
             </template>
         </div>
@@ -91,7 +91,9 @@ export default {
         this.refresh();
     },
     methods: {
-        refresh: async function() {
+        refresh: async function(token) {
+            if (token) window.token = token;
+
             await this.getMeta();
             await this.getUser();
             this.getStacks();
@@ -102,13 +104,7 @@ export default {
         },
         getLogout: async function() {
             try {
-                this.loading.user = true;
-                const res = await fetch(window.api + '/v1/user/logout', {
-                    method: 'GET'
-                });
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
-
+                delete window.token;
                 window.location.href = window.api;
             } catch (err) {
                 this.err = err;
@@ -117,13 +113,8 @@ export default {
         getMeta: async function() {
             try {
                 this.loading.meta = true;
-                const res = await fetch(window.api + '/api', {
-                    method: 'GET'
-                });
-                const body = await res.json();
+                this.meta = await window.std('/api');
                 this.loading.meta = false;
-                if (!res.ok) throw new Error(body.message);
-                this.meta = body;
             } catch (err) {
                 this.err = err;
             }
@@ -131,27 +122,15 @@ export default {
         getUser: async function() {
             try {
                 this.loading.user = true;
-                let res = await fetch(window.api + '/v1/user/self', {
-                    method: 'GET'
-                });
-
+                this.user = await window.std('/api/login');
                 this.loading.user = false;
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
-                this.user = body;
             } catch (err) {
                 console.error(err);
             }
         },
         getStacks: async function() {
             try {
-                let res = await fetch(window.api + '/v1/stacks', {
-                    method: 'GET'
-                });
-
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
-                this.stacks = body;
+                this.stacks = await window.std('/api/stack');
             } catch(err) {
                 console.error(err);
             }
