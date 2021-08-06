@@ -14,17 +14,20 @@ async function router(schema, config) {
      * @apiPermission user
      *
      * @apiDescription
-     *     Return a list of all projects on the server
+     *     Return a list of all projects on the server that the user has access to
      *
-     * @ apiSchema {jsonschema=../schema/res.ListStacks.json} apiSuccess
+     * @apiSchema (Query) {jsonschema=../schema/req.query.ListProjects.json} apiParam
+     * @ apiSchema {jsonschema=../schema/res.ListProjects.json} apiSuccess
      */
     await schema.get('/project', {
-        // res: 'res.ListProjects.json'
+        query: 'req.query.ListProjects.json',
+        res: 'res.ListProjects.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
 
-            // @TODO
+            req.query.uid = req.auth.uid;
+            res.json(await Project.list(config.pool, req.query));
         } catch (err) {
             return Err.respond(err, res);
         }

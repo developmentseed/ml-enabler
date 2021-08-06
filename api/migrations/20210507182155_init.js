@@ -25,29 +25,32 @@ exports.up = function(knex) {
             notes               TEXT NOT NULL DEFAULT ''
         );
 
-        CREATE TABLE projects_invite (
+        CREATE TABLE projects_access (
             id                  BIGSERIAL PRIMARY KEY,
-            created             TIMESTAMP NOT NULL DEFAULT Now(),
-            proj_id             BIGSERIAL NOT NULL,
-            email               TEXT UNIQUE NOT NULL,
-            token               TEXT NOT NULL,
+            pid                 BIGINT NOT NULL,
+            uid                 BIGINT NOT NULL,
+            access              TEXT NOT NULL,
 
-            CONSTRAINT fk_projs
-                FOREIGN KEY (proj_id)
-                REFERENCES projects(id)
-        );
-
-        CREATE TABLE users_projects_ref (
-            uid                 BIGSERIAL NOT NULL,
-            proj_id             BIGSERIAL NOT NULL,
-            access              TEXT NOT NULL DEFAULT 'user',
+            UNIQUE(pid, uid),
 
             CONSTRAINT fk_users
                 FOREIGN KEY (uid)
                 REFERENCES users(id),
 
             CONSTRAINT fk_proj
-                FOREIGN KEY (proj_id)
+                FOREIGN KEY (pid)
+                REFERENCES projects(id)
+        );
+
+        CREATE TABLE projects_invite (
+            id                  BIGSERIAL PRIMARY KEY,
+            pid                 BIGSERIAL NOT NULL,
+            created             TIMESTAMP NOT NULL DEFAULT Now(),
+            email               TEXT UNIQUE NOT NULL,
+            token               TEXT NOT NULL,
+
+            CONSTRAINT fk_projs
+                FOREIGN KEY (pid)
                 REFERENCES projects(id)
         );
 
@@ -76,33 +79,33 @@ exports.up = function(knex) {
 
         CREATE TABLE imagery (
             id                  BIGSERIAL PRIMARY KEY,
-            project_id          BIGINT NOT NULL,
+            pid                 BIGINT NOT NULL,
             name                TEXT NOT NULL,
             url                 TEXT NOT NULL,
             fmt                 TEXT NOT NULL,
 
             CONSTRAINT fk_projects
-                FOREIGN KEY (project_id)
+                FOREIGN KEY (pid)
                 REFERENCES projects(id)
         );
 
         CREATE TABLE integration (
             id                  BIGSERIAL PRIMARY KEY,
-            project_id          BIGINT NOT NULL,
+            pid                 BIGINT NOT NULL,
             integration         TEXT NOT NULL,
             name                TEXT NOT NULL,
             url                 TEXT NOT NULL,
             auth                TEXT,
 
             CONSTRAINT fk_projects
-                FOREIGN KEY (project_id)
+                FOREIGN KEY (pid)
                 REFERENCES projects(id)
         );
 
         CREATE TABLE predictions (
             id                  BIGSERIAL PRIMARY KEY,
             created             TIMESTAMP DEFAULT NOW(),
-            project_id          BIGINT NOT NULL,
+            pid                 BIGINT NOT NULL,
             tile_zoom           INTEGER NOT NULL,
             docker_link         TEXT,
             log_link            TEXT,
@@ -119,7 +122,7 @@ exports.up = function(knex) {
             imagery_id          BIGINT,
 
             CONSTRAINT fk_projects
-                FOREIGN KEY (project_id)
+                FOREIGN KEY (pid)
                 REFERENCES projects(id),
 
             CONSTRAINT fk_imagery
@@ -141,13 +144,13 @@ exports.up = function(knex) {
 
         CREATE TABLE model_aoi (
             id                  BIGSERIAL PRIMARY KEY,
-            project_id          BIGINT NOT NULL,
+            pid                 BIGINT NOT NULL,
             pred_id             BIGINT NOT NULL,
             bounds              GEOMETRY(POLYGON, 4326) NOT NULL,
             name                TEXT NOT NULL,
 
             CONSTRAINT fk_projects
-                FOREIGN KEY (project_id)
+                FOREIGN KEY (pid)
                 REFERENCES projects(id),
 
             CONSTRAINT fk_predictions

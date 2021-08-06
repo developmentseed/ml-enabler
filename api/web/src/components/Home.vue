@@ -154,7 +154,9 @@ export default {
                 const url = new URL('/api/project', window.api);
                 url.searchParams.append('filter', this.search);
                 url.searchParams.append('archived', this.archived);
-                this.projects = await window.std(url);
+                const projects = await window.std(url);
+
+                this.projects = projects.projects;
                 this.loading.projects = false;
             } catch (err) {
                 this.$emit('err', err);

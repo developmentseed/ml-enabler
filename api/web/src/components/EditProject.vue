@@ -211,7 +211,7 @@ export default {
         getProject: async function() {
             try {
                 this.project = await window.std(`/v1/model/${this.$route.params.modelid}`)
-                body.access = body.access === 'public' ? true : false;
+                this.project.access = this.project.access === 'public' ? true : false;
             } catch (err) {
                 this.$emit('err', err);
             }
