@@ -1,0 +1,20 @@
+{
+    "type": "array",
+    "description": "Billing tags that should be attached to project resources",
+    "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+            "Key",
+            "Value"
+        ],
+        "properties": {
+            "Key": {
+                "type": "string"
+            },
+            "Value": {
+                "type": "string"
+            }
+        }
+    }
+}

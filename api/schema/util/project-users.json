@@ -1,0 +1,20 @@
+{
+    "type": "array",
+    "description": "Access list of users for a particular project",
+    "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+
+        ],
+        "properties": {
+            "uid": {
+                "type": "integer",
+                "description": "User ID to set access for"
+            },
+            "access": {
+                "$ref": "./access.json"
+            }
+        }
+    }
+}

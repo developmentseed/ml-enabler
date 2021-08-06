@@ -1,0 +1,35 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "name",
+        "source",
+        "project_url",
+        "tags",
+        "access",
+        "users"
+    ],
+    "properties": {
+        "name": {
+            "type": "string"
+        },
+        "source": {
+            "type": "string"
+        },
+        "project_url": {
+            "type": "string"
+        },
+        "tags": {
+            "$ref": "./util/project-tags.json"
+        },
+        "access": {
+            "$ref": "./util/project-access.json"
+        },
+        "notes": {
+            "type": "string"
+        },
+        "users": {
+            "$ref": "./util/project-users.json"
+        }
+    }
+}

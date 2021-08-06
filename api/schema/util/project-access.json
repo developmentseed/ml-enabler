@@ -1,0 +1,8 @@
+{
+    "type": "string",
+    "description": "Is the project public or private",
+    "enum": [
+        "private",
+        "public"
+    ]
+}
