@@ -1,0 +1,39 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "limit": {
+            "$ref": "./util/limit.json"
+        },
+        "page": {
+            "$ref": "./util/page.json"
+        },
+        "filter": {
+            "type": "string",
+            "default": "",
+            "description": "Filter a complete or partial project name"
+        },
+        "order": {
+            "$ref": "./util/order.json"
+        },
+        "archived": {
+            "type": "boolean",
+            "default": false,
+            "description": "Show archived projects"
+        },
+        "sort": {
+            "type": "string",
+            "default": "created",
+            "enum": [
+                "id",
+                "created",
+                "name",
+                "source",
+                "archived",
+                "access",
+                "project_url"
+            ],
+            "description": "Field to sort order by"
+        }
+    }
+}

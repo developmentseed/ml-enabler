@@ -1,0 +1,57 @@
+{
+    "type": "object",
+    "required": [
+        "total",
+        "projects"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "total": {
+            "type": "integer",
+            "description": "Total number of items"
+        },
+        "projects": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "created",
+                    "name",
+                    "source",
+                    "archived",
+                    "project_url",
+                    "access"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "created": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "source": {
+                        "type": "string"
+                    },
+                    "archived": {
+                        "type": "boolean"
+                    },
+                    "project_url": {
+                        "type": "string"
+                    },
+                    "access": {
+                        "type": "string",
+                        "enum": [
+                            "private",
+                            "public"
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}
