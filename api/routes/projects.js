@@ -47,13 +47,13 @@ async function router(schema, config) {
      * @ apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
      */
     await schema.post('/project', {
-        req: 'req.body.CreateProject.json',
-        body: 'res.Project.json'
+        body: 'req.body.CreateProject.json',
+        res: 'res.Project.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
 
-            const project = Project.generate(config.pool, req.body);
+            const project = await Project.generate(config.pool, req.body);
 
             return res.json(project.serialize());
         } catch (err) {

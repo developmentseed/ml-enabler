@@ -156,7 +156,12 @@ async function server(args, config, cb) {
 
             if (err.validationErrors.body) {
                 errs = errs.concat(err.validationErrors.body.map((e) => {
-                    return { message: e.message };
+                    let msg = e.message;
+                    if (e.dataPath) msg = msg + ` (${e.dataPath})`;
+
+                    return {
+                        message: msg
+                    };
                 }));
             }
 

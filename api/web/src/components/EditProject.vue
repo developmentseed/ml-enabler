@@ -33,7 +33,7 @@
 
                 <div class='col col--6 py6'>
                     <label>Project Url</label>
-                    <input v-model='project.projectUrl' class='input' placeholder='External URL'/>
+                    <input v-model='project.project_url' class='input' placeholder='External URL'/>
                 </div>
 
                 <div class='col col--12 py6'>
@@ -147,7 +147,7 @@ export default {
                 notes: '',
                 access: false,
                 source: '',
-                projectUrl: '',
+                project_url: '',
                 users: [],
                 tags: []
             }
@@ -184,23 +184,28 @@ export default {
             this.search.user = null;
         },
         postProject: async function(archive) {
+            const body = {
+                name: this.project.name,
+                notes: this.project.notes,
+                access: this.project.access ? 'public' : 'private',
+                source: this.project.source,
+                project_url: this.project.project_url,
+                tags: this.project.tags,
+                users: this.project.users
+            };
+
+            if (!this.newProject) {
+                body.archived = archive ? true : false;
+            }
+
             try {
-                const body = await window.std(`/api/project${!this.newProject ? '/' + this.$route.params.projectid : ''}`, {
+                const proj = await window.std(`/api/project${!this.newProject ? '/' + this.$route.params.projectid : ''}`, {
                     method: this.$route.params.projectid ? 'PUT' : 'POST',
-                    body: {
-                        name: this.project.name,
-                        notes: this.project.notes,
-                        access: this.project.access ? 'public' : 'private',
-                        source: this.project.source,
-                        projectUrl: this.project.projectUrl,
-                        archived: archive ? true : false,
-                        tags: this.project.tags,
-                        users: this.project.users
-                    }
+                    body: body
                 });
 
                 if (this.newProject) {
-                    this.$router.push({ path: `/model/${body.id}` });
+                    this.$router.push({ path: `/model/${proj.id}` });
                 } else {
                     this.$router.push({ path: `/model/${this.$route.params.projectid}` });
                 }

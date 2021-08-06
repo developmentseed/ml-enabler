@@ -15,14 +15,10 @@
             "type": "boolean"
         },
         "tags": {
-            "type": "object"
+            "$ref": "./util/project-tags.json"
         },
         "access": {
-            "type": "string",
-            "enum": [
-                "private",
-                "public"
-            ]
+            "$ref": "./util/project-access.json"
         },
         "notes": {
             "type": "string"

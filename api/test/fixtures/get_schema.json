@@ -24,6 +24,16 @@
         "query": false,
         "res": true
     },
+    "GET /project": {
+        "body": false,
+        "query": true,
+        "res": true
+    },
+    "POST /project": {
+        "body": true,
+        "query": false,
+        "res": false
+    },
     "GET /schema": {
         "body": true,
         "query": true,

@@ -114,16 +114,16 @@ class Project {
         };
     }
 
-    static serialize(project) {
+    serialize() {
         return {
-            id: parseInt(project.id),
-            created: project.created,
-            source: project.source,
-            project_url: project.project_url,
-            archived: project.archived,
-            tags: project.tags,
-            access: project.access,
-            notes: project.notes
+            id: parseInt(this.id),
+            created: this.created,
+            source: this.source,
+            project_url: this.project_url,
+            archived: this.archived,
+            tags: this.tags,
+            access: this.access,
+            notes: this.notes
         };
     }
 
@@ -133,7 +133,7 @@ class Project {
                 SELECT
                     *
                 FROM
-                    project
+                    projects
                 WHERE
                     id = ${id}
             `);
@@ -178,10 +178,10 @@ class Project {
         }
     }
 
-    async generate(pool, prj) {
+    static async generate(pool, prj) {
         try {
             const pgres = await pool.query(sql`
-                INSERT INTO project (
+                INSERT INTO projects (
                     name,
                     source,
                     project_url,
@@ -200,6 +200,10 @@ class Project {
 
             return Project.deserialize(pgres.rows[0]);
         } catch (err) {
+            if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
+                throw new Err(400, null, 'Project by that name already exists');
+            }
+
             throw new Err(500, err, 'Failed to generate Project');
         }
     }

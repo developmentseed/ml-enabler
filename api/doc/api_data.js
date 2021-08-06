@@ -322,6 +322,203 @@ define({ "api": [
     "groupTitle": "Login"
   },
   {
+    "type": "post",
+    "url": "/api/project",
+    "title": "Create Project",
+    "version": "1.0.0",
+    "name": "CreateProject",
+    "group": "Projects",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Create a new project</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "source",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "project_url",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Object[]",
+            "optional": false,
+            "field": "tags",
+            "description": "<p>Billing tags that should be attached to project resources undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "tags.Key",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "tags.Value",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"private\"",
+              "\"public\""
+            ],
+            "optional": false,
+            "field": "access",
+            "description": "<p>Is the project public or private</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "notes",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Object[]",
+            "optional": false,
+            "field": "users",
+            "description": "<p>Access list of users for a particular project undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": true,
+            "field": "users.uid",
+            "description": "<p>User ID to set access for</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"user\"",
+              "\"disabled\"",
+              "\"admin\""
+            ],
+            "optional": true,
+            "field": "users.access",
+            "description": "<p>The access level of a given user</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/projects.js",
+    "groupTitle": "Projects"
+  },
+  {
+    "type": "get",
+    "url": "/api/project",
+    "title": "List Projects",
+    "version": "1.0.0",
+    "name": "ListProjects",
+    "group": "Projects",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return a list of all projects on the server that the user has access to</p>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Integer",
+            "size": "1 - 100",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "100",
+            "description": "<p>Limit number of returned items</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "size": "0 - ∞",
+            "optional": true,
+            "field": "page",
+            "defaultValue": "0",
+            "description": "<p>The page, based on the limit, to return</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "filter",
+            "defaultValue": "",
+            "description": "<p>Filter a complete or partial project name</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"desc\"",
+              "\"asc\""
+            ],
+            "optional": true,
+            "field": "order",
+            "defaultValue": "asc",
+            "description": "<p>Sort order to apply to results</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Boolean",
+            "optional": true,
+            "field": "archived",
+            "defaultValue": "false",
+            "description": "<p>Show archived projects</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"id\"",
+              "\"created\"",
+              "\"name\"",
+              "\"source\"",
+              "\"archived\"",
+              "\"access\"",
+              "\"project_url\""
+            ],
+            "optional": true,
+            "field": "sort",
+            "defaultValue": "created",
+            "description": "<p>Field to sort order by</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/projects.js",
+    "groupTitle": "Projects"
+  },
+  {
     "type": "get",
     "url": "/api/schema",
     "title": "List Schemas",
@@ -502,6 +699,245 @@ define({ "api": [
   },
   {
     "type": "post",
+    "url": "/api/token",
+    "title": "Create Token",
+    "version": "1.0.0",
+    "name": "CreateToken",
+    "group": "Token",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Create a new API token for programatic access</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Human Readable name of the API Token</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Human Readable name of the API Token</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "token",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/tokens.js",
+    "groupTitle": "Token"
+  },
+  {
+    "type": "delete",
+    "url": "/api/token/:token_id",
+    "title": "Delete Token",
+    "version": "1.0.0",
+    "name": "DeleteToken",
+    "group": "Token",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Delete a user's API Token</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>The HTTP Status Code of the response</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>A human readable status message</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/tokens.js",
+    "groupTitle": "Token"
+  },
+  {
+    "type": "delete",
+    "url": "/api/token/:token_id",
+    "title": "Get Token",
+    "version": "1.0.0",
+    "name": "GetToken",
+    "group": "Token",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Get information about a single token</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Human Readable name of the API Token</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/tokens.js",
+    "groupTitle": "Token"
+  },
+  {
+    "type": "get",
+    "url": "/api/token",
+    "title": "List Tokens",
+    "version": "1.0.0",
+    "name": "ListTokens",
+    "group": "Token",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>List all tokens associated with the requester's account</p>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Integer",
+            "size": "1 - 100",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "100",
+            "description": "<p>Limit number of returned items</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "size": "0 - ∞",
+            "optional": true,
+            "field": "page",
+            "defaultValue": "0",
+            "description": "<p>The page, based on the limit, to return</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "filter",
+            "defaultValue": "",
+            "description": "<p>Filter a complete or partial token name</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "total",
+            "description": "<p>Total number of users with the service</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "tokens",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "tokens.id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "tokens.created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "tokens.name",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/tokens.js",
+    "groupTitle": "Token"
+  },
+  {
+    "type": "post",
     "url": "/api/user",
     "title": "Create User",
     "version": "1.0.0",
@@ -548,37 +984,30 @@ define({ "api": [
           {
             "group": "Success 200",
             "type": "Integer",
-            "optional": true,
-            "field": "total",
-            "description": "<p>Total number of users with the service</p>"
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID of User</p>"
           },
           {
             "group": "Success 200",
-            "type": "Object",
+            "type": "Boolean",
             "optional": false,
-            "field": "users",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "users.id",
-            "description": "<p>undefined</p>"
+            "field": "validated",
+            "description": "<p>Has the user's email address been validated</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "users.username",
-            "description": "<p>undefined</p>"
+            "field": "username",
+            "description": "<p>Unique Username</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "users.email",
-            "description": "<p>undefined</p>"
+            "field": "email",
+            "description": "<p>Unique Email</p>"
           },
           {
             "group": "Success 200",
@@ -589,7 +1018,7 @@ define({ "api": [
               "\"admin\""
             ],
             "optional": false,
-            "field": "users.access",
+            "field": "access",
             "description": "<p>The access level of a given user</p>"
           }
         ]
@@ -607,9 +1036,9 @@ define({ "api": [
     "group": "User",
     "permission": [
       {
-        "name": "admin",
-        "title": "Admin",
-        "description": "<p>The user must be a server admin to use this endpoint</p>"
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
     "description": "<p>Return a list of users that have registered with the service</p>",
@@ -619,19 +1048,20 @@ define({ "api": [
           {
             "group": "Query",
             "type": "Integer",
-            "size": "-∞ - 100",
+            "size": "1 - 100",
             "optional": true,
             "field": "limit",
             "defaultValue": "100",
-            "description": "<p>Limit number of returned runs</p>"
+            "description": "<p>Limit number of returned items</p>"
           },
           {
             "group": "Query",
             "type": "Integer",
+            "size": "0 - ∞",
             "optional": true,
             "field": "page",
-            "defaultValue": "100",
-            "description": "<p>The offset based on limit to return</p>"
+            "defaultValue": "0",
+            "description": "<p>The page, based on the limit, to return</p>"
           },
           {
             "group": "Query",
@@ -652,6 +1082,34 @@ define({ "api": [
             "optional": true,
             "field": "access",
             "description": "<p>The access level of a given user</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"desc\"",
+              "\"asc\""
+            ],
+            "optional": true,
+            "field": "order",
+            "defaultValue": "asc",
+            "description": "<p>Sort order to apply to results</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"id\"",
+              "\"created\"",
+              "\"username\"",
+              "\"access\"",
+              "\"validated\"",
+              "\"email\""
+            ],
+            "optional": true,
+            "field": "sort",
+            "defaultValue": "created",
+            "description": "<p>Field to sort order by</p>"
           }
         ]
       }
@@ -668,31 +1126,31 @@ define({ "api": [
           },
           {
             "group": "Success 200",
-            "type": "Object",
+            "type": "Object[]",
             "optional": false,
             "field": "users",
-            "description": "<p>undefined</p>"
+            "description": "<p>undefined undefined</p>"
           },
           {
             "group": "Success 200",
             "type": "Integer",
             "optional": false,
             "field": "users.id",
-            "description": "<p>undefined</p>"
+            "description": "<p>Unique ID of User</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "users.username",
-            "description": "<p>undefined</p>"
+            "description": "<p>Unique Username</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
             "field": "users.email",
-            "description": "<p>undefined</p>"
+            "description": "<p>Unique Email</p>"
           },
           {
             "group": "Success 200",
@@ -705,6 +1163,13 @@ define({ "api": [
             "optional": false,
             "field": "users.access",
             "description": "<p>The access level of a given user</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "users.validated",
+            "description": "<p>Has the user's email address been validated</p>"
           }
         ]
       }
@@ -750,6 +1215,13 @@ define({ "api": [
             "optional": true,
             "field": "access",
             "description": "<p>The access level of a given user</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Boolean",
+            "optional": true,
+            "field": "validated",
+            "description": "<p>Has the user's email address been validated</p>"
           }
         ]
       }
@@ -760,37 +1232,30 @@ define({ "api": [
           {
             "group": "Success 200",
             "type": "Integer",
-            "optional": true,
-            "field": "total",
-            "description": "<p>Total number of users with the service</p>"
+            "optional": false,
+            "field": "id",
+            "description": "<p>Unique ID of User</p>"
           },
           {
             "group": "Success 200",
-            "type": "Object",
+            "type": "Boolean",
             "optional": false,
-            "field": "users",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "Integer",
-            "optional": false,
-            "field": "users.id",
-            "description": "<p>undefined</p>"
+            "field": "validated",
+            "description": "<p>Has the user's email address been validated</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "users.username",
-            "description": "<p>undefined</p>"
+            "field": "username",
+            "description": "<p>Unique Username</p>"
           },
           {
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "users.email",
-            "description": "<p>undefined</p>"
+            "field": "email",
+            "description": "<p>Unique Email</p>"
           },
           {
             "group": "Success 200",
@@ -801,7 +1266,7 @@ define({ "api": [
               "\"admin\""
             ],
             "optional": false,
-            "field": "users.access",
+            "field": "access",
             "description": "<p>The access level of a given user</p>"
           }
         ]
