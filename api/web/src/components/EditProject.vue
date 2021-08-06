@@ -185,13 +185,9 @@ export default {
         },
         postProject: async function(archive) {
             try {
-                const res = await fetch(window.api + `/v1/model${!this.newProject ? '/' + this.$route.params.modelid : ''}`, {
+                const body = await window.std(`/api/model${!this.newProject ? '/' + this.$route.params.modelid : ''}`, {
                     method: this.$route.params.modelid ? 'PUT' : 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        modelId: !this.newProject ? this.$route.params.modelid : undefined,
+                    body: {
                         name: this.project.name,
                         notes: this.project.notes,
                         access: this.project.access ? 'public' : 'private',
@@ -200,14 +196,11 @@ export default {
                         archived: archive ? true : false,
                         tags: this.project.tags,
                         users: this.project.users
-                    })
+                    }
                 });
 
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
-
                 if (this.newProject) {
-                    this.$router.push({ path: `/model/${body.model_id}` });
+                    this.$router.push({ path: `/model/${body.id}` });
                 } else {
                     this.$router.push({ path: `/model/${this.$route.params.modelid}` });
                 }
@@ -217,27 +210,17 @@ export default {
         },
         getProject: async function() {
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}`, {
-                    method: 'GET'
-                });
-
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message)
+                this.project = await window.std(`/v1/model/${this.$route.params.modelid}`)
                 body.access = body.access === 'public' ? true : false;
-
-                this.project = body;
             } catch (err) {
                 this.$emit('err', err);
             }
         },
         deleteProject: async function() {
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}`, {
+                await window.std(`/api/project/${this.$route.params.modelid}`, {
                     method: 'DELETE'
                 });
-
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
                 this.$router.push({ path: '/' });
             } catch (err) {
                 this.$emit('err', err);
@@ -245,14 +228,7 @@ export default {
         },
         getUsers: async function() {
             try {
-                const res = await fetch(window.api + `/v1/user`, {
-                    method: 'GET'
-                });
-
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message)
-
-                this.search.users = body.users;
+                this.search.users = (await window.std('/api/user')).users;
             } catch (err) {
                 this.$emit('err', err);
             }

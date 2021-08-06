@@ -92,7 +92,10 @@ export default {
     },
     methods: {
         refresh: async function(token) {
-            if (token) window.token = token;
+            if (token) {
+                localStorage.token = token;
+            }
+
 
             await this.getMeta();
             await this.getUser();

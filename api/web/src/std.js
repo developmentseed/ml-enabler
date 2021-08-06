@@ -14,8 +14,8 @@ function std() {
                 opts.headers['Content-Type'] = 'application/json';
             }
 
-            if (window.token && !opts.headers.Authorization) {
-                opts.headers['Authorization'] = 'Bearer ' + window.token;
+            if (localStorage.token && !opts.headers.Authorization) {
+                opts.headers['Authorization'] = 'Bearer ' + localStorage.token;
             }
 
             const res = await fetch(url, opts);

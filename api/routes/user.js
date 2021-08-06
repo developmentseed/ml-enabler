@@ -12,7 +12,7 @@ async function router(schema, config) {
      * @apiVersion 1.0.0
      * @apiName ListUsers
      * @apiGroup User
-     * @apiPermission admin
+     * @apiPermission user
      *
      * @apiDescription
      *     Return a list of users that have registered with the service
@@ -24,7 +24,7 @@ async function router(schema, config) {
         res: 'res.ListUsers.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await user.is_auth(req);
 
             res.json(await user.list(req.query));
         } catch (err) {
