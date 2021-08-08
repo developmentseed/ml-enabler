@@ -57,7 +57,7 @@
                     <div :key='user.uid' v-for='(user, user_idx) in project.users' class='col col--12 grid grid--gut12 my3'>
                         <div class='col col--8'>
                             <button @click='project.users.splice(user_idx, 1)' class='fl mr12 round btn btn--s mt6 btn--stroke color-gray'><svg class='icon'><use xlink:href='#icon-close'/></svg></button>
-                            <span v-text='user.name'/>
+                            <span v-text='user.username'/>
                         </div>
                         <div class='col col--4'>
                             <div class='select-container fr'>
@@ -73,7 +73,7 @@
 
                     <label class='ml12'>Add User to Project</label>
                     <vSelect
-                        label='name'
+                        label='username'
                         class='ml12 w-full'
                         v-model='search.user'
                         :options='search.users'
@@ -158,8 +158,8 @@ export default {
 
         if (this.newProject) {
             this.project.users.push({
-                uid: this.user.id,
-                name: this.user.name,
+                uid: this.user.uid,
+                username: this.user.username,
                 access: 'admin'
             });
         } else {
@@ -176,8 +176,8 @@ export default {
             }
 
             this.project.users.push({
-                uid: this.search.user.id,
-                name: this.search.user.name,
+                uid: this.search.user.uid,
+                username: this.search.user.username,
                 access: 'read'
             });
 
