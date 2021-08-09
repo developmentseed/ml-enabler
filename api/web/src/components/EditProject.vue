@@ -1,14 +1,13 @@
 <template>
     <div class="col col--12">
         <div class='col col--12 clearfix py6'>
-            <h2 v-if='!newProject' class='fl'>Modify Project</h2>
-            <h2 v-else class='fl cursor-default'>Add Project</h2>
+            <h2 class='fl'>Modify Project</h2>
 
             <button @click='$router.push({ path: "/" });' class='btn fr round btn--stroke color-gray color-black-on-hover'>
                 <svg class='icon'><use href='#icon-close'/></svg>
             </button>
 
-            <button v-if='!newProject' @click='deleteProject($route.params.projectid)' class='mr12 btn fr round btn--stroke color-gray color-red-on-hover'>
+            <button @click='deleteProject($route.params.projectid)' class='mr12 btn fr round btn--stroke color-gray color-red-on-hover'>
                 <svg class='icon'><use href='#icon-trash'/></svg>
             </button>
         </div>
@@ -23,7 +22,7 @@
                         <div class='switch'></div>
                     </label>
 
-                    <input v-model='project.name' class='input' placeholder='Model Name'/>
+                    <input v-model='project.name' class='input' placeholder='Project Name'/>
                 </div>
 
                 <div class='col col--6 py6'>
@@ -117,9 +116,8 @@
                 </template>
 
                 <div class='col col--12 py12'>
-                    <button v-if='!newProject && showAdvanced' @click='postProject(true)' class='btn btn--stroke round fl color-gray color-red-on-hover'>Archive Project</button>
-                    <button v-if='!newProject' @click='postProject(false)' class='btn btn--stroke round fr color-blue-light color-blue-on-hover'>Update Project</button>
-                    <button v-else @click='postProject(false)' class='btn btn--stroke round fr color-green-light color-green-on-hover'>Add Project</button>
+                    <button v-if='showAdvanced' @click='postProject(true)' class='btn btn--stroke round fl color-gray color-red-on-hover'>Archive Project</button>
+                    <button @click='postProject(false)' class='btn btn--stroke round fr color-blue-light color-blue-on-hover'>Update Project</button>
                 </div>
             </div>
         </div>
@@ -135,7 +133,6 @@ export default {
     props: ['meta', 'user'],
     data: function() {
         return {
-            newProject: this.$route.params.projectid !== 'new',
             showUser: false,
             showAdvanced: false,
             search: {
@@ -155,16 +152,7 @@ export default {
     },
     mounted: function() {
         this.getUsers();
-
-        if (this.newProject) {
-            this.project.users.push({
-                uid: this.user.uid,
-                username: this.user.username,
-                access: 'admin'
-            });
-        } else {
-            this.getProject();
-        }
+        this.getProject();
     },
     methods: {
         addUser: function() {
@@ -184,36 +172,22 @@ export default {
             this.search.user = null;
         },
         postProject: async function(archive) {
-            const body = {
-                name: this.project.name,
-                notes: this.project.notes,
-                access: this.project.access ? 'public' : 'private',
-                source: this.project.source,
-                project_url: this.project.project_url,
-                tags: this.project.tags,
-                users: this.project.users.map((u) => {
-                    return {
-                        uid: u.uid,
-                        access: u.access
-                    }
-                })
-            };
-
-            if (!this.newProject) {
-                body.archived = archive ? true : false;
-            }
 
             try {
-                const proj = await window.std(`/api/project${!this.newProject ? '/' + this.$route.params.projectid : ''}`, {
-                    method: this.$route.params.projectid ? 'PUT' : 'POST',
-                    body: body
+                const proj = await window.std(`/api/project/${this.$route.params.projectid}`, {
+                    method: 'PATCH',
+                    body: {
+                        name: this.project.name,
+                        archived: archive ? true : false,
+                        notes: this.project.notes,
+                        access: this.project.access ? 'public' : 'private',
+                        source: this.project.source,
+                        project_url: this.project.project_url,
+                        tags: this.project.tags,
+                    }
                 });
 
-                if (this.newProject) {
-                    this.$router.push({ path: `/project/${proj.id}` });
-                } else {
-                    this.$router.push({ path: `/project/${this.$route.params.projectid}` });
-                }
+                this.$router.push({ path: `/project/${this.$route.params.projectid}` });
             } catch (err) {
                 this.$emit('err', err);
             }

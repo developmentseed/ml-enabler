@@ -1434,6 +1434,184 @@
     "groupTitle": "Projects"
   },
   {
+    "type": "patch",
+    "url": "/api/project/:pid",
+    "title": "Patch Project",
+    "version": "1.0.0",
+    "name": "PatchProject",
+    "group": "Projects",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Update a project</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "source",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "project_url",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Boolean",
+            "optional": true,
+            "field": "archived",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Object[]",
+            "optional": true,
+            "field": "tags",
+            "description": "<p>Billing tags that should be attached to project resources undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "tags.Key",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "tags.Value",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "allowedValues": [
+              "\"private\"",
+              "\"public\""
+            ],
+            "optional": true,
+            "field": "access",
+            "description": "<p>Is the project public or private</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "notes",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "project_url",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "archived",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "tags",
+            "description": "<p>Billing tags that should be attached to project resources undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "tags.Key",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "tags.Value",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"private\"",
+              "\"public\""
+            ],
+            "optional": false,
+            "field": "access",
+            "description": "<p>Is the project public or private</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "notes",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/projects.js",
+    "groupTitle": "Projects"
+  },
+  {
     "type": "get",
     "url": "/api/schema",
     "title": "List Schemas",

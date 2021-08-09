@@ -124,6 +124,7 @@ class Project {
             id: parseInt(this.id),
             created: this.created,
             updated: this.updated,
+            name: this.name,
             source: this.source,
             project_url: this.project_url,
             archived: this.archived,

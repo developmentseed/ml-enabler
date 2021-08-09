@@ -1,8 +1,7 @@
 <template>
     <div class="col col--12">
         <div class='col col--12 clearfix py6'>
-            <h2 v-if='!newProject' class='fl'>Modify Project</h2>
-            <h2 v-else class='fl cursor-default'>Add Project</h2>
+            <h2 class='fl cursor-default'>Add Project</h2>
 
             <button @click='$router.push({ path: "/" });' class='btn fr round btn--stroke color-gray color-black-on-hover'>
                 <svg class='icon'><use href='#icon-close'/></svg>
@@ -19,7 +18,7 @@
                         <div class='switch'></div>
                     </label>
 
-                    <input v-model='project.name' class='input' placeholder='Model Name'/>
+                    <input v-model='project.name' class='input' placeholder='Project Name'/>
                 </div>
 
                 <div class='col col--6 py6'>
