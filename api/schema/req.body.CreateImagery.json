@@ -1,0 +1,20 @@
+{
+    "type": "object",
+    "required": [
+        "name",
+        "url",
+        "fmt"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "name": {
+            "type": "string"
+        },
+        "url": {
+            "type": "string"
+        },
+        "fmt": {
+            "type": "string"
+        }
+    }
+}

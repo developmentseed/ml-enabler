@@ -62,8 +62,7 @@ export default {
     data: function() {
         return {
             imagery: {
-                imageryId: false,
-                modelId: this.$route.params.modelid,
+                pid: this.$route.params.projectid,
                 name: '',
                 fmt: 'wms',
                 url: ''

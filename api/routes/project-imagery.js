@@ -8,10 +8,10 @@ async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
 
     /**
-     * @api {get} /api/project List Imagery
+     * @api {get} /api/project/:pid/imagery List Imagery
      * @apiVersion 1.0.0
      * @apiName ListImagery
-     * @apiGroup ProjectImagery
+     * @apiGroup Imagery
      * @apiPermission user
      *
      * @apiDescription
@@ -29,6 +29,35 @@ async function router(schema, config) {
 
             req.query.pid = req.params.pid;
             res.json(await Imagery.list(config.pool, req.query));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {post} /api/project/:pid/imagery Create Imagery
+     * @apiVersion 1.0.0
+     * @apiName CreateImagery
+     * @apiGroup Imagery
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Create a new imagery source
+     *
+     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateImagery.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.Imagery.json} apiSuccess
+     */
+    await schema.post('/project/:pid/imagery', {
+        body: 'req.body.CreateImagery.json',
+        res: 'res.Imagery.json'
+    }, async (req, res) => {
+        try {
+            await user.is_auth(req);
+
+            req.body.pid = req.params.pid;
+            const img = await Imagery.generate(config.pool, req.body);
+
+            return res.json(img.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }

@@ -54,7 +54,6 @@ class ProjectImagery {
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
         if (!query.filter) query.filter = '';
-        if (!query.archived) query.archived = false;
 
         if (!query.sort) query.sort = 'created';
         if (!query.order || query.order === 'asc') {

@@ -1,0 +1,42 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "limit": {
+            "$ref": "./util/limit.json"
+        },
+        "page": {
+            "$ref": "./util/page.json"
+        },
+        "filter": {
+            "type": "string",
+            "default": "",
+            "description": "Filter a complete or partial version"
+        },
+        "order": {
+            "$ref": "./util/order.json"
+        },
+        "sort": {
+            "type": "string",
+            "default": "created",
+            "enum": [
+                "id",
+                "created",
+                "tile_zoom",
+                "docker_link",
+                "log_link",
+                "model_link",
+                "checkpoint_link",
+                "tfrecord_link",
+                "save_link",
+                "inf_list",
+                "inf_type",
+                "inf_binary",
+                "inf_supertile",
+                "version",
+                "hint"
+            ],
+            "description": "Field to sort order by"
+        }
+    }
+}
