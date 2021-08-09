@@ -10,7 +10,7 @@
         <div class='col col--12 grid grid--gut12'>
             <div class='col col--6 pt12'>
                 <label>Username:</label>
-                <input :value='user.name' class='input' placeholder='Username'/>
+                <input :value='user.username' class='input' placeholder='Username'/>
             </div>
             <div class='col col--6 pt12'>
                 <label>Email:</label>

@@ -121,19 +121,12 @@ export default {
         },
         setToken: async function() {
             try {
-                const res = await fetch(`${window.location.origin}/v1/user/token`, {
+                const body = await window.std('/api/token', {
                     method: 'POST',
-                    credentials: 'same-origin',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
+                    body: {
                         name: this.newToken.name
-                    })
+                    }
                 });
-
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
 
                 this.newToken.token = body.token;
             } catch (err) {
@@ -142,42 +135,25 @@ export default {
         },
         getTokens: async function() {
             this.loading = true;
-
             try {
-                const res = await fetch(`${window.api}/v1/user/token`, {
-                    method: 'GET',
-                    credentials: 'same-origin'
-                });
+                const tokens = await window.std('/api/token');
 
-                const body = await res.json();
-
-                this.loading = false;
-                if (res.statusCode === 404) {
-                    this.tokens = [];
-                } else if (!res.ok && body.message) {
-                    throw new Error(res.message);
-                } else {
-                    this.tokens = body;
-                }
+                this.tokens = tokens.tokens;
             } catch (err) {
                 this.$emit('err', err);
             }
+            this.loading = false;
         },
-        deleteToken: function(token_id) {
-            fetch(`${window.api}/v1/user/token/${token_id}`, {
-                method: 'DELETE',
-                credentials: 'same-origin'
-            }).then((res) => {
-                if (!res.ok && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok) {
-                    throw new Error('Failed to delete token');
-                }
-
-                this.getTokens();
-            }).catch((err) => {
+        deleteToken: async function(token_id) {
+            try {
+                await window.std(`/api/token/${token_id}`, {
+                    method: 'DELETE',
+                });
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
+
+            this.getTokens();
         }
     }
 }
