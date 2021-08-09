@@ -1,6 +1,632 @@
 [
   {
     "type": "post",
+    "url": "/api/project/:pid/imagery",
+    "title": "Create Imagery",
+    "version": "1.0.0",
+    "name": "CreateImagery",
+    "group": "Imagery",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Create a new imagery source</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "url",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "fmt",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "pid",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "url",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "fmt",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-imagery.js",
+    "groupTitle": "Imagery"
+  },
+  {
+    "type": "delete",
+    "url": "/api/project/:pid/imagery/:imageryid",
+    "title": "delete Imagery",
+    "version": "1.0.0",
+    "name": "DeleteImagery",
+    "group": "Imagery",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Delete an imagery source</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>The HTTP Status Code of the response</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>A human readable status message</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-imagery.js",
+    "groupTitle": "Imagery"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:pid/imagery/:imageryid",
+    "title": "Get Imagery",
+    "version": "1.0.0",
+    "name": "GetImagery",
+    "group": "Imagery",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Get a single imagery source</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "pid",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "url",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "fmt",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-imagery.js",
+    "groupTitle": "Imagery"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:pid/imagery",
+    "title": "List Imagery",
+    "version": "1.0.0",
+    "name": "ListImagery",
+    "group": "Imagery",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return a list of all imagery sources within a project</p>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Integer",
+            "size": "1 - 100",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "100",
+            "description": "<p>Limit number of returned items</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "size": "0 - ∞",
+            "optional": true,
+            "field": "page",
+            "defaultValue": "0",
+            "description": "<p>The page, based on the limit, to return</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "filter",
+            "defaultValue": "",
+            "description": "<p>Filter a complete or partial project name</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"desc\"",
+              "\"asc\""
+            ],
+            "optional": true,
+            "field": "order",
+            "defaultValue": "asc",
+            "description": "<p>Sort order to apply to results</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"id\"",
+              "\"name\"",
+              "\"url\"",
+              "\"fmt\""
+            ],
+            "optional": true,
+            "field": "sort",
+            "defaultValue": "created",
+            "description": "<p>Field to sort order by</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "total",
+            "description": "<p>Total number of items</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": true,
+            "field": "projects",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "projects.id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "projects.created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "projects.updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "projects.name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "projects.url",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "projects.fmt",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-imagery.js",
+    "groupTitle": "Imagery"
+  },
+  {
+    "type": "patch",
+    "url": "/api/project/:pid/imagery/:imageryid",
+    "title": "Patch Imagery",
+    "version": "1.0.0",
+    "name": "PatchImagery",
+    "group": "Imagery",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Update an imagery source</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "url",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "fmt",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "pid",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "url",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "fmt",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-imagery.js",
+    "groupTitle": "Imagery"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:pid/iteration",
+    "title": "List Iteration",
+    "version": "1.0.0",
+    "name": "ListIteration",
+    "group": "Iterations",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return a list of all model iterations within a project</p>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Integer",
+            "size": "1 - 100",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "100",
+            "description": "<p>Limit number of returned items</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "size": "0 - ∞",
+            "optional": true,
+            "field": "page",
+            "defaultValue": "0",
+            "description": "<p>The page, based on the limit, to return</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "filter",
+            "defaultValue": "",
+            "description": "<p>Filter a complete or partial version</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"desc\"",
+              "\"asc\""
+            ],
+            "optional": true,
+            "field": "order",
+            "defaultValue": "asc",
+            "description": "<p>Sort order to apply to results</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"id\"",
+              "\"created\"",
+              "\"tile_zoom\"",
+              "\"docker_link\"",
+              "\"log_link\"",
+              "\"model_link\"",
+              "\"checkpoint_link\"",
+              "\"tfrecord_link\"",
+              "\"save_link\"",
+              "\"inf_list\"",
+              "\"inf_type\"",
+              "\"inf_binary\"",
+              "\"inf_supertile\"",
+              "\"version\"",
+              "\"hint\""
+            ],
+            "optional": true,
+            "field": "sort",
+            "defaultValue": "created",
+            "description": "<p>Field to sort order by</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "total",
+            "description": "<p>Total number of items</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "iterations",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "iterations.id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "iterations.created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "iterations.updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "iterations.version",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "iterations.docker_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "iterations.log_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "iterations.model_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "iterations.checkpoint_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "iterations.tfrecord_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "iterations.save_link",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-iteration.js",
+    "groupTitle": "Iterations"
+  },
+  {
+    "type": "post",
     "url": "/api/login",
     "title": "Create Session",
     "version": "1.0.0",
@@ -324,82 +950,6 @@
     "groupTitle": "Login"
   },
   {
-    "type": "get",
-    "url": "/api/project",
-    "title": "List Imagery",
-    "version": "1.0.0",
-    "name": "ListImagery",
-    "group": "ProjectImagery",
-    "permission": [
-      {
-        "name": "user",
-        "title": "User",
-        "description": "<p>A user must be logged in to use this endpoint</p>"
-      }
-    ],
-    "description": "<p>Return a list of all imagery sources within a project</p>",
-    "parameter": {
-      "fields": {
-        "Query": [
-          {
-            "group": "Query",
-            "type": "Integer",
-            "size": "1 - 100",
-            "optional": true,
-            "field": "limit",
-            "defaultValue": "100",
-            "description": "<p>Limit number of returned items</p>"
-          },
-          {
-            "group": "Query",
-            "type": "Integer",
-            "size": "0 - ∞",
-            "optional": true,
-            "field": "page",
-            "defaultValue": "0",
-            "description": "<p>The page, based on the limit, to return</p>"
-          },
-          {
-            "group": "Query",
-            "type": "String",
-            "optional": true,
-            "field": "filter",
-            "defaultValue": "",
-            "description": "<p>Filter a complete or partial project name</p>"
-          },
-          {
-            "group": "Query",
-            "type": "String",
-            "allowedValues": [
-              "\"desc\"",
-              "\"asc\""
-            ],
-            "optional": true,
-            "field": "order",
-            "defaultValue": "asc",
-            "description": "<p>Sort order to apply to results</p>"
-          },
-          {
-            "group": "Query",
-            "type": "String",
-            "allowedValues": [
-              "\"id\"",
-              "\"name\"",
-              "\"url\"",
-              "\"fmt\""
-            ],
-            "optional": true,
-            "field": "sort",
-            "defaultValue": "created",
-            "description": "<p>Field to sort order by</p>"
-          }
-        ]
-      }
-    },
-    "filename": "./routes/project-imagery.js",
-    "groupTitle": "ProjectImagery"
-  },
-  {
     "type": "post",
     "url": "/api/project",
     "title": "Create Project",
@@ -507,6 +1057,100 @@
         ]
       }
     },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "project_url",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "archived",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "tags",
+            "description": "<p>Billing tags that should be attached to project resources undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "tags.Key",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "tags.Value",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"private\"",
+              "\"public\""
+            ],
+            "optional": false,
+            "field": "access",
+            "description": "<p>Is the project public or private</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "notes",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
     "filename": "./routes/projects.js",
     "groupTitle": "Projects"
   },
@@ -525,6 +1169,100 @@
       }
     ],
     "description": "<p>Return a single project</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "source",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "project_url",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "archived",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "tags",
+            "description": "<p>Billing tags that should be attached to project resources undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "tags.Key",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "tags.Value",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"private\"",
+              "\"public\""
+            ],
+            "optional": false,
+            "field": "access",
+            "description": "<p>Is the project public or private</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "notes",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
     "filename": "./routes/projects.js",
     "groupTitle": "Projects"
   },
@@ -608,6 +1346,86 @@
             "field": "sort",
             "defaultValue": "created",
             "description": "<p>Field to sort order by</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "total",
+            "description": "<p>Total number of items</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "projects",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "projects.id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "projects.created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "projects.updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "projects.name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "projects.source",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "projects.archived",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "projects.project_url",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"private\"",
+              "\"public\""
+            ],
+            "optional": false,
+            "field": "projects.access",
+            "description": "<p>undefined</p>"
           }
         ]
       }

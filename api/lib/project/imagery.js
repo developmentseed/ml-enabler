@@ -185,6 +185,20 @@ class ProjectImagery {
             throw new Err(500, err, 'Failed to generate Imagery');
         }
     }
+
+    async delete(pool) {
+        try {
+            await pool.query(sql`
+                DELETE FROM imagery
+                    WHERE
+                        id = ${this.id}
+            `);
+
+            return true;
+        } catch (err) {
+            throw new Err(500, err, 'Failed to delete Imagery');
+        }
+    }
 }
 
 module.exports = ProjectImagery;

@@ -88,6 +88,66 @@ async function router(schema, config) {
             return Err.respond(err, res);
         }
     });
+
+    /**
+     * @api {patch} /api/project/:pid/imagery/:imageryid Patch Imagery
+     * @apiVersion 1.0.0
+     * @apiName PatchImagery
+     * @apiGroup Imagery
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Update an imagery source
+     *
+     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchImagery.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.Imagery.json} apiSuccess
+     */
+    await schema.patch('/project/:pid/imagery/:imageryid', {
+        body: 'req.body.PatchImagery.json',
+        res: 'res.Imagery.json'
+    }, async (req, res) => {
+        try {
+            await user.is_auth(req);
+
+            const img = await Imagery.from(config.pool, req.params.imageryid);
+            img.patch(req.body);
+            await img.commit(config.pool);
+
+            return res.json(img.serialize());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {delete} /api/project/:pid/imagery/:imageryid delete Imagery
+     * @apiVersion 1.0.0
+     * @apiName DeleteImagery
+     * @apiGroup Imagery
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Delete an imagery source
+     *
+     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
+     */
+    await schema.delete('/project/:pid/imagery/:imageryid', {
+        res: 'res.Standard.json'
+    }, async (req, res) => {
+        try {
+            await user.is_auth(req);
+
+            const img = await Imagery.from(config.pool, req.params.imageryid);
+            await img.delete(config.pool);
+
+            return res.json({
+                status: 200,
+                message: 'Imagery Deleted'
+            });
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 }
 
 module.exports = router;

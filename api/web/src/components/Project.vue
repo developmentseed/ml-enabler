@@ -235,19 +235,18 @@ export default {
         },
         getIterations: async function() {
             try {
-                const body = await window.std(`/api/project/${this.$route.params.projectid}/iteration`);
-
-                return {};
+                await window.std(`/api/project/${this.$route.params.projectid}/iteration`);
 
                 const vMap = {};
 
-                for (const v of body) {
+                for (const v of []) {
                     vMap[v.version] = v;
                 }
 
-                this.iterations = vSort.desc(body.map(r => r.version)).map(r => {
+                this.iterations = vSort.desc([].map(r => r.version)).map(r => {
                     return vMap[r];
                 });
+
             } catch (err) {
                 this.$emit('err', err);
             }
