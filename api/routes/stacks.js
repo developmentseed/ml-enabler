@@ -23,6 +23,14 @@ async function router(schema, config) {
         try {
             await user.is_auth(req);
 
+            return res.json({
+                models: [],
+                projects: [],
+                predictions: [],
+                iterations: [],
+                stacks: []
+            });
+
             // @TODO
         } catch (err) {
             return Err.respond(err, res);

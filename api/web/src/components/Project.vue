@@ -5,7 +5,7 @@
                 <div class='flex-child loading py24'></div>
             </div>
         </template>
-        <template v-else-if='$route.name === "model"'>
+        <template v-else-if='$route.name === "project"'>
             <div class='col col--12 clearfix py6'>
                 <h2 @click='$router.push({ name: "home" })' class='fl cursor-pointer txt-underline-on-hover'>Projects</h2>
                 <h2 class='fl px6'>&gt;</h2>
@@ -19,7 +19,7 @@
                     <svg class='icon'><use href='#icon-link'/></svg>
                 </button>
 
-                <button @click='$router.push({ name: "editmodel", params: { modelid: $route.params.modelid } })' class='mr12 btn fr round btn--stroke color-gray color-black-on-hover'>
+                <button @click='$router.push({ name: "editproject", params: { projectid: $route.params.projectid } })' class='mr12 btn fr round btn--stroke color-gray color-black-on-hover'>
                     <svg class='icon'><use href='#icon-pencil'/></svg>
                 </button>
 
@@ -43,12 +43,12 @@
                         <svg class='icon fl'><use href='#icon-chevron-down'/></svg>
 
                         <div class='round dropdown-content color-black' style='top: 24px;'>
-                            <div @click='$router.push({ path: `/model/${$route.params.modelid}/prediction` })' class='round bg-gray-faint-on-hover'>Prediction</div>
-                            <div @click='$router.push({ path: `/model/${$route.params.modelid}/training` })' class='round bg-gray-faint-on-hover'>Training</div>
+                            <div @click='$router.push({ path: `/project/${$route.params.projectid}/prediction` })' class='round bg-gray-faint-on-hover'>Prediction</div>
+                            <div @click='$router.push({ path: `/project/${$route.params.projectid}/training` })' class='round bg-gray-faint-on-hover'>Training</div>
                         </div>
                     </button>
                     <div v-if='folding.iterations' class='fr bg-gray-faint bg-gray-on-hover color-white-on-hover color-gray inline-block px6 py3 round txt-xs txt-bold mr3'>
-                        <span v-text='`${terations.length > 0 ? iterations.length : "No"} Iterations`'/>
+                        <span v-text='`${iterations.length > 0 ? iterations.length : "No"} Iterations`'/>
                     </div>
                 </div>
 
@@ -106,7 +106,7 @@
                         <span class='fl pl6'>Imagery</span>
                     </button>
 
-                    <button v-if='!folding.imagery' @click='$router.push({ path: `/model/${$route.params.modelid}/imagery` })' class='btn fr mb6 round btn--stroke color-gray color-green-on-hover'>
+                    <button v-if='!folding.imagery' @click='$router.push({ path: `/project/${$route.params.projectid}/imagery` })' class='btn fr mb6 round btn--stroke color-gray color-green-on-hover'>
                         <svg class='icon'><use href='#icon-plus'/></svg>
                     </button>
                     <div v-if='folding.imagery' class='fr bg-gray-faint bg-gray-on-hover color-white-on-hover color-gray inline-block px6 py3 round txt-xs txt-bold mr3'>
@@ -127,7 +127,7 @@
                         </div>
                     </template>
                     <template v-else>
-                        <div :key='img.id' v-for='img in imagery' @click='$router.push({ path: `/model/${$route.params.modelid}/imagery/${img.id}` })' class='cursor-pointer col col--12'>
+                        <div :key='img.id' v-for='img in imagery' @click='$router.push({ path: `/project/${$route.params.projectid}/imagery/${img.id}` })' class='cursor-pointer col col--12'>
                             <div class='col col--12 grid py6 px12 bg-darken10-on-hover'>
                                 <div class='col col--8'><h3 class='txt-h4 fl' v-text='img.name'></h3></div>
                                 <div class='col col--4'><div v-text='img.fmt' class='fr mx3 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue px6 py3 round txt-xs txt-bold'></div></div>
@@ -144,7 +144,7 @@
                         <span class='fl pl6'>Integrations</span>
                     </button>
 
-                    <button v-if='!folding.integrations' @click='$router.push({ path: `/model/${$route.params.modelid}/integration` })' class='btn fr mb6 round btn--stroke color-gray color-green-on-hover'>
+                    <button v-if='!folding.integrations' @click='$router.push({ path: `/project/${$route.params.projectid}/integration` })' class='btn fr mb6 round btn--stroke color-gray color-green-on-hover'>
                         <svg class='icon'><use href='#icon-plus'/></svg>
                     </button>
                     <div v-if='folding.integrations' class='fr bg-gray-faint bg-gray-on-hover color-white-on-hover color-gray inline-block px6 py3 round txt-xs txt-bold mr3'>
@@ -154,7 +154,7 @@
 
                 <Integrations
                     v-if='!folding.integrations'
-                    @integration='$router.push({ path: `/model/${$route.params.modelid}/integration/${$event.id}` })'
+                    @integration='$router.push({ path: `/project/${$route.params.projectid}/integration/${$event.id}` })'
                     @count='integrations = $event'
                 />
 
@@ -221,7 +221,7 @@ export default {
     },
     methods: {
         refresh: function() {
-            this.getPredictions();
+            this.getIterations();
             this.getProject();
             this.getImagery();
         },
@@ -233,9 +233,11 @@ export default {
 
             window.open(url, "_blank")
         },
-        getPredictions: async function() {
+        getIterations: async function() {
             try {
                 const body = await window.std(`/api/project/${this.$route.params.projectid}/iteration`);
+
+                return {};
 
                 const vMap = {};
 
