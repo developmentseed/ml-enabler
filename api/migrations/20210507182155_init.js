@@ -106,7 +106,7 @@ exports.up = function(knex) {
                 REFERENCES projects(id)
         );
 
-        CREATE TABLE predictions (
+        CREATE TABLE iterations (
             id                  BIGSERIAL PRIMARY KEY,
             created             TIMESTAMP NOT NULL DEFAULT NOW(),
             pid                 BIGINT NOT NULL,
@@ -134,22 +134,22 @@ exports.up = function(knex) {
                 REFERENCES imagery(id)
         );
 
-        CREATE TABLE prediction_tiles (
+        CREATE TABLE iteration_tiles (
             id                  BIGSERIAL PRIMARY KEY,
-            pred_id             BIGINT NOT NULL,
+            iter_id             BIGINT NOT NULL,
             predictions         JSONB NOT NULL,
             geom                GEOMETRY(POLYGON, 4326) NOT NULL,
             validity            JSONB,
 
-            CONSTRAINT fk_predictions
-                FOREIGN KEY (pred_id)
-                REFERENCES predictions(id)
+            CONSTRAINT fk_iterations
+                FOREIGN KEY (iter_id)
+                REFERENCES iterations(id)
         );
 
         CREATE TABLE model_aoi (
             id                  BIGSERIAL PRIMARY KEY,
             pid                 BIGINT NOT NULL,
-            pred_id             BIGINT NOT NULL,
+            iter_id             BIGINT NOT NULL,
             bounds              GEOMETRY(POLYGON, 4326) NOT NULL,
             name                TEXT NOT NULL,
 
@@ -157,21 +157,21 @@ exports.up = function(knex) {
                 FOREIGN KEY (pid)
                 REFERENCES projects(id),
 
-            CONSTRAINT fk_predictions
-                FOREIGN KEY (pred_id)
-                REFERENCES predictions(id)
+            CONSTRAINT fk_iterations
+                FOREIGN KEY (iter_id)
+                REFERENCES iterations(id)
         );
 
         CREATE TABLE tasks (
             id                  BIGSERIAL PRIMARY KEY,
-            pred_id             BIGINT NOT NULL,
+            iter_id             BIGINT NOT NULL,
             type                TEXT NOT NULL,
             created             TIMESTAMP NOT NULL DEFAULT NOW(),
             batch_id            TEXT,
 
-            CONSTRAINT fk_predictions
-                FOREIGN KEY (pred_id)
-                REFERENCES predictions(id)
+            CONSTRAINT fk_iterations
+                FOREIGN KEY (iter_id)
+                REFERENCES iterations(id)
         );
 
     `);

@@ -235,12 +235,8 @@ export default {
         },
         getPredictions: async function() {
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/prediction/all`, {
-                    method: 'GET'
-                });
+                const body = await window.std(`/api/project/${this.$route.params.projectid}/prediction`);
 
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
                 const vMap = {};
 
                 for (const v of body) {

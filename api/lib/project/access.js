@@ -109,8 +109,9 @@ class ProjectAccess {
     }
 
     static async from(pool, id) {
+        let pgres;
         try {
-            const pgres = await pool.query(sql`
+            pgres = await pool.query(sql`
                 SELECT
                     *
                 FROM
@@ -118,19 +119,21 @@ class ProjectAccess {
                 WHERE
                     id = ${id}
             `);
-
-            if (!pgres.rows.length) {
-                throw new Err(404, null, 'Project Access not found');
-            }
-            return ProjectAccess.serialize(pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Failed to load project access');
         }
+
+        if (!pgres.rows.length) {
+            throw new Err(404, null, 'Project Access not found');
+        }
+
+        return ProjectAccess.serialize(pgres.rows[0]);
     }
 
     static async from_alt(pool, pid, uid) {
+        let pgres;
         try {
-            const pgres = await pool.query(sql`
+            pgres = await pool.query(sql`
                 SELECT
                     *
                 FROM
@@ -139,14 +142,15 @@ class ProjectAccess {
                     uid = ${uid}
                     AND pid = ${pid}
             `);
-
-            if (!pgres.rows.length) {
-                throw new Err(404, null, 'Project Access not found');
-            }
-            return ProjectAccess.serialize(pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Failed to load project access');
         }
+
+        if (!pgres.rows.length) {
+            throw new Err(404, null, 'Project Access not found');
+        }
+
+        return ProjectAccess.serialize(pgres.rows[0]);
     }
 
     patch(patch) {

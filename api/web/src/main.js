@@ -60,7 +60,7 @@ const router = new VueRouter({
                 component: Imagery,
             },{
                 path: '/project/:projectid/integration/:integrationid',
-                name: 'editImagery',
+                name: 'editIntegration',
                 component: Integration,
             },{
                 name: 'prediction',

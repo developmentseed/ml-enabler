@@ -134,8 +134,9 @@ class Project {
     }
 
     static async from(pool, id) {
+        let pgres;
         try {
-            const pgres = await pool.query(sql`
+            pgres = await pool.query(sql`
                 SELECT
                     *
                 FROM
@@ -143,14 +144,15 @@ class Project {
                 WHERE
                     id = ${id}
             `);
-
-            if (!pgres.rows.length) {
-                throw new Err(404, null, 'Project not found');
-            }
-            return Project.deserialize(pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Failed to load project');
         }
+
+        if (!pgres.rows.length) {
+            throw new Err(404, null, 'Project not found');
+        }
+
+        return Project.deserialize(pgres.rows[0]);
     }
 
     patch(patch) {
