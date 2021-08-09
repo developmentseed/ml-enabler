@@ -12,6 +12,8 @@ class ProjectAccess {
         this.uid = false;
         this.pid = false;
         this.access = false;
+        this.created = false;
+        this.updated = false;
 
         // Attributes which are allowed to be patched
         this.attrs = Object.keys(require('../../schema/req.body.PatchProjectAccess.json').properties);
@@ -48,7 +50,6 @@ class ProjectAccess {
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
         if (!query.filter) query.filter = '';
-        if (!query.archived) query.archived = false;
 
         if (!query.sort) query.sort = 'created';
         if (!query.order || query.order === 'asc') {
@@ -65,17 +66,20 @@ class ProjectAccess {
                     pa.id,
                     pa.uid,
                     u.username,
-                    pa.access
+                    pa.access,
+                    pa.created,
+                    pa.updated
                 FROM
                     projects_access pa
-                        LEFT JOIN users u
-                        ON pa.uid = users.id
+                        INNER JOIN users u
+                        ON pa.uid = u.id
                 WHERE
                     u.username ~ ${query.filter}
                 GROUP BY
-                    pa.id
+                    pa.id,
+                    u.username
                 ORDER BY
-                    ${sql.identifier(['projects_access', query.sort])} ${query.order}
+                    ${sql.identifier(['pa', query.sort])} ${query.order}
                 LIMIT
                     ${query.limit}
                 OFFSET
@@ -91,7 +95,8 @@ class ProjectAccess {
                 return {
                     id: parseInt(row.id),
                     username: row.username,
-                    pid: parseInt(row.pid),
+                    created: parseInt(row.created),
+                    updated: parseInt(row.updated),
                     uid: parseInt(row.uid),
                     access: row.access
                 };
@@ -103,6 +108,8 @@ class ProjectAccess {
         return {
             id: parseInt(this.id),
             access: this.access,
+            created: this.created,
+            updated: this.updated,
             pid: parseInt(this.pid),
             uid: parseInt(this.uid),
         };
@@ -166,7 +173,8 @@ class ProjectAccess {
             await pool.query(sql`
                 UPDATE projects_access
                     SET
-                        access      = ${this.access}
+                        access      = ${this.access},
+                        updated     = NOW()
                     WHERE
                         id = ${this.id}
             `);

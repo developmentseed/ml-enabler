@@ -32,6 +32,7 @@ exports.up = function(knex) {
             uid                 BIGINT NOT NULL,
             access              TEXT NOT NULL,
             created             TIMESTAMP NOT NULL DEFAULT NOW(),
+            updated             TIMESTAMP NOT NULL DEFAULT NOW(),
 
             UNIQUE(pid, uid),
 

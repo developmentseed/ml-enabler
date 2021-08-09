@@ -5,7 +5,8 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-
+            "uid",
+            "access"
         ],
         "properties": {
             "uid": {
