@@ -19,7 +19,7 @@ async function router(schema, config) {
      *     Return a list of all projects on the server that the user has access to
      *
      * @apiSchema (Query) {jsonschema=../schema/req.query.ListProjects.json} apiParam
-     * @ apiSchema {jsonschema=../schema/res.ListProjects.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.ListProjects.json} apiSuccess
      */
     await schema.get('/project', {
         query: 'req.query.ListProjects.json',
@@ -46,7 +46,7 @@ async function router(schema, config) {
      *     Create a new project
      *
      * @apiSchema (Body) {jsonschema=../schema/req.body.CreateProject.json} apiParam
-     * @ apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
      */
     await schema.post('/project', {
         body: 'req.body.CreateProject.json',
@@ -80,7 +80,7 @@ async function router(schema, config) {
      * @apiDescription
      *     Return a single project
      *
-     * @ apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
      */
     await schema.get('/project/:pid', {
         res: 'res.Project.json'

@@ -2,7 +2,7 @@
     "type": "object",
     "required": [
         "total",
-        "projects"
+        "imagery"
     ],
     "additionalProperties": false,
     "properties": {
@@ -16,13 +16,11 @@
                 "type": "object",
                 "required": [
                     "id",
+                    "name",
+                    "url",
                     "created",
                     "updated",
-                    "name",
-                    "source",
-                    "archived",
-                    "project_url",
-                    "access"
+                    "fmt"
                 ],
                 "additionalProperties": false,
                 "properties": {
@@ -38,21 +36,11 @@
                     "name": {
                         "type": "string"
                     },
-                    "source": {
+                    "url": {
                         "type": "string"
                     },
-                    "archived": {
-                        "type": "boolean"
-                    },
-                    "project_url": {
+                    "fmt": {
                         "type": "string"
-                    },
-                    "access": {
-                        "type": "string",
-                        "enum": [
-                            "private",
-                            "public"
-                        ]
                     }
                 }
             }

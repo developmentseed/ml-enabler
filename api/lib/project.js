@@ -10,6 +10,7 @@ class Project {
     constructor() {
         this.id = false;
         this.created = false;
+        this.updated = false;
         this.source = '';
         this.project_url = '';
         this.archived = false;
@@ -23,6 +24,8 @@ class Project {
 
     static deserialize(dbrow) {
         dbrow.id = parseInt(dbrow.id);
+        dbrow.created = parseInt(dbrow.created);
+        dbrow.updated = parseInt(dbrow.updated);
 
         const prj = new Project();
 
@@ -67,6 +70,7 @@ class Project {
                     count(*) OVER() AS count,
                     projects.id,
                     projects.created,
+                    projects.updated,
                     projects.name,
                     projects.source,
                     projects.archived,
@@ -103,7 +107,8 @@ class Project {
             projects: pgres.rows.map((row) => {
                 return {
                     id: parseInt(row.id),
-                    created: row.created,
+                    created: parseInt(row.created),
+                    updated: parseInt(row.updated),
                     name: row.name,
                     source: row.source,
                     archived: row.archived,
@@ -118,6 +123,7 @@ class Project {
         return {
             id: parseInt(this.id),
             created: this.created,
+            updated: this.updated,
             source: this.source,
             project_url: this.project_url,
             archived: this.archived,
@@ -167,7 +173,8 @@ class Project {
                         archived    = ${this.archived},
                         tags        = ${JSON.stringify(this.tags)}::JSONB,
                         access      = ${this.access},
-                        notes       = ${this.notes}
+                        notes       = ${this.notes},
+                        updated     = NOW()
                     WHERE
                         id = ${this.id}
             `);

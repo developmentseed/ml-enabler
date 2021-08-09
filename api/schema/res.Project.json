@@ -1,7 +1,28 @@
 {
     "type": "object",
     "additionalProperties": false,
+    "required": [
+        "id",
+        "created",
+        "updated",
+        "name",
+        "source",
+        "project_url",
+        "archived",
+        "tags",
+        "access",
+        "notes"
+    ],
     "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "created": {
+            "type": "integer"
+        },
+        "updated": {
+            "type": "integer"
+        },
         "name": {
             "type": "string"
         },

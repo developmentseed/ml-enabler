@@ -5,7 +5,7 @@ exports.up = function(knex) {
 
         CREATE TABLE users (
             id                  BIGSERIAL PRIMARY KEY,
-            created             TIMESTAMP NOT NULL DEFAULT Now(),
+            created             TIMESTAMP NOT NULL DEFAULT NOW(),
             email               TEXT UNIQUE NOT NULL,
             username            TEXT UNIQUE NOT NULL,
             password            TEXT NOT NULL,
@@ -16,6 +16,7 @@ exports.up = function(knex) {
         CREATE TABLE projects (
             id                  BIGSERIAL PRIMARY KEY,
             created             TIMESTAMP NOT NULL DEFAULT NOW(),
+            updated             TIMESTAMP NOT NULL DEFAULT NOW(),
             name                TEXT UNIQUE NOT NULL,
             source              TEXT NOT NULL DEFAULT '',
             project_url         TEXT NOT NULL DEFAULT '',
@@ -30,6 +31,7 @@ exports.up = function(knex) {
             pid                 BIGINT NOT NULL,
             uid                 BIGINT NOT NULL,
             access              TEXT NOT NULL,
+            created             TIMESTAMP NOT NULL DEFAULT NOW(),
 
             UNIQUE(pid, uid),
 
@@ -45,7 +47,7 @@ exports.up = function(knex) {
         CREATE TABLE projects_invite (
             id                  BIGSERIAL PRIMARY KEY,
             pid                 BIGSERIAL NOT NULL,
-            created             TIMESTAMP NOT NULL DEFAULT Now(),
+            created             TIMESTAMP NOT NULL DEFAULT NOW(),
             email               TEXT UNIQUE NOT NULL,
             token               TEXT NOT NULL,
 
@@ -70,7 +72,7 @@ exports.up = function(knex) {
             uid                 BIGINT NOT NULL,
             name                TEXT NOT NULL,
             token               TEXT NOT NULL,
-            created             TIMESTAMP NOT NULL DEFAULT Now(),
+            created             TIMESTAMP NOT NULL DEFAULT NOW(),
 
             CONSTRAINT fk_users
                 FOREIGN KEY (uid)
@@ -83,6 +85,8 @@ exports.up = function(knex) {
             name                TEXT NOT NULL,
             url                 TEXT NOT NULL,
             fmt                 TEXT NOT NULL,
+            created             TIMESTAMP NOT NULL DEFAULT NOW(),
+            updated             TIMESTAMP DEFAULT NOW(),
 
             CONSTRAINT fk_projects
                 FOREIGN KEY (pid)
@@ -104,7 +108,7 @@ exports.up = function(knex) {
 
         CREATE TABLE predictions (
             id                  BIGSERIAL PRIMARY KEY,
-            created             TIMESTAMP DEFAULT NOW(),
+            created             TIMESTAMP NOT NULL DEFAULT NOW(),
             pid                 BIGINT NOT NULL,
             tile_zoom           INTEGER NOT NULL,
             docker_link         TEXT,
