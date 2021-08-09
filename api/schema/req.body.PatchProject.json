@@ -14,7 +14,7 @@
         "tags": {
             "$ref": "./util/project-tags.json"
         },
-        "ccess": {
+        "access": {
             "$ref": "./util/project-access.json"
         },
         "notes": {

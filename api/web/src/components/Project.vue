@@ -255,18 +255,10 @@ export default {
             }
         },
         getProject: async function() {
-            this.loading.project = true;
-
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}`, {
-                    method: 'GET'
-                });
-
-                const body = await res.json();
-
+                this.loading.project = true;
+                this.project = await window.std(`/api/project/${this.$route.params.projectid}`);
                 this.loading.project = false;
-                if (!res.ok) throw new Error(body.message);
-                this.project = body;
             } catch (err) {
                 this.$emit('err', err);
             }

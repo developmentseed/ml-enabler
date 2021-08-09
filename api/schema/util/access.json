@@ -2,6 +2,7 @@
     "type": "string",
     "enum": [
         "user",
+        "read",
         "disabled",
         "admin"
     ],

@@ -176,7 +176,7 @@ export default {
             }
 
             this.project.users.push({
-                uid: this.search.user.uid,
+                uid: this.search.user.id,
                 username: this.search.user.username,
                 access: 'read'
             });
@@ -191,7 +191,12 @@ export default {
                 source: this.project.source,
                 project_url: this.project.project_url,
                 tags: this.project.tags,
-                users: this.project.users
+                users: this.project.users.map((u) => {
+                    return {
+                        uid: u.uid,
+                        access: u.access
+                    }
+                })
             };
 
             if (!this.newProject) {
@@ -205,9 +210,9 @@ export default {
                 });
 
                 if (this.newProject) {
-                    this.$router.push({ path: `/model/${proj.id}` });
+                    this.$router.push({ path: `/project/${proj.id}` });
                 } else {
-                    this.$router.push({ path: `/model/${this.$route.params.projectid}` });
+                    this.$router.push({ path: `/project/${this.$route.params.projectid}` });
                 }
             } catch (err) {
                 this.$emit('err', err);

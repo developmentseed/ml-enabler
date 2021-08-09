@@ -141,7 +141,7 @@ class Project {
             if (!pgres.rows.length) {
                 throw new Err(404, null, 'Project not found');
             }
-            return Project.serialize(pgres.rows[0]);
+            return Project.deserialize(pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Failed to load project');
         }

@@ -1,6 +1,6 @@
 'use strict';
 
-const Err = require('./error');
+const Err = require('../error');
 const { sql } = require('slonik');
 
 /**
@@ -14,7 +14,7 @@ class ProjectAccess {
         this.access = false;
 
         // Attributes which are allowed to be patched
-        this.attrs = Object.keys(require('../schema/req.body.PatchProjectAccess.json').properties);
+        this.attrs = Object.keys(require('../../schema/req.body.PatchProjectAccess.json').properties);
     }
 
     static deserialize(dbrow) {
@@ -73,7 +73,7 @@ class ProjectAccess {
                 WHERE
                     u.username ~ ${query.filter}
                 GROUP BY
-                    projects.id
+                    pa.id
                 ORDER BY
                     ${sql.identifier(['projects_access', query.sort])} ${query.order}
                 LIMIT
@@ -87,7 +87,7 @@ class ProjectAccess {
 
         return {
             total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
-            projects: pgres.rows.map((row) => {
+            access: pgres.rows.map((row) => {
                 return {
                     id: parseInt(row.id),
                     username: row.username,
@@ -122,7 +122,7 @@ class ProjectAccess {
             if (!pgres.rows.length) {
                 throw new Err(404, null, 'Project Access not found');
             }
-            return Project.serialize(pgres.rows[0]);
+            return ProjectAccess.serialize(pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Failed to load project access');
         }
@@ -143,7 +143,7 @@ class ProjectAccess {
             if (!pgres.rows.length) {
                 throw new Err(404, null, 'Project Access not found');
             }
-            return Project.serialize(pgres.rows[0]);
+            return ProjectAccess.serialize(pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Failed to load project access');
         }
@@ -176,7 +176,7 @@ class ProjectAccess {
     static async generate(pool, access) {
         try {
             const pgres = await pool.query(sql`
-                INSERT INTO projects (
+                INSERT INTO projects_access (
                     access,
                     pid,
                     uid
@@ -187,7 +187,7 @@ class ProjectAccess {
                 ) RETURNING *
             `);
 
-            return Project.deserialize(pgres.rows[0]);
+            return ProjectAccess.deserialize(pgres.rows[0]);
         } catch (err) {
             if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
                 throw new Err(400, null, 'Project Access for that user already exists');
