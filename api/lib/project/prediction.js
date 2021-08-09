@@ -135,7 +135,7 @@ class ProjectImagery {
             throw new Err(404, null, 'Imagery not found');
         }
 
-        return ProjectImagery.serialize(pgres.rows[0]);
+        return ProjectImagery.deserialize(pgres.rows[0]);
     }
 
     patch(patch) {

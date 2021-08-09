@@ -127,7 +127,7 @@ class ProjectAccess {
             throw new Err(404, null, 'Project Access not found');
         }
 
-        return ProjectAccess.serialize(pgres.rows[0]);
+        return ProjectAccess.deserialize(pgres.rows[0]);
     }
 
     static async from_alt(pool, pid, uid) {

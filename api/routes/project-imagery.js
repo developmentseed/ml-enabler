@@ -62,6 +62,32 @@ async function router(schema, config) {
             return Err.respond(err, res);
         }
     });
+
+    /**
+     * @api {get} /api/project/:pid/imagery/:imageryid Get Imagery
+     * @apiVersion 1.0.0
+     * @apiName GetImagery
+     * @apiGroup Imagery
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Get a single imagery source
+     *
+     * @apiSchema {jsonschema=../schema/res.Imagery.json} apiSuccess
+     */
+    await schema.get('/project/:pid/imagery/:imageryid', {
+        res: 'res.Imagery.json'
+    }, async (req, res) => {
+        try {
+            await user.is_auth(req);
+
+            const img = await Imagery.from(config.pool, req.params.imageryid);
+
+            return res.json(img.serialize());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 }
 
 module.exports = router;
