@@ -73,24 +73,16 @@ export default {
     methods: {
         getImagery: async function() {
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/imagery/${this.$route.params.imageryid}`, {
-                    method: 'GET'
-                });
-
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
-
-                this.imagery = body;
+                this.imagery = await window.std(`/api/project/${this.$route.params.projectid}/imagery/${this.$route.params.imageryid}`);
             } catch (err) {
                 this.$emit('err', err);
             }
         },
         deleteImagery: async function() {
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/imagery/${this.$route.params.imageryid}`, {
+                await window.std(window.api + `/api/project/${this.$route.params.projectid}/imagery/${this.$route.params.imageryid}`, {
                     method: 'DELETE'
                 });
-                if (!res.ok) throw new Error('Failed to delete imagery');
                 this.$emit('refresh');
                 this.$router.go(-1);
             } catch (err) {
@@ -99,21 +91,15 @@ export default {
         },
         postImagery: async function() {
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/imagery${this.$route.params.imageryid ? '/' + this.$route.params.imageryid : ''}`, {
+                await window.std(window.api + `/api/project/${this.$route.params.projectid}/imagery${this.$route.params.imageryid ? '/' + this.$route.params.imageryid : ''}`, {
                     method: this.$route.params.imageryid ? 'PATCH' : 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        modelId: this.imagery.modelId,
+                    body: {
                         name: this.imagery.name,
                         url: this.imagery.url,
                         fmt: this.imagery.fmt
-                    })
+                    }
                 });
 
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
                 this.$emit('refresh');
                 this.$router.go(-1);
             } catch (err) {

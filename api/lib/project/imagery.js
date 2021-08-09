@@ -68,25 +68,25 @@ class ProjectImagery {
             pgres = await pool.query(sql`
                 SELECT
                     count(*) OVER() AS count,
-                    i.id,
-                    i.name,
-                    i.url,
-                    i.fmt,
-                    i.created,
-                    i.updated
+                    imagery.id,
+                    imagery.name,
+                    imagery.url,
+                    imagery.fmt,
+                    imagery.created,
+                    imagery.updated
                 FROM
-                    imagery i
+                    imagery
                 WHERE
-                    i.name ~ ${query.filter}
+                    imagery.name ~ ${query.filter}
                 ORDER BY
-                    ${sql.identifier(['projects_access', query.sort])} ${query.order}
+                    ${sql.identifier(['imagery', query.sort])} ${query.order}
                 LIMIT
                     ${query.limit}
                 OFFSET
                     ${query.limit * query.page}
             `);
         } catch (err) {
-            throw new Err(500, err, 'Internal Project Access Error');
+            throw new Err(500, err, 'Internal Imagery Error');
         }
 
         return {

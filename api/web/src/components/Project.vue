@@ -265,13 +265,8 @@ export default {
         },
         getImagery: async function() {
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/imagery`, {
-                    method: 'GET'
-                });
-
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
-                this.imagery = body;
+                const imagery = await window.std(`/api/project/${this.$route.params.projectid}/imagery`);
+                this.imagery = imagery.imagery;
             } catch (err) {
                 this.$emit('err', err);
             }
