@@ -109,6 +109,7 @@ exports.up = function(knex) {
         CREATE TABLE iterations (
             id                  BIGSERIAL PRIMARY KEY,
             created             TIMESTAMP NOT NULL DEFAULT NOW(),
+            updated             TIMESTAMP NOT NULL DEFAULT NOW(),
             pid                 BIGINT NOT NULL,
             tile_zoom           INTEGER NOT NULL,
             docker_link         TEXT,

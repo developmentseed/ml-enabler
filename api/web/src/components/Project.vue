@@ -48,12 +48,12 @@
                         </div>
                     </button>
                     <div v-if='folding.iterations' class='fr bg-gray-faint bg-gray-on-hover color-white-on-hover color-gray inline-block px6 py3 round txt-xs txt-bold mr3'>
-                        <span v-text='`${predictions.length > 0 ? predictions.length : "No"} Iterations`'/>
+                        <span v-text='`${terations.length > 0 ? iterations.length : "No"} Iterations`'/>
                     </div>
                 </div>
 
                 <div v-if='!folding.iterations' class='grid grid--gut12'>
-                    <template v-if='predictions.length === 0'>
+                    <template v-if='iterations.length === 0'>
                         <div class='col col--12 py6'>
                             <div class='flex-parent flex-parent--center-main pt36'>
                                 <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-info'/></svg>
@@ -65,31 +65,31 @@
                         </div>
                     </template>
                     <template v-else>
-                        <div :key='pred.predictionsId' v-for='pred in predictions' @click='$router.push({ name: "prediction", params: {
-                            modelid: $route.params.modelid,
-                            predid: pred.predictionsId
+                        <div :key='iter.id' v-for='iter in iterations' @click='$router.push({ name: "iteration", params: {
+                            projectid: $route.params.projectid,
+                            iterationid: iter.id
                         }})' class='cursor-pointer col col--12'>
                             <div class='col col--12 grid py6 px12 bg-darken10-on-hover'>
                                 <div class='col col--6'>
                                     <div class='col col--12 clearfix'>
-                                        <h3 class='txt-h4 fl' v-text='"v" + pred.version'></h3>
-                                        <span class='fl ml6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer' v-text='pred.hint'/>
+                                        <h3 class='txt-h4 fl' v-text='"v" + iter.version'></h3>
+                                        <span class='fl ml6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer' v-text='iter.hint'/>
                                     </div>
                                 </div>
                                 <div class='col col--6 clearfix'>
-                                    <template v-if='!pred.modelLink && pred.hint === "prediction"'>
+                                    <template v-if='!iter.modelLink && iter.hint === "prediction"'>
                                         <div class='fr bg-red-faint bg-red-on-hover color-white-on-hover color-red inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>
                                             No Model
                                         </div>
                                     </template>
 
-                                    <div v-if='pred.modelLink' class='fr mx3 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>
+                                    <div v-if='iter.modelLink' class='fr mx3 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>
                                         Model
                                     </div>
-                                    <div v-if='pred.saveLink' class='fr mx3 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>
+                                    <div v-if='iter.saveLink' class='fr mx3 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>
                                         Container
                                     </div>
-                                    <div v-if='stacks.predictions.includes(pred.predictionsId)' class='fr bg-green-faint bg-green-on-hover color-white-on-hover color-green inline-block px6 py3 round txt-xs txt-bold mr3'>
+                                    <div v-if='stacks.predictions.includes(iter.predictionsId)' class='fr bg-green-faint bg-green-on-hover color-white-on-hover color-green inline-block px6 py3 round txt-xs txt-bold mr3'>
                                         Active Stack
                                     </div>
                                 </div>
@@ -193,7 +193,7 @@ export default {
     props: ['meta', 'stacks', 'user'],
     data: function() {
         return {
-            predictions: [],
+            iterations: [],
             project: {},
             imagery: [],
             integrations: 0,
@@ -235,7 +235,7 @@ export default {
         },
         getPredictions: async function() {
             try {
-                const body = await window.std(`/api/project/${this.$route.params.projectid}/prediction`);
+                const body = await window.std(`/api/project/${this.$route.params.projectid}/iteration`);
 
                 const vMap = {};
 
@@ -243,7 +243,7 @@ export default {
                     vMap[v.version] = v;
                 }
 
-                this.predictions = vSort.desc(body.map(r => r.version)).map(r => {
+                this.iterations = vSort.desc(body.map(r => r.version)).map(r => {
                     return vMap[r];
                 });
             } catch (err) {
