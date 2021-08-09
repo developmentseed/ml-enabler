@@ -6,47 +6,44 @@ const { sql } = require('slonik');
 /**
  * @class
  */
-class Project {
+class ProjectAccess {
     constructor() {
         this.id = false;
-        this.created = false;
-        this.source = '';
-        this.project_url = '';
-        this.archived = false;
-        this.tags = {};
+        this.uid = false;
+        this.pid = false;
         this.access = false;
-        this.notes = '';
 
         // Attributes which are allowed to be patched
-        this.attrs = Object.keys(require('../schema/req.body.PatchProject.json').properties);
+        this.attrs = Object.keys(require('../schema/req.body.PatchProjectAccess.json').properties);
     }
 
     static deserialize(dbrow) {
         dbrow.id = parseInt(dbrow.id);
 
-        const prj = new Project();
+        const prj_access = new ProjectAccess();
 
         for (const key of Object.keys(dbrow)) {
-            prj[key] = dbrow[key];
+            prj_access[key] = dbrow[key];
         }
 
-        return prj;
+        return prj_access;
     }
 
     /**
-     * Return a list of users
+     * Return a list of users that can access a given project
      *
      * @param {Pool} pool - Instantiated Postgres Pool
+     *
+     * @param {Number} pid Project ID to access
      *
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page of users to return
      * @param {String} [query.filter=] - Name to filter by
-     * @param {boolean} [query.archived=false] - Only show archived projects
      * @param {String} [query.sort=created] Field to sort by
      * @param {String} [query.order=asc] Sort Order (asc/desc)
      */
-    static async list(pool, query) {
+    static async list(pool, pid, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
@@ -65,37 +62,27 @@ class Project {
             pgres = await pool.query(sql`
                 SELECT
                     count(*) OVER() AS count,
-                    projects.id,
-                    projects.created,
-                    projects.name,
-                    projects.source,
-                    projects.archived,
-                    projects.project_url,
-                    projects.access
+                    pa.id,
+                    pa.uid,
+                    u.username,
+                    pa.access
                 FROM
-                    projects,
-                    projects_access
+                    projects_access pa
+                        LEFT JOIN users u
+                        ON pa.uid = users.id
                 WHERE
-                    projects.name ~ ${query.filter}
-                    AND projects.archived = ${query.archived}
-                    AND (
-                        projects.access = 'public'
-                        OR (
-                            projects_access.uid = ${query.uid}
-                            AND projects_access.pid = projects.id
-                        )
-                    )
+                    u.username ~ ${query.filter}
                 GROUP BY
                     projects.id
                 ORDER BY
-                    ${sql.identifier(['projects', query.sort])} ${query.order}
+                    ${sql.identifier(['projects_access', query.sort])} ${query.order}
                 LIMIT
                     ${query.limit}
                 OFFSET
                     ${query.limit * query.page}
             `);
         } catch (err) {
-            throw new Err(500, err, 'Internal User Error');
+            throw new Err(500, err, 'Internal Project Access Error');
         }
 
         return {
@@ -103,11 +90,9 @@ class Project {
             projects: pgres.rows.map((row) => {
                 return {
                     id: parseInt(row.id),
-                    created: row.created,
-                    name: row.name,
-                    source: row.source,
-                    archived: row.archived,
-                    project_url: row.project_url,
+                    username: row.username,
+                    pid: parseInt(row.pid),
+                    uid: parseInt(row.uid),
                     access: row.access
                 };
             })
@@ -117,13 +102,9 @@ class Project {
     serialize() {
         return {
             id: parseInt(this.id),
-            created: this.created,
-            source: this.source,
-            project_url: this.project_url,
-            archived: this.archived,
-            tags: this.tags,
             access: this.access,
-            notes: this.notes
+            pid: parseInt(this.pid),
+            uid: parseInt(this.uid),
         };
     }
 
@@ -133,17 +114,38 @@ class Project {
                 SELECT
                     *
                 FROM
-                    projects
+                    projects_access
                 WHERE
                     id = ${id}
             `);
 
             if (!pgres.rows.length) {
-                throw new Err(404, null, 'Project not found');
+                throw new Err(404, null, 'Project Access not found');
             }
             return Project.serialize(pgres.rows[0]);
         } catch (err) {
-            throw new Err(500, err, 'Failed to load project');
+            throw new Err(500, err, 'Failed to load project access');
+        }
+    }
+
+    static async from_alt(pool, pid, uid) {
+        try {
+            const pgres = await pool.query(sql`
+                SELECT
+                    *
+                FROM
+                    projects_access
+                WHERE
+                    uid = ${uid}
+                    AND pid = ${pid}
+            `);
+
+            if (!pgres.rows.length) {
+                throw new Err(404, null, 'Project Access not found');
+            }
+            return Project.serialize(pgres.rows[0]);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to load project access');
         }
     }
 
@@ -156,57 +158,44 @@ class Project {
     }
 
     async commit(pool) {
-        if (this.id === false) throw new Err(500, null, 'Project.id must be populated');
-
         try {
             await pool.query(sql`
-                UPDATE projects
+                UPDATE projects_access
                     SET
-                        source      = ${this.source},
-                        project_url = ${this.project_url},
-                        archived    = ${this.archived},
-                        tags        = ${JSON.stringify(this.tags)}::JSONB,
-                        access      = ${this.access},
-                        notes       = ${this.notes}
+                        access      = ${this.access}
                     WHERE
                         id = ${this.id}
             `);
 
             return this;
         } catch (err) {
-            throw new Err(500, err, 'Failed to save Project');
+            throw new Err(500, err, 'Failed to save Project Access');
         }
     }
 
-    static async generate(pool, prj) {
+    static async generate(pool, access) {
         try {
             const pgres = await pool.query(sql`
                 INSERT INTO projects (
-                    name,
-                    source,
-                    project_url,
-                    tags,
                     access,
-                    notes
+                    pid,
+                    uid
                 ) VALUES (
-                    ${prj.name},
-                    ${prj.source},
-                    ${prj.project_url},
-                    ${JSON.stringify(prj.tags)}::JSONB,
-                    ${prj.access},
-                    ${prj.notes}
+                    ${access.access},
+                    ${access.pid},
+                    ${access.uid}
                 ) RETURNING *
             `);
 
             return Project.deserialize(pgres.rows[0]);
         } catch (err) {
             if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
-                throw new Err(400, null, 'Project by that name already exists');
+                throw new Err(400, null, 'Project Access for that user already exists');
             }
 
-            throw new Err(500, err, 'Failed to generate Project');
+            throw new Err(500, err, 'Failed to generate Project Access');
         }
     }
 }
 
-module.exports = Project;
+module.exports = ProjectAccess;
