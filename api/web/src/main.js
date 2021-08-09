@@ -9,6 +9,7 @@ import Home from './components/Home.vue';
 import Login from './components/Login.vue';
 import Project from './components/Project.vue';
 import Profile from './components/Profile.vue';
+import CreateProject from './components/CreateProject.vue';
 import EditProject from './components/EditProject.vue';
 import Prediction from './components/Prediction.vue';
 import Imagery from './components/Imagery.vue';
@@ -32,7 +33,7 @@ const router = new VueRouter({
         { path: '/login', name: 'login', component: Login },
         { path: '/profile', name: 'profile', component: Profile },
 
-        { path: '/project/new', name: 'newproject', component: EditProject },
+        { path: '/project/new', name: 'newproject', component: CreateProject },
 
         {
             path: '/project/:projectid',
