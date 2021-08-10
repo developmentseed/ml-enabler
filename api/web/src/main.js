@@ -11,7 +11,7 @@ import Project from './components/Project.vue';
 import Profile from './components/Profile.vue';
 import CreateProject from './components/CreateProject.vue';
 import EditProject from './components/EditProject.vue';
-import Prediction from './components/Prediction.vue';
+import Iteration from './components/Iteration.vue';
 import Imagery from './components/Imagery.vue';
 import Integration from './components/Integration.vue';
 import CreateIteration from './components/CreateIteration.vue';
@@ -49,7 +49,7 @@ const router = new VueRouter({
                 component: CreateIteration
             },{
                 path: '/project/:projectid/iteration',
-                name: 'createPrediction',
+                name: 'createIteration',
                 component: CreateIteration
             },{
                 path: '/project/:projectid/imagery',
@@ -67,7 +67,7 @@ const router = new VueRouter({
                 name: 'iteration',
                 path: '/project/:projectid/iteration/:iterationid',
                 redirect: '/project/:projectid/iteration/:iterationid/assets',
-                component: Prediction,
+                component: Iteration,
                 children: [{
                     name: 'config',
                     path: 'config',

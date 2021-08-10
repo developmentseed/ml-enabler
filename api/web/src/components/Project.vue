@@ -77,19 +77,19 @@
                                     </div>
                                 </div>
                                 <div class='col col--6 clearfix'>
-                                    <template v-if='!iter.modelLink && iter.hint === "prediction"'>
+                                    <template v-if='!iter.model_link && iter.hint === "prediction"'>
                                         <div class='fr bg-red-faint bg-red-on-hover color-white-on-hover color-red inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>
                                             No Model
                                         </div>
                                     </template>
 
-                                    <div v-if='iter.modelLink' class='fr mx3 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>
+                                    <div v-if='iter.model_link' class='fr mx3 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>
                                         Model
                                     </div>
-                                    <div v-if='iter.saveLink' class='fr mx3 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>
+                                    <div v-if='iter.save_link' class='fr mx3 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>
                                         Container
                                     </div>
-                                    <div v-if='stacks.predictions.includes(iter.predictionsId)' class='fr bg-green-faint bg-green-on-hover color-white-on-hover color-green inline-block px6 py3 round txt-xs txt-bold mr3'>
+                                    <div v-if='stacks.iterations.includes(iter.id)' class='fr bg-green-faint bg-green-on-hover color-white-on-hover color-green inline-block px6 py3 round txt-xs txt-bold mr3'>
                                         Active Stack
                                     </div>
                                 </div>
@@ -235,18 +235,17 @@ export default {
         },
         getIterations: async function() {
             try {
-                await window.std(`/api/project/${this.$route.params.projectid}/iteration`);
+                const body = await window.std(`/api/project/${this.$route.params.projectid}/iteration`);
 
                 const vMap = {};
 
-                for (const v of []) {
+                for (const v of body.iterations) {
                     vMap[v.version] = v;
                 }
 
-                this.iterations = vSort.desc([].map(r => r.version)).map(r => {
+                this.iterations = vSort.desc(body.iterations.map(r => r.version)).map(r => {
                     return vMap[r];
                 });
-
             } catch (err) {
                 this.$emit('err', err);
             }

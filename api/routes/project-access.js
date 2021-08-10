@@ -26,6 +26,7 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             await user.is_auth(req);
+            await Param.int(req, 'pid');
 
             res.json(await ProjectAccess.list(config.pool, req.params.pid, req.query));
         } catch (err) {

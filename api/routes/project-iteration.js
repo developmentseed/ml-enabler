@@ -26,16 +26,10 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             await user.is_auth(req);
+            await Param.int(req, 'pid');
 
             req.query.pid = req.params.pid;
-
-            // TODO
-            return res.json({
-                total: 0,
-                iterations: []
-            });
-
-            res.json(await Iterations.list(config.pool, req.query));
+            res.json(await Iteration.list(config.pool, req.query));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -60,10 +54,38 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             await user.is_auth(req);
+            await Param.int(req, 'pid');
 
             req.body.pid = req.params.pid;
             const iter = await Iteration.generate(config.pool, req.body);
 
+            return res.json(iter.serialize());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/project/:pid/iteration/:iterationid Get Iteration
+     * @apiVersion 1.0.0
+     * @apiName GetIteration
+     * @apiGroup Iterations
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Get a new iteration
+     *
+     * @apiSchema {jsonschema=../schema/res.Iteration.json} apiSuccess
+     */
+    await schema.get('/project/:pid/iteration/:iterationid', {
+        res: 'res.Iteration.json'
+    }, async (req, res) => {
+        try {
+            await user.is_auth(req);
+            await Param.int(req, 'pid');
+            await Param.int(req, 'iterationid');
+
+            const iter = await Iteration.from(config.pool, req.params.iterationid);
             return res.json(iter.serialize());
         } catch (err) {
             return Err.respond(err, res);

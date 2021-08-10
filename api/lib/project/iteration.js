@@ -31,7 +31,7 @@ class ProjectIteration extends Generic {
         this.imagery_id = false;
 
         // Attributes which are allowed to be patched
-        this.attrs = Object.keys(require('../../schema/req.body.PatchIntegration.json').properties);
+        this.attrs = Object.keys(require('../../schema/req.body.PatchIteration.json').properties);
     }
 
     /**
@@ -163,7 +163,7 @@ class ProjectIteration extends Generic {
                     id = ${id}
             `);
         } catch (err) {
-            throw new Err(500, err, 'Failed to load iterations');
+            throw new Err(500, err, 'Failed to load Iteration');
         }
 
         if (!pgres.rows.length) {

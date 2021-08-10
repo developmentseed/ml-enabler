@@ -97,21 +97,13 @@ export default {
     methods: {
         getImagery: async function() {
             this.loading.imagery = true;
-
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/imagery`, {
-                    method: 'GET'
-                });
-
-                const body = await res.json();
-
-                if (!res.ok) throw new Error(body.message);
-                this.imagery = body;
-
-                this.loading.imagery = false;
+                const body = await window.std(`/api/project/${this.$route.params.projectid}/imagery`);
+                this.imagery = body.imagery;
             } catch (err) {
                 this.$emit('err', err);
             }
+            this.loading.imagery = false;
         }
     },
     computed: {

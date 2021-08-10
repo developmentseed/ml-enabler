@@ -26,6 +26,7 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             await user.is_auth(req);
+            await Param.int(req, 'pid');
 
             req.query.pid = req.params.pid;
             res.json(await Imagery.list(config.pool, req.query));
@@ -53,6 +54,7 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             await user.is_auth(req);
+            await Param.int(req, 'pid');
 
             req.body.pid = req.params.pid;
             const img = await Imagery.generate(config.pool, req.body);
@@ -80,6 +82,8 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             await user.is_auth(req);
+            await Param.int(req, 'pid');
+            await Param.int(req, 'imageryid');
 
             const img = await Imagery.from(config.pool, req.params.imageryid);
 
@@ -108,6 +112,8 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             await user.is_auth(req);
+            await Param.int(req, 'pid');
+            await Param.int(req, 'imageryid');
 
             const img = await Imagery.from(config.pool, req.params.imageryid);
             img.patch(req.body);
@@ -136,6 +142,8 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             await user.is_auth(req);
+            await Param.int(req, 'pid');
+            await Param.int(req, 'imageryid');
 
             const img = await Imagery.from(config.pool, req.params.imageryid);
             await img.delete(config.pool);

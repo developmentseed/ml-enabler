@@ -3,18 +3,17 @@
         <div class='col col--12 clearfix py6'>
             <h2 @click='$router.push({ name: "home" })' class='fl cursor-pointer txt-underline-on-hover'>Projects</h2>
             <h2 class='fl px6'>&gt;</h2>
-            <h2 @click='$router.push({ name: "model", params: { modelid: $route.params.modelid } })' class='fl cursor-pointer txt-underline-on-hover' v-text='$route.params.modelid'></h2>
+            <h2 @click='$router.push({ name: "project", params: { projectid: $route.params.projectid } })' class='fl cursor-pointer txt-underline-on-hover' v-text='$route.params.projectid'></h2>
             <h2 class='fl px6'>&gt;</h2>
             <h2 class='fl cursor-default cursor-pointer txt-underline-on-hover' v-text='"v" + prediction.version'></h2>
 
-            <button @click='$router.push({ name: "model", params: { modelid: $route.params.modelid } })' class='btn fr round btn--stroke color-gray color-black-on-hover'>
+            <button @click='$router.push({ name: "project", params: { projectid: $route.params.projectid } })' class='btn fr round btn--stroke color-gray color-black-on-hover'>
                 <svg class='icon'><use href='#icon-close'/></svg>
             </button>
 
             <span class='fr mr6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer' v-text='"id: " + prediction.predictionsId'/>
         </div>
         <div class='border border--gray-light round col col--12 px12 py12 clearfix'>
-
             <template v-if='loading.prediction'>
                 <div class='flex-parent flex-parent--center-main w-full py24'>
                     <div class='flex-child loading py24'></div>
@@ -36,7 +35,7 @@
 
 <script>
 export default {
-    name: 'Prediction',
+    name: 'Iteration',
     props: ['meta', 'model'],
     data: function() {
         return {
@@ -66,34 +65,20 @@ export default {
         },
         refresh: function() {
             this.getTilejson();
-            this.getPrediction();
+            this.getIteration();
         },
-        getPrediction: async function() {
+        getIteration: async function() {
             this.loading.prediction = true;
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}`, {
-                    method: 'GET'
-                });
-
-                const body = await res.json();
-                this.loading.prediction = false;
-                if (!res.ok) throw new Error(body.message);
-                this.prediction = body;
+                this.prediction = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}`);
             } catch (err) {
                 this.$emit('err', err);
             }
+            this.loading.prediction = false;
         },
         getTilejson: async function() {
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/tiles`, {
-                    method: 'GET',
-                    credentials: 'same-origin'
-                });
-
-                if (res.status === 404) return this.tilejson = false;
-
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
+                const body = await window.std(window.api + `/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/tiles`);
                 body.tiles[0] = window.api + body.tiles[0];
                 this.tilejson = body;
             } catch (err) {
