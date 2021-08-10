@@ -2,12 +2,15 @@
 
 const Err = require('../error');
 const { sql } = require('slonik');
+const Generic = require('../generic');
 
 /**
  * @class
  */
-class ProjectImagery {
+class ProjectImagery extends Generic {
     constructor() {
+        super();
+
         this.id = false;
         this.pid = false;
         this.name = false;
@@ -136,14 +139,6 @@ class ProjectImagery {
         }
 
         return ProjectImagery.deserialize(pgres.rows[0]);
-    }
-
-    patch(patch) {
-        for (const attr of this.attrs) {
-            if (patch[attr] !== undefined) {
-                this[attr] = patch[attr];
-            }
-        }
     }
 
     async commit(pool) {

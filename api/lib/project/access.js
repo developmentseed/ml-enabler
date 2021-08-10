@@ -2,12 +2,15 @@
 
 const Err = require('../error');
 const { sql } = require('slonik');
+const Generic = require('../generic');
 
 /**
  * @class
  */
-class ProjectAccess {
+class ProjectAccess extends Generic {
     constructor() {
+        super();
+
         this.id = false;
         this.uid = false;
         this.pid = false;
@@ -158,14 +161,6 @@ class ProjectAccess {
         }
 
         return ProjectAccess.serialize(pgres.rows[0]);
-    }
-
-    patch(patch) {
-        for (const attr of this.attrs) {
-            if (patch[attr] !== undefined) {
-                this[attr] = patch[attr];
-            }
-        }
     }
 
     async commit(pool) {

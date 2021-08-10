@@ -1,7 +1,7 @@
 'use strict';
 
 const Err = require('../lib/error');
-const Imagery = require('../lib/project/imagery');
+const Iteration = require('../lib/project/iteration');
 const { Param } = require('../lib/util');
 
 async function router(schema, config) {
@@ -36,6 +36,34 @@ async function router(schema, config) {
             });
 
             res.json(await Iterations.list(config.pool, req.query));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {post} /api/project/:pid/iteration Create Iteration
+     * @apiVersion 1.0.0
+     * @apiName CreateIteration
+     * @apiGroup Iterations
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Create a new iteration within a project
+     *
+     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateIteration.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.Iteration.json} apiSuccess
+     */
+    await schema.post('/project/:pid/iteration', {
+        body: 'req.body.CreateIteration.json',
+        res: 'res.Iteration.json'
+    }, async (req, res) => {
+        try {
+            await user.is_auth(req);
+
+            const iter = await Iteration.generate(config.pool, req.body);
+
+            return res.json(iter.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }

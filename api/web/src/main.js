@@ -14,7 +14,7 @@ import EditProject from './components/EditProject.vue';
 import Prediction from './components/Prediction.vue';
 import Imagery from './components/Imagery.vue';
 import Integration from './components/Integration.vue';
-import CreatePrediction from './components/CreatePrediction.vue';
+import CreateIteration from './components/CreateIteration.vue';
 
 import Config from './components/prediction/Config.vue';
 import Assets from './components/prediction/Assets.vue';
@@ -46,11 +46,11 @@ const router = new VueRouter({
             },{
                 path: '/project/:projectid/training',
                 name: 'createTraining',
-                component: CreatePrediction,
+                component: CreateIteration
             },{
                 path: '/project/:projectid/prediction',
                 name: 'createPrediction',
-                component: CreatePrediction,
+                component: CreateIteration
             },{
                 path: '/project/:projectid/imagery',
                 name: 'createImagery',

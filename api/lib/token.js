@@ -5,15 +5,18 @@ const crypto = require('crypto');
 const { promisify } = require('util');
 const randomBytes = promisify(crypto.randomBytes);
 const { sql } = require('slonik');
+const Generic = require('./generic');
 
 /**
  * @class Token
  */
-class Token {
+class Token extends Generic {
     /**
      * @constructor
      */
     constructor() {
+        super();
+
         this.id = false;
         this.uid = false;
         this.created = false;
@@ -138,19 +141,6 @@ class Token {
         if (!pgres.rows.length) throw new Err(404, null, 'Token not found');
 
         return Token.pg(pgres.rows[0]);
-    }
-
-    /**
-     * Patch supported params from a body
-     *
-     * @param {Object} patch
-     */
-    patch(patch) {
-        for (const attr of this.attrs) {
-            if (patch[attr] !== undefined) {
-                this[attr] = patch[attr];
-            }
-        }
     }
 
     /**

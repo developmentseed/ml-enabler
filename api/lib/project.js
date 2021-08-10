@@ -1,13 +1,16 @@
 'use strict';
 
 const Err = require('./error');
+const Generic = require('./generic');
 const { sql } = require('slonik');
 
 /**
  * @class
  */
-class Project {
+class Project extends Generic {
     constructor() {
+        super();
+
         this.id = false;
         this.created = false;
         this.updated = false;
@@ -154,14 +157,6 @@ class Project {
         }
 
         return Project.deserialize(pgres.rows[0]);
-    }
-
-    patch(patch) {
-        for (const attr of this.attrs) {
-            if (patch[attr] !== undefined) {
-                this[attr] = patch[attr];
-            }
-        }
     }
 
     async commit(pool) {

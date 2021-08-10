@@ -1,0 +1,40 @@
+{
+    "type": "object",
+    "required": [
+        "tile_zoom",
+        "inf_list",
+        "inf_type",
+        "inf_binary",
+        "inf_supertile",
+        "version",
+        "hint",
+        "imagery_id"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "tile_zoom": {
+            "type": "integer"
+        },
+        "inf_list": {
+            "type": "string"
+        },
+        "inf_type": {
+            "type": "string"
+        },
+        "inf_binary": {
+            "type": "boolean"
+        },
+        "inf_supertile": {
+            "type": "boolean"
+        },
+        "version": {
+            "type": "string"
+        },
+        "hint": {
+            "type": "string"
+        },
+        "imagery_id": {
+            "type": "integer"
+        }
+    }
+}
