@@ -16,12 +16,12 @@ import Imagery from './components/Imagery.vue';
 import Integration from './components/Integration.vue';
 import CreateIteration from './components/CreateIteration.vue';
 
-import Config from './components/prediction/Config.vue';
-import Assets from './components/prediction/Assets.vue';
-import Export  from './components/prediction/Export.vue';
-import Map  from './components/prediction/Map.vue';
-import Stack from './components/prediction/Stack.vue';
-import PredTasks from './components/prediction/PredTasks.vue';
+import Config from './components/iteration/Config.vue';
+import Assets from './components/iteration/Assets.vue';
+import Export  from './components/iteration/Export.vue';
+import Map  from './components/iteration/Map.vue';
+import Stack from './components/iteration/Stack.vue';
+import PredTasks from './components/iteration/PredTasks.vue';
 
 Vue.use(VueRouter);
 Vue.config.productionTip = false
@@ -48,7 +48,7 @@ const router = new VueRouter({
                 name: 'createTraining',
                 component: CreateIteration
             },{
-                path: '/project/:projectid/prediction',
+                path: '/project/:projectid/iteration',
                 name: 'createPrediction',
                 component: CreateIteration
             },{
@@ -64,9 +64,9 @@ const router = new VueRouter({
                 name: 'editIntegration',
                 component: Integration,
             },{
-                name: 'prediction',
-                path: '/project/:projectid/prediction/:predid',
-                redirect: '/project/:projectid/prediction/:predid/assets',
+                name: 'iteration',
+                path: '/project/:projectid/iteration/:iterationid',
+                redirect: '/project/:projectid/iteration/:iterationid/assets',
                 component: Prediction,
                 children: [{
                     name: 'config',

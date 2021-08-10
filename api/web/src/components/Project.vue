@@ -43,7 +43,7 @@
                         <svg class='icon fl'><use href='#icon-chevron-down'/></svg>
 
                         <div class='round dropdown-content color-black' style='top: 24px;'>
-                            <div @click='$router.push({ path: `/project/${$route.params.projectid}/prediction` })' class='round bg-gray-faint-on-hover'>Prediction</div>
+                            <div @click='$router.push({ path: `/project/${$route.params.projectid}/iteration` })' class='round bg-gray-faint-on-hover'>Prediction</div>
                             <div @click='$router.push({ path: `/project/${$route.params.projectid}/training` })' class='round bg-gray-faint-on-hover'>Training</div>
                         </div>
                     </button>
