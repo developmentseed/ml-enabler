@@ -1,0 +1,7 @@
+{
+    "type": "string",
+    "minLength": 5,
+    "maxLength": 14,
+    "pattern": "^(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)$",
+    "description": "Semver of iteration"
+}

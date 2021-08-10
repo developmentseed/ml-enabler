@@ -28,10 +28,14 @@
             "type": "boolean"
         },
         "version": {
-            "type": "string"
+            "$ref": "./util/version.json"
         },
         "hint": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+                "iteration",
+                "training"
+            ]
         },
         "imagery_id": {
             "type": "integer"

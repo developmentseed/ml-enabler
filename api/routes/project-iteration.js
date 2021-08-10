@@ -61,6 +61,7 @@ async function router(schema, config) {
         try {
             await user.is_auth(req);
 
+            req.body.pid = req.params.pid;
             const iter = await Iteration.generate(config.pool, req.body);
 
             return res.json(iter.serialize());
