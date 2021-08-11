@@ -8,13 +8,15 @@ const Generic = require('../generic');
  * @class
  */
 class ProjectIntegration extends Generic {
+    static _table =  'integrations';
+
     constructor() {
-        this._table = 'integrations';
+        super();
+
+        this._table = ProjectIntegration._table;
 
         // Attributes which are allowed to be patched
         this.attrs = Object.keys(require('../../schema/req.body.PatchIntegration.json').properties);
-
-        super();
     }
 
     /**
@@ -85,21 +87,19 @@ class ProjectIntegration extends Generic {
         };
     }
 
-    deserialize(dbrow) {
+    static deserialize(dbrow) {
         dbrow.id = parseInt(dbrow.id);
         dbrow.pid = parseInt(dbrow.pid);
         dbrow.created = parseInt(dbrow.created);
         dbrow.updated = parseInt(dbrow.updated);
-        dbrow.tile_zoom = parseInt(dbrow.tile_zoom);
-        dbrow.imagery_id = parseInt(dbrow.imagery_id);
 
-        const iter = new ProjectIntegration();
+        const integ = new ProjectIntegration();
 
         for (const key of Object.keys(dbrow)) {
-            iter[key] = dbrow[key];
+            integ[key] = dbrow[key];
         }
 
-        return iter;
+        return integ;
     }
 
 
@@ -109,9 +109,9 @@ class ProjectIntegration extends Generic {
             pid: this.pid,
             created: this.created,
             updated: this.updated,
-            integration: row.integration,
-            name: row.name,
-            url: row.url,
+            integration: this.integration,
+            name: this.name,
+            url: this.url,
         };
     }
 
@@ -121,9 +121,9 @@ class ProjectIntegration extends Generic {
                 UPDATE integrations
                     SET
                         integration = ${this.integration},
-                        name = ${this.name},
-                        url = ${this.url},
-                        auth = ${this.auth},
+                        name        = ${this.name},
+                        url         = ${this.url},
+                        auth        = ${this.auth},
                         updated     = NOW()
                     WHERE
                         id = ${this.id}

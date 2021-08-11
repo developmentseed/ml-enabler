@@ -86,7 +86,7 @@ async function router(schema, config) {
             await Param.int(req, 'integrationid');
 
             const integ = await Integration.from(config.pool, req.params.integrationid);
-            return res.json(ingeg.serialize());
+            return res.json(integ.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
