@@ -42,13 +42,9 @@ export default {
         },
         getIntegration: async function() {
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/integration`, {
-                    method: 'GET'
-                });
+                const body = await window.std(`/api/project/${this.$route.params.projectid}/integration`)
 
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
-                this.integrations = body;
+                this.integrations = body.integrations;
                 this.$emit('count', this.integrations.length);
             } catch (err) {
                 this.$emit('err', err);

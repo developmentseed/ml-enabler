@@ -22,6 +22,7 @@
             "enum": [
                 "id",
                 "created",
+                "updated",
                 "tile_zoom",
                 "docker_link",
                 "log_link",

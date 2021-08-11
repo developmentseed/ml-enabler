@@ -27,6 +27,7 @@
             "enum": [
                 "id",
                 "created",
+                "updated",
                 "name",
                 "source",
                 "archived",

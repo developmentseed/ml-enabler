@@ -11,7 +11,7 @@
         "filter": {
             "type": "string",
             "default": "",
-            "description": "Filter a complete or partial project name"
+            "description": "Filter a complete or partial name"
         },
         "order": {
             "$ref": "./util/order.json"
@@ -21,11 +21,11 @@
             "default": "created",
             "enum": [
                 "id",
-                "name",
-                "url",
-                "fmt",
                 "created",
-                "updated"
+                "updated",
+                "integration",
+                "name",
+                "url"
             ],
             "description": "Field to sort order by"
         }

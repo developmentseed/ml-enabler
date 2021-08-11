@@ -78,25 +78,16 @@ export default {
     methods: {
         getIntegration: async function() {
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/integration/${this.$route.params.integrationid}`, {
-                    method: 'GET'
-                });
-
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
-
-
-                this.integration = body;
+                this.integration = await window.std(`/api/project/${this.$route.params.projectid}/integration/${this.$route.params.integrationid}`)
             } catch (err) {
                 this.$emit('err', err);
             }
         },
         deleteIntegration: async function() {
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/integration/${this.$route.params.integrationid}`, {
+                await window.std(`/api/project/${this.$route.params.projectid}/integration/${this.$route.params.integrationid}`, {
                     method: 'DELETE'
                 });
-                if (!res.ok) throw new Error('Failed to delete Integration');
                 this.$emit('refresh');
                 this.$router.go(-1);
             } catch (err) {
@@ -105,23 +96,17 @@ export default {
         },
         postIntegration: async function() {
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/integration${this.$route.params.integrationid ? '/' + this.$route.params.integrationid : ''}`, {
+                const body = await window.std(`/api/project/${this.$route.params.projectid}/integration${this.$route.params.integrationid ? '/' + this.$route.params.integrationid : ''}`, {
                     method: this.$route.params.integrationid ? 'PATCH' : 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        modelId: this.integration.modelId,
+                    body: {
                         integration: this.integration.integration,
                         auth: this.integration.auth,
                         name: this.integration.name,
                         url: this.integration.url
-                    })
+                    }
                 });
 
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
-                this.integration.integrationId = body.integrationId;
+                this.integration.id = body.id;
                 this.$emit('refresh');
                 this.$router.go(-1);
             } catch (err) {

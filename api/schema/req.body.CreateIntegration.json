@@ -1,0 +1,24 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "integration",
+        "name",
+        "url",
+        "auth"
+    ],
+    "properties": {
+        "integration": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "url": {
+            "type": "string"
+        },
+        "auth": {
+            "type": "string"
+        }
+    }
+}

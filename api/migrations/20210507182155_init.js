@@ -94,9 +94,11 @@ exports.up = function(knex) {
                 REFERENCES projects(id)
         );
 
-        CREATE TABLE integration (
+        CREATE TABLE integrations (
             id                  BIGSERIAL PRIMARY KEY,
             pid                 BIGINT NOT NULL,
+            created             TIMESTAMP NOT NULL DEFAULT NOW(),
+            updated             TIMESTAMP NOT NULL DEFAULT NOW(),
             integration         TEXT NOT NULL,
             name                TEXT NOT NULL,
             url                 TEXT NOT NULL,

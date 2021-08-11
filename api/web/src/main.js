@@ -60,6 +60,10 @@ const router = new VueRouter({
                 name: 'editImagery',
                 component: Imagery,
             },{
+                path: '/project/:projectid/integration',
+                name: 'createIntegration',
+                component: Integration,
+            },{
                 path: '/project/:projectid/integration/:integrationid',
                 name: 'editIntegration',
                 component: Integration,

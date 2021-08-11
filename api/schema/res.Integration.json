@@ -1,0 +1,33 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "id",
+        "pid",
+        "created",
+        "updated",
+        "integration",
+        "name",
+        "url"
+    ],
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "created": {
+            "type": "integer"
+        },
+        "updated": {
+            "type": "integer"
+        },
+        "integration": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "url": {
+            "type": "string"
+        }
+    }
+}
