@@ -17,7 +17,7 @@
             <div class='col col--4 py6'>
                 <label>Model Type:</label>
                 <div class='select-container'>
-                    <select disabled :value='prediction.infType' class='select'>
+                    <select disabled :value='prediction.inf_type' class='select'>
                         <option value='classification'>Classification</option>
                         <option value='detection'>Object Detection</option>
                     </select>
@@ -25,15 +25,15 @@
                 </div>
             </div>
 
-            <template v-if='prediction.infType === "classification"'>
+            <template v-if='prediction.inf_type === "classification"'>
                 <div class='col col--12 pr12 my12'>
                     <label>Inferences List:</label>
                     <label class='switch-container px6 fr'>
                         <span class='mr6'>Binary Inference</span>
-                        <input disabled :value='prediction.infBinary' type='checkbox' />
+                        <input disabled :value='prediction.inf_binary' type='checkbox' />
                         <div class='switch'></div>
                     </label>
-                    <input disabled :value='prediction.infList' type='text' class='input' placeholder='buildings,schools,roads,...'/>
+                    <input disabled :value='prediction.inf_list' type='text' class='input' placeholder='buildings,schools,roads,...'/>
                 </div>
                 <div class='col col--8'>
                 </div>
@@ -65,10 +65,10 @@
                 <label><span v-text='prediction.type'/> Zoom Level</label>
                 <label class='switch-container px6 fr'>
                     <span class='mr6'>Supertile</span>
-                    <input disabled :value='prediction.infSupertile' type='checkbox' />
+                    <input disabled :value='prediction.inf_supertile' type='checkbox' />
                     <div class='switch'></div>
                 </label>
-                <input disabled :value='prediction.tileZoom' class='input' placeholder='18'/>
+                <input disabled :value='prediction.tile_zoom' class='input' placeholder='18'/>
             </div>
         </div>
     </div>
