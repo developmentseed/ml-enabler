@@ -1,0 +1,32 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "limit": {
+            "$ref": "./util/limit.json"
+        },
+        "page": {
+            "$ref": "./util/page.json"
+        },
+        "filter": {
+            "type": "string",
+            "default": "",
+            "description": "Filter a complete or partial task"
+        },
+        "order": {
+            "$ref": "./util/order.json"
+        },
+        "sort": {
+            "type": "string",
+            "default": "created",
+            "enum": [
+                "id",
+                "created",
+                "updated",
+                "type",
+                "batch_id"
+            ],
+            "description": "Field to sort order by"
+        }
+    }
+}

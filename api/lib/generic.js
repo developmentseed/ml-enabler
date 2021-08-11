@@ -39,6 +39,12 @@ class Generic {
         return this.deserialize(pgres.rows[0]);
     }
 
+    deserialize(dbrow) {
+        if (!this._schema) throw new Err(500, null, 'Internal: Schema not defined');
+
+        console.error(this);
+    }
+
     async delete(pool) {
         if (!this._table) throw new Err(500, null, 'Internal: Table not defined');
 

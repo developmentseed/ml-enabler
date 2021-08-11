@@ -1,0 +1,32 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "id",
+        "iter_id",
+        "type",
+        "created",
+        "updated",
+        "batch_id"
+    ],
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "iter_id": {
+            "type": "integer"
+        },
+        "created": {
+            "type": "integer"
+        },
+        "updated": {
+            "type": "integer"
+        },
+        "type": {
+            "type": "string"
+        },
+        "batch_id": {
+            "type": "integer"
+        }
+    }
+}

@@ -79,8 +79,12 @@ export default {
         getTilejson: async function() {
             try {
                 const body = await window.std(window.api + `/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/tiles`);
-                body.tiles[0] = window.api + body.tiles[0];
-                this.tilejson = body;
+                if (body.uploaded) {
+                    body.tiles[0] = window.api + body.tiles[0];
+                    this.tilejson = body;
+                } else {
+                    this.tilejson = false;
+                }
             } catch (err) {
                 this.$emit('err', err);
             }

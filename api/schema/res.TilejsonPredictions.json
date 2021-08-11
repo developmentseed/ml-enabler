@@ -1,0 +1,12 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "uploaded"
+    ],
+    "properties": {
+        "uploaded": {
+            "type": "boolean"
+        }
+    }
+}

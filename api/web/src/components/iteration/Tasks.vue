@@ -138,9 +138,7 @@ export default {
             this.log = task_id;
 
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/task/${task_id}/logs`, {
-                    method: 'GET'
-                });
+                const res = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/task/${task_id}/logs`);
 
                 const body = await res.json();
                 if (!res.ok) throw new Error(body.message)
@@ -160,12 +158,7 @@ export default {
             }
 
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/task?pred_id=${this.$route.params.predid}&type=retrain,tfrecords,ecr,populate`, {
-                    method: 'GET'
-                });
-
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message)
+                const body = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/task`);
 
                 this.tasks = body.tasks.map((task) => {
                     task._loading = true;

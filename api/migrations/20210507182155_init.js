@@ -171,6 +171,7 @@ exports.up = function(knex) {
             iter_id             BIGINT NOT NULL,
             type                TEXT NOT NULL,
             created             TIMESTAMP NOT NULL DEFAULT NOW(),
+            updated             TIMESTAMP NOT NULL DEFAULT NOW(),
             batch_id            TEXT,
 
             CONSTRAINT fk_iterations
