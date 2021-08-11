@@ -16,6 +16,7 @@
                 "type": "object",
                 "required": [
                     "id",
+                    "hint",
                     "created",
                     "updated",
                     "version",
@@ -36,6 +37,13 @@
                     },
                     "updated": {
                         "type": "integer"
+                    },
+                    "hint": {
+                        "type": "string",
+                        "enum": [
+                            "iteration",
+                            "training"
+                        ]
                     },
                     "version": {
                         "type": "string"

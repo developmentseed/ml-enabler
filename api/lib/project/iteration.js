@@ -67,6 +67,7 @@ class ProjectIteration extends Generic {
                 SELECT
                     count(*) OVER() AS count,
                     id,
+                    hint,
                     created,
                     updated,
                     version,
@@ -96,6 +97,7 @@ class ProjectIteration extends Generic {
             iterations: pgres.rows.map((row) => {
                 return {
                     id: parseInt(row.id),
+                    hint: row.hint,
                     created: parseInt(row.created),
                     updated: parseInt(row.updated),
                     version: row.version,
