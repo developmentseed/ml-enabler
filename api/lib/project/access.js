@@ -8,8 +8,12 @@ const Generic = require('../generic');
  * @class
  */
 class ProjectAccess extends Generic {
+    static _table = 'projects_access';
+
     constructor() {
         super();
+
+        this._table = ProjectAccess._table;
 
         this.id = false;
         this.uid = false;
@@ -116,28 +120,6 @@ class ProjectAccess extends Generic {
             pid: parseInt(this.pid),
             uid: parseInt(this.uid),
         };
-    }
-
-    static async from(pool, id) {
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                SELECT
-                    *
-                FROM
-                    projects_access
-                WHERE
-                    id = ${id}
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to load project access');
-        }
-
-        if (!pgres.rows.length) {
-            throw new Err(404, null, 'Project Access not found');
-        }
-
-        return ProjectAccess.deserialize(pgres.rows[0]);
     }
 
     static async from_alt(pool, pid, uid) {

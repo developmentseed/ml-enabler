@@ -8,8 +8,12 @@ const { sql } = require('slonik');
  * @class
  */
 class Project extends Generic {
+    static _table = 'projects';
+
     constructor() {
         super();
+
+        this._table = Project._table;
 
         this.id = false;
         this.created = false;
@@ -135,28 +139,6 @@ class Project extends Generic {
             access: this.access,
             notes: this.notes
         };
-    }
-
-    static async from(pool, id) {
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                SELECT
-                    *
-                FROM
-                    projects
-                WHERE
-                    id = ${id}
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to load project');
-        }
-
-        if (!pgres.rows.length) {
-            throw new Err(404, null, 'Project not found');
-        }
-
-        return Project.deserialize(pgres.rows[0]);
     }
 
     async commit(pool) {

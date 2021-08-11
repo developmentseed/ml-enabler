@@ -127,6 +127,37 @@ async function router(schema, config) {
             return Err.respond(err, res);
         }
     });
+
+    /**
+     * @api {delete} /api/project/:pid Delete Project
+     * @apiVersion 1.0.0
+     * @apiName DeleteProject
+     * @apiGroup Projects
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Delete a project
+     *
+     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
+     */
+    await schema.delete('/project/:pid', {
+        res: 'res.Standard.json'
+    }, async (req, res) => {
+        try {
+            await user.is_auth(req);
+            await Param.int(req, 'pid');
+
+            const project = await Project.from(config.pool, req.params.pid);
+            await project.delete(config.pool);
+
+            return res.json({
+                status: 200,
+                message: 'Project Deleted'
+            });
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 }
 
 module.exports = router;

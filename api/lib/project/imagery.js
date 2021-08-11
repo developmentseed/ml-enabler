@@ -8,8 +8,12 @@ const Generic = require('../generic');
  * @class
  */
 class ProjectImagery extends Generic {
+    static _table = 'imagery';
+
     constructor() {
         super();
+
+        this._table = ProjectImagery._table;
 
         this.id = false;
         this.pid = false;
@@ -118,28 +122,6 @@ class ProjectImagery extends Generic {
         };
     }
 
-    static async from(pool, id) {
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                SELECT
-                    *
-                FROM
-                    imagery
-                WHERE
-                    id = ${id}
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to load imagery');
-        }
-
-        if (!pgres.rows.length) {
-            throw new Err(404, null, 'Imagery not found');
-        }
-
-        return ProjectImagery.deserialize(pgres.rows[0]);
-    }
-
     async commit(pool) {
         try {
             await pool.query(sql`
@@ -178,20 +160,6 @@ class ProjectImagery extends Generic {
             return ProjectImagery.deserialize(pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Failed to generate Imagery');
-        }
-    }
-
-    async delete(pool) {
-        try {
-            await pool.query(sql`
-                DELETE FROM imagery
-                    WHERE
-                        id = ${this.id}
-            `);
-
-            return true;
-        } catch (err) {
-            throw new Err(500, err, 'Failed to delete Imagery');
         }
     }
 }
