@@ -181,8 +181,8 @@
 <script>
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import buffer from '../../../node_modules/@turf/buffer/index.js';
-import bboxPolygon from '../../../node_modules/@turf/bbox-polygon/index.js';
+import buffer from '@turf/buffer';
+import bboxPolygon from '@turf/bbox-polygon';
 import IterationHeader from './IterationHeader.vue';
 import Integrations from '../Integrations.vue';
 

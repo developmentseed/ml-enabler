@@ -27,8 +27,8 @@ import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 
 import DrawRectangle from 'mapbox-gl-draw-rectangle-mode';
 
-import bboxPolygon from '../../../node_modules/@turf/bbox-polygon/index.js';
-import bbox from '../../../node_modules/@turf/bbox/index.js'
+import bboxPolygon from '@turf/bbox-polygon';
+import bbox from '@turf/bbox'
 
 export default {
     name: 'StackMap',
