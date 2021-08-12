@@ -166,13 +166,13 @@ export default {
                 });
                 this.tasks.forEach(task => this.getTask(task.id));
 
-                this.loading.init = false;
-                this.loading.tasks = false;
                 if (loop) this.loop();
             } catch (err) {
-                console.error(err)
                 this.$emit('err', err);
             }
+
+            this.loading.init = false;
+            this.loading.tasks = false;
         },
         getTask: async function(task_id) {
             try {
