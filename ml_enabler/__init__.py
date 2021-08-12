@@ -77,11 +77,6 @@ def init_routes(app):
         PredictionValidity,
     )
     from ml_enabler.api.swagger import SwaggerDocsAPI
-
-    api.add_resource(StatusCheckAPI, "/v1/health")
-
-    api.add_resource(SwaggerDocsAPI, "/v1/docs")
-
     api.add_resource(MapboxAPI, "/v1/mapbox", methods=["GET"])
 
     api.add_resource(

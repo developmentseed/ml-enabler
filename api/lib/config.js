@@ -9,13 +9,12 @@ class Config {
 
         this.silent = !!args.silent;
 
-        this.limits = args.limit || {
-            exports: 300
-        };
+        this.bucket = process.env.ASSET_BUCKET;
 
-        this.url = 'http://localhost:2001';
         this.postgres = args.postgres || process.env.POSTGRES || 'postgres://postgres@localhost:5432/mlenabler';
         this.Environment = process.env.ENVIRONMENT || 'docker';
+
+        this.url = 'http://localhost:2001';
         this.signing_secret = process.env.SIGNING_SECRET || '123';
 
         try {
