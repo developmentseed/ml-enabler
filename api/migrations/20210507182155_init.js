@@ -150,8 +150,10 @@ exports.up = function(knex) {
                 REFERENCES iterations(id)
         );
 
-        CREATE TABLE model_aoi (
+        CREATE TABLE aois (
             id                  BIGSERIAL PRIMARY KEY,
+            created             TIMESTAMP NOT NULL DEFAULT NOW(),
+            updated             TIMESTAMP NOT NULL DEFAULT NOW(),
             pid                 BIGINT NOT NULL,
             iter_id             BIGINT NOT NULL,
             bounds              GEOMETRY(POLYGON, 4326) NOT NULL,
