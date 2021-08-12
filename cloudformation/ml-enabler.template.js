@@ -396,7 +396,7 @@ const Resources = {
                 Name: 'app',
                 Image: cf.join([cf.accountId, '.dkr.ecr.', cf.region, '.amazonaws.com/ml-enabler:', cf.ref('GitSha')]),
                 PortMappings: [{
-                    ContainerPort: 5000
+                    ContainerPort: 2000
                 }],
                 Environment: [{
                     Name: 'POSTGRES',
@@ -443,7 +443,7 @@ const Resources = {
     MLEnablerService: {
         Type: 'AWS::ECS::Service',
         Properties: {
-            ServiceName: cf.join('-', [cf.stackName, 'Service']),
+            ServiceName: cf.join('-', [cf.stackName, 'service']),
             Cluster: cf.ref('MLEnablerECSCluster'),
             TaskDefinition: cf.ref('MLEnablerTaskDefinition'),
             LaunchType: 'FARGATE',
@@ -460,7 +460,7 @@ const Resources = {
             },
             LoadBalancers: [{
                 ContainerName: 'app',
-                ContainerPort: 5000,
+                ContainerPort: 2000,
                 TargetGroupArn: cf.ref('MLEnablerTargetGroup')
             }]
         }
@@ -473,8 +473,8 @@ const Resources = {
             SecurityGroupIngress: [{
                 CidrIp: '0.0.0.0/0',
                 IpProtocol: 'tcp',
-                FromPort: 5000,
-                ToPort: 5000
+                FromPort: 2000,
+                ToPort: 2000
             },{
                 CidrIp: '0.0.0.0/0',
                 IpProtocol: 'tcp',
