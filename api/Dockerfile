@@ -16,7 +16,11 @@ RUN export NODEV='16.6.2' \
     && ./node-v${NODEV}-linux-x64/bin/npm install -g npm@7
 
 RUN npm install \
-    && npm run doc
+    && npm run doc \
+    && cd web \
+    && npm install -g yarn \
+    && yarn install \
+    && yarn build
 
 RUN cp ./nginx.conf /etc/nginx/sites-enabled/default
 
