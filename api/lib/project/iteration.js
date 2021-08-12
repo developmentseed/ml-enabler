@@ -8,8 +8,12 @@ const Generic = require('../generic');
  * @class
  */
 class ProjectIteration extends Generic {
+    static _table = 'iterations';
+
     constructor() {
         super();
+
+        this._table = ProjectIteration._table;
 
         this.id = false;
         this.pid = false;
