@@ -72,7 +72,7 @@ class ProjectIntegration extends Generic {
             throw new Err(500, err, 'Internal Integration Error');
         }
 
-        return this.deserialize(pgres.rows);
+        return ProjectIntegration.deserialize(pgres.rows);
     }
 
     serialize() {
@@ -125,7 +125,7 @@ class ProjectIntegration extends Generic {
                 ) RETURNING *
             `);
 
-            return this.deserialize(pgres.rows[0]);
+            return ProjectIntegration.deserialize(pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Failed to generate Integration');
         }

@@ -11,6 +11,8 @@ const Generic = require('./generic');
  * @class Token
  */
 class Token extends Generic {
+    static _table = 'users_tokens';
+
     /**
      * @constructor
      */
@@ -27,27 +29,13 @@ class Token extends Generic {
     }
 
     /**
-     * Deserialize from PG Row
-     *
-     * @param {Object} row - Postgres Row
-     * @returns {Token}
-     */
-    static pg(row) {
-        const token = new Token();
-        token.id = parseInt(row.id);
-        token.uid = parseInt(row.uid);
-        Object.assign(token, row);
-        return token;
-    }
-
-    /**
      * Serialize to json
      *
      * @param {boolean} secret - Show the token
      *
      * @returns {Object}
      */
-    json(secret) {
+    serialize(secret) {
         const token = {
             id: parseInt(this.id),
             created: parseInt(this.created),
@@ -95,16 +83,7 @@ class Token extends Generic {
                     ${query.limit * query.page}
             `);
 
-            return {
-                total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
-                tokens: pgres.rows.map((token) => {
-                    return {
-                        id: parseInt(token.id),
-                        created: parseInt(token.created),
-                        name: token.name
-                    };
-                })
-            };
+            return this.deserialize(pgres.rows, 'tokens');
         } catch (err) {
             throw new Err(500, err, 'Failed to list tokens');
         }
@@ -140,7 +119,7 @@ class Token extends Generic {
 
         if (!pgres.rows.length) throw new Err(404, null, 'Token not found');
 
-        return Token.pg(pgres.rows[0]);
+        return this.deserialize(pgres.rows[0]);
     }
 
     /**
@@ -254,7 +233,7 @@ class Token extends Generic {
                 ) RETURNING *
             `);
 
-            return Token.pg(pgres.rows[0]);
+            return this.deserialize(pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Failed to generate token');
         }

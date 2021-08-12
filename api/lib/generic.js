@@ -39,7 +39,7 @@ class Generic {
         return this.deserialize(pgres.rows[0]);
     }
 
-    static deserialize(dbrow) {
+    static deserialize(dbrow, alias) {
         let array = false;
 
         // Return a list style result
@@ -52,7 +52,7 @@ class Generic {
                 res.total = parseInt(dbrow[0].count);
             }
 
-            res[this._table] = [];
+            res[alias || this._table || 'items'] = [];
 
             for (const row of dbrow) {
                 const single = {};
@@ -61,7 +61,7 @@ class Generic {
                     single[key] = row[key];
                 }
 
-                res[this._table].push(single);
+                res[alias || this._table || 'items'].push(single);
             }
 
             return res;

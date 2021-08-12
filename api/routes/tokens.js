@@ -55,7 +55,7 @@ async function router(schema, config) {
             await user.is_auth(req);
 
             req.body.uid = req.auth.uid;
-            return res.json((await UserToken.gen(config.pool, req.body)).json(true));
+            return res.json((await UserToken.gen(config.pool, req.body)).serialize(true));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -84,7 +84,7 @@ async function router(schema, config) {
             const token = await UserToken.from(config.pool, req.params.token_id);
             if (token.uid !== req.auth.uid) throw new Err(401, null, 'Cannot get a token you did not create');
 
-            return res.json(token.json());
+            return res.json(token.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }

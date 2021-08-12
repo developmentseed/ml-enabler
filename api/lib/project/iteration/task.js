@@ -80,7 +80,7 @@ class ProjectTask extends Generic {
             throw new Err(500, err, 'Internal Tasks Error');
         }
 
-        return this.deserialize(pgres.rows);
+        return ProjectTask.deserialize(pgres.rows);
     }
 
     serialize() {

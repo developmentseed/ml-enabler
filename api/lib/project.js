@@ -29,20 +29,6 @@ class Project extends Generic {
         this.attrs = Object.keys(require('../schema/req.body.PatchProject.json').properties);
     }
 
-    static deserialize(dbrow) {
-        dbrow.id = parseInt(dbrow.id);
-        dbrow.created = parseInt(dbrow.created);
-        dbrow.updated = parseInt(dbrow.updated);
-
-        const prj = new Project();
-
-        for (const key of Object.keys(dbrow)) {
-            prj[key] = dbrow[key];
-        }
-
-        return prj;
-    }
-
     /**
      * Return a list of users
      *
@@ -108,22 +94,8 @@ class Project extends Generic {
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
-
-        return {
-            total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
-            projects: pgres.rows.map((row) => {
-                return {
-                    id: parseInt(row.id),
-                    created: parseInt(row.created),
-                    updated: parseInt(row.updated),
-                    name: row.name,
-                    source: row.source,
-                    archived: row.archived,
-                    project_url: row.project_url,
-                    access: row.access
-                };
-            })
-        };
+    
+        return this.deserialize(pgres.rows);
     }
 
     serialize() {

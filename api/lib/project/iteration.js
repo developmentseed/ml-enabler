@@ -92,43 +92,8 @@ class ProjectIteration extends Generic {
             throw new Err(500, err, 'Internal Integration Error');
         }
 
-        return {
-            total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
-            iterations: pgres.rows.map((row) => {
-                return {
-                    id: parseInt(row.id),
-                    hint: row.hint,
-                    created: parseInt(row.created),
-                    updated: parseInt(row.updated),
-                    version: row.version,
-                    docker_link: row.docker_link,
-                    log_link: row.log_link,
-                    model_link: row.model_link,
-                    checkpoint_link: row.checkpoint_link,
-                    tfrecord_link: row.tfrecord_link,
-                    save_link: row.save_link
-                };
-            })
-        };
+        return ProjectIteration.deserialize(pgres.rows);
     }
-
-    static deserialize(dbrow) {
-        dbrow.id = parseInt(dbrow.id);
-        dbrow.pid = parseInt(dbrow.pid);
-        dbrow.created = parseInt(dbrow.created);
-        dbrow.updated = parseInt(dbrow.updated);
-        dbrow.tile_zoom = parseInt(dbrow.tile_zoom);
-        dbrow.imagery_id = parseInt(dbrow.imagery_id);
-
-        const iter = new ProjectIteration();
-
-        for (const key of Object.keys(dbrow)) {
-            iter[key] = dbrow[key];
-        }
-
-        return iter;
-    }
-
 
     serialize() {
         return {

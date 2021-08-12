@@ -26,18 +26,6 @@ class ProjectAccess extends Generic {
         this.attrs = Object.keys(require('../../schema/req.body.PatchProjectAccess.json').properties);
     }
 
-    static deserialize(dbrow) {
-        dbrow.id = parseInt(dbrow.id);
-
-        const prj_access = new ProjectAccess();
-
-        for (const key of Object.keys(dbrow)) {
-            prj_access[key] = dbrow[key];
-        }
-
-        return prj_access;
-    }
-
     /**
      * Return a list of users that can access a given project
      *
@@ -96,19 +84,7 @@ class ProjectAccess extends Generic {
             throw new Err(500, err, 'Internal Project Access Error');
         }
 
-        return {
-            total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
-            access: pgres.rows.map((row) => {
-                return {
-                    id: parseInt(row.id),
-                    username: row.username,
-                    created: parseInt(row.created),
-                    updated: parseInt(row.updated),
-                    uid: parseInt(row.uid),
-                    access: row.access
-                };
-            })
-        };
+        return ProjectAccess.deserialize(pgres.rows);
     }
 
     serialize() {

@@ -27,21 +27,6 @@ class ProjectImagery extends Generic {
         this.attrs = Object.keys(require('../../schema/req.body.PatchImagery.json').properties);
     }
 
-    static deserialize(dbrow) {
-        dbrow.id = parseInt(dbrow.id);
-        dbrow.pid = parseInt(dbrow.pid);
-        dbrow.created = parseInt(dbrow.created);
-        dbrow.updated = parseInt(dbrow.updated);
-
-        const imagery = new ProjectImagery();
-
-        for (const key of Object.keys(dbrow)) {
-            imagery[key] = dbrow[key];
-        }
-
-        return imagery;
-    }
-
     /**
      * Return a list of imagery sources for a given project
      *
@@ -95,19 +80,7 @@ class ProjectImagery extends Generic {
             throw new Err(500, err, 'Internal Imagery Error');
         }
 
-        return {
-            total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
-            imagery: pgres.rows.map((row) => {
-                return {
-                    id: parseInt(row.id),
-                    created: parseInt(row.created),
-                    updated: parseInt(row.updated),
-                    name: row.name,
-                    url: row.url,
-                    fmt: row.fmt
-                };
-            })
-        };
+        return ProjectImagery.deserialize(pgres.rows);
     }
 
     serialize() {
