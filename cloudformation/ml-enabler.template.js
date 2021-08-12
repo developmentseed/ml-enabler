@@ -399,32 +399,22 @@ const Resources = {
                     ContainerPort: 5000
                 }],
                 Environment: [{
-                    Name:'POSTGRES_DB',
-                    Value: 'mlenabler'
+                    Name: 'POSTGRES',
+                    Value: cf.join([
+                        'postgresql://',
+                        cf.ref('DatabaseUser'),
+                        ':',
+                        cf.ref('DatabasePassword'),
+                        '@',
+                        cf.getAtt('MLEnablerRDS', 'Endpoint.Address'),
+                        ':5432/mlenabler'
+                    ])
                 },{
                     Name: 'ENVIRONMENT',
                     Value: 'aws'
                 },{
                     Name: 'MACHINE_AUTH',
                     Value: cf.ref('MachineAuth')
-                },{
-                    Name:'POSTGRES_USER',
-                    Value: cf.ref('DatabaseUser')
-                },{
-                    Name:'POSTGRES_PASSWORD',
-                    Value: cf.ref('DatabasePassword')
-                },{
-                    Name:'POSTGRES_ENDPOINT',
-                    Value: cf.getAtt('MLEnablerRDS', 'Endpoint.Address')
-                },{
-                    Name:'POSTGRES_PORT',
-                    Value: '5432'
-                },{
-                    Name: 'FLASK_APP',
-                    Value: 'ml_enabler'
-                },{
-                    Name: 'ECS_LOG_LEVEL',
-                    Value: 'debug'
                 },{
                     Name: 'GitSha',
                     Value: cf.ref('GitSha')
@@ -437,9 +427,6 @@ const Resources = {
                 },{
                     Name: 'ASSET_BUCKET',
                     Value: cf.ref('MLEnablerBucket')
-                },{
-                    Name: 'INTERACTIVE',
-                    Value: 'false'
                 }],
                 LogConfiguration: {
                     LogDriver: 'awslogs',
