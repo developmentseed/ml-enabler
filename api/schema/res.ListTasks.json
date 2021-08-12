@@ -13,23 +13,35 @@
         "tasks": {
             "type": "array",
             "items": {
-                "id": {
-                    "type": "integer"
-                },
-                "iter_id": {
-                    "type": "integer"
-                },
-                "created": {
-                    "type": "integer"
-                },
-                "updated": {
-                    "type": "integer"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "batch_id": {
-                    "type": "integer"
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "id",
+                    "iter_id",
+                    "created",
+                    "updated",
+                    "type",
+                    "batch_id"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "iter_id": {
+                        "type": "integer"
+                    },
+                    "created": {
+                        "type": "integer"
+                    },
+                    "updated": {
+                        "type": "integer"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "batch_id": {
+                        "type": "integer"
+                    }
                 }
             }
         }

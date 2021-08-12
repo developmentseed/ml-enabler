@@ -273,7 +273,9 @@
               "\"id\"",
               "\"name\"",
               "\"url\"",
-              "\"fmt\""
+              "\"fmt\"",
+              "\"created\"",
+              "\"updated\""
             ],
             "optional": true,
             "field": "sort",
@@ -450,6 +452,350 @@
   },
   {
     "type": "post",
+    "url": "/api/project/:pid/integration",
+    "title": "Create Integration",
+    "version": "1.0.0",
+    "name": "CreateIntegration",
+    "group": "Integrations",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Create a new integration within a project</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "integration",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "url",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "auth",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "integration",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "url",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-integration.js",
+    "groupTitle": "Integrations"
+  },
+  {
+    "type": "delete",
+    "url": "/api/project/:pid/integration/:integrationid",
+    "title": "Delete Integration",
+    "version": "1.0.0",
+    "name": "DeleteIntegration",
+    "group": "Integrations",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Delete an integration</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>The HTTP Status Code of the response</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>A human readable status message</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-integration.js",
+    "groupTitle": "Integrations"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:pid/integration/:integrationid",
+    "title": "Get Integration",
+    "version": "1.0.0",
+    "name": "GetIntegration",
+    "group": "Integrations",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Get an integration</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "integration",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "url",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-integration.js",
+    "groupTitle": "Integrations"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:pid/integration",
+    "title": "List Integration",
+    "version": "1.0.0",
+    "name": "ListIntegration",
+    "group": "Integrations",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return a list of all api integrations within a project</p>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Integer",
+            "size": "1 - 100",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "100",
+            "description": "<p>Limit number of returned items</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "size": "0 - ∞",
+            "optional": true,
+            "field": "page",
+            "defaultValue": "0",
+            "description": "<p>The page, based on the limit, to return</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "filter",
+            "defaultValue": "",
+            "description": "<p>Filter a complete or partial name</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"desc\"",
+              "\"asc\""
+            ],
+            "optional": true,
+            "field": "order",
+            "defaultValue": "asc",
+            "description": "<p>Sort order to apply to results</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"id\"",
+              "\"created\"",
+              "\"updated\"",
+              "\"integration\"",
+              "\"name\"",
+              "\"url\""
+            ],
+            "optional": true,
+            "field": "sort",
+            "defaultValue": "created",
+            "description": "<p>Field to sort order by</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "total",
+            "description": "<p>Total number of items</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "integrations",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "integrations.id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "integrations.created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "integrations.updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "integrations.name",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "integrations.integration",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "integrations.url",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-integration.js",
+    "groupTitle": "Integrations"
+  },
+  {
+    "type": "post",
     "url": "/api/project/:pid/iteration",
     "title": "Create Iteration",
     "version": "1.0.0",
@@ -504,13 +850,18 @@
           {
             "group": "Body",
             "type": "String",
+            "size": "5..14",
             "optional": false,
             "field": "version",
-            "description": "<p>undefined</p>"
+            "description": "<p>Semver of iteration</p>"
           },
           {
             "group": "Body",
             "type": "String",
+            "allowedValues": [
+              "\"iteration\"",
+              "\"training\""
+            ],
             "optional": false,
             "field": "hint",
             "description": "<p>undefined</p>"
@@ -525,6 +876,149 @@
         ]
       }
     },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docker_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "log_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "model_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "checkpoint_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "tfrecord_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "save_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "tile_zoom",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "inf_list",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "inf_type",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "inf_binary",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "inf_supertile",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "version",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "hint",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "imagery_id",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-iteration.js",
+    "groupTitle": "Iterations"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:pid/iteration/:iterationid",
+    "title": "Get Iteration",
+    "version": "1.0.0",
+    "name": "GetIteration",
+    "group": "Iterations",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Get a new iteration</p>",
     "success": {
       "fields": {
         "Success 200": [
@@ -715,6 +1209,7 @@
             "allowedValues": [
               "\"id\"",
               "\"created\"",
+              "\"updated\"",
               "\"tile_zoom\"",
               "\"docker_link\"",
               "\"log_link\"",
@@ -773,6 +1268,17 @@
             "type": "Integer",
             "optional": false,
             "field": "iterations.updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "allowedValues": [
+              "\"iteration\"",
+              "\"training\""
+            ],
+            "optional": false,
+            "field": "iterations.hint",
             "description": "<p>undefined</p>"
           },
           {
@@ -1156,6 +1662,37 @@
   },
   {
     "type": "get",
+    "url": "/api/project/:pid/iteration/:iterationid/tiles",
+    "title": "TileJSON",
+    "version": "1.0.0",
+    "name": "TilejsonPredictions",
+    "group": "Predictions",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return a TileJSON for the predictions of a given iteration</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "uploaded",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-iteration-prediction-tiles.js",
+    "groupTitle": "Predictions"
+  },
+  {
+    "type": "get",
     "url": "/api/project/:pid/user",
     "title": "List Users",
     "version": "1.0.0",
@@ -1499,6 +2036,44 @@
     "groupTitle": "Projects"
   },
   {
+    "type": "delete",
+    "url": "/api/project/:pid",
+    "title": "Delete Project",
+    "version": "1.0.0",
+    "name": "DeleteProject",
+    "group": "Projects",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Delete a project</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>The HTTP Status Code of the response</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>A human readable status message</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/projects.js",
+    "groupTitle": "Projects"
+  },
+  {
     "type": "post",
     "url": "/api/project/:pid",
     "title": "Get Project",
@@ -1680,6 +2255,7 @@
             "allowedValues": [
               "\"id\"",
               "\"created\"",
+              "\"updated\"",
               "\"name\"",
               "\"source\"",
               "\"archived\"",
@@ -2140,6 +2716,145 @@
     "description": "<p>Return a list of all currently deployed stacks</p>",
     "filename": "./routes/stacks.js",
     "groupTitle": "Stacks"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:pid/iteration",
+    "title": "List Tasks",
+    "version": "1.0.0",
+    "name": "ListTask",
+    "group": "Tasks",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return a list of tasks within a project</p>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "Integer",
+            "size": "1 - 100",
+            "optional": true,
+            "field": "limit",
+            "defaultValue": "100",
+            "description": "<p>Limit number of returned items</p>"
+          },
+          {
+            "group": "Query",
+            "type": "Integer",
+            "size": "0 - ∞",
+            "optional": true,
+            "field": "page",
+            "defaultValue": "0",
+            "description": "<p>The page, based on the limit, to return</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": true,
+            "field": "filter",
+            "defaultValue": "",
+            "description": "<p>Filter a complete or partial task</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"desc\"",
+              "\"asc\""
+            ],
+            "optional": true,
+            "field": "order",
+            "defaultValue": "asc",
+            "description": "<p>Sort order to apply to results</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"id\"",
+              "\"created\"",
+              "\"updated\"",
+              "\"type\"",
+              "\"batch_id\""
+            ],
+            "optional": true,
+            "field": "sort",
+            "defaultValue": "created",
+            "description": "<p>Field to sort order by</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "total",
+            "description": "<p>Total number of items</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Object[]",
+            "optional": false,
+            "field": "tasks",
+            "description": "<p>undefined undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "tasks.id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "tasks.iter_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "tasks.created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "tasks.updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "tasks.type",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "tasks.batch_id",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-iteration-task.js",
+    "groupTitle": "Tasks"
   },
   {
     "type": "post",
