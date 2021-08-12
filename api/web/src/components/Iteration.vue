@@ -5,16 +5,16 @@
             <h2 class='fl px6'>&gt;</h2>
             <h2 @click='$router.push({ name: "project", params: { projectid: $route.params.projectid } })' class='fl cursor-pointer txt-underline-on-hover' v-text='$route.params.projectid'></h2>
             <h2 class='fl px6'>&gt;</h2>
-            <h2 class='fl cursor-default cursor-pointer txt-underline-on-hover' v-text='"v" + prediction.version'></h2>
+            <h2 class='fl cursor-default cursor-pointer txt-underline-on-hover' v-text='"v" + iteration.version'></h2>
 
             <button @click='$router.push({ name: "project", params: { projectid: $route.params.projectid } })' class='btn fr round btn--stroke color-gray color-black-on-hover'>
                 <svg class='icon'><use href='#icon-close'/></svg>
             </button>
 
-            <span class='fr mr6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer' v-text='"id: " + prediction.predictionsId'/>
+            <span class='fr mr6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer' v-text='"id: " + iteration.id'/>
         </div>
         <div class='border border--gray-light round col col--12 px12 py12 clearfix'>
-            <template v-if='loading.prediction'>
+            <template v-if='loading.iteration'>
                 <div class='flex-parent flex-parent--center-main w-full py24'>
                     <div class='flex-child loading py24'></div>
                 </div>
@@ -23,7 +23,7 @@
                 <router-view
                     :meta='meta'
                     :model='model'
-                    :prediction='prediction'
+                    :iteration='iteration'
                     :tilejson='tilejson'
                     @refresh='refresh'
                     @err='$emit("err", $event)'
@@ -39,10 +39,10 @@ export default {
     props: ['meta', 'model'],
     data: function() {
         return {
-            prediction: {},
+            iteration: {},
             tilejson: false,
             loading: {
-                prediction: true
+                iteration: true
             }
         }
     },
@@ -68,13 +68,13 @@ export default {
             this.getIteration();
         },
         getIteration: async function() {
-            this.loading.prediction = true;
+            this.loading.iteration = true;
             try {
-                this.prediction = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}`);
+                this.iteration = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}`);
             } catch (err) {
                 this.$emit('err', err);
             }
-            this.loading.prediction = false;
+            this.loading.iteration = false;
         },
         getTilejson: async function() {
             try {

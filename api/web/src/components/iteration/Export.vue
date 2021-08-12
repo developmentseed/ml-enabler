@@ -1,8 +1,8 @@
 <template>
     <div class='col col--12 relative'>
         <div class='col col--12 border-b border--gray-light clearfix mb6'>
-            <PredictionHeader
-                :prediction='prediction'
+            <IterationHeader
+                :iteration='iteration'
             />
         </div>
 
@@ -205,12 +205,12 @@
 </template>
 
 <script>
-import PredictionHeader from './PredictionHeader.vue';
+import IterationHeader from './IterationHeader.vue';
 import Integrations from '../Integrations.vue';
 
 export default {
     name: 'Export',
-    props: ['meta', 'tilejson', 'model', 'prediction'],
+    props: ['meta', 'tilejson', 'model', 'iteration'],
     data: function() {
         return {
             mode: 'download',
@@ -246,7 +246,7 @@ export default {
     mounted: function() {
         this.mr.project = this.model.name;
         this.mr.project_desc = this.model.name;
-        this.mr.challenge = `${this.model.name} - v${this.prediction.version}`;
+        this.mr.challenge = `${this.model.name} - v${this.iteration.version}`;
     },
     watch: {
         'params.inferences': function() {
@@ -258,7 +258,7 @@ export default {
     },
     methods: {
         getExport: function() {
-            const url = new URL(`${window.api}/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/export`);
+            const url = new URL(`${window.api}/v1/model/${this.$route.params.modelid}/iteration/${this.$route.params.predid}/export`);
 
             url.searchParams.set('format', this.params.format);
             url.searchParams.set('inferences', this.params.inferences);
@@ -304,7 +304,7 @@ export default {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        prediction: this.$route.params.predid,
+                        iteration: this.$route.params.iterationid,
                         project: this.mr.project,
                         project_desc: this.mr.project_desc,
                         challenge: this.mr.challenge,
@@ -331,7 +331,7 @@ export default {
         },
     },
     components: {
-        PredictionHeader,
+        IterationHeader,
         Integrations
     }
 }

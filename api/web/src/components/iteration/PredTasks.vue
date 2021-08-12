@@ -1,11 +1,11 @@
 <template>
     <div class='col col--12'>
         <div class='col col--12 border-b border--gray-light clearfix mb6'>
-            <PredictionHeader
-                :prediction='prediction'
+            <IterationHeader
+                :iteration='iteration'
             />
         </div>
-        <template v-if='!prediction'>
+        <template v-if='!iteration'>
             <div class='flex-parent flex-parent--center-main w-full py24'>
                 <div class='flex-child loading py24'></div>
             </div>
@@ -24,10 +24,10 @@
         <template v-else-if='!create'>
             <Tasks
                 @create='create = $event'
-                :prediction='prediction'
+                :iteration='iteration'
             />
         </template>
-        <template v-else-if='create === "retrain" && !prediction.tfrecordLink'>
+        <template v-else-if='create === "retrain" && !iteration.tfrecord_link'>
             <button @click='create = false' class='btn fr round btn--stroke color-gray color-black-on-hover'>
                 <svg class='icon'><use href='#icon-close'/></svg>
             </button>
@@ -42,7 +42,7 @@
                 </h1>
             </div>
         </template>
-        <template v-else-if='create === "retrain" && !prediction.modelLink'>
+        <template v-else-if='create === "retrain" && !iteration.model_link'>
             <button @click='create = false' class='btn fr round btn--stroke color-gray color-black-on-hover'>
                 <svg class='icon'><use href='#icon-close'/></svg>
             </button>
@@ -81,7 +81,7 @@
                 </button>
             </div>
         </template>
-        <template v-else-if='create === "retrain" && !prediction.checkpointLink'>
+        <template v-else-if='create === "retrain" && !iteration.checkpoint_link'>
             <div class='flex-parent flex-parent--center-main pt12 pb36'>
                 <h1 class='flex-child txt-h4 cursor-default align-center'>
                     Checkpoint Upload
@@ -94,7 +94,7 @@
 
             <UploadPrediction
                 type='checkpoint'
-                :prediction='prediction'
+                :iteration='iteration'
                 v-on:close='$emit("refresh")'
             />
         </template>
@@ -159,12 +159,12 @@
 
 <script>
 import Tasks from './Tasks.vue';
-import PredictionHeader from './PredictionHeader.vue';
+import IterationHeader from './IterationHeader.vue';
 import UploadPrediction from './UploadPrediction.vue';
 
 export default {
     name: 'PredTasks',
-    props: ['meta', 'prediction', 'tilejson'],
+    props: ['meta', 'iteration', 'tilejson'],
     data: function() {
         return {
             advanced: false,
@@ -185,7 +185,7 @@ export default {
     components: {
         Tasks,
         UploadPrediction,
-        PredictionHeader
+        IterationHeader
     },
     mounted: function() {
         this.refresh();

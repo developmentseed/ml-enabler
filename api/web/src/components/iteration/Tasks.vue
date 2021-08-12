@@ -25,7 +25,7 @@
             </template>
         </template>
         <template v-else>
-            <h2 class='w-full align-center txt-h4 py12'><span v-text='prediction.hint.charAt(0).toUpperCase() + prediction.hint.slice(1)'/> Tasks</h2>
+            <h2 class='w-full align-center txt-h4 py12'><span v-text='iteration.hint.charAt(0).toUpperCase() + iteration.hint.slice(1)'/> Tasks</h2>
 
             <div class='col col--12 grid border-b border--gray-light'>
                 <div class='col col--2'>Type</div>
@@ -97,7 +97,7 @@
 <script>
 export default {
     name: 'Tasks',
-    props: ['prediction'],
+    props: ['iteration'],
     data: function() {
         return {
             init: true,

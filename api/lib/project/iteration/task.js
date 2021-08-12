@@ -3,6 +3,7 @@
 const Err = require('../../error');
 const { sql } = require('slonik');
 const Generic = require('../../generic');
+const schema = require('../../../schema/res.Task.json');
 
 /**
  * @class
@@ -24,7 +25,7 @@ class ProjectTask extends Generic {
         this.batch_id = false;
 
         // Attributes which are allowed to be patched
-        this.attrs = Object.keys(require('../../schema/req.body.PatchTask.json').properties);
+        this.attrs = Object.keys(require('../../../schema/req.body.PatchTask.json').properties);
     }
 
     /**

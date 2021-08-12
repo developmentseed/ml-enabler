@@ -1,11 +1,11 @@
 <template>
     <div class='col col--12'>
         <div class='col col--12 border-b border--gray-light clearfix mb6'>
-            <PredictionHeader
-                :prediction='prediction'
+            <IterationHeader
+                :iteration='iteration'
             />
 
-            <div v-if='prediction.modelLink' class='fr'>
+            <div v-if='iteration.model_link' class='fr'>
                 <button @click='refresh' class='btn fr round btn--stroke btn--gray'>
                     <svg class='icon'><use href='#icon-refresh'/></svg>
                 </button>
@@ -25,12 +25,12 @@
                 <h1 class='flex-child txt-h4 cursor-default align-center'>Stacks can only be created when MLEnabler is running in an "aws" environment</h1>
             </div>
         </template>
-        <template v-else-if='!prediction || loading.stack'>
+        <template v-else-if='!iteration || loading.stack'>
             <div class='flex-parent flex-parent--center-main w-full py24'>
                 <div class='flex-child loading py24'></div>
             </div>
         </template>
-        <template v-else-if='!prediction.modelLink'>
+        <template v-else-if='!iteration.model_link'>
             <div class='col col--12 py6'>
                 <div class='flex-parent flex-parent--center-main pt36'>
                     <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-info'/></svg>
@@ -198,14 +198,14 @@
 </template>
 
 <script>
-import PredictionHeader from './PredictionHeader.vue';
+import IterationHeader from './IterationHeader.vue';
 import StackList from './StackList.vue';
 import StackXYZ from './StackXYZ.vue';
 import StackMap from './StackMap.vue';
 
 export default {
     name: 'Stack',
-    props: ['meta', 'model', 'prediction'],
+    props: ['meta', 'model', 'iteration'],
     data: function() {
         return {
             mode: 'bbox',
@@ -440,7 +440,7 @@ export default {
         }
     },
     components: {
-        PredictionHeader,
+        IterationHeader,
         StackList,
         StackXYZ,
         StackMap

@@ -39,10 +39,45 @@ class Generic {
         return this.deserialize(pgres.rows[0]);
     }
 
-    deserialize(dbrow) {
+    static deserialize(dbrow) {
         if (!this._schema) throw new Err(500, null, 'Internal: Schema not defined');
 
-        console.error(this);
+        let array = false;
+
+        // Return a list style result
+        if (Array.isArray(dbrow)) {
+            const res = {
+                total: dbrow.length
+            };
+
+            if (dbrow[0] && dbrow[0].count && !isNaN(parseInt(dbrow[0].count))) {
+                res.total = parseInt(dbrow[0].count);
+            }
+
+            res[this._table] = [];
+
+            for (const row of dbrow) {
+                single = {};
+
+                for (const key of Object.keys(row)) {
+                    single[key] = row[key];
+                }
+
+                res[this._table].push(single);
+            }
+
+            return res;
+
+        // Return a single Class result
+        } else {
+            const single = new this();
+
+            for (const key of Object.keys(dbrow)) {
+                single[key] = row[key];
+            }
+
+            return single;
+        }
     }
 
     async delete(pool) {

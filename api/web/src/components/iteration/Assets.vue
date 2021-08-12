@@ -1,34 +1,34 @@
 <template>
     <div class='col col--12'>
         <div class='col col--12 border-b border--gray-light clearfix mb6'>
-            <PredictionHeader
-                :prediction='prediction'
+            <IterationHeader
+                :iteration='iteration'
             />
 
             <div class='fr'>
-                <button v-if='prediction.logLink' @click='logLink(prediction.logLink)' class='mx3 btn btn--s btn--stroke color-gray color-blue-on-hover round'><svg class='icon fl' style='margin-top: 4px;'><use href='#icon-link'/></svg>Build Log</button>
-                <button v-if='prediction.dockerLink' @click='ecrLink(prediction.dockerLink)' class='mx3 btn btn--s btn--stroke color-gray color-blue-on-hover round'><svg class='icon fl' style='margin-top: 4px;'><use href='#icon-link'/></svg> ECR</button>
+                <button v-if='iteration.log_link' @click='logLink(iteration.log_link)' class='mx3 btn btn--s btn--stroke color-gray color-blue-on-hover round'><svg class='icon fl' style='margin-top: 4px;'><use href='#icon-link'/></svg>Build Log</button>
+                <button v-if='iteration.dockerLink' @click='ecrLink(iteration.docker_link)' class='mx3 btn btn--s btn--stroke color-gray color-blue-on-hover round'><svg class='icon fl' style='margin-top: 4px;'><use href='#icon-link'/></svg> ECR</button>
             </div>
         </div>
 
-        <h2 class='w-full align-center txt-h4 py12'><span v-text='prediction.hint.charAt(0).toUpperCase() + prediction.hint.slice(1)'/> Assets</h2>
+        <h2 class='w-full align-center txt-h4 py12'><span v-text='iteration.hint.charAt(0).toUpperCase() + iteration.hint.slice(1)'/> Assets</h2>
 
-        <template v-if='prediction.hint === "prediction" && !prediction.modelLink'>
+        <template v-if='iteration.hint === "iteration" && !iteration.model_link'>
             <div class='align-center pb6'>Upload a model to get started</div>
 
             <UploadPrediction
                 type='model'
-                :prediction='prediction'
+                :iteration='iteration'
                 @err='$emit("err", $event)'
                 @close='$router.push({ name: "model", params: { modelid: $route.params.modelid } })'
             />
         </template>
-        <template v-else-if='prediction.hint === "training" && !tilejson'>
+        <template v-else-if='iteration.hint === "training" && !tilejson'>
             <div class='align-center pb6'>Upload GeoJSON Training Data to get started</div>
 
             <UploadPrediction
                 type='inferences'
-                :prediction='prediction'
+                :iteration='iteration'
                 @err='$emit("err", $event)'
                 @close='$router.push({ name: "model", params: { modelid: $route.params.modelid } })'
             />
@@ -43,48 +43,48 @@
             </div>
         </template>
         <template v-else-if='
-            !prediction.modelLink
-            && !prediction.tfrecordLink
-            && !prediction.checkpointLink
-            && !prediction.saveLink
-            && !prediction.dockerLink
+            !iteration.model_link
+            && !iteration.tfrecord_link
+            && !iteration.checkpoint_link
+            && !iteration.save_link
+            && !iteration.docker_link
         '>
             <div class='col col--12 py3'>
                 <div class='align-center'>No Downloadable Assets</div>
             </div>
         </template>
         <template v-else>
-            <div v-if='prediction.modelLink' class='col col--12 py3'>
+            <div v-if='iteration.model_link' class='col col--12 py3'>
                 <div class='col col--12 mb6'>
                     <span>TF Model</span>
                     <button @click='dwn("model")' class='mt6 btn btn--s btn--stroke round fr btn--gray'><svg class='icon'><use href='#icon-arrow-down'/></svg></button>
                 </div>
-                <pre class='pre w-full' v-text='"s3://" + prediction.modelLink'/>
+                <pre class='pre w-full' v-text='"s3://" + iteration.model_link'/>
             </div>
-            <div v-if='prediction.tfrecordLink' class='col col--12 py3'>
+            <div v-if='iteration.tfrecord_link' class='col col--12 py3'>
                 <div class='col col--12 mb6'>
                     <span>TF Records</span>
                     <button @click='dwn("tfrecord")' class='mt6 btn btn--s btn--stroke round fr btn--gray'><svg class='icon'><use href='#icon-arrow-down'/></svg></button>
                 </div>
-                <pre class='pre' v-text='"s3://" + prediction.tfrecordLink'></pre>
+                <pre class='pre' v-text='"s3://" + iteration.tfrecord_link'></pre>
             </div>
-            <div v-if='prediction.checkpointLink' class='col col--12 py3'>
+            <div v-if='iteration.checkpoint_link' class='col col--12 py3'>
                 <div class='col col--12 mb6'>
                     <span>TF Checkpoint</span>
                     <button @click='dwn("checkpoint")' class='mt6 btn btn--s btn--stroke round fr btn--gray'><svg class='icon'><use href='#icon-arrow-down'/></svg></button>
                 </div>
-                <pre class='pre' v-text='"s3://" + prediction.checkpointLink'></pre>
+                <pre class='pre' v-text='"s3://" + iterationt.checkpoint_link'></pre>
             </div>
-            <div v-if='prediction.saveLink' class='col col--12 py3'>
+            <div v-if='iteration.save_link' class='col col--12 py3'>
                 <div class='col col--12 mb6'>
                     <span>TFServing Container</span>
                     <button @click='dwn("container")' class='mt6 btn btn--s btn--stroke round fr btn--gray'><svg class='icon'><use href='#icon-arrow-down'/></svg></button>
                 </div>
-                <pre class='pre' v-text='"s3://" + prediction.saveLink'></pre>
+                <pre class='pre' v-text='"s3://" + iteration.save_link'></pre>
             </div>
-            <div v-if='prediction.saveLink' class='col col--12 py3'>
+            <div v-if='iteration.save_link' class='col col--12 py3'>
                 <div class='align-center'>ECR Container</div>
-                <pre class='pre' v-text='prediction.dockerLink'></pre>
+                <pre class='pre' v-text='iteration.docker_link'></pre>
             </div>
         </template>
     </div>
@@ -92,16 +92,16 @@
 
 <script>
 import UploadPrediction from './UploadPrediction.vue';
-import PredictionHeader from './PredictionHeader.vue';
+import IterationHeader from './IterationHeader.vue';
 
 export default {
     name: 'Assets',
-    props: ['meta', 'prediction', 'tilejson'],
+    props: ['meta', 'iteration', 'tilejson'],
     data: function() {
         return { }
     },
     components: {
-        PredictionHeader,
+        IterationHeader,
         UploadPrediction
     },
     methods: {
@@ -114,7 +114,7 @@ export default {
             this.external(url);
         },
         dwn: function(asset) {
-            this.external(window.api + `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/asset?type=${asset}`)
+            this.external(window.api + `/v1/model/${this.$route.params.modelid}/iteration/${this.$route.params.iterationid}/asset?type=${asset}`)
         },
         external: function(url) {
             if (!url) return;

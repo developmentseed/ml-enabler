@@ -1,8 +1,8 @@
 <template>
     <div class='col col--12'>
         <div class='col col--12 border-b border--gray-light clearfix mb6'>
-            <PredictionHeader
-                :prediction='prediction'
+            <IterationHeader
+                :iteration='iteration'
             />
             <div class='fr'>
                 <button @click='$emit("refresh")' class='mx3 btn btn--stroke color-gray color-blue-on-hover round'><svg class='icon fl'><use href='#icon-refresh'/></svg></button>
@@ -183,12 +183,12 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import buffer from '../../../node_modules/@turf/buffer/index.js';
 import bboxPolygon from '../../../node_modules/@turf/bbox-polygon/index.js';
-import PredictionHeader from './PredictionHeader.vue';
+import IterationHeader from './IterationHeader.vue';
 import Integrations from '../Integrations.vue';
 
 export default {
     name: 'Map',
-    props: ['meta', 'prediction', 'tilejson'],
+    props: ['meta', 'iteration', 'tilejson'],
     data: function() {
         return {
             mode: 'visualize',
@@ -543,7 +543,7 @@ export default {
     },
     components: {
         Integrations,
-        PredictionHeader
+        IterationHeader
     }
 }
 </script>
