@@ -77,7 +77,7 @@
                                     </div>
                                 </div>
                                 <div class='col col--6 clearfix'>
-                                    <template v-if='!iter.model_link && iter.hint === "prediction"'>
+                                    <template v-if='!iter.model_link && iter.hint === "iteration"'>
                                         <div class='fr bg-red-faint bg-red-on-hover color-white-on-hover color-red inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>
                                             No Model
                                         </div>
