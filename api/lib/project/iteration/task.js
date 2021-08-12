@@ -10,7 +10,6 @@ const schema = require('../../../schema/res.Task.json');
  */
 class ProjectTask extends Generic {
     static _table = 'imagery';
-    static _schema = require('../../../schema/res.Task.json');
 
     constructor() {
         super();

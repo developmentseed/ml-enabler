@@ -72,36 +72,8 @@ class ProjectIntegration extends Generic {
             throw new Err(500, err, 'Internal Integration Error');
         }
 
-        return {
-            total: pgres.rows.length ? parseInt(pgres.rows[0].count) : 0,
-            integrations: pgres.rows.map((row) => {
-                return {
-                    id: parseInt(row.id),
-                    created: parseInt(row.created),
-                    updated: parseInt(row.updated),
-                    integration: row.integration,
-                    name: row.name,
-                    url: row.url,
-                };
-            })
-        };
+        return this.deserialize(pgres.rows);
     }
-
-    static deserialize(dbrow) {
-        dbrow.id = parseInt(dbrow.id);
-        dbrow.pid = parseInt(dbrow.pid);
-        dbrow.created = parseInt(dbrow.created);
-        dbrow.updated = parseInt(dbrow.updated);
-
-        const integ = new ProjectIntegration();
-
-        for (const key of Object.keys(dbrow)) {
-            integ[key] = dbrow[key];
-        }
-
-        return integ;
-    }
-
 
     serialize() {
         return {

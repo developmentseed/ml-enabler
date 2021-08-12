@@ -40,8 +40,6 @@ class Generic {
     }
 
     static deserialize(dbrow) {
-        if (!this._schema) throw new Err(500, null, 'Internal: Schema not defined');
-
         let array = false;
 
         // Return a list style result
@@ -57,7 +55,7 @@ class Generic {
             res[this._table] = [];
 
             for (const row of dbrow) {
-                single = {};
+                const single = {};
 
                 for (const key of Object.keys(row)) {
                     single[key] = row[key];
@@ -73,7 +71,7 @@ class Generic {
             const single = new this();
 
             for (const key of Object.keys(dbrow)) {
-                single[key] = row[key];
+                single[key] = dbrow[key];
             }
 
             return single;
