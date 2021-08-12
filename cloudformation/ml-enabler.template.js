@@ -502,7 +502,10 @@ const Resources = {
     MLEnablerTargetGroup: {
         Type: 'AWS::ElasticLoadBalancingV2::TargetGroup',
         Properties: {
-            Port: 5000,
+            HealthCheckEnabled: true,
+            HealthCheckIntervalSeconds: 30,
+            HealthCheckPath: '/health',
+            Port: 2000,
             Protocol: 'HTTP',
             VpcId: cf.ref('MLEnablerVPC'),
             TargetType: 'ip',
