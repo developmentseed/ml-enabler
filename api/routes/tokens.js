@@ -113,7 +113,12 @@ async function router(schema, config) {
             const token = await UserToken.from(config.pool, req.params.token_id);
             if (token.uid !== req.auth.uid) throw new Err(401, null, 'Cannot delete a token you did not create');
 
-            return res.json(await token.delete(config.pool));
+            await token.delete(config.pool);
+
+            return res.json({
+                status: 200,
+                message: 'Token Deleted'
+            });
         } catch (err) {
             return Err.respond(err, res);
         }

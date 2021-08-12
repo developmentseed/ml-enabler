@@ -118,28 +118,6 @@ class ProjectIteration extends Generic {
         };
     }
 
-    static async from(pool, id) {
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                SELECT
-                    *
-                FROM
-                    iterations
-                WHERE
-                    id = ${id}
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to load Iteration');
-        }
-
-        if (!pgres.rows.length) {
-            throw new Err(404, null, 'Integration not found');
-        }
-
-        return ProjectIteration.deserialize(pgres.rows[0]);
-    }
-
     async commit(pool) {
         try {
             await pool.query(sql`
@@ -185,20 +163,6 @@ class ProjectIteration extends Generic {
             return ProjectIteration.deserialize(pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Failed to generate Integration');
-        }
-    }
-
-    async delete(pool) {
-        try {
-            await pool.query(sql`
-                DELETE FROM iterations
-                    WHERE
-                        id = ${this.id}
-            `);
-
-            return true;
-        } catch (err) {
-            throw new Err(500, err, 'Failed to delete Integration');
         }
     }
 }

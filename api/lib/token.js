@@ -19,6 +19,8 @@ class Token extends Generic {
     constructor() {
         super();
 
+        this._table = Token._table;
+
         this.id = false;
         this.uid = false;
         this.created = false;
@@ -90,39 +92,6 @@ class Token extends Generic {
     }
 
     /**
-     * Get Token from ID
-     *
-     * @param {Pool} pool - Postgres Pool instance
-     * @param {Number} id - Token ID
-     *
-     * @returns {Token}
-     */
-    static async from(pool, id) {
-        let pgres;
-
-        try {
-            pgres = await pool.query(sql`
-                SELECT
-                    id,
-                    uid,
-                    created,
-                    name,
-                    token
-                FROM
-                    users_tokens
-                WHERE
-                    id = ${id}
-            `);
-        } catch (err) {
-            throw new Err(500, err , 'Failed to fetch token');
-        }
-
-        if (!pgres.rows.length) throw new Err(404, null, 'Token not found');
-
-        return this.deserialize(pgres.rows[0]);
-    }
-
-    /**
      * Commit a token to the database
      *
      * @param {Pool} pool - Postgres Pool instance
@@ -138,29 +107,6 @@ class Token extends Generic {
             `);
         } catch (err) {
             throw new Err(500, err, 'failed to save token');
-        }
-    }
-
-    /**
-     * Delete a token
-     *
-     * @param {Pool} pool - Postgres Pool instance
-     */
-    async delete(pool) {
-        try {
-            await pool.query(sql`
-                DELETE FROM
-                    users_tokens
-                WHERE
-                    id = ${this.id}
-            `);
-
-            return {
-                status: 200,
-                message: 'Token Deleted'
-            };
-        } catch (err) {
-            throw new Err(500, err, 'Failed to delete token');
         }
     }
 
