@@ -20,7 +20,7 @@
                 type='model'
                 :iteration='iteration'
                 @err='$emit("err", $event)'
-                @close='$router.push({ name: "model", params: { modelid: $route.params.modelid } })'
+                @close='$router.push({ name: "project", params: { projectid: $route.params.projectid } })'
             />
         </template>
         <template v-else-if='iteration.hint === "training" && !tilejson'>
@@ -30,7 +30,7 @@
                 type='inferences'
                 :iteration='iteration'
                 @err='$emit("err", $event)'
-                @close='$router.push({ name: "model", params: { modelid: $route.params.modelid } })'
+                @close='$router.push({ name: "project", params: { projectid: $route.params.projectid } })'
             />
         </template>
         <template v-else-if='meta.environment !== "aws"'>
@@ -114,7 +114,7 @@ export default {
             this.external(url);
         },
         dwn: function(asset) {
-            this.external(window.api + `/v1/model/${this.$route.params.modelid}/iteration/${this.$route.params.iterationid}/asset?type=${asset}`)
+            this.external(window.api + `/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/asset?type=${asset}`)
         },
         external: function(url) {
             if (!url) return;
