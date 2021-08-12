@@ -1,0 +1,39 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "id",
+        "pid",
+        "created",
+        "updated",
+        "iter_id",
+        "bounds",
+        "name"
+    ],
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "pid": {
+            "type": "integer"
+        },
+        "created": {
+            "type": "integer"
+        },
+        "updated": {
+            "type": "integer"
+        },
+        "name": {
+            "type": "string"
+        },
+        "iter_id": {
+            "type": "integer"
+        },
+        "bounds": {
+            "type": "array",
+            "items": {
+                "type": "number"
+            }
+        }
+    }
+}

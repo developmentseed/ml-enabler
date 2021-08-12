@@ -1,0 +1,19 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "bounds",
+        "name"
+    ],
+    "properties": {
+        "name": {
+            "type": "string"
+        },
+        "bounds": {
+            "type": "array",
+            "items": {
+                "type": "number"
+            }
+        }
+    }
+}
