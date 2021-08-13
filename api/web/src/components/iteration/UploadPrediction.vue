@@ -40,8 +40,8 @@ export default {
             label: '',
             server: {
                 url: this.type === 'inferences'
-                    ? `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/import`
-                    : `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/asset?type=${this.type}`,
+                    ? `/api/prediction/${this.$route.params.predictionid}/iteration/${this.$route.params.iterationid}/import`
+                    : `/api/prediction/${this.$route.params.predictionid}/iteration/${this.$route.params.iterationid}/asset?type=${this.type}`,
                 process: {
                     onerror: this.error
                 }
