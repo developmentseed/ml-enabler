@@ -29,7 +29,7 @@ async function router(schema, config) {
             await Param.int(req, 'pid');
 
             req.query.pid = req.params.pid;
-            res.json(await Imagery.list(config.pool, req.query));
+            res.json(await Imagery.list(config.pool, req.params.pid, req.query));
         } catch (err) {
             return Err.respond(err, res);
         }

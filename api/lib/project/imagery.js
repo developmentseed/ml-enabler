@@ -68,7 +68,8 @@ class ProjectImagery extends Generic {
                 FROM
                     imagery
                 WHERE
-                    imagery.name ~ ${query.filter}
+                    pid = ${pid}
+                    AND imagery.name ~ ${query.filter}
                 ORDER BY
                     ${sql.identifier(['imagery', query.sort])} ${query.order}
                 LIMIT

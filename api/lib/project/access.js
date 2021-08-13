@@ -69,7 +69,8 @@ class ProjectAccess extends Generic {
                         INNER JOIN users u
                         ON pa.uid = u.id
                 WHERE
-                    u.username ~ ${query.filter}
+                    pid = ${pid}
+                    AND u.username ~ ${query.filter}
                 GROUP BY
                     pa.id,
                     u.username

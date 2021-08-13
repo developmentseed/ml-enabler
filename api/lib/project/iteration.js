@@ -84,7 +84,8 @@ class ProjectIteration extends Generic {
                 FROM
                     iterations
                 WHERE
-                    version ~ ${query.filter}
+                    pid = ${pid}
+                    AND version ~ ${query.filter}
                 ORDER BY
                     ${sql.identifier(['iterations', query.sort])} ${query.order}
                 LIMIT

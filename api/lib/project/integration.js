@@ -60,7 +60,8 @@ class ProjectIntegration extends Generic {
                 FROM
                     integrations
                 WHERE
-                    name ~ ${query.filter}
+                    pid = ${pid}
+                    AND name ~ ${query.filter}
                 ORDER BY
                     ${sql.identifier(['integrations', query.sort])} ${query.order}
                 LIMIT
