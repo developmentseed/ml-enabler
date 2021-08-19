@@ -1,6 +1,8 @@
 'use strict';
 
 const AWS = require('aws-sdk');
+const fs = require('fs');
+const path = require('path');
 const Err = require('./error');
 const cf = new AWS.CloudFormation({
     region: process.env.AWS_DEFAULT_REGION
@@ -87,19 +89,19 @@ class Stack {
 
             await cf.createStack({
                 StackName: stack_name,
-                TemplateBody: JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../prediction.template.json'))),
+                TemplateBody: String(fs.readFileSync(path.resolve(__dirname, '../../cloudformation/prediction.template.json'))),
                 Tags: options.tags,
                 Parameters: [
                     { ParameterKey: 'GitSha',           ParameterValue: process.env.GitSha },
                     { ParameterKey: 'StackName',        ParameterValue: process.env.StackName },
                     { ParameterKey: 'ImageTag',         ParameterValue: image },
-                    { ParameterKey: 'Inferences',       ParameterValue: options.inferences, },
-                    { ParameterKey: 'ProjectId',        ParameterValue: options.project_id, },
-                    { ParameterKey: 'IterationId',      ParameterValue: options.iteration_id, },
-                    { ParameterKey: 'ImageryId',        ParameterValue: options.imagery_id, },
-                    { ParameterKey: 'MaxSize',          ParameterValue: options.max_size, },
-                    { ParameterKey: 'MaxConcurrency',   ParameterValue: options.max_concurrency, },
-                    { ParameterKey: 'InfSupertile',     ParameterValue: options.inf_supertile, }
+                    { ParameterKey: 'Inferences',       ParameterValue: options.inf_list },
+                    { ParameterKey: 'ProjectId',        ParameterValue: String(options.project_id) },
+                    { ParameterKey: 'IterationId',      ParameterValue: String(options.iteration_id) },
+                    { ParameterKey: 'ImageryId',        ParameterValue: String(options.imagery_id) },
+                    { ParameterKey: 'MaxSize',          ParameterValue: String(options.max_size) },
+                    { ParameterKey: 'MaxConcurrency',   ParameterValue: String(options.max_concurrency) },
+                    { ParameterKey: 'InfSupertile',     ParameterValue: options.inf_supertile ? 'True' : 'False' }
                 ],
                 Capabilities: ["CAPABILITY_NAMED_IAM"],
                 OnFailure: "ROLLBACK"

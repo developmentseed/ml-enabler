@@ -1,7 +1,7 @@
 'use strict';
 
 const Err = require('../lib/error');
-const Project = require('../lib/project');
+const Iteration = require('../lib/project/iteration');
 const Stack = require('../lib/stack');
 const { Param } = require('../lib/util');
 
@@ -67,6 +67,7 @@ async function router(schema, config) {
                     project_id: req.params.pid,
                     iteration_id: req.params.iterationid,
                     imagery_id: iter.imagery_id,
+                    inf_list: iter.inf_list,
                     inf_supertile: iter.inf_supertile
                 }
             );

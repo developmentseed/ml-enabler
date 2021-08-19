@@ -58,11 +58,11 @@
                 <template v-if='advanced'>
                     <div class='col col--6 py6'>
                         <label>Max Instance Count</label>
-                        <input v-model='params.maxSize' type='text' class='input'>
+                        <input v-model='params.max_size' type='text' class='input'>
                     </div>
                     <div class='col col--6 py6'>
                         <label>Max Inference Concurrency</label>
-                        <input v-model='params.maxConcurrency' type='text' class='input'/>
+                        <input v-model='params.max_concurrency' type='text' class='input'/>
                     </div>
 
                     <div class='col col--12'>
@@ -227,8 +227,8 @@ export default {
             looping: false,
             params: {
                 image: false,
-                maxSize: '1',
-                maxConcurrency: '50',
+                max_size: '1',
+                max_concurrency: '50',
                 tags: []
             },
             submit: false,
@@ -245,11 +245,11 @@ export default {
         },
         'params.type': function() {
             if (this.params.type === 'classification') {
-                this.params.maxSize = '1';
-                this.params.maxConcurrency = '50';
+                this.params.max_size = '1';
+                this.params.max_concurrency = '50';
             } else if (this.params.type === 'detection') {
-                this.params.maxSize = '5';
-                this.params.maxConcurrency = '5';
+                this.params.max_size = '5';
+                this.params.max_concurrency = '5';
             }
         }
     },
@@ -369,7 +369,7 @@ export default {
             this.loading.stack = true;
 
             try {
-                const res = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/stack`, {
+                const body = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/stack`, {
                     method: 'DELETE'
                 });
 
@@ -397,32 +397,27 @@ export default {
             this.loading.stack = true;
 
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/stack`, {
+                this.stack = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/stack`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
+                    body: {
                         tags: this.params.tags.map((tag) => {
                             return {
                                 Key: tag.Key,
                                 Value: tag.Value
                             };
                         }),
-                        maxSize: this.params.maxSize,
-                        maxConcurrency: this.params.maxConcurrency
-                    })
+                        max_size: parseInt(this.params.max_size),
+                        max_concurrency: parseInt(this.params.max_concurrency)
+                    }
                 });
-
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
-                this.stack = body;
-                this.loading.stack = false;
 
                 if (!this.looping) this.loop();
             } catch (err) {
                 this.$emit('err', err);
             }
+
+            this.loading.stack = false;
+
         }
     },
     components: {

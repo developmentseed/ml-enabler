@@ -5,10 +5,6 @@
             "Type": "String",
             "Description": "GitSha to Deploy"
         },
-        "MachineAuth": {
-            "Type": "String",
-            "Description": "The password for the default machine user"
-        },
         "StackName": {
             "Type": "String",
             "Description": "Name of parent stack"
@@ -21,16 +17,16 @@
             "Type": "String",
             "Description": "Ordered, CSV Delimited list of name for prediction values"
         },
-        "ModelId": {
-            "Type": "String",
-            "Description": "MLEnabler Model ID"
+        "ProjectId": {
+            "Type": "Number",
+            "Description": "MLEnabler Project ID"
         },
-        "PredictionId": {
-            "Type": "String",
-            "Description": "MLEnabler Prediction ID"
+        "IterationId": {
+            "Type": "Number",
+            "Description": "MLEnabler Iteration ID"
         },
         "ImageryId": {
-            "Type": "String",
+            "Type": "Number",
             "Description": "ImageryId source to use"
         },
         "MaxConcurrency": {
@@ -55,10 +51,10 @@
                 "LogGroupName": { "Fn::Join": [ "", [
                     "/aws/lambda/",
                     { "Ref": "StackName" },
-                    "-models-",
-                    { "Ref": "ModelId" },
-                    "-prediction-",
-                    { "Ref": "PredictionId" },
+                    "-project-",
+                    { "Ref": "ProjectId" },
+                    "-iteration-",
+                    { "Ref": "IterationId" },
                     "-queue"
                 ]]},
                 "RetentionInDays": 7
@@ -69,7 +65,7 @@
              "Properties": {
                  "LogGroupName": { "Fn::Join": [ "-", [
                      { "Ref": "StackName" },
-                     { "Ref": "PredictionId" }
+                     { "Ref": "IterationId" }
                  ]]},
                  "RetentionInDays": 7
              }
@@ -113,12 +109,11 @@
                     "Variables": {
                         "GDAL_DATA": "/opt/share/gdal",
                         "PROJ_LIB": "/opt/share/proj",
-                        "MACHINE_AUTH": { "Ref": "MachineAuth" },
                         "StackName": { "Ref": "AWS::StackName" },
                         "INFERENCES": { "Ref": "Inferences" },
                         "INF_SUPERTILE": {"Ref": "InfSupertile"},
-                        "PREDICTION_ID": { "Ref": "PredictionId" },
-                        "MODEL_ID": { "Ref": "ModelId" },
+                        "ITERATION_ID": { "Ref": "IterationId" },
+                        "PROJECT_ID": { "Ref": "ProjectId" },
                         "IMAGERY_ID": { "Ref": "ImageryId" },
                         "PREDICTION_ENDPOINT": { "Fn::Join": ["", [
                             "http://", { "Fn::GetAtt": ["PredELB", "DNSName"]}, "/v1/models/default/versions/001"]
@@ -398,7 +393,7 @@
                         "Options": {
                             "awslogs-group": { "Fn::Join": [ "-", [
                                 { "Ref": "StackName" },
-                                { "Ref": "PredictionId" }
+                                { "Ref": "IterationId" }
                             ]]},
                             "awslogs-region": { "Ref": "AWS::Region" }
                         }
