@@ -175,7 +175,7 @@
         <template v-else>
             <router-view
                 :meta='meta'
-                :model='project'
+                :project='project'
                 :user='user'
                 @refresh='refresh'
                 @err='$emit("err", $event)'

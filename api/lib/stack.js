@@ -1,12 +1,13 @@
 'use strict';
 
 const AWS = require('aws-sdk');
+const Err = require('./error');
 const cf = new AWS.CloudFormation({
     region: process.env.AWS_DEFAULT_REGION
 });
 
 class Stack {
-    async list() {
+    static async list() {
         let stacks = [];
 
         let partial = false;
@@ -52,7 +53,34 @@ class Stack {
         }
     }
 
-    async generate(pid, iterationid, options) {
+    static async from(pid, iterationid) {
+        const stack_name = `${process.env.StackName}-project-${pid}-iteration-${iterationid}`;
+
+        let stack;
+        try {
+            stack = await cf.describeStacks({
+                StackName: stack_name
+            }).promise();
+        } catch (err) {
+            if (err.statusCode === 400) {
+                return {
+                    id: 'none',
+                    name: stack,
+                    status: 'None'
+                };
+            } else {
+                throw new Err(500, err, 'Could not describe stacks');
+            }
+        }
+
+        return {
+            id: stack.Stacks[0].StackId,
+            name: stack,
+            status: stack.Stacks[0].StackStatus
+        };
+    }
+
+    static async generate(pid, iterationid, options) {
         try {
             const image = `project-${pid}-iteration-${iterationid}`;
             const stack_name = `${process.env.StackName}-${image}`;

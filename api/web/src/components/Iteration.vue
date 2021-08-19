@@ -22,7 +22,7 @@
             <template v-else>
                 <router-view
                     :meta='meta'
-                    :model='model'
+                    :project='project'
                     :iteration='iteration'
                     :tilejson='tilejson'
                     @refresh='refresh'
@@ -36,7 +36,7 @@
 <script>
 export default {
     name: 'Iteration',
-    props: ['meta', 'model'],
+    props: ['meta', 'project'],
     data: function() {
         return {
             iteration: {},

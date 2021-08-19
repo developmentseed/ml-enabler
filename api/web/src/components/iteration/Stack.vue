@@ -205,7 +205,7 @@ import StackMap from './StackMap.vue';
 
 export default {
     name: 'Stack',
-    props: ['meta', 'model', 'iteration'],
+    props: ['meta', 'project', 'iteration'],
     data: function() {
         return {
             mode: 'bbox',
@@ -254,14 +254,14 @@ export default {
         }
     },
     mounted: function() {
-        this.params.tags = JSON.parse(JSON.stringify(this.model.tags));
+        this.params.tags = JSON.parse(JSON.stringify(this.project.tags));
         this.refresh();
     },
     methods: {
         refresh: function() {
             this.getImagery();
             if (this.meta.environment === 'aws') {
-                this.getStatus();
+                this.getStack();
                 this.getQueue();
             }
         },
@@ -350,37 +350,29 @@ export default {
                 }
 
                 this.loop();
-                this.getStatus();
+                this.getStack();
             }, 5000);
         },
-        getStatus: async function() {
+        getStack: async function() {
             this.loading.stack = true;
 
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/stack`, {
-                    method: 'GET'
-                });
-
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
-                this.stack = body;
-                this.loading.stack = false;
-
+                this.stack = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/stack`);
                 if (!this.looping) this.loop();
             } catch (err) {
                 this.$emit('err', err);
             }
+
+            this.loading.stack = false;
         },
         deleteStack: async function() {
             this.loading.stack = true;
 
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/stack`, {
+                const res = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/stack`, {
                     method: 'DELETE'
                 });
 
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
                 this.stack = body;
                 this.loading.stack = false;
 
@@ -394,13 +386,7 @@ export default {
         },
         getImagery: async function() {
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/imagery/${this.prediction.imagery_id}`, {
-                    method: 'GET',
-                });
-
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
-                this.imagery = body;
+                this.imagery = await window.std(`/api/project/${this.$route.params.projectid}/imagery/${this.iteration.imagery_id}`);
             } catch (err) {
                 this.$emit('err', err);
             }

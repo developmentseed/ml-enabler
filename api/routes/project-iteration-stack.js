@@ -9,7 +9,33 @@ async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
 
     /**
-     * @api {post} /api/project/:pid/iteration Create Stack
+     * @api {get} /api/project/:pid/iteration/:iterationid/stack Get Stack
+     * @apiVersion 1.0.0
+     * @apiName GetStack
+     * @apiGroup Stacks
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Get all information about a deployed stack
+     *
+     * @apiSchema {jsonschema=../schema/res.Stack.json} apiSuccess
+     */
+    await schema.get('/project/:pid/iteration/:iterationid/stack', {
+        res: 'res.Stack.json'
+    }, async (req, res) => {
+        try {
+            await user.is_auth(req);
+            await Param.int(req, 'pid');
+            await Param.int(req, 'iterationid');
+
+            return res.json(await Stack.from(req.params.pid, req.params.iterationid));
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {post} /api/project/:pid/iteration/:iterationid/stack Create Stack
      * @apiVersion 1.0.0
      * @apiName CreateStack
      * @apiGroup Stacks
