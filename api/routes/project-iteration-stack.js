@@ -1,6 +1,7 @@
 'use strict';
 
 const Err = require('../lib/error');
+const Project = require('../lib/project');
 const Stack = require('../lib/stack');
 const { Param } = require('../lib/util');
 
@@ -29,10 +30,19 @@ async function router(schema, config) {
             await Param.int(req, 'pid');
             await Param.int(req, 'iterationid');
 
+            const iter = await Iteration.from(config.pool, req.params.iterationid);
+
             const stack = await Stack.generate(
                 req.params.pid,
-                req.params.iterationid,
-                req.body
+                req.params.iterationid, {
+                    tags: req.body.tags,
+                    max_size: req.body.max_size,
+                    max_concurrency: req.body.max_concurrency,
+                    project_id: req.params.pid,
+                    iteration_id: req.params.iterationid,
+                    imagery_id: iter.imagery_id,
+                    inf_supertile: iter.inf_supertile
+                }
             );
 
             return res.json({

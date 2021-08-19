@@ -52,45 +52,29 @@ class Stack {
         }
     }
 
-    async generate(pid, iterationid, stack) {
+    async generate(pid, iterationid, options) {
         try {
-            async cf.createStack({
-                StackName=
-                TemplateBody=
-                Tags=stack.tags,
-                Parameters=[{
-                    ParameterKey: 'GitSha',
-                    ParameterValue: CONFIG.EnvironmentConfig.GitSha,
-                },{
-                    ParameterKey: 'StackName',
-                    ParameterValue: CONFIG.EnvironmentConfig.GitSha,
-                },{
-                    ParameterKey: 'ImageTag',
-                    ParameterValue: CONFIG.EnvironmentConfig.GitSha,
-                },{
-                    ParameterKey: 'Inferences',
-                    ParameterValue: CONFIG.EnvironmentConfig.GitSha,
-                },{
-                    ParameterKey: 'ModelId',
-                    ParameterValue: CONFIG.EnvironmentConfig.GitSha,
-                },{
-                    ParameterKey: 'PredictionId',
-                    ParameterValue: CONFIG.EnvironmentConfig.GitSha,
-                },{
-                    ParameterKey: 'ImageryId',
-                    ParameterValue: CONFIG.EnvironmentConfig.GitSha,
-                },{
-                    ParameterKey: 'MaxSize',
-                    ParameterValue: CONFIG.EnvironmentConfig.GitSha,
-                },{
-                    ParameterKey: 'MaxConcurrency',
-                    ParameterValue: CONFIG.EnvironmentConfig.GitSha,
-                },{
-                    ParameterKey: 'InfSupertile',
-                    ParameterValue: CONFIG.EnvironmentConfig.GitSha,
-                }],
-                Capabilities=["CAPABILITY_NAMED_IAM"],
-                OnFailure="ROLLBACK"
+            const image = `project-${pid}-iteration-${iterationid}`;
+            const stack_name = `${process.env.StackName}-${image}`;
+
+            await cf.createStack({
+                StackName: stack_name,
+                TemplateBody: JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../prediction.template.json'))),
+                Tags: options.tags,
+                Parameters: [
+                    { ParameterKey: 'GitSha',           ParameterValue: process.env.GitSha },
+                    { ParameterKey: 'StackName',        ParameterValue: process.env.StackName },
+                    { ParameterKey: 'ImageTag',         ParameterValue: image },
+                    { ParameterKey: 'Inferences',       ParameterValue: options.inferences, },
+                    { ParameterKey: 'ProjectId',        ParameterValue: options.project_id, },
+                    { ParameterKey: 'IterationId',      ParameterValue: options.iteration_id, },
+                    { ParameterKey: 'ImageryId',        ParameterValue: options.imagery_id, },
+                    { ParameterKey: 'MaxSize',          ParameterValue: options.max_size, },
+                    { ParameterKey: 'MaxConcurrency',   ParameterValue: options.max_concurrency, },
+                    { ParameterKey: 'InfSupertile',     ParameterValue: options.inf_supertile, }
+                ],
+                Capabilities: ["CAPABILITY_NAMED_IAM"],
+                OnFailure: "ROLLBACK"
             }).promise();
         } catch (err) {
             throw new Err(500, err, 'Failed to create stack');

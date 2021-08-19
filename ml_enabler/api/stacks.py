@@ -60,10 +60,6 @@ def post(project_id, prediction_id):
             Tags=payload.get("tags", []),
             Parameters=[
                 {
-                    "ParameterKey": "GitSha",
-                    "ParameterValue": CONFIG.EnvironmentConfig.GitSha,
-                },
-                {
                     "ParameterKey": "MachineAuth",
                     "ParameterValue": CONFIG.EnvironmentConfig.MACHINE_AUTH,
                 },

@@ -11,6 +11,8 @@ class Config {
 
         this.bucket = process.env.ASSET_BUCKET;
 
+        if (!process.env.GitSha) throw new Error('GitSha Required');
+
         this.postgres = args.postgres || process.env.POSTGRES || 'postgres://postgres@localhost:5432/mlenabler';
         this.Environment = process.env.ENVIRONMENT || 'docker';
 
