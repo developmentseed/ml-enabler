@@ -52,7 +52,7 @@ async function router(schema, config) {
                     await file;
 
                     let body = {};
-                    body[`${req.query.type}`] = key;
+                    body[`${req.query.type}_link`] = key;
                     iter.patch(body);
                     await iter.commit(config.pool);
 
