@@ -14,7 +14,7 @@ class Stack {
 
         let partial = false;
         try {
-             partial = await cf.listStacks({
+            partial = await cf.listStacks({
                 StackStatusFilter: [
                     'CREATE_IN_PROGRESS',
                     'CREATE_COMPLETE',
@@ -35,7 +35,7 @@ class Stack {
                     'IMPORT_COMPLETE',
                     'IMPORT_ROLLBACK_IN_PROGRESS',
                     'IMPORT_ROLLBACK_FAILED',
-                    'IMPORT_ROLLBACK_COMPLETE',
+                    'IMPORT_ROLLBACK_COMPLETE'
                 ]
             }).promise();
 
@@ -103,8 +103,8 @@ class Stack {
                     { ParameterKey: 'MaxConcurrency',   ParameterValue: String(options.max_concurrency) },
                     { ParameterKey: 'InfSupertile',     ParameterValue: options.inf_supertile ? 'True' : 'False' }
                 ],
-                Capabilities: ["CAPABILITY_NAMED_IAM"],
-                OnFailure: "ROLLBACK"
+                Capabilities: ['CAPABILITY_NAMED_IAM'],
+                OnFailure: 'ROLLBACK'
             }).promise();
         } catch (err) {
             throw new Err(500, err, 'Failed to create stack');

@@ -40,8 +40,6 @@ class Generic {
     }
 
     static deserialize(dbrow, alias) {
-        let array = false;
-
         // Return a list style result
         if (Array.isArray(dbrow)) {
             const res = {
