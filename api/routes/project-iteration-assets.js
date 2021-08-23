@@ -23,6 +23,7 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Iteration.json} apiSuccess
      */
     await schema.post('/project/:pid/iteration/:iterationid/asset', {
+        query: 'req.query.UploadIterationAsset.json',
         res: 'res.Iteration.json'
     }, async (req, res) => {
         try {
@@ -40,9 +41,10 @@ async function router(schema, config) {
                 headers: req.headers
             });
 
-            let key = `project/${req.params.pid}/iteration/${req.params.iterationid}/${req.query.asset}.zip`;
+            let key = `project/${req.params.pid}/iteration/${req.params.iterationid}/${req.query.type}.zip`;
+
             busboy.on('file', (fieldname, file) => {
-                file = S3.put(key);
+                file = S3.put(key, file);
             });
 
             busboy.on('finish', async () => {
@@ -50,7 +52,7 @@ async function router(schema, config) {
                     await file;
 
                     let body = {};
-                    body[`${req.query.asset_link}`] = key;
+                    body[`${req.query.type}`] = key;
                     iter.patch(body);
                     await iter.commit(body);
 
@@ -59,6 +61,8 @@ async function router(schema, config) {
                     Err.respond(res, err);
                 }
             });
+
+            req.pipe(busboy);
         } catch (err) {
             return Err.respond(err, res);
         }

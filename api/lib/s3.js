@@ -2,6 +2,7 @@
 
 const AWS = require('aws-sdk');
 const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
+const Err = require('./error');
 
 class S3 {
     constructor(params) {
@@ -9,9 +10,9 @@ class S3 {
     }
 
     static async put(key, stream) {
-        if (!process.env.ASSET_BUCKET) return;
-
         try {
+            if (!process.env.ASSET_BUCKET) throw new Err(400, null, 'ASSET_BUCKET not set');
+
             await s3.upload({
                 Bucket: process.env.ASSET_BUCKET,
                 Key: key,

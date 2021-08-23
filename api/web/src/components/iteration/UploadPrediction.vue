@@ -2,7 +2,7 @@
     <div class="col col--12">
         <div class='col col--12'>
             <file-pond
-                name='model-upload'
+                name='file'
                 ref='pond'
                 :label-idle='label'
                 v-bind:allow-multiple='false'

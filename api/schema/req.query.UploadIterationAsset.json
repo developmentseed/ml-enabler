@@ -2,7 +2,7 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
-        "query": {
+        "type": {
             "type": "string",
             "enum": [
                 "model",
