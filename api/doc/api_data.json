@@ -795,6 +795,203 @@
     "groupTitle": "Integrations"
   },
   {
+    "type": "get",
+    "url": "/api/project/:pid/iteration/:iterationid/asset",
+    "title": "Download",
+    "version": "1.0.0",
+    "name": "DownloadIterationAsset",
+    "group": "IterationAssets",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Download an iteration asset</p>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"model\"",
+              "\"tfrecord\"",
+              "\"checkpoint\""
+            ],
+            "optional": true,
+            "field": "type",
+            "description": "<p>Asset Type to upload</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-iteration-assets.js",
+    "groupTitle": "IterationAssets"
+  },
+  {
+    "type": "post",
+    "url": "/api/project/:pid/iteration/:iterationid/asset",
+    "title": "Upload",
+    "version": "1.0.0",
+    "name": "UploadIterationAsset",
+    "group": "IterationAssets",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Create a new upload for an iteration</p>",
+    "parameter": {
+      "fields": {
+        "Query": [
+          {
+            "group": "Query",
+            "type": "String",
+            "allowedValues": [
+              "\"model\"",
+              "\"tfrecord\"",
+              "\"checkpoint\""
+            ],
+            "optional": true,
+            "field": "type",
+            "description": "<p>Asset Type to upload</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docker_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "log_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "model_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "checkpoint_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "tfrecord_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "save_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "tile_zoom",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "inf_list",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "inf_type",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "inf_binary",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "inf_supertile",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "version",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "hint",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "imagery_id",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-iteration-assets.js",
+    "groupTitle": "IterationAssets"
+  },
+  {
     "type": "post",
     "url": "/api/project/:pid/iteration",
     "title": "Create Iteration",
@@ -2698,6 +2895,137 @@
     },
     "filename": "./index.js",
     "groupTitle": "Server"
+  },
+  {
+    "type": "post",
+    "url": "/api/project/:pid/iteration/:iterationid/stack",
+    "title": "Create Stack",
+    "version": "1.0.0",
+    "name": "CreateStack",
+    "group": "Stacks",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Create a new stack within a project</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Object[]",
+            "optional": false,
+            "field": "tags",
+            "description": "<p>Billing tags that should be attached to project resources undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "tags.Key",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": false,
+            "field": "tags.Value",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": false,
+            "field": "max_size",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Body",
+            "type": "Integer",
+            "optional": false,
+            "field": "max_concurrency",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>AWS ARN ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Human Readable CloudFormation Stack Name</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "status",
+            "description": "<p>CloudFormation Status Enum</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-iteration-stack.js",
+    "groupTitle": "Stacks"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:pid/iteration/:iterationid/stack",
+    "title": "Get Stack",
+    "version": "1.0.0",
+    "name": "GetStack",
+    "group": "Stacks",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Get all information about a deployed stack</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "id",
+            "description": "<p>AWS ARN ID</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "name",
+            "description": "<p>Human Readable CloudFormation Stack Name</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "status",
+            "description": "<p>CloudFormation Status Enum</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-iteration-stack.js",
+    "groupTitle": "Stacks"
   },
   {
     "type": "get",
