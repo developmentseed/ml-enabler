@@ -43,7 +43,10 @@ export default {
                     ? `/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/import`
                     : `/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/asset?type=${this.type}`,
                 process: {
-                    onerror: this.error
+                    onerror: this.error,
+                    headers: {
+                        Authorization: `Bearer ${localStorage.token}`
+                    }
                 }
             },
             filetype: ''
