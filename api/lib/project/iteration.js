@@ -128,7 +128,12 @@ class ProjectIteration extends Generic {
             await pool.query(sql`
                 UPDATE iterations
                     SET
-                        updated     = NOW()
+                        model_link          = ${this.model_link},
+                        checkpoint_link     = ${this.checkpoint_link},
+                        tfrecord_link       = ${this.tfrecord_link},
+                        save_link           = ${this.save_link},
+                        docker_link         = ${this.docker_link},
+                        updated             = NOW()
                     WHERE
                         id = ${this.id}
             `);

@@ -54,7 +54,7 @@ async function router(schema, config) {
                     let body = {};
                     body[`${req.query.type}`] = key;
                     iter.patch(body);
-                    await iter.commit(body);
+                    await iter.commit(config.pool);
 
                     return res.json(iter.serialize());
                 } catch (err) {
