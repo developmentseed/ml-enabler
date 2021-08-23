@@ -9,12 +9,15 @@ class Config {
 
         this.silent = !!args.silent;
 
-        this.bucket = process.env.ASSET_BUCKET;
-
         if (!process.env.GitSha) throw new Error('GitSha Required');
 
         this.postgres = args.postgres || process.env.POSTGRES || 'postgres://postgres@localhost:5432/mlenabler';
         this.Environment = process.env.ENVIRONMENT || 'docker';
+
+        if (this.Environment === 'aws') {
+            this.bucket = process.env.ASSET_BUCKET;
+            if (!this.bucket) throw new Error('ASSET_BUCKET Required');
+        }
 
         this.url = 'http://localhost:2001';
         this.signing_secret = process.env.SIGNING_SECRET || '123';
