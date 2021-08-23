@@ -5,6 +5,7 @@ const S3 = require('../lib/s3');
 const Busboy = require('busboy');
 const Iteration = require('../lib/project/iteration');
 const { Param } = require('../lib/util');
+const path = require('path');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
@@ -81,9 +82,11 @@ async function router(schema, config) {
      * @apiSchema (Query) {jsonschema=../schema/req.query.DownloadIterationAsset.json} apiParam
      */
     await schema.get('/project/:pid/iteration/:iterationid/asset', {
-        query: 'req.query.UploadIterationAsset.json'
+        query: 'req.query.DownloadIterationAsset.json'
     }, async (req, res) => {
         try {
+            req.auth = req.token;
+
             await user.is_auth(req);
             await Param.int(req, 'pid');
             await Param.int(req, 'iterationid');
@@ -92,9 +95,9 @@ async function router(schema, config) {
 
             const iter = await Iteration.from(config.pool, req.params.iterationid);
 
-            if (!iter[`${req.params.asset}_link`]) throw new Err(400, null, 'Asset does not exist');
+            if (!iter[`${req.query.type}_link`]) throw new Err(400, null, 'Asset does not exist');
 
-            res.type(path.parse(license.name_raw || 'blob.bin').ext);
+            res.type(path.parse('blob.zip').ext);
             const s3 = new S3({
                 Bucket: process.env.ASSET_BUCKET,
                 Key: `project/${req.params.pid}/iteration/${req.params.iterationid}/${req.query.type}.zip`

@@ -136,6 +136,13 @@ async function server(args, config, cb) {
                     return Err.respond(new Err(401, err, 'Invalid Token'), res);
                 }
             }
+        } else if (req.query.token) {
+            try {
+                const decoded = jwt.verify(req.query.token, config.signing_secret);
+                req.token = await user.user(decoded.u);
+            } catch (err) {
+                return Err.respond(new Err(401, err, 'Invalid Token'), res);
+            }
         } else {
             req.auth = false;
         }

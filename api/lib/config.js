@@ -5,43 +5,49 @@ const { sql, createPool } = require('slonik');
 const Err = require('./error');
 
 class Config {
-    static async env(args = {}) {
-        this.args = args;
+    constructor() {
 
-        this.silent = !!args.silent;
+    }
+
+    static async env(args = {}) {
+        const cnf = new Config();
+
+        cnf.args = args;
+
+        cnf.silent = !!args.silent;
 
         if (!process.env.GitSha) throw new Error('GitSha Required');
 
-        this.postgres = args.postgres || process.env.POSTGRES || 'postgres://postgres@localhost:5432/mlenabler';
-        this.Environment = process.env.ENVIRONMENT || 'docker';
+        cnf.postgres = args.postgres || process.env.POSTGRES || 'postgres://postgres@localhost:5432/mlenabler';
+        cnf.Environment = process.env.ENVIRONMENT || 'docker';
 
-        if (this.Environment === 'aws') {
-            this.bucket = process.env.ASSET_BUCKET;
-            if (!this.bucket) throw new Error('ASSET_BUCKET Required');
+        if (cnf.Environment === 'aws') {
+            cnf.bucket = process.env.ASSET_BUCKET;
+            if (!cnf.bucket) throw new Error('ASSET_BUCKET Required');
         }
 
-        this.url = 'http://localhost:2001';
-        this.signing_secret = process.env.SIGNING_SECRET || '123';
+        cnf.url = 'http://localhost:2001';
+        cnf.signing_secret = process.env.SIGNING_SECRET || '123';
 
         try {
             if (!process.env.AWS_DEFAULT_REGION) {
-                if (!this.silent) console.error('ok - set env AWS_DEFAULT_REGION: us-east-1');
+                if (!cnf.silent) console.error('ok - set env AWS_DEFAULT_REGION: us-east-1');
                 process.env.AWS_DEFAULT_REGION = 'us-east-1';
             }
 
             if (!process.env.StackName || process.env.StackName === 'test') {
-                if (!this.silent) console.error('ok - set env StackName: test');
-                this.Stack = 'test';
+                if (!cnf.silent) console.error('ok - set env StackName: test');
+                cnf.Stack = 'test';
 
-                this.octo = false;
-                this.CookieSecret = '123';
-                this.SharedSecret = '123';
+                cnf.octo = false;
+                cnf.CookieSecret = '123';
+                cnf.SharedSecret = '123';
             } else {
                 const secrets = await Config.secret('Batch');
 
-                this.CookieSecret = secrets.CookieSecret;
-                this.SharedSecret = process.env.SharedSecret;
-                this.Stack = process.env.StackName;
+                cnf.CookieSecret = secrets.CookieSecret;
+                cnf.SharedSecret = process.env.SharedSecret;
+                cnf.Stack = process.env.StackName;
             }
 
             if (!process.env.MAPBOX_TOKEN) {
@@ -49,22 +55,22 @@ class Config {
             }
 
             if (!process.env.GithubSecret) {
-                if (!this.silent) console.error('ok - set env GithubSecret: no-secret');
+                if (!cnf.silent) console.error('ok - set env GithubSecret: no-secret');
                 process.env.GithubSecret = 'no-secret';
             }
         } catch (err) {
             throw new Error(err);
         }
 
-        this.pool = false;
+        cnf.pool = false;
         let retry = 5;
         do {
             try {
-                this.pool = createPool(this.postgres);
+                cnf.pool = createPool(cnf.postgres);
 
-                await this.pool.query(sql`SELECT NOW()`);
+                await cnf.pool.query(sql`SELECT NOW()`);
             } catch (err) {
-                this.pool = false;
+                cnf.pool = false;
 
                 if (retry === 0) {
                     console.error('not ok - terminating due to lack of postgres connection');
@@ -76,9 +82,9 @@ class Config {
                 console.error(`ok - retrying... (${5 - retry}/5)`);
                 await sleep(5000);
             }
-        } while (!this.pool);
+        } while (!cnf.pool);
 
-        return this;
+        return cnf;
     }
 
     static secret(secretName) {
@@ -102,7 +108,7 @@ class Config {
     }
 
     is_aws() {
-        if (config.Environment !== 'aws') throw new Err(400, null, 'Deployment must be in AWS Environment to use this endpoint');
+        if (this.Environment !== 'aws') throw new Err(400, null, 'Deployment must be in AWS Environment to use this endpoint');
         return true;
     }
 }

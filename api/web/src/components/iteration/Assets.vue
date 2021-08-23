@@ -114,7 +114,7 @@ export default {
             this.external(url);
         },
         dwn: function(asset) {
-            this.external(window.api + `/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/asset?type=${asset}`)
+            this.external(window.api + `/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/asset?type=${asset}&token=${localStorage.token}`)
         },
         external: function(url) {
             if (!url) return;
