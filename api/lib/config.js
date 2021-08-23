@@ -2,6 +2,7 @@
 
 const AWS = require('aws-sdk');
 const { sql, createPool } = require('slonik');
+const Err = require('./error');
 
 class Config {
     static async env(args = {}) {
@@ -98,6 +99,11 @@ class Config {
                 }
             });
         });
+    }
+
+    is_aws() {
+        if (config.Environment !== 'aws') throw new Err(400, null, 'Deployment must be in AWS Environment to use this endpoint');
+        return true;
     }
 }
 

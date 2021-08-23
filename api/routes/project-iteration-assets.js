@@ -31,7 +31,7 @@ async function router(schema, config) {
             await Param.int(req, 'pid');
             await Param.int(req, 'iterationid');
 
-            if (config.Environment !== 'aws') throw new Err(400, null, 'Deployment must be in AWS Environment to use this endpoint');
+            config.is_aws();
 
             const iter = await Iteration.from(config.pool, req.params.iterationid);
 
@@ -63,6 +63,44 @@ async function router(schema, config) {
             });
 
             req.pipe(busboy);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {get} /api/project/:pid/iteration/:iterationid/asset Download
+     * @apiVersion 1.0.0
+     * @apiName DownloadIterationAsset
+     * @apiGroup IterationAssets
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Download an iteration asset
+     *
+     * @apiSchema (Query) {jsonschema=../schema/req.query.DownloadIterationAsset.json} apiParam
+     */
+    await schema.get('/project/:pid/iteration/:iterationid/asset', {
+        query: 'req.query.UploadIterationAsset.json'
+    }, async (req, res) => {
+        try {
+            await user.is_auth(req);
+            await Param.int(req, 'pid');
+            await Param.int(req, 'iterationid');
+
+            config.is_aws();
+
+            const iter = await Iteration.from(config.pool, req.params.iterationid);
+
+            if (!iter[`${req.params.asset}_link`]) throw new Err(400, null, 'Asset does not exist');
+
+            res.type(path.parse(license.name_raw || 'blob.bin').ext);
+            const s3 = new S3({
+                Bucket: process.env.ASSET_BUCKET,
+                Key: `project/${req.params.pid}/iteration/${req.params.iterationid}/${req.query.type}.zip`
+            });
+
+            return s3.stream(res, `project-${req.params.pid}-iteration-${req.params.iterationid}-${req.query.type}.zip`);
         } catch (err) {
             return Err.respond(err, res);
         }
