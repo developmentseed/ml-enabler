@@ -18,19 +18,12 @@ class ProjectTask extends Generic {
 
         this._table = ProjectTask._table;
 
-        this.id = false;
-        this.iter_id = false;
-        this.created = false;
-        this.updated = false;
-        this.type = false;
-        this.batch_id = false;
-
         // Attributes which are allowed to be patched
         this.attrs = Object.keys(require('../../../schema/req.body.PatchTask.json').properties);
     }
 
     /**
-     * Return a list of imagery sources for a given project
+     * Return a list of tasks for a given project
      *
      * @param {Pool} pool - Instantiated Postgres Pool
      *
@@ -39,7 +32,6 @@ class ProjectTask extends Generic {
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page of users to return
-     * @param {String} [query.filter=] - Name to filter by
      * @param {String} [query.sort=created] Field to sort by
      * @param {String} [query.order=asc] Sort Order (asc/desc)
      */
@@ -47,7 +39,6 @@ class ProjectTask extends Generic {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
-        if (!query.filter) query.filter = '';
 
         if (!query.sort) query.sort = 'created';
         if (!query.order || query.order === 'asc') {
@@ -90,21 +81,17 @@ class ProjectTask extends Generic {
             id: this.id,
             created: this.created,
             updated: this.updated,
-            pid: this.pid,
-            name: this.name,
-            url: this.url,
-            fmt: this.fmt
+            iter_id: this.pid,
+            type: this.type,
+            batch_id: this.batch_id
         };
     }
 
     async commit(pool) {
         try {
             await pool.query(sql`
-                UPDATE imagery
+                UPDATE tasks
                     SET
-                        name        = ${this.name},
-                        url         = ${this.url},
-                        fmt         = ${this.fmt},
                         updated     = NOW()
                     WHERE
                         id = ${this.id}
@@ -119,16 +106,14 @@ class ProjectTask extends Generic {
     static async generate(pool, task) {
         try {
             const pgres = await pool.query(sql`
-                INSERT INTO imagery (
-                    pid,
-                    name,
-                    url,
-                    fmt
+                INSERT INTO tasks (
+                    iter_id,
+                    type,
+                    batch_id
                 ) VALUES (
-                    ${task.pid},
-                    ${task.name},
-                    ${task.url},
-                    ${task.fmt}
+                    ${task.iter_id},
+                    ${task.type},
+                    ${task.batch_id}
                 ) RETURNING *
             `);
 
@@ -159,7 +144,7 @@ class ProjectTask extends Generic {
         Task.generate(pool, {
             pid:
             type: 'ecr',
-            bathc_id: job.jobId
+            batch_id: job.jobId
         });
     }
 }

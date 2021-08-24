@@ -8,11 +8,6 @@
         "page": {
             "$ref": "./util/page.json"
         },
-        "filter": {
-            "type": "string",
-            "default": "",
-            "description": "Filter a complete or partial task"
-        },
         "order": {
             "$ref": "./util/order.json"
         },
