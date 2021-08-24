@@ -1,8 +1,6 @@
 'use strict';
 
 const Err = require('../lib/error');
-const Project = require('../lib/project');
-const ProjectAccess = require('../lib/project/access');
 const { Param } = require('../lib/util');
 
 async function router(schema, config) {

@@ -52,15 +52,15 @@ async function router(schema, config) {
             return Err.respond(err, res);
         }
 
-        busboy.on('file', (fieldname, file) => {
-            file = S3.put(key, file);
+        busboy.on('file', (fieldname, fstream) => {
+            file = S3.put(key, fstream);
         });
 
         busboy.on('finish', async () => {
             try {
                 await file;
 
-                let body = {};
+                const body = {};
                 body[`${req.query.type}_link`] = key;
                 iter.patch(body);
                 await iter.commit(config.pool);

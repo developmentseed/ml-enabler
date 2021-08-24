@@ -1,6 +1,5 @@
 'use strict';
 
-const AWS = require('aws-sdk');
 const { sql, createPool } = require('slonik');
 const Err = require('./error');
 

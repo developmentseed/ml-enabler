@@ -20,7 +20,7 @@ RUN npm install \
     && cd web \
     && npm install -g yarn \
     && yarn install \
-    && yarn build
+    && yarn prod
 
 RUN cp ./nginx.conf /etc/nginx/sites-enabled/default
 
