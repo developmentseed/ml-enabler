@@ -6,6 +6,7 @@ const Busboy = require('busboy');
 const Iteration = require('../lib/project/iteration');
 const { Param } = require('../lib/util');
 const path = require('path');
+const Task = require('../lib/project/iteration/task');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
@@ -56,6 +57,13 @@ async function router(schema, config) {
                     body[`${req.query.type}_link`] = key;
                     iter.patch(body);
                     await iter.commit(config.pool);
+
+                    Task.batch(config, {
+                        environment: [{
+                            name: 'MODEL',
+                            value: process.env.ASSET_BUCKET + '/' + key
+                        }]
+                    });
 
                     return res.json(iter.serialize());
                 } catch (err) {

@@ -123,27 +123,45 @@ class ProjectTask extends Generic {
         }
     }
 
-    static batch(pool) {
+    /**
+     * Create a new batch task
+     *
+     * @param {Config} config Config object
+     * @param {Object} opts Options Object
+     * @param {String} opts.type Type
+     * @param {Number} opts.iter_id Iteration ID
+     * @param {Object[]} opts.environment AWS Batch Environment Override
+     */
+    static async batch(config, opts) {
+        let jobName, jobDef;
+        let jobQueue = config.StackName + '-queue';
+
+        if (!opts.environment) opts.environent = [];
+
+        if (type === 'ecr') {
+            jobName = config.StackName + 'ecr-build';
+            jobDef = config.StackName + '-build-job';
+        } else {
+            throw new Err(400, null, 'Unsupported task type');
+        }
+
         let job;
         try {
             job = await batch.submitJob({
-                jobName: CONFIG.EnvironmentConfig.STACK + 'ecr-build',
-                jobQueue: CONFIG.EnvironmentConfig.STACK + '-queue',
-                jobDefinition: CONFIG.EnvironmentConfig.STACK + '-build-job',
+                jobName: jobName,
+                jobQueue: jobQueue,
+                jobDefinition: jobDef,
                 containerOverrides: {
-                    "environment": [{
-                        name: 'MODEL',
-                        value: CONFIG.EnvironmentConfig.ASSET_BUCKET + '/' + key,
-                    }]
+                    environment: opts.environment
                 },
             }).promise();
         } catch (err) {
-
+            throw new Err(500, err, 'Failed to submit job');
         }
 
-        Task.generate(pool, {
-            pid:
-            type: 'ecr',
+        await Task.generate(config.pool, {
+            iter_id: opts.iter_id,
+            type: opts.type,
             batch_id: job.jobId
         });
     }
