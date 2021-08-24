@@ -24,7 +24,7 @@ main();
 async function main() {
     try {
         if (!process.env.MODEL) throw new Error('MODEL env var not set');
-        if (!process.env.MACHINE_AUTH) throw new Error('MACHINE_AUTH env var not set');
+        if (!process.env.TOKEN) throw new Error('TOKEN env var not set');
         if (!process.env.BATCH_ECR) throw new Error('BATCH_ECR env var not set');
         if (!process.env.AWS_ACCOUNT_ID) throw new Error('AWS_ACCOUT_ID env var not set');
         if (!process.env.AWS_REGION) throw new Error('AWS_REGION env var not set');
@@ -118,12 +118,13 @@ function set_link(project, iteration, patch) {
         console.error(`ok - saving project (${project}), iteration (${iteration}) state: ${JSON.stringify(patch)}`);
 
         const url = new URL(process.env.API_URL);
-        url.username = 'machine';
-        url.password = process.env.MACHINE_AUTH;
 
         request({
             method: 'PATCH',
             url: `${String(url)}/api/project/${project}/iteration/${iteration}`,
+            auth: {
+                bearer: process.env.TOKEN
+            },
             json: true,
             body: patch
         }, (err, res) => {

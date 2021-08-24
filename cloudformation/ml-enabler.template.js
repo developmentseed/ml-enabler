@@ -7,8 +7,8 @@ const Parameters = {
         Type: 'String',
         Description: 'GitSha to Deploy'
     },
-    MachineAuth: {
-        Description: 'The password for the default machine user',
+    SigningSecret: {
+        Description: 'Secret to signing JWT Tokens',
         Type: 'String'
     },
     ContainerCpu: {
@@ -413,8 +413,8 @@ const Resources = {
                     Name: 'ENVIRONMENT',
                     Value: 'aws'
                 },{
-                    Name: 'MACHINE_AUTH',
-                    Value: cf.ref('MachineAuth')
+                    Name: 'SigningSecret',
+                    Value: cf.ref('SigningSecret')
                 },{
                     Name: 'GitSha',
                     Value: cf.ref('GitSha')

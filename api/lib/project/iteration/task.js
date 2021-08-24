@@ -6,6 +6,7 @@ const Generic = require('../../generic');
 const schema = require('../../../schema/res.Task.json');
 const AWS = require('aws-sdk');
 const batch = new AWS.Batch({ region: process.env.AWS_DEFAULT_REGION });
+const jwt = require('jsonwebtoken');
 
 /**
  * @class
@@ -144,6 +145,15 @@ class ProjectTask extends Generic {
         } else {
             throw new Err(400, null, 'Unsupported task type');
         }
+
+        const token = jwt.sign({
+            t: 'i', // Internal
+        }, config.SigningSecret);
+
+        opts.environment.push({
+            name: 'TOKEN',
+            value: token
+        });
 
         let job;
         try {

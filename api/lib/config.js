@@ -5,10 +5,6 @@ const { sql, createPool } = require('slonik');
 const Err = require('./error');
 
 class Config {
-    constructor() {
-
-    }
-
     static async env(args = {}) {
         const cnf = new Config();
 
@@ -31,7 +27,7 @@ class Config {
         }
 
         cnf.url = 'http://localhost:2001';
-        cnf.signing_secret = process.env.SIGNING_SECRET || '123';
+        cnf.SigningSecret = process.env.SigningSecret || '123';
 
         try {
             if (!process.env.AWS_DEFAULT_REGION) {
@@ -43,10 +39,6 @@ class Config {
                 if (!cnf.silent) console.error('ok - set env StackName: test');
                 cnf.Stack = 'test';
                 cnf.StackName = 'test';
-
-                cnf.octo = false;
-                cnf.CookieSecret = '123';
-                cnf.SharedSecret = '123';
             }
 
             if (!process.env.MAPBOX_TOKEN) {
