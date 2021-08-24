@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV DOCKER_DRIVER=overlay2
 ENV DOCKER_TLS_CERTDIR=''
 
-RUN apk add nodejs
+RUN apk add nodejs nodejs-npm
 RUN apk -v --update add \
         python \
         py-pip \
