@@ -4,6 +4,8 @@ const Err = require('../../error');
 const { sql } = require('slonik');
 const Generic = require('../../generic');
 const schema = require('../../../schema/res.Task.json');
+const AWS = require('aws-sdk');
+const batch = new AWS.Batch({ region: process.env.AWS_DEFAULT_REGION });
 
 /**
  * @class
@@ -114,7 +116,7 @@ class ProjectTask extends Generic {
         }
     }
 
-    static async generate(pool, imagery) {
+    static async generate(pool, task) {
         try {
             const pgres = await pool.query(sql`
                 INSERT INTO imagery (
@@ -123,10 +125,10 @@ class ProjectTask extends Generic {
                     url,
                     fmt
                 ) VALUES (
-                    ${imagery.pid},
-                    ${imagery.name},
-                    ${imagery.url},
-                    ${imagery.fmt}
+                    ${task.pid},
+                    ${task.name},
+                    ${task.url},
+                    ${task.fmt}
                 ) RETURNING *
             `);
 
@@ -134,6 +136,31 @@ class ProjectTask extends Generic {
         } catch (err) {
             throw new Err(500, err, 'Failed to generate Task');
         }
+    }
+
+    static batch(pool) {
+        let job;
+        try {
+            job = await batch.submitJob({
+                jobName: CONFIG.EnvironmentConfig.STACK + 'ecr-build',
+                jobQueue: CONFIG.EnvironmentConfig.STACK + '-queue',
+                jobDefinition: CONFIG.EnvironmentConfig.STACK + '-build-job',
+                containerOverrides: {
+                    "environment": [{
+                        name: 'MODEL',
+                        value: CONFIG.EnvironmentConfig.ASSET_BUCKET + '/' + key,
+                    }]
+                },
+            }).promise();
+        } catch (err) {
+
+        }
+
+        Task.generate(pool, {
+            pid:
+            type: 'ecr',
+            bathc_id: job.jobId
+        });
     }
 }
 

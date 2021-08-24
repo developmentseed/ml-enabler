@@ -100,7 +100,7 @@ async function router(schema, config) {
             res.type(path.parse('blob.zip').ext);
             const s3 = new S3({
                 Bucket: process.env.ASSET_BUCKET,
-                Key: `project/${req.params.pid}/iteration/${req.params.iterationid}/${req.query.type}.zip`
+                Key: iter[`${req.query.type}_link`]
             });
 
             return s3.stream(res, `project-${req.params.pid}-iteration-${req.params.iterationid}-${req.query.type}.zip`);
