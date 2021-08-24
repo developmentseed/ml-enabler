@@ -4,6 +4,9 @@
     "main": "index.js",
     "license": "MIT",
     "private": true,
+    "scripts": {
+        "lint": "eslint *.js"
+    },
     "dependencies": {
         "aws-sdk": "^2.631.0",
         "d3-queue": "^3.0.7",
@@ -12,5 +15,9 @@
         "mkdirp": "^1.0.3",
         "request": "^2.88.2",
         "unzipper": "^0.10.10"
+    },
+    "devDependencies": {
+        "eslint": "^7.32.0",
+        "eslint-plugin-node": "^11.1.0"
     }
 }
