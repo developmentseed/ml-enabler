@@ -159,7 +159,7 @@ class ProjectTask extends Generic {
             throw new Err(500, err, 'Failed to submit job');
         }
 
-        await Task.generate(config.pool, {
+        await ProjectTask.generate(config.pool, {
             iter_id: opts.iter_id,
             type: opts.type,
             batch_id: job.jobId

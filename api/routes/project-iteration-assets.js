@@ -34,49 +34,53 @@ async function router(schema, config) {
             await Param.int(req, 'iterationid');
 
             config.is_aws();
-
-            const iter = await Iteration.from(config.pool, req.params.iterationid);
-
-            let file;
-            const busboy = new Busboy({
-                files: 1,
-                headers: req.headers
-            });
-
-            let key = `project/${req.params.pid}/iteration/${req.params.iterationid}/${req.query.type}.zip`;
-
-            busboy.on('file', (fieldname, file) => {
-                file = S3.put(key, file);
-            });
-
-            busboy.on('finish', async () => {
-                try {
-                    await file;
-
-                    let body = {};
-                    body[`${req.query.type}_link`] = key;
-                    iter.patch(body);
-                    await iter.commit(config.pool);
-
-                    await Task.batch(config, {
-                        type: 'ecr',
-                        iter_id: iter.id,
-                        environment: [{
-                            name: 'MODEL',
-                            value: process.env.ASSET_BUCKET + '/' + key
-                        }]
-                    });
-
-                    return res.json(iter.serialize());
-                } catch (err) {
-                    Err.respond(res, err);
-                }
-            });
-
-            req.pipe(busboy);
         } catch (err) {
             return Err.respond(err, res);
         }
+
+        const busboy = new Busboy({
+            files: 1,
+            headers: req.headers
+        });
+
+
+        let iter, file, key;
+        try {
+            iter = await Iteration.from(config.pool, req.params.iterationid);
+            key = `project/${req.params.pid}/iteration/${req.params.iterationid}/${req.query.type}.zip`;
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+
+        busboy.on('file', (fieldname, file) => {
+            file = S3.put(key, file);
+        });
+
+        busboy.on('finish', async () => {
+            try {
+                await file;
+
+                let body = {};
+                body[`${req.query.type}_link`] = key;
+                iter.patch(body);
+                await iter.commit(config.pool);
+
+                await Task.batch(config, {
+                    type: 'ecr',
+                    iter_id: iter.id,
+                    environment: [{
+                        name: 'MODEL',
+                        value: process.env.ASSET_BUCKET + '/' + key
+                    }]
+                });
+
+                return res.json(iter.serialize());
+            } catch (err) {
+                Err.respond(err, res);
+            }
+        });
+
+        req.pipe(busboy);
     });
 
     /**

@@ -24,6 +24,10 @@ class Config {
         if (cnf.Environment === 'aws') {
             cnf.bucket = process.env.ASSET_BUCKET;
             if (!cnf.bucket) throw new Error('ASSET_BUCKET Required');
+
+            cnf.StackName = process.env.StackName;
+            cnf.Stack = process.env.StackName;
+            if (!cnf.StackName) throw new Error('StackName Required');
         }
 
         cnf.url = 'http://localhost:2001';
@@ -38,25 +42,15 @@ class Config {
             if (!process.env.StackName || process.env.StackName === 'test') {
                 if (!cnf.silent) console.error('ok - set env StackName: test');
                 cnf.Stack = 'test';
+                cnf.StackName = 'test';
 
                 cnf.octo = false;
                 cnf.CookieSecret = '123';
                 cnf.SharedSecret = '123';
-            } else {
-                const secrets = await Config.secret('Batch');
-
-                cnf.CookieSecret = secrets.CookieSecret;
-                cnf.SharedSecret = process.env.SharedSecret;
-                cnf.Stack = process.env.StackName;
             }
 
             if (!process.env.MAPBOX_TOKEN) {
                 throw new Error('not ok - MAPBOX_TOKEN env var required');
-            }
-
-            if (!process.env.GithubSecret) {
-                if (!cnf.silent) console.error('ok - set env GithubSecret: no-secret');
-                process.env.GithubSecret = 'no-secret';
             }
         } catch (err) {
             throw new Error(err);
@@ -85,26 +79,6 @@ class Config {
         } while (!cnf.pool);
 
         return cnf;
-    }
-
-    static secret(secretName) {
-        return new Promise((resolve, reject) => {
-            const client = new AWS.SecretsManager({
-                region: process.env.AWS_DEFAULT_REGION
-            });
-
-            client.getSecretValue({
-                SecretId: secretName
-            }, (err, data) => {
-                if (err) return reject(err);
-
-                try {
-                    return resolve(JSON.parse(data.SecretString));
-                } catch (err) {
-                    return reject(err);
-                }
-            });
-        });
     }
 
     is_aws() {
