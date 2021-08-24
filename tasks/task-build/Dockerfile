@@ -5,7 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV DOCKER_DRIVER=overlay2
 ENV DOCKER_TLS_CERTDIR=''
 
-RUN apk add nodejs yarn
+RUN apk add nodejs
 RUN apk -v --update add \
         python \
         py-pip \
@@ -20,4 +20,4 @@ RUN apk -v --update add \
 WORKDIR /usr/local/src/batch
 ADD . /usr/local/src/batch
 
-RUN yarn install
+RUN npm install
