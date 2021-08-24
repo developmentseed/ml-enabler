@@ -129,6 +129,8 @@ exports.up = function(knex) {
             hint                TEXT,
             imagery_id          BIGINT,
 
+            UNIQUE(pid, version),
+
             CONSTRAINT fk_projects
                 FOREIGN KEY (pid)
                 REFERENCES projects(id),

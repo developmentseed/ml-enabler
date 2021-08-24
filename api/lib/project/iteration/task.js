@@ -138,7 +138,7 @@ class ProjectTask extends Generic {
 
         if (!opts.environment) opts.environent = [];
 
-        if (type === 'ecr') {
+        if (opts.type === 'ecr') {
             jobName = config.StackName + 'ecr-build';
             jobDef = config.StackName + '-build-job';
         } else {

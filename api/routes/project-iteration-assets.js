@@ -58,7 +58,9 @@ async function router(schema, config) {
                     iter.patch(body);
                     await iter.commit(config.pool);
 
-                    Task.batch(config, {
+                    await Task.batch(config, {
+                        type: 'ecr',
+                        iter_id: iter.id,
                         environment: [{
                             name: 'MODEL',
                             value: process.env.ASSET_BUCKET + '/' + key
