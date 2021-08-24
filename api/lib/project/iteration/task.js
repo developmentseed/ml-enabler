@@ -61,8 +61,6 @@ class ProjectTask extends Generic {
                     batch_id
                 FROM
                     tasks
-                WHERE
-                    type ~ ${query.filter}
                 ORDER BY
                     ${sql.identifier(['tasks', query.sort])} ${query.order}
                 LIMIT
