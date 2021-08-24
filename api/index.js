@@ -130,7 +130,7 @@ async function server(args, config, cb) {
                 }
             } else {
                 try {
-                    const decoded = jwt.verify(authorization[1], config.signing_secret);
+                    const decoded = jwt.verify(authorization[1], config.SigningSecret);
                     req.auth = await user.user(decoded.u);
                 } catch (err) {
                     return Err.respond(new Err(401, err, 'Invalid Token'), res);
@@ -138,7 +138,7 @@ async function server(args, config, cb) {
             }
         } else if (req.query.token) {
             try {
-                const decoded = jwt.verify(req.query.token, config.signing_secret);
+                const decoded = jwt.verify(req.query.token, config.SigningSecret);
                 req.token = await user.user(decoded.u);
             } catch (err) {
                 return Err.respond(new Err(401, err, 'Invalid Token'), res);

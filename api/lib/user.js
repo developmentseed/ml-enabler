@@ -380,7 +380,7 @@ class User {
 
         const token = jwt.sign({
             u: parseInt(pgres.rows[0].id)
-        }, this.config.signing_secret);
+        }, this.config.SigningSecret);
 
         return {
             uid: parseInt(pgres.rows[0].id),
