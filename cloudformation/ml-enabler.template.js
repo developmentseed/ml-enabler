@@ -419,7 +419,7 @@ const Resources = {
                     Name: 'GitSha',
                     Value: cf.ref('GitSha')
                 },{
-                    Name: 'STACK',
+                    Name: 'StackName',
                     Value: cf.stackName
                 },{
                     Name: 'MAPBOX_TOKEN',
