@@ -127,18 +127,18 @@ class ProjectTask extends Generic {
      *
      * @param {Config} config Config object
      * @param {Object} opts Options Object
+     * @param {String} opts.name Name of Batch Job
      * @param {String} opts.type Type
      * @param {Number} opts.iter_id Iteration ID
      * @param {Object[]} opts.environment AWS Batch Environment Override
      */
     static async batch(config, opts) {
-        let jobName, jobDef;
+        let jobDef;
         let jobQueue = config.StackName + '-queue';
 
         if (!opts.environment) opts.environent = [];
 
         if (opts.type === 'ecr') {
-            jobName = config.StackName + 'ecr-build';
             jobDef = config.StackName + '-build-job';
         } else {
             throw new Err(400, null, 'Unsupported task type');
@@ -156,7 +156,7 @@ class ProjectTask extends Generic {
         let job;
         try {
             job = await batch.submitJob({
-                jobName: jobName,
+                jobName: opts.name,
                 jobQueue: jobQueue,
                 jobDefinition: jobDef,
                 containerOverrides: {

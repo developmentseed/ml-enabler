@@ -67,6 +67,7 @@ async function router(schema, config) {
 
                 await Task.batch(config, {
                     type: 'ecr',
+                    name: `build-${req.params.pid}-${req.params.iterationid}`,
                     iter_id: iter.id,
                     environment: [{
                         name: 'MODEL',

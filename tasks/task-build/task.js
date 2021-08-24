@@ -117,11 +117,9 @@ function set_link(project, iteration, patch) {
     return new Promise((resolve, reject) => {
         console.error(`ok - saving project (${project}), iteration (${iteration}) state: ${JSON.stringify(patch)}`);
 
-        const url = new URL(process.env.API_URL);
-
         request({
             method: 'PATCH',
-            url: `${String(url)}/api/project/${project}/iteration/${iteration}`,
+            url: `${process.env.API_URL}/api/project/${project}/iteration/${iteration}`,
             auth: {
                 bearer: process.env.TOKEN
             },
