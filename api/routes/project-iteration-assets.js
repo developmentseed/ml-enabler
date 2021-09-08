@@ -65,7 +65,7 @@ async function router(schema, config) {
                 iter.patch(body);
                 await iter.commit(config.pool);
 
-                if (req.quey.type === 'model') {
+                if (req.query.type === 'model') {
                     await Task.batch(config, {
                         type: 'ecr',
                         name: `build-${req.params.pid}-${req.params.iterationid}`,
