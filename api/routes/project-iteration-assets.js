@@ -65,15 +65,17 @@ async function router(schema, config) {
                 iter.patch(body);
                 await iter.commit(config.pool);
 
-                await Task.batch(config, {
-                    type: 'ecr',
-                    name: `build-${req.params.pid}-${req.params.iterationid}`,
-                    iter_id: iter.id,
-                    environment: [{
-                        name: 'MODEL',
-                        value: process.env.ASSET_BUCKET + '/' + key
-                    }]
-                });
+                if (req.quey.type === 'model') {
+                    await Task.batch(config, {
+                        type: 'ecr',
+                        name: `build-${req.params.pid}-${req.params.iterationid}`,
+                        iter_id: iter.id,
+                        environment: [{
+                            name: 'MODEL',
+                            value: process.env.ASSET_BUCKET + '/' + key
+                        }]
+                    });
+                }
 
                 return res.json(iter.serialize());
             } catch (err) {
