@@ -433,7 +433,7 @@ const Resources = {
                     Options: {
                         'awslogs-group': cf.stackName,
                         'awslogs-region': cf.region,
-                        'awslogs-stream-prefix': cf.join('-', ['awslogs', cf.stackName])
+                        'awslogs-stream-prefix': cf.stackName
                     }
                 },
                 Essential: true
@@ -912,6 +912,7 @@ module.exports = cf.merge({
 },
 alarms({
     prefix: 'MLEnabler',
+    apache: cf.stackName,
     email: 'ingalls@developmentseed.org',
     cluster: cf.ref('MLEnablerECSCluster'),
     service: cf.getAtt('MLEnablerService', 'Name'),
