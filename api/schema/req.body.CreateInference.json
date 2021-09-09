@@ -1,0 +1,15 @@
+{
+    "type": "object",
+    "required": [
+        "inferences"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "inferences": {
+            "type": "array",
+            "items": {
+                "type": "object"
+            }
+        }
+    }
+}

@@ -1,5 +1,6 @@
 'use strict';
 
+const CP = require('child_process');
 const { sql, createPool } = require('slonik');
 const Err = require('./error');
 
@@ -11,7 +12,9 @@ class Config {
 
         cnf.silent = !!args.silent;
 
-        if (!process.env.GitSha) throw new Error('GitSha Required');
+        if (!process.env.GitSha) {
+            process.env.GitSha = String(CP.execSync('git rev-parse HEAD'));
+        }
 
         cnf.postgres = args.postgres || process.env.POSTGRES || 'postgres://postgres@localhost:5432/mlenabler';
         cnf.Environment = process.env.ENVIRONMENT || 'docker';
