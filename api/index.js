@@ -131,7 +131,13 @@ async function server(args, config, cb) {
             } else {
                 try {
                     const decoded = jwt.verify(authorization[1], config.SigningSecret);
-                    req.auth = await user.user(decoded.u);
+
+                    // Internal Machine Token
+                    if (decoded.t === 'i') {
+                        req.auth = 'internal';
+                    } else {
+                        req.auth = await user.user(decoded.u);
+                    }
                 } catch (err) {
                     return Err.respond(new Err(401, err, 'Invalid Token'), res);
                 }
@@ -139,7 +145,11 @@ async function server(args, config, cb) {
         } else if (req.query.token) {
             try {
                 const decoded = jwt.verify(req.query.token, config.SigningSecret);
-                req.token = await user.user(decoded.u);
+                if (decoded.t === 'i') {
+                    req.auth = 'internal';
+                } else {
+                    req.token = await user.user(decoded.u);
+                }
             } catch (err) {
                 return Err.respond(new Err(401, err, 'Invalid Token'), res);
             }

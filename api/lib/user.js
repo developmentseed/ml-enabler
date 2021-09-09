@@ -19,6 +19,8 @@ class User {
     }
 
     async is_auth(req) {
+        if (req.auth === 'internal') return true;
+
         if (!req.auth || !req.auth.access || !req.auth.uid) {
             throw new Err(401, null, 'Authentication Required');
         }
@@ -31,6 +33,8 @@ class User {
     }
 
     async is_admin(req) {
+        if (req.auth === 'internal') return true;
+
         await this.is_auth(req);
 
         if (req.auth.access !== 'admin') {
