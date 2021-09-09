@@ -42,7 +42,7 @@ async function main() {
         const iteration_id = get_iteration_id(model);
 
         const links = {
-            modelLink: model
+            model_link: model
         };
 
         if (process.env.AWS_BATCH_JOB_ID) {
@@ -131,7 +131,7 @@ function set_link(project, iteration, patch) {
             if (res.statusCode === 200) {
                 return resolve(res);
             } else {
-                return reject(res.statusCode + ':' + res.body);
+                return reject(res.statusCode + ':' + typeof res.body === 'object' ? JSON.stringify(res.body) : res.body);
             }
         });
     });
