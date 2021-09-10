@@ -91,6 +91,37 @@ async function router(schema, config) {
             return Err.respond(err, res);
         }
     });
+
+    /**
+     * @api {patch} /api/project/:pid/iteration/:iterationid Patch Iteration
+     * @apiVersion 1.0.0
+     * @apiName PatchIteration
+     * @apiGroup Iterations
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Upate an existing iteration
+     *
+     * @apiSchema {jsonschema=../schema/res.Iteration.json} apiSuccess
+     */
+    await schema.patch('/project/:pid/iteration/:iterationid', {
+        body: 'req.body.PatchIteration.json',
+        res: 'res.Iteration.json'
+    }, async (req, res) => {
+        try {
+            await user.is_auth(req);
+            await Param.int(req, 'pid');
+            await Param.int(req, 'iterationid');
+
+            const iter = await Iteration.from(config.pool, req.params.iterationid);
+            iter.patch(req.body);
+            await iter.commit(config.pool);
+
+            return res.json(iter.serialize());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 }
 
 module.exports = router;

@@ -883,7 +883,7 @@ const Outputs = {
     },
     UI: {
         Description: 'UI URL',
-        Value: cf.join(['http://', cf.getAtt('MLEnablerELB', 'DNSName'), '/admin/'])
+        Value: cf.getAtt('MLEnablerELB', 'DNSName')
     },
     S3: {
         Description: 'Asset Storage',
