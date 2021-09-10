@@ -12,7 +12,7 @@ const jwt = require('jsonwebtoken');
  * @class
  */
 class ProjectTask extends Generic {
-    static _table = 'imagery';
+    static _table = 'tasks';
 
     constructor() {
         super();
