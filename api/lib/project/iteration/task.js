@@ -6,6 +6,7 @@ const Generic = require('../../generic');
 const schema = require('../../../schema/res.Task.json');
 const AWS = require('aws-sdk');
 const batch = new AWS.Batch({ region: process.env.AWS_DEFAULT_REGION });
+const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
 const jwt = require('jsonwebtoken');
 
 /**
@@ -100,6 +101,28 @@ class ProjectTask extends Generic {
         } catch (err) {
             throw new Err(500, err, 'Failed to save Task');
         }
+    }
+
+    async logs() {
+        if (!this.logs) throw new Err(400, null, 'Task did not save log_link');
+
+        let logs = await cwl.getLogEvents({
+            logGroupName: '/aws/batch/job',
+            logStreamName: this.logs
+        }).promise();
+
+        let line = 0;
+        logs = logs.events.map((log) => {
+            return {
+                id: line++,
+                message: event.timestamp,
+                message: event.message
+            };
+        });
+
+        return {
+            logs: logs
+        };
     }
 
     static async generate(pool, task) {

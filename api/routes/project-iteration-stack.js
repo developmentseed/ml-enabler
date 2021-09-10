@@ -58,7 +58,7 @@ async function router(schema, config) {
 
             const iter = await Iteration.from(config.pool, req.params.iterationid);
 
-            const stack = await Stack.generate(
+            await Stack.generate(
                 req.params.pid,
                 req.params.iterationid, {
                     tags: req.body.tags,

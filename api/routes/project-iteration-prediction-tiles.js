@@ -23,6 +23,8 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             await user.is_auth(req);
+            await Param.int(req, 'pid');
+            await Param.int(req, 'iterationid');
 
             res.json({
                 uploaded: false

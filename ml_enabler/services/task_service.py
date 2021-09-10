@@ -86,34 +86,3 @@ class TaskService:
                 task["logs"] = False
 
         return task
-
-    @staticmethod
-    def logs(task_id: int):
-        task = TaskService.get(task_id)
-
-        if not task:
-            raise NotFound
-
-        logs = []
-        if task["logs"] is False:
-            logs.append({"id": 1, "message": "No Logs in LogStream"})
-        else:
-            cwl = boto3.client("logs")
-
-            rawlogs = cwl.get_log_events(
-                logGroupName="/aws/batch/job", logStreamName=task["logs"]
-            )
-
-            line = 0
-            for event in rawlogs["events"]:
-                logs.append(
-                    {
-                        "id": line,
-                        "timestamp": event["timestamp"],
-                        "message": event["message"],
-                    }
-                )
-
-                line = line + 1
-
-        return {"logs": logs}

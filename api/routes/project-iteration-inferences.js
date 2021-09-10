@@ -1,7 +1,6 @@
 'use strict';
 
 const Err = require('../lib/error');
-const Iteration = require('../lib/project/iteration');
 const { Param } = require('../lib/util');
 
 async function router(schema, config) {

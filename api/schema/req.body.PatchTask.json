@@ -1,9 +1,5 @@
 {
     "type": "object",
     "additionalProperties": false,
-    "properties": {
-        "batch_id": {
-            "type": "integer"
-        }
-    }
+    "properties": { }
 }

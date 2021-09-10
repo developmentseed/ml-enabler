@@ -451,6 +451,37 @@ define({ "api": [
     "groupTitle": "Imagery"
   },
   {
+    "type": "get",
+    "url": "/api/project/:pid/iteration/:iterationid/inference",
+    "title": "Create Inference",
+    "version": "1.0.0",
+    "name": "CreateInference",
+    "group": "Inferences",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Create a new inference on the server</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "Object[]",
+            "optional": false,
+            "field": "inferences",
+            "description": "<p>undefined undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-iteration-inferences.js",
+    "groupTitle": "Inferences"
+  },
+  {
     "type": "post",
     "url": "/api/project/:pid/integration",
     "title": "Create Integration",
@@ -820,9 +851,16 @@ define({ "api": [
               "\"tfrecord\"",
               "\"checkpoint\""
             ],
-            "optional": true,
+            "optional": false,
             "field": "type",
             "description": "<p>Asset Type to upload</p>"
+          },
+          {
+            "group": "Query",
+            "type": "String",
+            "optional": false,
+            "field": "token",
+            "description": "<p>Authentication Token</p>"
           }
         ]
       }
@@ -856,7 +894,7 @@ define({ "api": [
               "\"tfrecord\"",
               "\"checkpoint\""
             ],
-            "optional": true,
+            "optional": false,
             "field": "type",
             "description": "<p>Asset Type to upload</p>"
           }
@@ -1525,6 +1563,149 @@ define({ "api": [
             "type": "String",
             "optional": false,
             "field": "iterations.save_link",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-iteration.js",
+    "groupTitle": "Iterations"
+  },
+  {
+    "type": "patch",
+    "url": "/api/project/:pid/iteration/:iterationid",
+    "title": "Patch Iteration",
+    "version": "1.0.0",
+    "name": "PatchIteration",
+    "group": "Iterations",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Upate an existing iteration</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "docker_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "log_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "model_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "checkpoint_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "tfrecord_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "save_link",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "tile_zoom",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "inf_list",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "inf_type",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "inf_binary",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Boolean",
+            "optional": false,
+            "field": "inf_supertile",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "version",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "hint",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "imagery_id",
             "description": "<p>undefined</p>"
           }
         ]
@@ -3047,7 +3228,111 @@ define({ "api": [
   },
   {
     "type": "get",
-    "url": "/api/project/:pid/iteration",
+    "url": "/api/project/:pid/iteration/:iterationid/task/:taskid",
+    "title": "Delete Task",
+    "version": "1.0.0",
+    "name": "DeleteTask",
+    "group": "Tasks",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Remove a previous task entry</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>The HTTP Status Code of the response</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>A human readable status message</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-iteration-task.js",
+    "groupTitle": "Tasks"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:pid/iteration/:iterationid/task/:taskid",
+    "title": "Get Task",
+    "version": "1.0.0",
+    "name": "GetTask",
+    "group": "Tasks",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return all information about a single task</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "iter_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "type",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "batch_id",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-iteration-task.js",
+    "groupTitle": "Tasks"
+  },
+  {
+    "type": "get",
+    "url": "/api/project/:pid/iteration/:iterationid/task",
     "title": "List Tasks",
     "version": "1.0.0",
     "name": "ListTask",
@@ -3080,14 +3365,6 @@ define({ "api": [
             "field": "page",
             "defaultValue": "0",
             "description": "<p>The page, based on the limit, to return</p>"
-          },
-          {
-            "group": "Query",
-            "type": "String",
-            "optional": true,
-            "field": "filter",
-            "defaultValue": "",
-            "description": "<p>Filter a complete or partial task</p>"
           },
           {
             "group": "Query",
@@ -3176,6 +3453,72 @@ define({ "api": [
             "type": "Integer",
             "optional": false,
             "field": "tasks.batch_id",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-iteration-task.js",
+    "groupTitle": "Tasks"
+  },
+  {
+    "type": "patch",
+    "url": "/api/project/:pid/iteration/:iterationid/task/:taskid",
+    "title": "Patch Task",
+    "version": "1.0.0",
+    "name": "PatchTask",
+    "group": "Tasks",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Update a single task</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "iter_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "type",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "batch_id",
             "description": "<p>undefined</p>"
           }
         ]

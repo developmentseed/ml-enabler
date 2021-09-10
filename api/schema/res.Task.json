@@ -4,9 +4,9 @@
     "required": [
         "id",
         "iter_id",
-        "type",
         "created",
         "updated",
+        "type",
         "batch_id"
     ],
     "properties": {
