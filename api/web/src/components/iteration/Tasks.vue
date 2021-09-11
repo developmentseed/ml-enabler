@@ -176,12 +176,7 @@ export default {
         },
         getTask: async function(task_id) {
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/task/${task_id}`, {
-                    method: 'GET'
-                });
-
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message)
+                const res = await fetch(window.api + `/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/task/${task_id}`);
 
                 for (const task of this.tasks) {
                     if (task.id !== body.id) continue;
@@ -197,12 +192,9 @@ export default {
         },
         deleteTask: async function(task_id) {
             try {
-                let res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/task/${task_id}`, {
+                let res = await fetch(window.api + `/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/task/${task_id}`, {
                     method: 'DELETE'
                 });
-
-                let body = await res.json();
-                if (!res.ok) throw new Error(body.message)
 
                 this.getTasks()
             } catch (err) {

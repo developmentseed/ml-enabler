@@ -153,6 +153,12 @@ class ProjectTask extends Generic {
         }
     }
 
+    async from(pool, id) {
+        const task = await parent(pool, id);
+
+        return task;
+    }
+
     /**
      * Create a new batch task
      *
