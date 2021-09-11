@@ -7,7 +7,6 @@
         "pid",
         "tile_zoom",
         "docker_link",
-        "log_link",
         "model_link",
         "checkpoint_link",
         "tfrecord_link",
@@ -32,9 +31,6 @@
             "type": "integer"
         },
         "docker_link": {
-            "type": "string"
-        },
-        "log_link": {
             "type": "string"
         },
         "model_link": {

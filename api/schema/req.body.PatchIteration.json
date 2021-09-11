@@ -5,9 +5,6 @@
         "docker_link": {
             "type": "string"
         },
-        "log_link": {
-            "type": "string"
-        },
         "model_link": {
             "type": "string"
         },

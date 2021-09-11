@@ -59,7 +59,8 @@ class ProjectTask extends Generic {
                     type,
                     created,
                     updated,
-                    batch_id
+                    batch_id,
+                    log_link
                 FROM
                     tasks
                 ORDER BY
@@ -83,7 +84,8 @@ class ProjectTask extends Generic {
             updated: this.updated,
             iter_id: this.pid,
             type: this.type,
-            batch_id: this.batch_id
+            batch_id: this.batch_id,
+            log_link: this.log_link
         };
     }
 
@@ -92,6 +94,8 @@ class ProjectTask extends Generic {
             await pool.query(sql`
                 UPDATE tasks
                     SET
+                        batch_id    = ${this.batch_id},
+                        log_link    = ${this.log_link},
                         updated     = NOW()
                     WHERE
                         id = ${this.id}
@@ -104,11 +108,11 @@ class ProjectTask extends Generic {
     }
 
     async logs() {
-        if (!this.logs) throw new Err(400, null, 'Task did not save log_link');
+        if (!this.log_link) throw new Err(400, null, 'Task did not save log_link');
 
         let logs = await cwl.getLogEvents({
             logGroupName: '/aws/batch/job',
-            logStreamName: this.logs
+            logStreamName: this.log_link
         }).promise();
 
         let line = 0;
@@ -167,6 +171,12 @@ class ProjectTask extends Generic {
             throw new Err(400, null, 'Unsupported task type');
         }
 
+        const task = await ProjectTask.generate(config.pool, {
+            iter_id: opts.iter_id,
+            type: opts.type,
+            batch_id: job.jobId
+        });
+
         const token = jwt.sign({
             t: 'i', // Internal
         }, config.SigningSecret);
@@ -174,6 +184,11 @@ class ProjectTask extends Generic {
         opts.environment.push({
             name: 'TOKEN',
             value: token
+        });
+
+        opts.environment.push({
+            name: 'TASK_ID',
+            value: task.id
         });
 
         let job;
@@ -190,11 +205,11 @@ class ProjectTask extends Generic {
             throw new Err(500, err, 'Failed to submit job');
         }
 
-        await ProjectTask.generate(config.pool, {
-            iter_id: opts.iter_id,
-            type: opts.type,
+        task.patch({
             batch_id: job.jobId
         });
+
+        await task.commit(config.pool);
     }
 }
 

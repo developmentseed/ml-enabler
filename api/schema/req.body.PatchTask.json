@@ -1,5 +1,9 @@
 {
     "type": "object",
     "additionalProperties": false,
-    "properties": { }
+    "properties": {
+        "log_link": {
+            "type": "string"
+        }
+    }
 }

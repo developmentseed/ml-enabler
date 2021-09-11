@@ -29,6 +29,7 @@ async function main() {
         if (!process.env.AWS_ACCOUNT_ID) throw new Error('AWS_ACCOUT_ID env var not set');
         if (!process.env.AWS_REGION) throw new Error('AWS_REGION env var not set');
         if (!process.env.API_URL) throw new Error('API_URL env var not set');
+        if (!process.env.TASK_ID) throw new Error('TASK_ID env var not set');
 
         const tmp = os.tmpdir() + '/' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
@@ -46,9 +47,8 @@ async function main() {
         };
 
         if (process.env.AWS_BATCH_JOB_ID) {
-            const logLink = await log_link();
-
-            links.log_link = logLink;
+            const logLink = await get_log_link();
+            await set_log_link(project_id, iteration_id, process.env.TASK_ID, logLink);
         }
 
         await set_link(project_id, iteration_id, links);
@@ -83,7 +83,7 @@ function get_iteration_id(model) {
     return parseInt(model.split('/')[4]);
 }
 
-function log_link() {
+function get_log_link() {
     return new Promise((resolve, reject) => {
         // Allow local runs
 
@@ -110,6 +110,32 @@ function log_link() {
                 }
             });
         }
+    });
+}
+
+function set_log_link(project, iteration, task, log) {
+    return new Promise((resolve, reject) => {
+        console.error(`ok - saving log_link (proj ${project}), iteration (${iteration}) task: ${task} log: ${log}))`);
+
+        request({
+            method: 'PATCH',
+            url: `${process.env.API_URL}/api/project/${project}/iteration/${iteration}/task/${task}`,
+            auth: {
+                bearer: process.env.TOKEN
+            },
+            json: true,
+            body: {
+                log_link: log
+            }
+        }, (err, res) => {
+            if (err) return reject(err);
+
+            if (res.statusCode === 200) {
+                return resolve(res);
+            } else {
+                return reject(res.statusCode + ':' + typeof res.body === 'object' ? JSON.stringify(res.body) : res.body);
+            }
+        });
     });
 }
 

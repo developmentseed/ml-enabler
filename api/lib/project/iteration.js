@@ -21,7 +21,6 @@ class ProjectIteration extends Generic {
         this.updated = false;
         this.tile_zoom = false;
         this.docker_link = false;
-        this.log_link = false;
         this.model_link = false;
         this.checkpoint_link = false;
         this.tfrecord_link = false;
@@ -76,7 +75,6 @@ class ProjectIteration extends Generic {
                     updated,
                     version,
                     docker_link,
-                    log_link,
                     model_link,
                     checkpoint_link,
                     tfrecord_link,
@@ -108,7 +106,6 @@ class ProjectIteration extends Generic {
             pid: this.pid,
             tile_zoom: this.tile_zoom,
             docker_link: this.docker_link,
-            log_link: this.log_link,
             model_link: this.model_link,
             checkpoint_link: this.checkpoint_link,
             tfrecord_link: this.tfrecord_link,

@@ -25,7 +25,6 @@
                 "updated",
                 "tile_zoom",
                 "docker_link",
-                "log_link",
                 "model_link",
                 "checkpoint_link",
                 "tfrecord_link",
