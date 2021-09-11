@@ -29,7 +29,7 @@ class ProjectTask extends Generic {
      *
      * @param {Pool} pool - Instantiated Postgres Pool
      *
-     * @param {Number} pid Project ID to access
+     * @param {Number} iteration Iteration to list tasks for
      *
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
@@ -37,7 +37,7 @@ class ProjectTask extends Generic {
      * @param {String} [query.sort=created] Field to sort by
      * @param {String} [query.order=asc] Sort Order (asc/desc)
      */
-    static async list(pool, pid, query) {
+    static async list(pool, iteration, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
@@ -63,6 +63,8 @@ class ProjectTask extends Generic {
                     log_link
                 FROM
                     tasks
+                WHERE
+                    iter_id = ${iteration}
                 ORDER BY
                     ${sql.identifier(['tasks', query.sort])} ${query.order}
                 LIMIT

@@ -29,9 +29,7 @@ async function router(schema, config) {
             await Param.int(req, 'pid');
             await Param.int(req, 'iterationid');
 
-            req.query.pid = req.params.pid;
-            req.query.iterationid = req.params.iterationid;
-            res.json(await Task.list(config.pool, req.query));
+            res.json(await Task.list(config.pool, req.params.iterationid, req.query));
         } catch (err) {
             return Err.respond(err, res);
         }
