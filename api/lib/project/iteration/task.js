@@ -185,7 +185,7 @@ class ProjectTask extends Generic {
 
         opts.environment.push({
             name: 'TASK_ID',
-            value: task.id
+            value: String(task.id)
         });
 
         let job;
