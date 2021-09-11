@@ -134,12 +134,10 @@ class ProjectTask extends Generic {
             const pgres = await pool.query(sql`
                 INSERT INTO tasks (
                     iter_id,
-                    type,
-                    batch_id
+                    type
                 ) VALUES (
                     ${task.iter_id},
-                    ${task.type},
-                    ${task.batch_id}
+                    ${task.type}
                 ) RETURNING *
             `);
 
