@@ -103,7 +103,10 @@ export default {
             init: true,
             tasks: [],
             log: false,
-            logs: [],
+            logs: [{
+                id: 1,
+                message: 'NO LOGS FOUND'
+            }],
             looping: false,
             loading: {
                 init: true,
@@ -138,16 +141,14 @@ export default {
             this.log = task_id;
 
             try {
-                const res = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/task/${task_id}/logs`);
-
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message)
+                const body = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/task/${task_id}/logs`);
 
                 this.logs = body.logs;
-                this.loading.logs = false;
             } catch (err) {
                 this.$emit('err', err);
             }
+
+            this.loading.logs = false;
         },
         getTasks: async function(loop) {
             if (this.init) {
@@ -192,7 +193,7 @@ export default {
         },
         deleteTask: async function(task_id) {
             try {
-                let res = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/task/${task_id}`, {
+                await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/task/${task_id}`, {
                     method: 'DELETE'
                 });
 
