@@ -87,7 +87,9 @@ class ProjectTask extends Generic {
             iter_id: this.pid,
             type: this.type,
             batch_id: this.batch_id,
-            log_link: this.log_link
+            log_link: this.log_link,
+            status: this.status || null,
+            statusReason: this.statusReason || null
         };
     }
 
@@ -153,8 +155,37 @@ class ProjectTask extends Generic {
         }
     }
 
-    async from(pool, id) {
-        const task = await parent(pool, id);
+    async delete(pool) {
+        if (this.batch_id) {
+            try {
+                await batch.cancelJob({
+                    jobId: task.batch_id,
+                    reason: 'User Requested'
+                }).promise();
+            } catch (err) {
+                throw new Err(500, err, 'Failed to cancel job');
+            }
+        }
+
+        return await super.delete(pool);
+    }
+
+    static async from(pool, id) {
+        const task = await super.from(pool, id);
+
+        if (task.batch_id) {
+            const res = await batch.describeJobs({
+                jobs: [task.batch_id]
+            }).promise();
+
+            if (res.jobs.length === 1) {
+                task.status = res.jobs[0].status;
+                task.statusReason = res.jobs[0].statusReason;
+            } else {
+                task.status = 'UNKNOWN';
+                task.statusReason = 'AWS does not report this task';
+            }
+        }
 
         return task;
     }
@@ -200,9 +231,8 @@ class ProjectTask extends Generic {
             value: String(task.id)
         });
 
-        let job;
         try {
-            job = await batch.submitJob({
+            const job = await batch.submitJob({
                 jobName: opts.name,
                 jobQueue: jobQueue,
                 jobDefinition: jobDef,
@@ -210,15 +240,12 @@ class ProjectTask extends Generic {
                     environment: opts.environment
                 },
             }).promise();
+
+            task.batch_id = job.jobId;
+            await task.commit(config.pool);
         } catch (err) {
             throw new Err(500, err, 'Failed to submit job');
         }
-
-        task.patch({
-            batch_id: job.jobId
-        });
-
-        await task.commit(config.pool);
     }
 }
 

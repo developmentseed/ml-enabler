@@ -176,7 +176,7 @@ export default {
         },
         getTask: async function(task_id) {
             try {
-                const res = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/task/${task_id}`);
+                const body = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/task/${task_id}`);
 
                 for (const task of this.tasks) {
                     if (task.id !== body.id) continue;
