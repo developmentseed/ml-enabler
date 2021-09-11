@@ -110,10 +110,14 @@ class ProjectTask extends Generic {
     async logs() {
         if (!this.log_link) throw new Err(400, null, 'Task did not save log_link');
 
-        let logs = await cwl.getLogEvents({
-            logGroupName: '/aws/batch/job',
-            logStreamName: this.log_link
-        }).promise();
+        try {
+            let logs = await cwl.getLogEvents({
+                logGroupName: '/aws/batch/job',
+                logStreamName: this.log_link
+            }).promise();
+        } catch (err) {
+            throw new Err(400, err, 'Failed to obtain logs');
+        }
 
         let line = 0;
         logs = logs.events.map((log) => {

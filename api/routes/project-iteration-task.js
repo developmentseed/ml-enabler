@@ -60,7 +60,7 @@ async function router(schema, config) {
 
             const task = await Task.from(config.pool, req.params.taskid);
 
-            return res.json(task.logs());
+            return res.json(await task.logs());
         } catch (err) {
             return Err.respond(err, res);
         }
