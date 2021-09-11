@@ -173,8 +173,7 @@ class ProjectTask extends Generic {
 
         const task = await ProjectTask.generate(config.pool, {
             iter_id: opts.iter_id,
-            type: opts.type,
-            batch_id: job.jobId
+            type: opts.type
         });
 
         const token = jwt.sign({
