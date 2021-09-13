@@ -94,7 +94,9 @@ async function router(schema, config) {
                 iter_id: req.params.iterationid,
                 environment: [{
                     name: 'TASK',
-                    value: JSON.stringify(req.body)
+                    value: JSON.stringify({
+                        queue: false
+                    })
                 }]
             });
 

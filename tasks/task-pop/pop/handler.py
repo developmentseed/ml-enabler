@@ -12,13 +12,12 @@ from shapely.geometry import shape
 from shapely.ops import transform
 from functools import partial
 from tiletanic import tilecover, tileschemes
-from pop.custom_types import SQSEvent
 from contextlib import closing
 
 tiler = tileschemes.WebMercator()
 
 
-def handler(event: SQSEvent) -> bool:
+def handler(event) -> bool:
     queue_name = event['queue']
     assert(queue_name)
 

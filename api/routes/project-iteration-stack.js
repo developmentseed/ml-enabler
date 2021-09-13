@@ -85,7 +85,7 @@ async function router(schema, config) {
     });
 
     /**
-     * @api {delete} /api/project/:pid/iteration/:iterationid/stack/:stackid Delete Stack
+     * @api {delete} /api/project/:pid/iteration/:iterationid/stack Delete Stack
      * @apiVersion 1.0.0
      * @apiName DeleteStack
      * @apiGroup Stacks
@@ -96,18 +96,17 @@ async function router(schema, config) {
      *
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
-    await schema.delete('/project/:pid/iteration/:iterationid/stack/:stackid', {
+    await schema.delete('/project/:pid/iteration/:iterationid/stack', {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
             await Param.int(req, 'pid');
             await Param.int(req, 'iterationid');
-            await Param.int(req, 'stackid');
             config.is_aws();
 
-            const stack = await Stack.from(config.pool, req.params.stackid);
-            await Stack.delete();
+            const stack = await Stack.from(req.params.pid, req.params.iterationid);
+            await stack.delete();
 
             return res.json({
                 status: 200,
