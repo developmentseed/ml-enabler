@@ -91,7 +91,7 @@ export default {
                     body: {
                         iter_id: parseInt(this.$route.params.iterationid),
                         name: this.name.label,
-                        bounds: this.name.bounds
+                        bounds: this.name.bounds.split(',').map((b) => Number(b))
                     }
                 });
 

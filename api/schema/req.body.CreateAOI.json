@@ -6,6 +6,9 @@
         "name"
     ],
     "properties": {
+        "iter_id": {
+            "type": "integer"
+        },
         "name": {
             "type": "string"
         },

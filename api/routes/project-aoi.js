@@ -126,7 +126,7 @@ async function router(schema, config) {
     });
 
     /**
-     * @api {delete} /api/project/:pid/aoi/:aoiid Delete AOI 
+     * @api {delete} /api/project/:pid/aoi/:aoiid Delete AOI
      * @apiVersion 1.0.0
      * @apiName DeleteAOI
      * @apiGroup AOI

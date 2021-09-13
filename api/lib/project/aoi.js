@@ -3,6 +3,7 @@
 const Err = require('../error');
 const { sql } = require('slonik');
 const Generic = require('../generic');
+const bboxPolygon = require('@turf/bbox-polygon').default;
 
 /**
  * @class
@@ -113,6 +114,8 @@ class ProjectAOI extends Generic {
 
     static async generate(pool, aoi) {
         try {
+            aoi.bounds = bboxPolygon(aoi.bounds).geometry;
+
             const pgres = await pool.query(sql`
                 INSERT INTO aois (
                     pid,
@@ -120,10 +123,10 @@ class ProjectAOI extends Generic {
                     name,
                     bounds
                 ) VALUES (
-                    ${aois.pid},
-                    ${aois.iter_id},
-                    ${aois.name},
-                    ${aois.bounds}
+                    ${aoi.pid},
+                    ${aoi.iter_id || null},
+                    ${aoi.name},
+                    ST_GeomFromGeoJSON(${JSON.stringify(aoi.bounds)})
                 ) RETURNING *
             `);
 
