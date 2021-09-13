@@ -269,11 +269,9 @@ export default {
             this.loading.queue = true;
 
             try {
-                await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/stack/queue`, {
+                this.queue = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/stack/queue`, {
                     method: 'DELETE'
                 });
-
-                this.getQueue();
             } catch (err) {
                 this.$emit('err', err);
             }
@@ -303,7 +301,7 @@ export default {
             }
 
             try {
-                const res = await window.std(window.api + `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/stack/queue`, {
+                await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/stack/queue`, {
                     method: 'POST',
                     body: reqbody
                 });

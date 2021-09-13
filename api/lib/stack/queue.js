@@ -3,16 +3,18 @@
 const AWS = require('aws-sdk');
 const fs = require('fs');
 const path = require('path');
-const Err = require('./error');
+const Err = require('../error');
 const sqs = new AWS.SQS({
     region: process.env.AWS_DEFAULT_REGION
 });
 
 class StackQueue {
-    static async from(stack_name) {
+    static async from(pid, iterationid) {
+        let queues;
+
         try {
-            const queues = await sqs.listQueues({
-                QueueNamePrefix: `${stack}-models-${model}-prediction-${pred}-`
+            queues = await sqs.listQueues({
+                QueueNamePrefix: `${process.env.StackName}-project-${pid}-iteration-${iterationid}-`
             }).promise();
         } catch (err) {
             throw new Err(500, err, 'Failed to list queues');
@@ -30,8 +32,8 @@ class StackQueue {
         const queue = new StackQueue();
         try {
             queue.active = await sqs.getQueueAttributes({
-                QueueUrl=active,
-                AttributeNames=[
+                QueueUrl: active,
+                AttributeNames: [
                     'ApproximateNumberOfMessages',
                     'ApproximateNumberOfMessagesNotVisible',
                 ]
@@ -42,8 +44,8 @@ class StackQueue {
 
         try {
             queue.dead = await sqs.getQueueAttributes({
-                QueueUrl=dead,
-                AttributeNames=[
+                QueueUrl: dead,
+                AttributeNames: [
                     'ApproximateNumberOfMessages',
                 ]
             }).promise();
@@ -56,16 +58,17 @@ class StackQueue {
 
     serialize() {
         return {
-            queued: this.active["Attributes"]["ApproximateNumberOfMessages"],
-            inflight: this.active["Attributes"]["ApproximateNumberOfMessagesNotVisible"],
-            dead: this.dead["Attributes"]["ApproximateNumberOfMessages"]
+            queued: parseInt(this.active["Attributes"]["ApproximateNumberOfMessages"]),
+            inflight: parseInt(this.active["Attributes"]["ApproximateNumberOfMessagesNotVisible"]),
+            dead: parseInt(this.dead["Attributes"]["ApproximateNumberOfMessages"])
         }
     }
 
-    static async delete() {
+    static async delete(pid, iterationid) {
+        let queues;
         try {
-            const queues = await sqs.listQueues({
-                QueueNamePrefix: `${stack}-models-${model}-prediction-${pred}-`
+            queues = await sqs.listQueues({
+                QueueNamePrefix: `${process.env.StackName}-project-${pid}-iteration-${iterationid}-`
             }).promise();
         } catch (err) {
             throw new Err(500, err, 'Failed to list queues');
