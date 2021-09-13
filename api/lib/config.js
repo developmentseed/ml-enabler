@@ -4,6 +4,7 @@ const CP = require('child_process');
 const { sql, createPool, createTypeParserPreset } = require('slonik');
 const Err = require('./error');
 const wkx = require('wkx');
+const bbox = require('@turf/bbox').default;
 
 class Config {
     static async env(args = {}) {
@@ -62,7 +63,11 @@ class Config {
                         ...createTypeParserPreset(), {
                             name: 'geometry',
                             parse: (value) => {
-                                return wkx.Geometry.parse(Buffer.from(value, 'hex')).toGeoJSON();
+                                const geom = wkx.Geometry.parse(Buffer.from(value, 'hex')).toGeoJSON();
+
+                                geom.bounds = bbox(geom);
+
+                                return geom;
                             }
                         }
                     ]

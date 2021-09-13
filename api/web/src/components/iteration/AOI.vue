@@ -18,18 +18,18 @@
                 <template v-if='mode === "existing"'>
                     <vSelect
                         class='w-full'
-                        v-model='name'
+                        v-model='selected'
                         :options='aois'
                     />
                 </template>
                 <template v-else>
-                    <input v-model='name.label' type='text' class='input' placeholder='New York City, NY, USA'/>
+                    <input v-model='selected.label' type='text' class='input' placeholder='New York City, NY, USA'/>
                 </template>
             </div>
         </div>
         <div class='col col--6'>
             <label>Bounding Box</label>
-            <input :disabled='mode === "existing"' v-model='name.bounds' type='text' class='input mt6' placeholder='minX, minY, maxX, maxY'/>
+            <input :disabled='mode === "existing"' v-model='selected.bounds' type='text' class='input mt6' placeholder='minX, minY, maxX, maxY'/>
         </div>
 
         <div class='col col--12 my12'>
@@ -48,7 +48,7 @@ export default {
     data: function() {
         return {
             mode: 'new',
-            name: {
+            selected: {
                 label: '',
                 bounds: '',
                 code: ''
@@ -58,22 +58,22 @@ export default {
     },
     computed: {
         isSubmittable: function() {
-            return !this.name.length && this.name.bounds.split(',').length !== 4;
+            return !this.selected.bounds && this.selected.bounds.split(',').length !== 4;
         }
     },
     watch: {
-        'name.bounds': function() {
-            this.$emit('bounds', this.name.bounds);
+        'selected.bounds': function() {
+            this.$emit('bounds', this.selected.bounds);
         },
         mode: function() {
-            this.name = {
+            this.selected = {
                 label: '',
                 bounds: '',
                 code: ''
             }
         },
         mapbounds: function() {
-            this.name.bounds = this.mapbounds
+            this.selected.bounds = this.mapbounds
         },
     },
     mounted: function() {
@@ -90,8 +90,8 @@ export default {
                     method: 'POST',
                     body: {
                         iter_id: parseInt(this.$route.params.iterationid),
-                        name: this.name.label,
-                        bounds: this.name.bounds.split(',').map((b) => Number(b))
+                        name: this.selected.label,
+                        bounds: this.selected.bounds.split(',').map((b) => Number(b))
                     }
                 });
 
@@ -107,7 +107,8 @@ export default {
                 this.aois = body.aois.map((aoi) => {
                     return {
                         label: aoi.name,
-                        bounds: aoi.bounds,
+                        bounds: aoi.bounds.bounds,
+                        geom: aoi.bounds,
                         code: aoi.id
                     };
                 });
