@@ -936,13 +936,6 @@
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "log_link",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
             "field": "model_link",
             "description": "<p>undefined</p>"
           },
@@ -1146,13 +1139,6 @@
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "log_link",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
             "field": "model_link",
             "description": "<p>undefined</p>"
           },
@@ -1283,13 +1269,6 @@
             "type": "String",
             "optional": false,
             "field": "docker_link",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "log_link",
             "description": "<p>undefined</p>"
           },
           {
@@ -1447,7 +1426,6 @@
               "\"updated\"",
               "\"tile_zoom\"",
               "\"docker_link\"",
-              "\"log_link\"",
               "\"model_link\"",
               "\"checkpoint_link\"",
               "\"tfrecord_link\"",
@@ -1534,13 +1512,6 @@
             "group": "Success 200",
             "type": "String",
             "optional": false,
-            "field": "iterations.log_link",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
             "field": "iterations.model_link",
             "description": "<p>undefined</p>"
           },
@@ -1615,13 +1586,6 @@
             "type": "String",
             "optional": false,
             "field": "docker_link",
-            "description": "<p>undefined</p>"
-          },
-          {
-            "group": "Success 200",
-            "type": "String",
-            "optional": false,
-            "field": "log_link",
             "description": "<p>undefined</p>"
           },
           {
@@ -3078,6 +3042,96 @@
     "groupTitle": "Server"
   },
   {
+    "type": "get",
+    "url": "/api/project/:pid/iteration/:iterationid/stack/queue",
+    "title": "Get Queue",
+    "version": "1.0.0",
+    "name": "GetStackQueue",
+    "group": "StackQueue",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Get all information about the SQS queue powering the stack</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "queued",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "inflight",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "dead",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-iteration-stack-queue.js",
+    "groupTitle": "StackQueue"
+  },
+  {
+    "type": "delete",
+    "url": "/api/project/:pid/iteration/:iterationid/stack/queue",
+    "title": "Purge Queue",
+    "version": "1.0.0",
+    "name": "GetStackQueue",
+    "group": "StackQueue",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Get all information about the SQS queue powering the stack</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "queued",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "inflight",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "dead",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-iteration-stack-queue.js",
+    "groupTitle": "StackQueue"
+  },
+  {
     "type": "post",
     "url": "/api/project/:pid/iteration/:iterationid/stack",
     "title": "Create Stack",
@@ -3156,6 +3210,44 @@
             "optional": false,
             "field": "status",
             "description": "<p>CloudFormation Status Enum</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-iteration-stack.js",
+    "groupTitle": "Stacks"
+  },
+  {
+    "type": "delete",
+    "url": "/api/project/:pid/iteration/:iterationid/stack/:stackid",
+    "title": "Delete Stack",
+    "version": "1.0.0",
+    "name": "DeleteStack",
+    "group": "Stacks",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Delete stack within a project</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "status",
+            "description": "<p>The HTTP Status Code of the response</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "message",
+            "description": "<p>A human readable status message</p>"
           }
         ]
       }
@@ -3323,6 +3415,13 @@
             "optional": false,
             "field": "batch_id",
             "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String/Null",
+            "optional": false,
+            "field": "log_link",
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -3386,7 +3485,8 @@
               "\"created\"",
               "\"updated\"",
               "\"type\"",
-              "\"batch_id\""
+              "\"batch_id\"",
+              "\"log_link\""
             ],
             "optional": true,
             "field": "sort",
@@ -3454,6 +3554,13 @@
             "optional": false,
             "field": "tasks.batch_id",
             "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "tasks.log_link",
+            "description": "<p>undefined</p>"
           }
         ]
       }
@@ -3462,11 +3569,11 @@
     "groupTitle": "Tasks"
   },
   {
-    "type": "patch",
-    "url": "/api/project/:pid/iteration/:iterationid/task/:taskid",
-    "title": "Patch Task",
+    "type": "get",
+    "url": "/api/project/:pid/iteration/:iterationid/task/:taskid/logs",
+    "title": "Get Logs",
     "version": "1.0.0",
-    "name": "PatchTask",
+    "name": "LogTask",
     "group": "Tasks",
     "permission": [
       {
@@ -3475,7 +3582,7 @@
         "description": "<p>A user must be logged in to use this endpoint</p>"
       }
     ],
-    "description": "<p>Update a single task</p>",
+    "description": "<p>Return task log if it has not expired</p>",
     "success": {
       "fields": {
         "Success 200": [
@@ -3519,6 +3626,99 @@
             "type": "Integer",
             "optional": false,
             "field": "batch_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String/Null",
+            "optional": false,
+            "field": "log_link",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/project-iteration-task.js",
+    "groupTitle": "Tasks"
+  },
+  {
+    "type": "patch",
+    "url": "/api/project/:pid/iteration/:iterationid/task/:taskid",
+    "title": "Patch Task",
+    "version": "1.0.0",
+    "name": "PatchTask",
+    "group": "Tasks",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Update a single task</p>",
+    "parameter": {
+      "fields": {
+        "Body": [
+          {
+            "group": "Body",
+            "type": "String",
+            "optional": true,
+            "field": "log_link",
+            "description": "<p>undefined</p>"
+          }
+        ]
+      }
+    },
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "iter_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "created",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "updated",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "type",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "Integer",
+            "optional": false,
+            "field": "batch_id",
+            "description": "<p>undefined</p>"
+          },
+          {
+            "group": "Success 200",
+            "type": "String/Null",
+            "optional": false,
+            "field": "log_link",
             "description": "<p>undefined</p>"
           }
         ]
