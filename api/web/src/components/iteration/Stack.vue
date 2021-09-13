@@ -269,12 +269,10 @@ export default {
             this.loading.queue = true;
 
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/stack/tiles`, {
+                await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/stack/tiles`, {
                     method: 'DELETE'
                 });
 
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
                 this.getQueue();
             } catch (err) {
                 this.$emit('err', err);
@@ -284,17 +282,13 @@ export default {
             this.loading.queue = true;
 
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/stack/tiles`, {
-                    method: 'GET'
-                });
+                this.queue = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/stack/tiles`);
 
-                const body = await res.json();
-                if (!res.ok) throw new Error(res.message);
-                this.queue = body;
-                this.loading.queue = false;
             } catch (err) {
                 //this.$emit('err', err);
             }
+
+            this.loading.queue = false;
         },
         postQueue: async function(payload) {
             this.loading.stack = true;
