@@ -86,20 +86,14 @@ export default {
             }
 
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/aoi`, {
+                const body = await fetch(`/api/project/${this.$route.params.projectid}/aoi`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
+                    body: {
                         pred_id: parseInt(this.$route.params.predid),
                         name: this.name.label,
                         bounds: this.name.bounds
-                    })
+                    }
                 });
-
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
 
                 this.$emit('submit');
             } catch (err) {
@@ -108,12 +102,7 @@ export default {
         },
         getAOI: async function() {
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/aoi`, {
-                    method: 'GET'
-                });
-
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
+                const body = await window.std(`/api/project/${this.$route.params.projectid}/aoi`);
 
                 this.aois = body.aois.map((aoi) => {
                     return {
