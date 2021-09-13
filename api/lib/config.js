@@ -1,8 +1,9 @@
 'use strict';
 
 const CP = require('child_process');
-const { sql, createPool } = require('slonik');
+const { sql, createPool, createTypeParserPreset } = require('slonik');
 const Err = require('./error');
+const wkx = require('wkx');
 
 class Config {
     static async env(args = {}) {
@@ -56,7 +57,16 @@ class Config {
         let retry = 5;
         do {
             try {
-                cnf.pool = createPool(cnf.postgres);
+                cnf.pool = createPool(cnf.postgres, {
+                    typeParsers: [
+                        ...createTypeParserPreset(), {
+                            name: 'geometry',
+                            parse: (value) => {
+                                return wkx.Geometry.parse(Buffer.from(value, 'hex')).toGeoJSON();
+                            }
+                        }
+                    ]
+                });
 
                 await cnf.pool.query(sql`SELECT NOW()`);
             } catch (err) {
