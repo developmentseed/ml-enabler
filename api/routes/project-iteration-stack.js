@@ -28,7 +28,8 @@ async function router(schema, config) {
             await Param.int(req, 'pid');
             await Param.int(req, 'iterationid');
 
-            return res.json(await Stack.from(req.params.pid, req.params.iterationid));
+            const stack = await Stack.from(req.params.pid, req.params.iterationid);
+            return res.json(stack.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -75,6 +76,38 @@ async function router(schema, config) {
             return res.json({
                 status: 200,
                 message: 'Stack Created'
+            });
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {delete} /api/project/:pid/iteration/:iterationid/stack Delete Stack
+     * @apiVersion 1.0.0
+     * @apiName DeleteStack
+     * @apiGroup Stacks
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Delete stack within a project
+     *
+     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
+     */
+    await schema.delete('/project/:pid/iteration/:iterationid/stack/stackid', {
+        res: 'res.Standard.json'
+    }, async (req, res) => {
+        try {
+            await user.is_auth(req);
+            await Param.int(req, 'pid');
+            await Param.int(req, 'iterationid');
+            await Param.int(req, 'stackid');
+
+            const stack = await Stack.from(config.pool, req.params.stackid);
+            await Stack.delete();
+            return res.json({
+                status: 200,
+                message: 'Stack Deleted'
             });
         } catch (err) {
             return Err.respond(err, res);

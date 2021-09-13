@@ -55,13 +55,22 @@ class Stack {
         }
     }
 
-    static async from(pid, iterationid) {
-        const stack_name = `${process.env.StackName}-project-${pid}-iteration-${iterationid}`;
+    serialize() {
+        return {
+            id: this.id,
+            name: this.stack_name,
+            status: this.status
+        }
+    }
 
-        let stack;
+    static async from(pid, iterationid) {
+        const stack = new Stack();
+
+        stack.stack_name = `${process.env.StackName}-project-${pid}-iteration-${iterationid}`;
+
         try {
-            stack = await cf.describeStacks({
-                StackName: stack_name
+            stack.stack = await cf.describeStacks({
+                StackName: this.stack_name
             }).promise();
         } catch (err) {
             if (err.statusCode === 400) {
@@ -75,11 +84,13 @@ class Stack {
             }
         }
 
-        return {
-            id: stack.Stacks[0].StackId,
-            name: stack,
-            status: stack.Stacks[0].StackStatus
-        };
+        stack.pid = pid;
+        stack.iterationid = iterationid;
+
+        stack.id = stack.stack.Stacks[0].StackId,
+        stack.status = stack.stack.Stacks[0].StackStatus
+
+        return stack;
     }
 
     static async generate(pid, iterationid, options) {
@@ -108,6 +119,16 @@ class Stack {
             }).promise();
         } catch (err) {
             throw new Err(500, err, 'Failed to create stack');
+        }
+    }
+
+    async delete() {
+        try {
+            await cf.deleteStack({
+                StackName: this.stack_name
+            }).promise();
+        } catch (err) {
+            throw new Err(500, err, 'Failed to delete stack');
         }
     }
 }
