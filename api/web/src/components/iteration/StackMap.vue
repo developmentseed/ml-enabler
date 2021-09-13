@@ -51,10 +51,7 @@ export default {
     },
     mounted: async function() {
         try {
-            const res = await fetch(window.api + `/v1/mapbox`, {
-                method: 'GET'
-            });
-            const body = await res.json();
+            const body = await window.std(`/api/mapbox`);
             this.token = body.token;
             this.init();
         } catch (err) {

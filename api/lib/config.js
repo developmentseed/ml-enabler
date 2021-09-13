@@ -46,6 +46,8 @@ class Config {
             if (!process.env.MAPBOX_TOKEN) {
                 throw new Error('not ok - MAPBOX_TOKEN env var required');
             }
+
+            cnf.Mapbox = process.env.MAPBOX_TOKEN;
         } catch (err) {
             throw new Error(err);
         }

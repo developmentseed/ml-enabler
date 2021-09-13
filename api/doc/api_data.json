@@ -2004,6 +2004,37 @@
   },
   {
     "type": "get",
+    "url": "/api/mapbox",
+    "title": "Mapbox Settings",
+    "version": "1.0.0",
+    "name": "GetMapbox",
+    "group": "Mapbox",
+    "permission": [
+      {
+        "name": "user",
+        "title": "User",
+        "description": "<p>A user must be logged in to use this endpoint</p>"
+      }
+    ],
+    "description": "<p>Return necessary information to show Mapbox maps</p>",
+    "success": {
+      "fields": {
+        "Success 200": [
+          {
+            "group": "Success 200",
+            "type": "String",
+            "optional": false,
+            "field": "token",
+            "description": "<p>Mapbox access token</p>"
+          }
+        ]
+      }
+    },
+    "filename": "./routes/mapbox.js",
+    "groupTitle": "Mapbox"
+  },
+  {
+    "type": "get",
     "url": "/api/project/:pid/iteration/:iterationid/tiles",
     "title": "TileJSON",
     "version": "1.0.0",
