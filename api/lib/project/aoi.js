@@ -64,7 +64,8 @@ class ProjectAOI extends Generic {
                     aois.iter_id,
                     aois.name,
                     aois.created,
-                    aois.updated
+                    aois.updated,
+                    aois.bounds
                 FROM
                     aois
                 WHERE
