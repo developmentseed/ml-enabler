@@ -63,7 +63,7 @@ export default {
     },
     watch: {
         'selected.bounds': function() {
-            this.$emit('bounds', this.selected.bounds);
+            this.$emit('bounds', this.selected.bounds.join(','));
         },
         mode: function() {
             this.selected = {
