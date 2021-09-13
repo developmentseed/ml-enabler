@@ -86,10 +86,10 @@ export default {
             }
 
             try {
-                const body = await fetch(`/api/project/${this.$route.params.projectid}/aoi`, {
+                await window.std(`/api/project/${this.$route.params.projectid}/aoi`, {
                     method: 'POST',
                     body: {
-                        pred_id: parseInt(this.$route.params.predid),
+                        iter_id: parseInt(this.$route.params.iterationid),
                         name: this.name.label,
                         bounds: this.name.bounds
                     }
