@@ -89,12 +89,12 @@ async function router(schema, config) {
             config.is_aws();
 
             Task.batch(config, {
-                type: 'pop'm
+                type: 'pop',
                 name: `pop-${req.params.pid}-${req.params.iterationid}`,
-                iter_id: req.params.iterationid
+                iter_id: req.params.iterationid,
                 environment: [{
-                    Name: 'TASK',
-                    Value: JSON.stringify(req.body)
+                    name: 'TASK',
+                    value: JSON.stringify(req.body)
                 }]
             });
 
