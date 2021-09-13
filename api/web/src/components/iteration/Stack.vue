@@ -269,7 +269,7 @@ export default {
             this.loading.queue = true;
 
             try {
-                await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/stack/tiles`, {
+                await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/stack/queue`, {
                     method: 'DELETE'
                 });
 
@@ -282,7 +282,7 @@ export default {
             this.loading.queue = true;
 
             try {
-                this.queue = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/stack/tiles`);
+                this.queue = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/stack/queue`);
 
             } catch (err) {
                 //this.$emit('err', err);
@@ -303,21 +303,17 @@ export default {
             }
 
             try {
-                const res = await fetch(window.api + `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/stack/tiles`, {
+                const res = await window.std(window.api + `/v1/model/${this.$route.params.modelid}/prediction/${this.$route.params.predid}/stack/queue`, {
                     method: 'POST',
-                    headers: reqbody ? {
-                        'Content-Type': 'application/json'
-                    } : {},
                     body: reqbody
                 });
 
-                const body = await res.json();
-                if (!res.ok) throw new Error(body.message);
                 this.submit = true;
-                this.loading.stack = false;
             } catch (err) {
                 this.$emit('err', err);
             }
+
+            this.loading.stack = false;
         },
         loop: function() {
             this.looping = true;
