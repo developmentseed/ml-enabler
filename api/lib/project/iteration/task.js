@@ -208,6 +208,8 @@ class ProjectTask extends Generic {
 
         if (opts.type === 'ecr') {
             jobDef = config.StackName + '-build-job';
+        } else if (opts.type === 'pop') {
+            jobDef = config.StackName + '-pop-job';
         } else {
             throw new Err(400, null, 'Unsupported task type');
         }
