@@ -20,6 +20,10 @@ class StackQueue {
             throw new Err(500, err, 'Failed to list queues');
         }
 
+        if (!queues.QueueUrls) {
+            throw new Err(400, null, 'No Queues Found');
+        }
+
         let active, dead;
         for (const queue of queues.QueueUrls) {
             if (queue.includes('-dead-queue')) {
