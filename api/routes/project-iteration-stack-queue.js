@@ -78,9 +78,11 @@ async function router(schema, config) {
      * @apiDescription
      *     Populate a stack queue
      *
+     * @apiSchema (Body) {jsonschema=../schema/req.body.PopulateStackQueue.json} apiParam
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.post('/project/:pid/iteration/:iterationid/stack/queue', {
+        body: 'req.body.PopulateStackQueue.json',
         res: 'res.StackQueue.json'
     }, async (req, res) => {
         try {
@@ -100,7 +102,9 @@ async function router(schema, config) {
             if (imagery.fmt === 'wms') {
                 payload.zoom = iter.tile_zoom;
                 payload.imagery = imagery.url;
-                payload.payload = req.body;
+
+                if (!req.body.geometry) throw new Err(400, null, 'geometry must be provided if the imagery layer is WMS');
+                payload.payload = req.body.geometry;
             } else if (imagery.fmt === 'list') {
                 payload.url = imagery.url;
             } else {

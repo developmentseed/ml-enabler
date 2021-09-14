@@ -293,9 +293,11 @@ export default {
 
             let reqbody;
             if (payload && payload.geometry) {
-                reqbody = JSON.stringify(payload.geometry);
+                reqbody = {
+                    geometry: payload.geometry
+                };
             } else if (payload) {
-                reqbody = JSON.stringify(payload)
+                reqbody = payload
             } else {
                 reqbody = false;
             }
