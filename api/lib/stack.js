@@ -70,15 +70,14 @@ class Stack {
 
         try {
             stack.stack = await cf.describeStacks({
-                StackName: this.stack_name
+                StackName: stack.stack_name
             }).promise();
         } catch (err) {
             if (err.statusCode === 400) {
-                return {
-                    id: 'none',
-                    name: stack,
-                    status: 'None'
-                };
+                stack.id = 'none',
+                stack.status = 'None'
+
+                return stack;
             } else {
                 throw new Err(500, err, 'Could not describe stacks');
             }
@@ -86,6 +85,10 @@ class Stack {
 
         stack.pid = pid;
         stack.iterationid = iterationid;
+
+        if (!stack.stack.Stacks || !stack.stack.Stacks.length) {
+            throw new Err(400, null, 'No Stack Found');
+        }
 
         stack.id = stack.stack.Stacks[0].StackId,
         stack.status = stack.stack.Stacks[0].StackStatus
