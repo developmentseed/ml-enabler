@@ -1,9 +1,10 @@
 'use strict';
 
 const Err = require('../lib/error');
-const Iteration = require('../lib/project/iteration');
 const StackQueue = require('../lib/stack/queue');
 const Task = require('../lib/project/iteration/task');
+const Iteration = require('../lib/project/iteration');
+const Imagery = require('../lib/project/imagery');
 const { Param } = require('../lib/util');
 
 async function router(schema, config) {
@@ -88,15 +89,31 @@ async function router(schema, config) {
             await Param.int(req, 'iterationid');
             config.is_aws();
 
+            const iter = await Iteration.from(config.pool, req.params.iterationid);
+            const imagery = await Imagery.from(config.pool, iter.imagery_id);
+
+            const payload = {
+                fmt: imagery.fmt,
+                queue: `${process.env.StackName}-project-${req.params.pid}-iteration-${req.params.iterationid}-queue`
+            };
+
+            if (imagery.fmt === 'wms') {
+                payload.zoom = iter.tile_zoom;
+                payload.imagery = imagery.url;
+                payload.payload = req.body;
+            } else if (imagery.fmt === 'list') {
+                payload.url = imagery.url;
+            } else {
+                throw new Err(400, null, 'Unknown imagery type');
+            }
+
             Task.batch(config, {
                 type: 'pop',
                 name: `pop-${req.params.pid}-${req.params.iterationid}`,
                 iter_id: req.params.iterationid,
                 environment: [{
                     name: 'TASK',
-                    value: JSON.stringify({
-                        queue: false
-                    })
+                    value: JSON.stringify(payload)
                 }]
             });
 

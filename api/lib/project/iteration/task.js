@@ -159,7 +159,7 @@ class ProjectTask extends Generic {
         if (this.batch_id) {
             try {
                 await batch.cancelJob({
-                    jobId: task.batch_id,
+                    jobId: this.batch_id,
                     reason: 'User Requested'
                 }).promise();
             } catch (err) {
