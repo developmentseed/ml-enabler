@@ -4,7 +4,7 @@
     "main": "index.js",
     "private": true,
     "scripts": {
-        "doc": "apidoc -f ./index.js -f ./routes/.*.js -e node_modules -e coverage -e web --private",
+        "doc": "apidoc -i ./ -f ./routes/ -e node_modules -e coverage -e web --private",
         "lint": "eslint index.js 'lib/**/*.js' 'routes/**/*.js' 'test/**/*.js'",
         "test": "tape test/*.test.js | tap-dot",
         "start": "node index.js --email",
@@ -51,6 +51,7 @@
     },
     "apidoc": {
         "name": "ML Enabler",
-        "title": "ML Enabler"
+        "title": "ML Enabler",
+        "version": "1.0.0"
     }
 }
