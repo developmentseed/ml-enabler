@@ -1,5 +1,5 @@
 function std() {
-    window.std = async function(url, opts = {}) {
+    window.std = async function(url, opts = {}, redirect = true) {
         try {
             url = new URL(url);
         } catch (err) {
@@ -30,6 +30,9 @@ function std() {
 
                 if (bdy.message) throw new Error(bdy.message);
                 else throw new Error(`Status Code: ${res.status}`);
+            } else if (redirect && res.status === 401) {
+                delete localStorage.token;
+                return window.location.reload();
             }
 
             return await res.json();

@@ -125,7 +125,7 @@ export default {
         getUser: async function() {
             try {
                 this.loading.user = true;
-                this.user = await window.std('/api/login');
+                this.user = await window.std('/api/login', {}, false);
                 this.loading.user = false;
             } catch (err) {
                 console.error(err);
