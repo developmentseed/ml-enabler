@@ -5,7 +5,7 @@ const Err = require('./error');
 const AWS = require('aws-sdk');
 
 /**
- * @class Email
+ * @class
  *
  * @prop {Config} config Serverwide Config
  * @prop {Object} mailGenerator MailGen Generation API

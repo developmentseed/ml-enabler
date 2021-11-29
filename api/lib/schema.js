@@ -6,13 +6,9 @@ const path = require('path');
 
 /**
  * @class
+ * @param {Object} router Express Router Object
  */
 class Schemas {
-    /**
-     * @constructor
-     *
-     * @param {Object} router Express Router Object
-     */
     constructor(router) {
         if (!router) throw new Error('Router Param Required');
 

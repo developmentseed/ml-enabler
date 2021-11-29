@@ -1,14 +1,20 @@
-'use strict';
-
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
 const { sql } = require('slonik');
 
 /**
  * @class
  */
 class Generic {
+    constructor() {
+        this._table = this.constructor._table;
+        this._res = this.constructor._res;
+        this._patch = this.constructor._patch;
+    }
+
     patch(patch) {
-        for (const attr of this.attrs) {
+        if (!this._patch) throw new Err(500, null, 'Internal: Patch not defined');
+
+        for (const attr of Object.keys(this._patch.properties)) {
             if (patch[attr] !== undefined) {
                 this[attr] = patch[attr];
             }
@@ -39,6 +45,19 @@ class Generic {
         return this.deserialize(pgres.rows[0]);
     }
 
+    serialize() {
+        if (!this._res) throw new Err(500, null, 'Internal: Res not defined');
+        if (this._res.type !== 'object') throw new Err(500, null, 'Only Object Serialization Supported');
+
+        const res = {};
+
+        for (const key of Object.keys(this._res.properties)) {
+            if (this[key] !== undefined) res[key] = this[key];
+        }
+
+        return res;
+    }
+
     static deserialize(dbrow, alias) {
         // Return a list style result
         if (Array.isArray(dbrow)) {
@@ -54,6 +73,7 @@ class Generic {
 
             for (const row of dbrow) {
                 const single = {};
+                delete row.count;
 
                 for (const key of Object.keys(row)) {
                     single[key] = row[key];
@@ -88,6 +108,7 @@ class Generic {
 
             return true;
         } catch (err) {
+            if (err.originalError.code === '23503') throw new Err(400, err, `${this._table} is still in use`);
             throw new Err(500, err, `Failed to delete from ${this._table}`);
         }
     }

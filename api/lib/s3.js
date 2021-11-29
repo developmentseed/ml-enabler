@@ -4,6 +4,9 @@ const AWS = require('aws-sdk');
 const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
 const Err = require('./error');
 
+/**
+ * @class
+ */
 class S3 {
     constructor(params) {
         this.params = params;

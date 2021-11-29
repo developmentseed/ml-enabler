@@ -8,26 +8,9 @@ const { sql } = require('slonik');
  * @class
  */
 class Project extends Generic {
-    static _table = 'projects';
-
-    constructor() {
-        super();
-
-        this._table = Project._table;
-
-        this.id = false;
-        this.created = false;
-        this.updated = false;
-        this.source = '';
-        this.project_url = '';
-        this.archived = false;
-        this.tags = {};
-        this.access = false;
-        this.notes = '';
-
-        // Attributes which are allowed to be patched
-        this.attrs = Object.keys(require('../schema/req.body.PatchProject.json').properties);
-    }
+    static static _table = 'projects';
+    static _patch = require('../schema/req.body.PatchProject.json');
+    static _res = require('../schema/res.Project.json');
 
     /**
      * Return a list of users
@@ -94,23 +77,8 @@ class Project extends Generic {
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }
-    
-        return this.deserialize(pgres.rows);
-    }
 
-    serialize() {
-        return {
-            id: parseInt(this.id),
-            created: this.created,
-            updated: this.updated,
-            name: this.name,
-            source: this.source,
-            project_url: this.project_url,
-            archived: this.archived,
-            tags: this.tags,
-            access: this.access,
-            notes: this.notes
-        };
+        return this.deserialize(pgres.rows);
     }
 
     async commit(pool) {

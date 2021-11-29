@@ -6,6 +6,9 @@ const Err = require('./error');
 const wkx = require('wkx');
 const bbox = require('@turf/bbox').default;
 
+/** 
+ * @class
+ */
 class Config {
     static async env(args = {}) {
         const cnf = new Config();

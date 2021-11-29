@@ -8,46 +8,12 @@ const { sql } = require('slonik');
 const Generic = require('./generic');
 
 /**
- * @class Token
+ * @class
  */
 class Token extends Generic {
     static _table = 'users_tokens';
-
-    /**
-     * @constructor
-     */
-    constructor() {
-        super();
-
-        this._table = Token._table;
-
-        this.id = false;
-        this.uid = false;
-        this.created = false;
-        this.name = false;
-        this.token = false;
-
-        this.attrs = Object.keys(require('../schema/req.body.PatchToken.json').properties);
-    }
-
-    /**
-     * Serialize to json
-     *
-     * @param {boolean} secret - Show the token
-     *
-     * @returns {Object}
-     */
-    serialize(secret) {
-        const token = {
-            id: parseInt(this.id),
-            created: parseInt(this.created),
-            name: this.name
-        };
-
-        if (secret) token.token = this.token;
-
-        return token;
-    }
+    static _patch = require('../schema/req.body.PatchToken.json');
+    static _res = require('../schema/res.Token.json');
 
     /**
      * List & Filter Tokens
@@ -163,7 +129,7 @@ class Token extends Generic {
      *
      * @returns {Token}
      */
-    static async gen(pool, params = {}) {
+    static async generate(pool, params = {}) {
         try {
             const pgres = await pool.query(sql`
                 INSERT INTO users_tokens (

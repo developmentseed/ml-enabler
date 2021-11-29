@@ -8,6 +8,9 @@ const cf = new AWS.CloudFormation({
     region: process.env.AWS_DEFAULT_REGION
 });
 
+/**
+ * @class
+ */
 class Stack {
     static async list() {
         let stacks = [];
