@@ -1,9 +1,9 @@
 'use strict';
 
+const { Err } = require('@openaddresses/batch-schema');
 const AWS = require('aws-sdk');
 const fs = require('fs');
 const path = require('path');
-const Err = require('./error');
 const cf = new AWS.CloudFormation({
     region: process.env.AWS_DEFAULT_REGION
 });

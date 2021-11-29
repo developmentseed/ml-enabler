@@ -3,7 +3,7 @@
 const AWS = require('aws-sdk');
 const fs = require('fs');
 const path = require('path');
-const Err = require('../error');
+const { Err } = require('@openaddresses/batch-schema');
 const sqs = new AWS.SQS({
     region: process.env.AWS_DEFAULT_REGION
 });

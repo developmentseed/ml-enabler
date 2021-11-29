@@ -1,6 +1,6 @@
 'use strict';
 
-const Err = require('../error');
+const { Err } = require('@openaddresses/batch-schema');
 const { sql } = require('slonik');
 const Generic = require('../generic');
 
@@ -9,22 +9,8 @@ const Generic = require('../generic');
  */
 class ProjectAccess extends Generic {
     static _table = 'projects_access';
-
-    constructor() {
-        super();
-
-        this._table = ProjectAccess._table;
-
-        this.id = false;
-        this.uid = false;
-        this.pid = false;
-        this.access = false;
-        this.created = false;
-        this.updated = false;
-
-        // Attributes which are allowed to be patched
-        this.attrs = Object.keys(require('../../schema/req.body.PatchProjectAccess.json').properties);
-    }
+    static _patch = require('../../schema/req.body.PatchProjectAccess.json');
+    static _res = require('../../schema/res.ProjectAccess.json');
 
     /**
      * Return a list of users that can access a given project
@@ -86,17 +72,6 @@ class ProjectAccess extends Generic {
         }
 
         return ProjectAccess.deserialize(pgres.rows);
-    }
-
-    serialize() {
-        return {
-            id: parseInt(this.id),
-            access: this.access,
-            created: this.created,
-            updated: this.updated,
-            pid: parseInt(this.pid),
-            uid: parseInt(this.uid),
-        };
     }
 
     static async from_alt(pool, pid, uid) {

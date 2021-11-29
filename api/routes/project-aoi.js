@@ -1,8 +1,7 @@
 'use strict';
 
-const Err = require('../lib/error');
+const { Err } = require('@openaddresses/batch-schema');
 const AOI = require('../lib/project/aoi');
-const { Param } = require('../lib/util');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
@@ -21,12 +20,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.ListAOI.json} apiSuccess
      */
     await schema.get('/project/:pid/aoi', {
+        ':pid': 'integer',
         query: 'req.query.ListAOI.json',
         res: 'res.ListAOI.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
 
             req.query.pid = req.params.pid;
             res.json(await AOI.list(config.pool, req.params.pid, req.query));
@@ -49,12 +48,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.AOI.json} apiSuccess
      */
     await schema.post('/project/:pid/aoi', {
+        ':pid': 'integer',
         body: 'req.body.CreateAOI.json',
         res: 'res.AOI.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
 
             req.body.pid = req.params.pid;
             const img = await AOI.generate(config.pool, req.body);
@@ -78,12 +77,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.AOI.json} apiSuccess
      */
     await schema.get('/project/:pid/aoi/:aoiid', {
+        ':pid': 'integer',
+        ':aoiid': 'integer',
         res: 'res.AOI.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'aoiid');
 
             const img = await AOI.from(config.pool, req.params.aoiid);
 
@@ -107,13 +106,13 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.AOI.json} apiSuccess
      */
     await schema.patch('/project/:pid/aoi/:aoiid', {
+        ':pid': 'integer',
+        ':aoiid': 'integer',
         body: 'req.body.PatchAOI.json',
         res: 'res.AOI.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'aoiid');
 
             const img = await AOI.from(config.pool, req.params.aoiid);
             img.patch(req.body);
@@ -138,12 +137,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/project/:pid/aoi/:aoiid', {
+        ':pid': 'integer',
+        ':aoiid': 'integer',
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'aoiid');
 
             const img = await AOI.from(config.pool, req.params.aoiid);
             await img.delete(config.pool);

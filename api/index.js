@@ -2,8 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const Err = require('./lib/error');
-const Schema = require('./lib/schema');
+const { Schema, Err } = require('@openaddresses/batch-schema');
 const jwt = require('jsonwebtoken');
 const { ValidationError } = require('express-json-validator-middleware');
 const morgan = require('morgan');
@@ -50,7 +49,9 @@ async function server(args, config, cb) {
 
     const app = express();
 
-    const schema = new Schema(express.Router());
+    const schema = new Schema(express.Router(), {
+        schemas: path.resolve(__dirname, 'schema')
+    });
 
     app.disable('x-powered-by');
 
@@ -160,6 +161,7 @@ async function server(args, config, cb) {
         return next();
     });
 
+    await schema.api();
 
     // Load dynamic routes directory
     for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
@@ -167,36 +169,7 @@ async function server(args, config, cb) {
         await require('./routes/' + r)(schema, config);
     }
 
-    schema.router.use((err, req, res, next) => {
-        if (err instanceof ValidationError) {
-            let errs = [];
-
-            if (err.validationErrors.body) {
-                errs = errs.concat(err.validationErrors.body.map((e) => {
-                    let msg = e.message;
-                    if (e.dataPath) msg = msg + ` (${e.dataPath})`;
-
-                    return {
-                        message: msg
-                    };
-                }));
-            }
-
-            if (err.validationErrors.query) {
-                errs = errs.concat(err.validationErrors.query.map((e) => {
-                    return { message: e.message };
-                }));
-            }
-
-            return Err.respond(
-                new Err(400, null, 'validation error'),
-                res,
-                errs
-            );
-        } else {
-            next(err);
-        }
-    });
+    schema.error();
 
     schema.router.all('*', (req, res) => {
         return res.status(404).json({

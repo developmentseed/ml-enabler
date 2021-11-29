@@ -1,6 +1,6 @@
 'use strict';
 
-const Err = require('../error');
+const { Err } = require('@openaddresses/batch-schema');
 const { sql } = require('slonik');
 const Generic = require('../generic');
 const bboxPolygon = require('@turf/bbox-polygon').default;
@@ -10,23 +10,8 @@ const bboxPolygon = require('@turf/bbox-polygon').default;
  */
 class ProjectAOI extends Generic {
     static _table = 'aois';
-
-    constructor() {
-        super();
-
-        this._table = ProjectAOI._table;
-
-        this.id = false;
-        this.created = false;
-        this.updated = false;
-        this.pid = false;
-        this.iter_id = false;
-        this.bounds = false;
-        this.name = false;
-
-        // Attributes which are allowed to be patched
-        this.attrs = Object.keys(require('../../schema/req.body.PatchAOI.json').properties);
-    }
+    static _patch = require('../../schema/req.body.PatchAOI.json');
+    static _res = require('../../schema/res.AOI.json');
 
     /**
      * Return a list of aois for a given project
@@ -82,18 +67,6 @@ class ProjectAOI extends Generic {
         }
 
         return ProjectAOI.deserialize(pgres.rows);
-    }
-
-    serialize() {
-        return {
-            id: this.id,
-            pid: this.pid,
-            iter_id: this.iter_id,
-            created: this.created,
-            updated: this.updated,
-            name: this.name,
-            bounds: this.bounds
-        };
     }
 
     async commit(pool) {

@@ -1,7 +1,6 @@
 'use strict';
 
-const Err = require('../lib/error');
-const { Param } = require('../lib/util');
+const { Err } = require('@openaddresses/batch-schema');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
@@ -86,12 +85,11 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.User.json} apiSuccess
      */
     await schema.patch('/user/:uid', {
+        ':uid': 'integer',
         body: 'req.body.PatchUser.json',
         res: 'res.User.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'uid');
-
             await user.is_auth(req);
 
             if (req.auth.access !== 'admin' && req.auth.uid !== req.params.uid) {

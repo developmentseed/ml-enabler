@@ -1,8 +1,7 @@
 'use strict';
 
-const Err = require('../lib/error');
+const { Err } = require('@openaddresses/batch-schema');
 const Iteration = require('../lib/project/iteration');
-const { Param } = require('../lib/util');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
@@ -21,12 +20,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.ListIterations.json} apiSuccess
      */
     await schema.get('/project/:pid/iteration', {
+        ':pid': 'integer',
         query: 'req.query.ListIterations.json',
         res: 'res.ListIterations.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
 
             req.query.pid = req.params.pid;
             res.json(await Iteration.list(config.pool, req.params.pid, req.query));
@@ -49,12 +48,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Iteration.json} apiSuccess
      */
     await schema.post('/project/:pid/iteration', {
+        ':pid': 'integer',
         body: 'req.body.CreateIteration.json',
         res: 'res.Iteration.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
 
             req.body.pid = req.params.pid;
             const iter = await Iteration.generate(config.pool, req.body);
@@ -78,12 +77,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Iteration.json} apiSuccess
      */
     await schema.get('/project/:pid/iteration/:iterationid', {
+        ':pid': 'integer',
+        ':iterationid': 'integer',
         res: 'res.Iteration.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'iterationid');
 
             const iter = await Iteration.from(config.pool, req.params.iterationid);
             return res.json(iter.serialize());
@@ -105,13 +104,13 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Iteration.json} apiSuccess
      */
     await schema.patch('/project/:pid/iteration/:iterationid', {
+        ':pid': 'integer',
+        ':iterationid': 'integer',
         body: 'req.body.PatchIteration.json',
         res: 'res.Iteration.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'iterationid');
 
             const iter = await Iteration.from(config.pool, req.params.iterationid);
             iter.patch(req.body);

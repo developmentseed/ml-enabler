@@ -1,10 +1,9 @@
 'use strict';
 
-const Err = require('../lib/error');
+const { Err } = require('@openaddresses/batch-schema');
 const S3 = require('../lib/s3');
 const Busboy = require('busboy');
 const Iteration = require('../lib/project/iteration');
-const { Param } = require('../lib/util');
 const path = require('path');
 const Task = require('../lib/project/iteration/task');
 
@@ -25,13 +24,13 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Iteration.json} apiSuccess
      */
     await schema.post('/project/:pid/iteration/:iterationid/asset', {
+        ':pid': 'integer',
+        ':iterationid': 'integer',
         query: 'req.query.UploadIterationAsset.json',
         res: 'res.Iteration.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'iterationid');
 
             config.is_aws();
         } catch (err) {
@@ -99,14 +98,14 @@ async function router(schema, config) {
      * @apiSchema (Query) {jsonschema=../schema/req.query.DownloadIterationAsset.json} apiParam
      */
     await schema.get('/project/:pid/iteration/:iterationid/asset', {
+        ':pid': 'integer',
+        ':iterationid': 'integer',
         query: 'req.query.DownloadIterationAsset.json'
     }, async (req, res) => {
         try {
             req.auth = req.token;
 
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'iterationid');
 
             config.is_aws();
 

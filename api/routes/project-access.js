@@ -1,8 +1,7 @@
 'use strict';
 
-const Err = require('../lib/error');
+const { Err } = require('@openaddresses/batch-schema');
 const ProjectAccess = require('../lib/project/access');
-const { Param } = require('../lib/util');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
@@ -21,12 +20,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.ListProjectAccess.json} apiSuccess
      */
     await schema.get('/project/:pid/user', {
+        ':pid': 'integer',
         query: 'req.query.ListProjectAccess.json',
         res: 'res.ListProjectAccess.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
 
             res.json(await ProjectAccess.list(config.pool, req.params.pid, req.query));
         } catch (err) {

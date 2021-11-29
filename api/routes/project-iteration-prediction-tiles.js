@@ -1,7 +1,6 @@
 'use strict';
 
-const Err = require('../lib/error');
-const { Param } = require('../lib/util');
+const { Err } = require('@openaddresses/batch-schema');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
@@ -19,12 +18,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.TilejsonPredictions.json} apiSuccess
      */
     await schema.get('/project/:pid/iteration/:iterationid/tiles', {
+        ':pid': 'integer',
+        ':iterationid': 'integer',
         res: 'res.TilejsonPredictions.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'iterationid');
 
             res.json({
                 uploaded: false

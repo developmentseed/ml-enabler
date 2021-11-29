@@ -1,6 +1,6 @@
 'use strict';
 
-const Err = require('../error');
+const { Err } = require('@openaddresses/batch-schema');
 const { sql } = require('slonik');
 const Generic = require('../generic');
 
@@ -9,15 +9,8 @@ const Generic = require('../generic');
  */
 class ProjectIntegration extends Generic {
     static _table =  'integrations';
-
-    constructor() {
-        super();
-
-        this._table = ProjectIntegration._table;
-
-        // Attributes which are allowed to be patched
-        this.attrs = Object.keys(require('../../schema/req.body.PatchIntegration.json').properties);
-    }
+    static _patch = require('../../schema/req.body.PatchIntegration.json');
+    static _res = require('../../schema/res.Integration.json');
 
     /**
      * Return a list of integrations for a given project
@@ -74,18 +67,6 @@ class ProjectIntegration extends Generic {
         }
 
         return ProjectIntegration.deserialize(pgres.rows);
-    }
-
-    serialize() {
-        return {
-            id: this.id,
-            pid: this.pid,
-            created: this.created,
-            updated: this.updated,
-            integration: this.integration,
-            name: this.name,
-            url: this.url,
-        };
     }
 
     async commit(pool) {

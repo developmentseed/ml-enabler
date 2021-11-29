@@ -1,6 +1,6 @@
 'use strict';
 
-const Err = require('../../error');
+const { Err } = require('@openaddresses/batch-schema');
 const { sql } = require('slonik');
 const Generic = require('../../generic');
 const schema = require('../../../schema/res.Task.json');

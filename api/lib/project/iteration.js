@@ -1,6 +1,6 @@
 'use strict';
 
-const Err = require('../error');
+const { Err } = require('@openaddresses/batch-schema');
 const { sql } = require('slonik');
 const Generic = require('../generic');
 
@@ -9,33 +9,8 @@ const Generic = require('../generic');
  */
 class ProjectIteration extends Generic {
     static _table = 'iterations';
-
-    constructor() {
-        super();
-
-        this._table = ProjectIteration._table;
-
-        this.id = false;
-        this.pid = false;
-        this.created = false;
-        this.updated = false;
-        this.tile_zoom = false;
-        this.docker_link = false;
-        this.model_link = false;
-        this.checkpoint_link = false;
-        this.tfrecord_link = false;
-        this.save_link = false;
-        this.inf_list = false;
-        this.inf_type = false;
-        this.inf_binary = false;
-        this.inf_supertile = false;
-        this.version = false;
-        this.hint = false;
-        this.imagery_id = false;
-
-        // Attributes which are allowed to be patched
-        this.attrs = Object.keys(require('../../schema/req.body.PatchIteration.json').properties);
-    }
+    static _patch = require('../../schema/req.body.PatchIteration.json');
+    static _res = require('../../schema/res.Iteration.json');
 
     /**
      * Return a list of iterations for a given project
@@ -96,28 +71,6 @@ class ProjectIteration extends Generic {
         }
 
         return ProjectIteration.deserialize(pgres.rows);
-    }
-
-    serialize() {
-        return {
-            id: this.id,
-            created: this.created,
-            updated: this.updated,
-            pid: this.pid,
-            tile_zoom: this.tile_zoom,
-            docker_link: this.docker_link,
-            model_link: this.model_link,
-            checkpoint_link: this.checkpoint_link,
-            tfrecord_link: this.tfrecord_link,
-            save_link: this.save_link,
-            inf_list: this.inf_list,
-            inf_type: this.inf_type,
-            inf_binary: this.inf_binary,
-            inf_supertile: this.inf_supertile,
-            version: this.version,
-            hint: this.hint,
-            imagery_id: this.imagery_id
-        };
     }
 
     async commit(pool) {

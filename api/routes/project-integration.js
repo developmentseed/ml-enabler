@@ -1,8 +1,7 @@
 'use strict';
 
-const Err = require('../lib/error');
+const { Err } = require('@openaddresses/batch-schema');
 const Integration = require('../lib/project/integration');
-const { Param } = require('../lib/util');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
@@ -21,12 +20,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.ListIntegrations.json} apiSuccess
      */
     await schema.get('/project/:pid/integration', {
+        ':pid': 'integer',
         query: 'req.query.ListIntegrations.json',
         res: 'res.ListIntegrations.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
 
             req.query.pid = req.params.pid;
             res.json(await Integration.list(config.pool, req.params.pid, req.query));
@@ -49,12 +48,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Integration.json} apiSuccess
      */
     await schema.post('/project/:pid/integration', {
+        ':pid': 'integer',
         body: 'req.body.CreateIntegration.json',
         res: 'res.Integration.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
 
             req.body.pid = req.params.pid;
             const integ = await Integration.generate(config.pool, req.body);
@@ -78,12 +77,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Integration.json} apiSuccess
      */
     await schema.get('/project/:pid/integration/:integrationid', {
+        ':pid': 'integer',
+        ':integrationid': 'integer',
         res: 'res.Integration.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'integrationid');
 
             const integ = await Integration.from(config.pool, req.params.integrationid);
             return res.json(integ.serialize());
@@ -105,12 +104,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/project/:pid/integration/:integrationid', {
+        ':pid': 'integer',
+        ':integrationid': 'integer',
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'integrationid');
 
             const integ = await Integration.from(config.pool, req.params.integrationid);
             await integ.delete(config.pool);

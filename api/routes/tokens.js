@@ -1,7 +1,6 @@
 'use strict';
 
-const Err = require('../lib/error');
-const { Param } = require('../lib/util');
+const { Err } = require('@openaddresses/batch-schema');
 const UserToken = new require('../lib/token');
 
 async function router(schema, config) {
@@ -74,11 +73,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Token.json} apiSuccess
      */
     await schema.get('/token/:token_id', {
+        ':token_id': 'integer',
         res: 'res.Token.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'token_id');
-
             await user.is_auth(req);
 
             const token = await UserToken.from(config.pool, req.params.token_id);
@@ -103,11 +101,10 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/token/:token_id', {
+        ':token_id': 'integer',
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await Param.int(req, 'token_id');
-
             await user.is_auth(req);
 
             const token = await UserToken.from(config.pool, req.params.token_id);

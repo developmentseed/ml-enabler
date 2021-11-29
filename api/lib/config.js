@@ -2,11 +2,11 @@
 
 const CP = require('child_process');
 const { sql, createPool, createTypeParserPreset } = require('slonik');
-const Err = require('./error');
+const { Err } = require('@openaddresses/batch-schema');
 const wkx = require('wkx');
 const bbox = require('@turf/bbox').default;
 
-/** 
+/**
  * @class
  */
 class Config {

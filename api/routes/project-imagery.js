@@ -1,8 +1,7 @@
 'use strict';
 
-const Err = require('../lib/error');
+const { Err } = require('@openaddresses/batch-schema');
 const Imagery = require('../lib/project/imagery');
-const { Param } = require('../lib/util');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
@@ -21,12 +20,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.ListImagery.json} apiSuccess
      */
     await schema.get('/project/:pid/imagery', {
+        ':pid': 'integer',
         query: 'req.query.ListImagery.json',
         res: 'res.ListImagery.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
 
             req.query.pid = req.params.pid;
             res.json(await Imagery.list(config.pool, req.params.pid, req.query));
@@ -49,12 +48,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Imagery.json} apiSuccess
      */
     await schema.post('/project/:pid/imagery', {
+        ':pid': 'integer',
         body: 'req.body.CreateImagery.json',
         res: 'res.Imagery.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
 
             req.body.pid = req.params.pid;
             const img = await Imagery.generate(config.pool, req.body);
@@ -78,12 +77,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Imagery.json} apiSuccess
      */
     await schema.get('/project/:pid/imagery/:imageryid', {
+        ':pid': 'integer',
+        ':imageryid': 'integer',
         res: 'res.Imagery.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'imageryid');
 
             const img = await Imagery.from(config.pool, req.params.imageryid);
 
@@ -107,13 +106,13 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Imagery.json} apiSuccess
      */
     await schema.patch('/project/:pid/imagery/:imageryid', {
+        ':pid': 'integer',
+        ':imageryid': 'integer',
         body: 'req.body.PatchImagery.json',
         res: 'res.Imagery.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'imageryid');
 
             const img = await Imagery.from(config.pool, req.params.imageryid);
             img.patch(req.body);
@@ -138,12 +137,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/project/:pid/imagery/:imageryid', {
+        ':pid': 'integer',
+        ':imageryid': 'integer',
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'imageryid');
 
             const img = await Imagery.from(config.pool, req.params.imageryid);
             await img.delete(config.pool);

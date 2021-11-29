@@ -1,9 +1,8 @@
 'use strict';
 
-const Err = require('../lib/error');
+const { Err } = require('@openaddresses/batch-schema');
 const Project = require('../lib/project');
 const ProjectAccess = require('../lib/project/access');
-const { Param } = require('../lib/util');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
@@ -83,11 +82,11 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
      */
     await schema.get('/project/:pid', {
+        ':pid': 'integer',
         res: 'res.Project.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
 
             const project = await Project.from(config.pool, req.params.pid);
 
@@ -111,12 +110,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Project.json} apiSuccess
      */
     await schema.patch('/project/:pid', {
+        ':pid': 'integer',
         body: 'req.body.PatchProject.json',
         res: 'res.Project.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
 
             const project = await Project.from(config.pool, req.params.pid);
             project.patch(req.body);
@@ -141,11 +140,11 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/project/:pid', {
+        ':pid': 'integer',
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
 
             const project = await Project.from(config.pool, req.params.pid);
             await project.delete(config.pool);

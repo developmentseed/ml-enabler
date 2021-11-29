@@ -1,9 +1,8 @@
 'use strict';
 
-const Err = require('../lib/error');
+const { Err } = require('@openaddresses/batch-schema');
 const Iteration = require('../lib/project/iteration');
 const Stack = require('../lib/stack');
-const { Param } = require('../lib/util');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
@@ -21,12 +20,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Stack.json} apiSuccess
      */
     await schema.get('/project/:pid/iteration/:iterationid/stack', {
+        ':pid': 'integer',
+        ':iterationid': 'integer',
         res: 'res.Stack.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'iterationid');
             config.is_aws();
 
             const stack = await Stack.from(req.params.pid, req.params.iterationid);
@@ -50,13 +49,13 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Stack.json} apiSuccess
      */
     await schema.post('/project/:pid/iteration/:iterationid/stack', {
+        ':pid': 'integer',
+        ':iterationid': 'integer',
         body: 'req.body.CreateStack.json',
         res: 'res.Stack.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'iterationid');
             config.is_aws();
 
             const iter = await Iteration.from(config.pool, req.params.iterationid);
@@ -97,12 +96,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/project/:pid/iteration/:iterationid/stack', {
+        ':pid': 'integer',
+        ':iterationid': 'integer',
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'iterationid');
             config.is_aws();
 
             const stack = await Stack.from(req.params.pid, req.params.iterationid);

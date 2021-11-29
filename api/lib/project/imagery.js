@@ -1,6 +1,6 @@
 'use strict';
 
-const Err = require('../error');
+const { Err } = require('@openaddresses/batch-schema');
 const { sql } = require('slonik');
 const Generic = require('../generic');
 
@@ -9,23 +9,8 @@ const Generic = require('../generic');
  */
 class ProjectImagery extends Generic {
     static _table = 'imagery';
-
-    constructor() {
-        super();
-
-        this._table = ProjectImagery._table;
-
-        this.id = false;
-        this.pid = false;
-        this.name = false;
-        this.url = false;
-        this.created = false;
-        this.updated = false;
-        this.fmt = false;
-
-        // Attributes which are allowed to be patched
-        this.attrs = Object.keys(require('../../schema/req.body.PatchImagery.json').properties);
-    }
+    static _patch = require('../../schema/req.body.PatchImagery.json');
+    static _res = require('../../schema/res.Imagery.json');
 
     /**
      * Return a list of imagery sources for a given project
@@ -55,9 +40,7 @@ class ProjectImagery extends Generic {
         }
 
         let pgres;
-        try {
-            pgres = await pool.query(sql`
-                SELECT
+        try { pgres = await pool.query(sql` SELECT
                     count(*) OVER() AS count,
                     imagery.id,
                     imagery.name,
@@ -82,18 +65,6 @@ class ProjectImagery extends Generic {
         }
 
         return ProjectImagery.deserialize(pgres.rows);
-    }
-
-    serialize() {
-        return {
-            id: this.id,
-            created: this.created,
-            updated: this.updated,
-            pid: this.pid,
-            name: this.name,
-            url: this.url,
-            fmt: this.fmt
-        };
     }
 
     async commit(pool) {

@@ -1,11 +1,10 @@
 'use strict';
 
-const Err = require('../lib/error');
+const { Err } = require('@openaddresses/batch-schema');
 const StackQueue = require('../lib/stack/queue');
 const Task = require('../lib/project/iteration/task');
 const Iteration = require('../lib/project/iteration');
 const Imagery = require('../lib/project/imagery');
-const { Param } = require('../lib/util');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
@@ -23,12 +22,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.StackQueue.json} apiSuccess
      */
     await schema.get('/project/:pid/iteration/:iterationid/stack/queue', {
+        ':pid': 'integer',
+        ':iterationid': 'integer',
         res: 'res.StackQueue.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'iterationid');
             config.is_aws();
 
             const queue = await StackQueue.from(req.params.pid, req.params.iterationid);
@@ -51,12 +50,12 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.StackQueue.json} apiSuccess
      */
     await schema.delete('/project/:pid/iteration/:iterationid/stack/queue', {
+        ':pid': 'integer',
+        ':iterationid': 'integer',
         res: 'res.StackQueue.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'iterationid');
             config.is_aws();
 
             await StackQueue.delete(req.params.pid, req.params.iterationid);
@@ -82,13 +81,13 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.post('/project/:pid/iteration/:iterationid/stack/queue', {
+        ':pid': 'integer',
+        ':iterationid': 'integer',
         body: 'req.body.PopulateStackQueue.json',
         res: 'res.StackQueue.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'iterationid');
             config.is_aws();
 
             const iter = await Iteration.from(config.pool, req.params.iterationid);

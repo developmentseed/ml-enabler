@@ -1,8 +1,7 @@
 'use strict';
 
-const Err = require('../lib/error');
+const { Err } = require('@openaddresses/batch-schema');
 const Task = require('../lib/project/iteration/task');
-const { Param } = require('../lib/util');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
@@ -21,13 +20,13 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.ListTasks.json} apiSuccess
      */
     await schema.get('/project/:pid/iteration/:iterationid/task', {
+        ':pid': 'integer',
+        ':iterationid': 'integer',
         query: 'req.query.ListTasks.json',
         res: 'res.ListTasks.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'iterationid');
 
             res.json(await Task.list(config.pool, req.params.iterationid, req.query));
         } catch (err) {
@@ -48,13 +47,13 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Task.json} apiSuccess
      */
     await schema.get('/project/:pid/iteration/:iterationid/task/:taskid/logs', {
+        ':pid': 'integer',
+        ':iterationid': 'integer',
+        ':taskid': 'integer',
         res: 'res.Task.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'iterationid');
-            await Param.int(req, 'taskid');
 
             const task = await Task.from(config.pool, req.params.taskid);
 
@@ -77,13 +76,13 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Task.json} apiSuccess
      */
     await schema.get('/project/:pid/iteration/:iterationid/task/:taskid', {
+        ':pid': 'integer',
+        ':iterationid': 'integer',
+        ':taskid': 'integer',
         res: 'res.Task.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'iterationid');
-            await Param.int(req, 'taskid');
 
             const task = await Task.from(config.pool, req.params.taskid);
 
@@ -107,14 +106,14 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Task.json} apiSuccess
      */
     await schema.patch('/project/:pid/iteration/:iterationid/task/:taskid', {
+        ':pid': 'integer',
+        ':iterationid': 'integer',
+        ':taskid': 'integer',
         body: 'req.body.PatchTask.json',
         res: 'res.Task.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'iterationid');
-            await Param.int(req, 'taskid');
 
             const task = await Task.from(config.pool, req.params.taskid);
             task.patch(req.body);
@@ -139,13 +138,13 @@ async function router(schema, config) {
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/project/:pid/iteration/:iterationid/task/:taskid', {
+        ':pid': 'integer',
+        ':iterationid': 'integer',
+        ':taskid': 'integer',
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
             await user.is_auth(req);
-            await Param.int(req, 'pid');
-            await Param.int(req, 'iterationid');
-            await Param.int(req, 'taskid');
 
             const task = await Task.from(config.pool, req.params.taskid);
             await task.delete(config.pool);
