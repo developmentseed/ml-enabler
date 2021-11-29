@@ -1,4 +1,4 @@
-'use strict';
+
 
 const { Err } = require('@openaddresses/batch-schema');
 const UserToken = new require('../lib/token');
@@ -54,14 +54,14 @@ async function router(schema, config) {
             await user.is_auth(req);
 
             req.body.uid = req.auth.uid;
-            return res.json((await UserToken.gen(config.pool, req.body)).serialize(true));
+            return res.json((await UserToken.generate(config.pool, req.body)).serialize(true));
         } catch (err) {
             return Err.respond(err, res);
         }
     });
 
     /**
-     * @api {delete} /api/token/:token_id Get Token
+     * @api {get} /api/token/:token_id Get Token
      * @apiVersion 1.0.0
      * @apiName GetToken
      * @apiGroup Token
@@ -79,10 +79,12 @@ async function router(schema, config) {
         try {
             await user.is_auth(req);
 
-            const token = await UserToken.from(config.pool, req.params.token_id);
+            let token = await UserToken.from(config.pool, req.params.token_id);
             if (token.uid !== req.auth.uid) throw new Err(401, null, 'Cannot get a token you did not create');
 
-            return res.json(token.serialize());
+            token = token.serialize();
+            delete token.token;
+            return res.json(token);
         } catch (err) {
             return Err.respond(err, res);
         }

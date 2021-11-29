@@ -1,8 +1,4 @@
-'use strict';
-
 const AWS = require('aws-sdk');
-const fs = require('fs');
-const path = require('path');
 const { Err } = require('@openaddresses/batch-schema');
 const sqs = new AWS.SQS({
     region: process.env.AWS_DEFAULT_REGION
@@ -39,7 +35,7 @@ class StackQueue {
                 QueueUrl: active,
                 AttributeNames: [
                     'ApproximateNumberOfMessages',
-                    'ApproximateNumberOfMessagesNotVisible',
+                    'ApproximateNumberOfMessagesNotVisible'
                 ]
             }).promise();
         } catch (err) {
@@ -50,7 +46,7 @@ class StackQueue {
             queue.dead = await sqs.getQueueAttributes({
                 QueueUrl: dead,
                 AttributeNames: [
-                    'ApproximateNumberOfMessages',
+                    'ApproximateNumberOfMessages'
                 ]
             }).promise();
         } catch (err) {
@@ -62,10 +58,10 @@ class StackQueue {
 
     serialize() {
         return {
-            queued: parseInt(this.active["Attributes"]["ApproximateNumberOfMessages"]),
-            inflight: parseInt(this.active["Attributes"]["ApproximateNumberOfMessagesNotVisible"]),
-            dead: parseInt(this.dead["Attributes"]["ApproximateNumberOfMessages"])
-        }
+            queued: parseInt(this.active['Attributes']['ApproximateNumberOfMessages']),
+            inflight: parseInt(this.active['Attributes']['ApproximateNumberOfMessagesNotVisible']),
+            dead: parseInt(this.dead['Attributes']['ApproximateNumberOfMessages'])
+        };
     }
 
     static async delete(pid, iterationid) {

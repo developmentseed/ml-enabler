@@ -1,5 +1,3 @@
-'use strict';
-
 const { Err } = require('@openaddresses/batch-schema');
 const { sql } = require('slonik');
 const Generic = require('../generic');

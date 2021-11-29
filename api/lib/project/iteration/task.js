@@ -1,9 +1,6 @@
-'use strict';
-
 const { Err } = require('@openaddresses/batch-schema');
 const { sql } = require('slonik');
 const Generic = require('../../generic');
-const schema = require('../../../schema/res.Task.json');
 const AWS = require('aws-sdk');
 const batch = new AWS.Batch({ region: process.env.AWS_DEFAULT_REGION });
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
@@ -14,15 +11,8 @@ const jwt = require('jsonwebtoken');
  */
 class ProjectTask extends Generic {
     static _table = 'tasks';
-
-    constructor() {
-        super();
-
-        this._table = ProjectTask._table;
-
-        // Attributes which are allowed to be patched
-        this.attrs = Object.keys(require('../../../schema/req.body.PatchTask.json').properties);
-    }
+    static _patch = require('../../../schema/req.body.PatchTask.json');
+    static _res = require('../../../schema/res.Task.json');
 
     /**
      * Return a list of tasks for a given project
@@ -79,20 +69,6 @@ class ProjectTask extends Generic {
         return ProjectTask.deserialize(pgres.rows);
     }
 
-    serialize() {
-        return {
-            id: this.id,
-            created: this.created,
-            updated: this.updated,
-            iter_id: this.pid,
-            type: this.type,
-            batch_id: this.batch_id,
-            log_link: this.log_link,
-            status: this.status || null,
-            statusReason: this.statusReason || null
-        };
-    }
-
     async commit(pool) {
         try {
             await pool.query(sql`
@@ -114,8 +90,9 @@ class ProjectTask extends Generic {
     async logs() {
         if (!this.log_link) throw new Err(400, null, 'Task did not save log_link');
 
+        let logs;
         try {
-            let logs = await cwl.getLogEvents({
+            logs = await cwl.getLogEvents({
                 logGroupName: '/aws/batch/job',
                 logStreamName: this.log_link
             }).promise();
@@ -124,10 +101,10 @@ class ProjectTask extends Generic {
         }
 
         let line = 0;
-        logs = logs.events.map((log) => {
+        logs = logs.events.map((event) => {
             return {
                 id: line++,
-                message: event.timestamp,
+                timestamp: event.timestamp,
                 message: event.message
             };
         });
@@ -202,7 +179,7 @@ class ProjectTask extends Generic {
      */
     static async batch(config, opts) {
         let jobDef;
-        let jobQueue = config.StackName + '-queue';
+        const jobQueue = config.StackName + '-queue';
 
         if (!opts.environment) opts.environent = [];
 
@@ -220,7 +197,7 @@ class ProjectTask extends Generic {
         });
 
         const token = jwt.sign({
-            t: 'i', // Internal
+            t: 'i' // Internal
         }, config.SigningSecret);
 
         opts.environment.push({
@@ -240,7 +217,7 @@ class ProjectTask extends Generic {
                 jobDefinition: jobDef,
                 containerOverrides: {
                     environment: opts.environment
-                },
+                }
             }).promise();
 
             task.batch_id = job.jobId;

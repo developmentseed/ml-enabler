@@ -16,6 +16,10 @@
         },
         "created": {
             "type": "integer"
+        },
+        "token": {
+            "type": "string",
+            "description": "Token returned when initially created"
         }
     }
 }

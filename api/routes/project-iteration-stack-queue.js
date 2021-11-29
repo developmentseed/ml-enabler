@@ -1,4 +1,4 @@
-'use strict';
+
 
 const { Err } = require('@openaddresses/batch-schema');
 const StackQueue = require('../lib/stack/queue');

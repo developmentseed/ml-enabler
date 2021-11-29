@@ -1,10 +1,7 @@
-'use strict';
-
 const fs = require('fs');
 const path = require('path');
 const { Schema, Err } = require('@openaddresses/batch-schema');
 const jwt = require('jsonwebtoken');
-const { ValidationError } = require('express-json-validator-middleware');
 const morgan = require('morgan');
 const express = require('express');
 const pkg = require('./package.json');

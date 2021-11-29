@@ -1,4 +1,4 @@
-'use strict';
+
 
 const CP = require('child_process');
 const { sql, createPool, createTypeParserPreset } = require('slonik');

@@ -1,4 +1,4 @@
-'use strict';
+
 
 const { Err } = require('@openaddresses/batch-schema');
 const AWS = require('aws-sdk');
@@ -63,7 +63,7 @@ class Stack {
             id: this.id,
             name: this.stack_name,
             status: this.status
-        }
+        };
     }
 
     static async from(pid, iterationid) {
@@ -78,7 +78,7 @@ class Stack {
         } catch (err) {
             if (err.statusCode === 400) {
                 stack.id = 'none',
-                stack.status = 'None'
+                stack.status = 'None';
 
                 return stack;
             } else {
@@ -94,7 +94,7 @@ class Stack {
         }
 
         stack.id = stack.stack.Stacks[0].StackId,
-        stack.status = stack.stack.Stacks[0].StackStatus
+        stack.status = stack.stack.Stacks[0].StackStatus;
 
         return stack;
     }

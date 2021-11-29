@@ -1,4 +1,4 @@
-'use strict';
+
 
 const memjs = require('memjs');
 
@@ -70,6 +70,7 @@ class Cacher {
      *
      * @param {Object} obj Object to test
      * @param {String} key Default Cache Key
+     * @returns {boolean|Object}
      */
     static Miss(obj, key) {
         if (!obj) return key;
