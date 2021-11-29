@@ -22,7 +22,7 @@
         "mapbox-gl-draw-rectangle-mode": "^1.0.4",
         "semver-sort": "^0.0.4",
         "vue": "^2.6.11",
-        "vue-filepond": "^7.0.2",
+        "vue-filepond": "^6.0.0",
         "vue-router": "^3.5.3",
         "vue-select": "^3.16.0"
     },

@@ -1,7 +1,7 @@
 <template>
     <div class="col col--12">
         <div class='col col--12'>
-            <file-pond
+            <FilePond
                 name='file'
                 ref='pond'
                 :label-idle='label'
