@@ -1,5 +1,3 @@
-
-
 const { Err } = require('@openaddresses/batch-schema');
 const UserToken = new require('../lib/token');
 

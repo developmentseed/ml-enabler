@@ -1,5 +1,3 @@
-
-
 const { Err } = require('@openaddresses/batch-schema');
 const Imagery = require('../lib/project/imagery');
 

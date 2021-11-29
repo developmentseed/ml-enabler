@@ -1,5 +1,3 @@
-
-
 const { Err } = require('@openaddresses/batch-schema');
 
 async function router(schema, config) {

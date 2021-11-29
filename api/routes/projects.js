@@ -1,5 +1,3 @@
-
-
 const { Err } = require('@openaddresses/batch-schema');
 const Project = require('../lib/project');
 const ProjectAccess = require('../lib/project/access');

@@ -1,5 +1,3 @@
-
-
 process.env.StackName = 'test';
 
 const { sql } = require('slonik');

@@ -1,5 +1,3 @@
-
-
 const { Err } = require('@openaddresses/batch-schema');
 const StackQueue = require('../lib/stack/queue');
 const Task = require('../lib/project/iteration/task');
