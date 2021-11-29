@@ -92,10 +92,7 @@ export default {
     },
     methods: {
         refresh: async function(token) {
-            if (token) {
-                localStorage.token = token;
-            }
-
+            if (token) localStorage.token = token;
 
             await this.getMeta();
             await this.getUser();
@@ -107,8 +104,8 @@ export default {
         },
         getLogout: async function() {
             try {
-                delete window.token;
-                window.location.href = window.api;
+                delete localStorage.token;
+                if (this.$router.path !== '/') this.$router.push({ path: "/" })
             } catch (err) {
                 this.err = err;
             }
@@ -133,7 +130,7 @@ export default {
         },
         getStacks: async function() {
             try {
-                this.stacks = await window.std('/api/stack');
+                this.stacks = await window.std('/api/stack', {}, false);
             } catch(err) {
                 console.error(err);
             }

@@ -65,7 +65,7 @@ export default {
                         username: this.username,
                         password: this.password
                     }
-                });
+                }, false);
 
                 this.loading = false;
 
