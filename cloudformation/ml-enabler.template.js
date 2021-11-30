@@ -637,7 +637,7 @@ const Resources = {
     PredLambdaFunctionRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
-            RoleName: cf.join('-', [ cf.ref('AWS::StackName'), 'queue-role' ]),
+            RoleName: cf.join('-', [ cf.stackName, 'queue-role' ]),
             AssumeRolePolicyDocument: {
                 Version: '2012-10-17',
                 Statement: [{
@@ -650,7 +650,7 @@ const Resources = {
             },
             Path: '/',
             Policies: [{
-                PolicyName: cf.join('-', [ cf.ref('AWS::StackName'), 'queue-policy' ]),
+                PolicyName: cf.join('-', [ cf.stackName, 'queue-policy' ]),
                 PolicyDocument: {
                     Version: '2012-10-17',
                     Statement: [{
@@ -775,11 +775,7 @@ const Resources = {
     PredFirehoseRolePolicy: {
         Type: 'AWS::IAM::Policy',
         Properties: {
-            PolicyName: cf.join('', [
-                cf.ref('StackName'),
-                "-project-", cf.ref('ProjectId'),
-                "-iteration-", cf.ref('IterationId')
-            ]),
+            PolicyName: cf.join('', [ cf.stackName, "-firehose" ]),
             PolicyDocument: {
                 Version: '2012-10-17',
                 Statement: [{
@@ -793,10 +789,7 @@ const Resources = {
                         's3:PutObject'
                     ],
                     Resource: [ cf.join('', [
-                        'arn:aws:s3:::', cf.ref('StackName'), '-', cf.accountId, '-', cf.region, '/',
-                        'project/', cf.ref('ProjectId'),
-                        'iteration', cf.ref('IterationId'),
-                        'prediction/*'
+                        'arn:aws:s3:::', cf.stackName, '-', cf.accountId, '-', cf.region, '/*',
                     ]) ],
                 }]
             },
@@ -823,7 +816,7 @@ const Resources = {
         Type : 'AWS::EC2::SecurityGroup',
         Properties: {
             GroupDescription: cf.join('-', [
-                cf.ref('AWS::StackName'),
+                cf.stackName,
                 'pred-ec2-sg'
             ]),
             VpcId: cf.ref('MLEnablerVPC'),

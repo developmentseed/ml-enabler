@@ -405,7 +405,6 @@ module.exports = {
         },
         PredFirehose: {
             Type: 'AWS::KinesisFirehose::DeliveryStream',
-            DependsOn: ['FirehoseDeliveryIAMPolicy'],
             Properties: {
                 DeliveryStreamName: cf.join('', [
                     cf.ref('StackName'),
