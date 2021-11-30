@@ -9,8 +9,11 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
     # read all our environment variables to throw errors early
     prediction_endpoint = os.getenv('PREDICTION_ENDPOINT')
     mlenabler_endpoint = os.getenv('MLENABLER_ENDPOINT')
+    stream = os.getenv('StackName')
+
     super_tile = os.getenv('INF_SUPERTILE')
 
+    assert(stream)
     assert(prediction_endpoint)
     assert(mlenabler_endpoint)
 
@@ -46,7 +49,7 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
             print('RESULT: ' + str(len(preds["predictions"])) + ' Predictions')
 
             # Save the prediction to ML-Enabler
-            dap.save_prediction(preds)
+            dap.save_prediction(preds, stream)
     elif model_type == ModelType.CLASSIFICATION:
         print("TYPE: Classification")
 
@@ -58,7 +61,7 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
         preds = dap.cl_post_prediction(payload, chips, inferences)
 
         # Save the prediction to ML-Enabler
-        dap.save_prediction(preds)
+        dap.save_prediction(preds, stream)
     else:
         print("Unknown Model")
 

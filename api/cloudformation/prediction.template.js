@@ -111,29 +111,27 @@ module.exports = {
                     Variables: {
                         "GDAL_DATA": "/opt/share/gdal",
                         "PROJ_LIB": "/opt/share/proj",
-                        "StackName": { "Ref": "AWS::StackName" },
+                        "StackName": cf.stackName,
                         "INFERENCES": cf.ref('Inferences'),
                         "INF_SUPERTILE": cf.ref('InfSupertile'),
                         "IMAGERY_ID": cf.ref('ImageryId'),
                         "PREDICTION_ENDPOINT": cf.join('', [
                             'http://', cf.getAtt('PredELB', 'DNSName'), '/v1/models/default/versions/001'
                         ]),
-                        "MLENABLER_ENDPOINT": { "Fn::ImportValue": { "Fn::Join": [ "-", [
-                            { "Ref": "StackName" },
-                            "api"
-                        ]]}}
+                        "MLENABLER_ENDPOINT": { "Fn::ImportValue": cf.join('-', [
+                            cf.ref('StackName'), 'api'
+                        ])}
                     }
                 }
             }
         },
-        "PredInstanceProfile": {
-            "Type": "AWS::IAM::InstanceProfile",
-            "Properties": {
-                "Path": "/",
-                "Roles": [{ "Fn::ImportValue": { "Fn::Join": [ "-", [
-                    { "Ref": "StackName" },
-                    "exec-role-name"
-                ]]}}]
+        PredInstanceProfile: {
+            Type: 'AWS::IAM::InstanceProfile',
+            Properties: {
+                Path: '/',
+                Roles: [{ "Fn::ImportValue": cf.join('-', [
+                    cf.ref('StackName'), "exec-role-name"
+                ])}]
             }
         },
         "PredTargetGroup": {
