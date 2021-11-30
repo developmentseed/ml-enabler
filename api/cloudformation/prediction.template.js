@@ -1,48 +1,50 @@
-{
-    "AWSTemplateFormatVersion" : "2010-09-09",
-    "Parameters": {
-        "GitSha": {
-            "Type": "String",
-            "Description": "GitSha to Deploy"
+const cf = require('@mapbox/cloudfriend');
+
+module.exports = {
+    AWSTemplateFormatVersion : '2010-09-09',
+    Parameters: {
+        GitSha: {
+            Type: 'String',
+            Description: "GitSha to Deploy"
         },
-        "StackName": {
-            "Type": "String",
-            "Description": "Name of parent stack"
+        StackName: {
+            Type: 'String',
+            Description: 'Name of parent stack'
         },
-        "ImageTag": {
-            "Type": "String",
-            "Description": "ECR Image tag to deploy"
+        ImageTag: {
+            Type: 'String',
+            Description: 'ECR Image tag to deploy'
         },
-        "Inferences": {
-            "Type": "String",
-            "Description": "Ordered, CSV Delimited list of name for prediction values"
+        Inferences: {
+            Type: 'String',
+            Description: 'Ordered, CSV Delimited list of name for prediction values'
         },
-        "ProjectId": {
-            "Type": "Number",
-            "Description": "MLEnabler Project ID"
+        ProjectId: {
+            Type: 'Number',
+            Description: 'MLEnabler Project ID'
         },
-        "IterationId": {
-            "Type": "Number",
-            "Description": "MLEnabler Iteration ID"
+        IterationId: {
+            Type: 'Number',
+            Description: 'MLEnabler Iteration ID'
         },
-        "ImageryId": {
-            "Type": "Number",
-            "Description": "ImageryId source to use"
+        ImageryId: {
+            Type: 'Number',
+            Description: 'ImageryId source to use'
         },
-        "MaxConcurrency": {
-            "Type": "Number",
-            "Default": 50,
-            "Description": "Max number of concurrent lambdas"
+        MaxConcurrency: {
+            Type: 'Number',
+            Default: 50,
+            Description: 'Max number of concurrent lambdas'
         },
-        "MaxSize": {
-            "Type": "Number",
-            "Default": 10,
-            "Description": "Max number of TFServing Images"
+        MaxSize: {
+            Type: 'Number',
+            Default: 10,
+            Description: 'Max number of TFServing Images'
         },
-        "InfSupertile": {
-            "Type": "String",
-            "Description": "Model was trained and should inference on supertiles"
-        }
+        InfSupertile: {
+            Type: 'String',
+            Description: 'Model was trained and should inference on supertiles'
+        },
     },
     "Resources" : {
         "PredLambdaLogs": {
@@ -60,15 +62,15 @@
                 "RetentionInDays": 7
             }
         },
-         "PredLogs": {
-             "Type": "AWS::Logs::LogGroup",
-             "Properties": {
-                 "LogGroupName": { "Fn::Join": [ "-", [
-                     { "Ref": "StackName" },
-                     { "Ref": "IterationId" }
-                 ]]},
-                 "RetentionInDays": 7
-             }
+        "PredLogs": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+                "LogGroupName": { "Fn::Join": [ "-", [
+                    { "Ref": "StackName" },
+                    { "Ref": "IterationId" }
+                ]]},
+                "RetentionInDays": 7
+            }
         },
         "PredLambdaSource": {
             "Type": "AWS::Lambda::EventSourceMapping",
@@ -182,10 +184,10 @@
         "PredELBSecurityGroup": {
             "Type" : "AWS::EC2::SecurityGroup",
             "Properties": {
-                 "GroupDescription": { "Fn::Join": [ "-", [
+                "GroupDescription": { "Fn::Join": [ "-", [
                     { "Ref": "StackName" },
                     "pred-elb-sg"
-                 ]]},
+                ]]},
                 "SecurityGroupIngress": [{
                     "CidrIp": "0.0.0.0/0",
                     "IpProtocol": "tcp",
@@ -400,6 +402,63 @@
                     }
                 }]
             }
+        },
+        PredFirehose: {
+            Type: 'AWS::KinesisFirehose::DeliveryStream',
+            DependsOn: ['FirehoseDeliveryIAMPolicy'],
+            Properties: {
+                DeliveryStreamName: cf.join('', [
+                    cf.ref('StackName'),
+                    "-project-", cf.ref('ProjectId'),
+                    "-iteration-", cf.ref('IterationId')
+                ]),
+                DeliveryStreamType: 'DirectPut',
+                S3DestinationConfiguration: {
+                    BucketARN: cf.join('', ['arn:aws:s3:::', cf.ref('StackName'), '-', cf.accountId, '-', cf.region]),
+                    Prefix: cf.join('', [
+                        'project/', cf.ref('ProjectId'),
+                        'iteration', cf.ref('IterationId'),
+                        'prediction'
+                    ]),
+                    BufferingHints: {
+                        IntervalInSeconds: 60,
+                        SizeInMBs: 100
+                    },
+                    CompressionFormat: 'GZIP',
+                    RoleARN: cf.getAtt('FirehoseDeliveryIAMRole', 'Arn')
+                }
+            },
+        },
+        FirehoseDeliveryIAMPolicy: {
+            Type: 'AWS::IAM::Policy',
+            Properties: {
+                PolicyName: cf.join('', [
+                    cf.ref('StackName'),
+                    "-project-", cf.ref('ProjectId'),
+                    "-iteration-", cf.ref('IterationId')
+                ]),
+                PolicyDocument: {
+                    Version: '2012-10-17',
+                    Statement: [{
+                        Effect: 'Allow',
+                        Action: [
+                            's3:AbortMultipartUpload',
+                            's3:GetBucketLocation',
+                            's3:GetObject',
+                            's3:ListBucket',
+                            's3:ListBucketMultipartUploads',
+                            's3:PutObject'
+                        ],
+                        Resource: [ cf.join('', [
+                            'arn:aws:s3:::', cf.ref('StackName'), '-', cf.accountId, '-', cf.region, '/',
+                            'project/', cf.ref('ProjectId'),
+                            'iteration', cf.ref('IterationId'),
+                            'prediction/*'
+                        ]) ],
+                    }]
+                },
+                Roles: [ cf.ref('FirehoseDeliveryIAMRole') ]
+            },
         }
     },
     "Mappings": {

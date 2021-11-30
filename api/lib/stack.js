@@ -1,12 +1,10 @@
-
-
 const { Err } = require('@openaddresses/batch-schema');
 const AWS = require('aws-sdk');
-const fs = require('fs');
-const path = require('path');
 const cf = new AWS.CloudFormation({
     region: process.env.AWS_DEFAULT_REGION
 });
+
+const template = require('../cloudformation/prediction.template.js');
 
 /**
  * @class
@@ -106,7 +104,7 @@ class Stack {
 
             await cf.createStack({
                 StackName: stack_name,
-                TemplateBody: String(fs.readFileSync(path.resolve(__dirname, '../cloudformation/prediction.template.json'))),
+                TemplateBody: JSON.stringify(template),
                 Tags: options.tags,
                 Parameters: [
                     { ParameterKey: 'GitSha',           ParameterValue: process.env.GitSha },
