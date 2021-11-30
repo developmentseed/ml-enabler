@@ -4,6 +4,9 @@ const sqs = new AWS.SQS({
     region: process.env.AWS_DEFAULT_REGION
 });
 
+/**
+ * @class
+ */
 class StackQueue {
     static async from(pid, iterationid) {
         let queues;
@@ -78,7 +81,7 @@ class StackQueue {
             try {
                 await sqs.purgeQueue({
                     QueueUrl: queue
-                });
+                }).promise();
             } catch (err) {
                 throw new Err(500, err, 'Failed to purge queue');
             }
