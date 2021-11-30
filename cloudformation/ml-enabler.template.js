@@ -248,6 +248,7 @@ const Resources = {
                     },{
                         Effect: 'Allow', // These are all required to spin up a prediction stack
                         Action: [
+                            'deliverystream:*',
                             'iam:PassRole',
                             'logs:DescribeLogGroups',
                             'ecs:CreateService',
@@ -756,6 +757,52 @@ const Resources = {
             Path: '/service-role/'
         }
     },
+    PredFirehoseRole: {
+        Type: 'AWS::IAM::Role',
+        Properties: {
+            AssumeRolePolicyDocument: {
+                Version: '2012-10-17',
+                Statement: [ {
+                    Effect: 'Allow',
+                    Principal: {
+                        Service: 'firehose.amazonaws.com'
+                    },
+                    Action: 'sts:AssumeRole'
+                }]
+            }
+        }
+    },
+    PredFirehoseRolePolicy: {
+        Type: 'AWS::IAM::Policy',
+        Properties: {
+            PolicyName: cf.join('', [
+                cf.ref('StackName'),
+                "-project-", cf.ref('ProjectId'),
+                "-iteration-", cf.ref('IterationId')
+            ]),
+            PolicyDocument: {
+                Version: '2012-10-17',
+                Statement: [{
+                    Effect: 'Allow',
+                    Action: [
+                        's3:AbortMultipartUpload',
+                        's3:GetBucketLocation',
+                        's3:GetObject',
+                        's3:ListBucket',
+                        's3:ListBucketMultipartUploads',
+                        's3:PutObject'
+                    ],
+                    Resource: [ cf.join('', [
+                        'arn:aws:s3:::', cf.ref('StackName'), '-', cf.accountId, '-', cf.region, '/',
+                        'project/', cf.ref('ProjectId'),
+                        'iteration', cf.ref('IterationId'),
+                        'prediction/*'
+                    ]) ],
+                }]
+            },
+            Roles: [ cf.ref('PredFirehoseRole') ]
+        },
+    },
     PredTaskRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
@@ -809,6 +856,13 @@ const Outputs = {
         Value: cf.ref('PredServiceSecurityGroup'),
         Export: {
             Name: cf.join('-', [cf.stackName, 'sg'])
+        }
+    },
+    InternalFirehoseRole: {
+        Description: 'Firehose Role',
+        Value: cf.getAtt('PredFirehoseRole', 'Arn'),
+        Export: {
+            Name: cf.join('-', [cf.stackName, 'firehose-role'])
         }
     },
     InternalLambdaRole: {

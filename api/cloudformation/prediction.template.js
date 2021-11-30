@@ -425,54 +425,11 @@ module.exports = {
                         SizeInMBs: 100
                     },
                     CompressionFormat: 'GZIP',
-                    RoleARN: cf.getAtt('PredFirehoseRole', 'Arn')
+                    RoleArn: { "Fn::ImportValue": { "Fn::Join": [ "-", [
+                        { "Ref": "StackName" },
+                        "firehose-role"
+                    ]]}},
                 }
-            },
-        },
-        PredFirehoseRole: {
-            Type: 'AWS::IAM::Role',
-            Properties: {
-                AssumeRolePolicyDocument: {
-                    Version: '2012-10-17',
-                    Statement: [ {
-                        Effect: 'Allow',
-                        Principal: {
-                            Service: 'firehose.amazonaws.com'
-                        },
-                        Action: 'sts:AssumeRole'
-                    }]
-                }
-            }
-        },
-        FirehoseDeliveryIAMPolicy: {
-            Type: 'AWS::IAM::Policy',
-            Properties: {
-                PolicyName: cf.join('', [
-                    cf.ref('StackName'),
-                    "-project-", cf.ref('ProjectId'),
-                    "-iteration-", cf.ref('IterationId')
-                ]),
-                PolicyDocument: {
-                    Version: '2012-10-17',
-                    Statement: [{
-                        Effect: 'Allow',
-                        Action: [
-                            's3:AbortMultipartUpload',
-                            's3:GetBucketLocation',
-                            's3:GetObject',
-                            's3:ListBucket',
-                            's3:ListBucketMultipartUploads',
-                            's3:PutObject'
-                        ],
-                        Resource: [ cf.join('', [
-                            'arn:aws:s3:::', cf.ref('StackName'), '-', cf.accountId, '-', cf.region, '/',
-                            'project/', cf.ref('ProjectId'),
-                            'iteration', cf.ref('IterationId'),
-                            'prediction/*'
-                        ]) ],
-                    }]
-                },
-                Roles: [ cf.ref('PredFirehoseRole') ]
             },
         }
     },
