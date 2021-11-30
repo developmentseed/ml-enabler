@@ -106,7 +106,7 @@ class Stack {
 
             await cf.createStack({
                 StackName: stack_name,
-                TemplateBody: String(fs.readFileSync(path.resolve(__dirname, '../../cloudformation/prediction.template.json'))),
+                TemplateBody: String(fs.readFileSync(path.resolve(__dirname, '../cloudformation/prediction.template.json'))),
                 Tags: options.tags,
                 Parameters: [
                     { ParameterKey: 'GitSha',           ParameterValue: process.env.GitSha },
