@@ -232,7 +232,6 @@ export default {
                 this.$emit('err', err);
             }
         },
-
         createImport: function(event) {
             const file = event.target.files[0];
               const fr = new FileReader();

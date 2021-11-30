@@ -25,12 +25,17 @@ class Config {
         cnf.Environment = process.env.ENVIRONMENT || 'docker';
 
         if (cnf.Environment === 'aws') {
-            cnf.bucket = process.env.ASSET_BUCKET;
-            if (!cnf.bucket) throw new Error('ASSET_BUCKET Required');
-
             cnf.StackName = process.env.StackName;
             cnf.Stack = process.env.StackName;
             if (!cnf.StackName) throw new Error('StackName Required');
+
+            if (process.env.AWS_ACCOUNT_ID && process.env.AWS_DEFAULT_REGION && cnf.StackName) {
+                process.env.ASSET_BUCKET=`${cnf.stackName}-${process.env.AWS_ACCOUNT_ID}-${process.env.AWS_DEFAULT_REGION}`;
+            }
+
+            cnf.bucket = process.env.ASSET_BUCKET;
+
+            if (!cnf.bucket) throw new Error('ASSET_BUCKET Required');
         }
 
         cnf.url = 'http://localhost:2001';

@@ -194,7 +194,7 @@ export default {
         },
         createUser: async function() {
             try  {
-                const res = await window.std('/api/user', {
+                await window.std('/api/user', {
                     method: 'POST',
                     body: {
                         username: this.newUser.username,
