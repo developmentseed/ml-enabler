@@ -30,7 +30,7 @@
                     <label>Inferences List:</label>
                     <label class='switch-container px6 fr'>
                         <span class='mr6'>Binary Inference</span>
-                        <input disabled :value='iteration.inf_binary' type='checkbox' />
+                        <input disabled v-model='iteration.inf_binary' type='checkbox' />
                         <div class='switch'></div>
                     </label>
                     <input disabled :value='iteration.inf_list' type='text' class='input' placeholder='buildings,schools,roads,...'/>
@@ -65,7 +65,7 @@
                 <label><span v-text='iteration.type'/> Zoom Level</label>
                 <label class='switch-container px6 fr'>
                     <span class='mr6'>Supertile</span>
-                    <input disabled :value='iteration.inf_supertile' type='checkbox' />
+                    <input disabled v-model='iteration.inf_supertile' type='checkbox' />
                     <div class='switch'></div>
                 </label>
                 <input disabled :value='iteration.tile_zoom' class='input' placeholder='18'/>
