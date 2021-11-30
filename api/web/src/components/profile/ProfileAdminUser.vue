@@ -170,34 +170,27 @@ export default {
             this.newUser.password = false;
             this.getUsers();
         },
-        getUsers: function() {
+        getUsers: async function() {
             this.loading = true;
 
-            const url = new URL(`${window.api}/v1/user`);
+            const url = new URL(`${window.api}/api/user`);
             url.searchParams.append('limit', this.perpage)
             url.searchParams.append('page', this.page)
             url.searchParams.append('filter', this.filter)
 
-            fetch(url, {
-                method: 'GET'
-            }).then((res) => {
+            try {
+                const res = await window.std(url);
+
                 this.loading = false;
 
-                if (!res.ok && res.statusCode !== 404 && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok && res.statusCode !== 404) {
-                    throw new Error('Failed to load users');
-                }
-                return res.json();
-            }).then((res) => {
                 this.total = res.total;
                 this.users = res.users.map((user) => {
                     user._open = false;
                     return user;
                 });
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         },
         createUser: function() {
             fetch(`${window.api}/v1/user`, {
