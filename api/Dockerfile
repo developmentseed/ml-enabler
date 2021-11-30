@@ -7,8 +7,6 @@ WORKDIR $HOME
 COPY ./ $HOME/api
 WORKDIR $HOME/api
 
-COPY ./cloudformation/prediction.template.json ./cloudformation/
-
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y nginx curl
 
