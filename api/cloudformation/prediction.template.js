@@ -102,24 +102,24 @@ module.exports = {
                     { "Ref": "StackName" },
                     "lambda-role"
                 ]]}},
-                "Handler": "download_and_predict.handler.handler",
-                "MemorySize": 512,
-                "Runtime": "python3.7",
-                "ReservedConcurrentExecutions": { "Ref": "MaxConcurrency" },
-                "Timeout": 240,
-                "Environment": {
-                    "Variables": {
+                Handler: 'download_and_predict.handler.handler',
+                MemorySize: 512,
+                Runtime: 'python3.7',
+                ReservedConcurrentExecutions: cf.ref('MaxConcurrency'),
+                Timeout: 240,
+                Environment: {
+                    Variables: {
                         "GDAL_DATA": "/opt/share/gdal",
                         "PROJ_LIB": "/opt/share/proj",
                         "StackName": { "Ref": "AWS::StackName" },
-                        "INFERENCES": { "Ref": "Inferences" },
-                        "INF_SUPERTILE": {"Ref": "InfSupertile"},
-                        "ITERATION_ID": { "Ref": "IterationId" },
-                        "PROJECT_ID": { "Ref": "ProjectId" },
-                        "IMAGERY_ID": { "Ref": "ImageryId" },
-                        "PREDICTION_ENDPOINT": { "Fn::Join": ["", [
-                            "http://", { "Fn::GetAtt": ["PredELB", "DNSName"]}, "/v1/models/default/versions/001"]
-                        ]},
+                        "INFERENCES": cf.ref('Inferences'),
+                        "INF_SUPERTILE": cf.ref('InfSupertile'),
+                        "ITERATION_ID": cf.ref('IterationId'),
+                        "PROJECT_ID": cf.ref('ProjectId'),
+                        "IMAGERY_ID": cf.ref('ImageryId'),
+                        "PREDICTION_ENDPOINT": cf.join('', [
+                            'http://', cf.getAtt('PredELB', 'DNSName'), '/v1/models/default/versions/001'
+                        ]),
                         "MLENABLER_ENDPOINT": { "Fn::ImportValue": { "Fn::Join": [ "-", [
                             { "Ref": "StackName" },
                             "api"
@@ -425,9 +425,24 @@ module.exports = {
                         SizeInMBs: 100
                     },
                     CompressionFormat: 'GZIP',
-                    RoleARN: cf.getAtt('FirehoseDeliveryIAMRole', 'Arn')
+                    RoleARN: cf.getAtt('PredFirehoseRole', 'Arn')
                 }
             },
+        },
+        PredFirehoseRole: {
+            Type: 'AWS::IAM::Role',
+            Properties: {
+                AssumeRolePolicyDocument: {
+                    Version: '2012-10-17',
+                    Statement: [ {
+                        Effect: 'Allow',
+                        Principal: {
+                            Service: 'firehose.amazonaws.com'
+                        },
+                        Action: 'sts:AssumeRole'
+                    }]
+                }
+            }
         },
         FirehoseDeliveryIAMPolicy: {
             Type: 'AWS::IAM::Policy',
@@ -457,7 +472,7 @@ module.exports = {
                         ]) ],
                     }]
                 },
-                Roles: [ cf.ref('FirehoseDeliveryIAMRole') ]
+                Roles: [ cf.ref('PredFirehoseRole') ]
             },
         }
     },

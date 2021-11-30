@@ -9,6 +9,7 @@ import geojson
 import requests
 import rasterio
 import shapely
+import boto3
 
 from shapely.geometry import box
 from requests.auth import HTTPBasicAuth
@@ -30,6 +31,7 @@ import numpy as np
 
 from download_and_predict.custom_types import SQSEvent
 
+firehose = boto3.client('firehose')
 
 class ModelType(Enum):
     OBJECT_DETECT = 1
