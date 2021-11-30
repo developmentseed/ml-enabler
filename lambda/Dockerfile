@@ -20,9 +20,7 @@ RUN pip3 install -r requirements.txt --no-binary rasterio,shapely,numpy -t $PACK
 ################################################################################
 #                            REDUCE PACKAGE SIZE                               #
 ################################################################################
-RUN rm -rdf $PACKAGE_PREFIX/boto3/ \
-  && rm -rdf $PACKAGE_PREFIX/botocore/ \
-  && rm -rdf $PACKAGE_PREFIX/docutils/ \
+RUN rm -rdf $PACKAGE_PREFIX/docutils/ \
   && rm -rdf $PACKAGE_PREFIX/dateutil/ \
   && rm -rdf $PACKAGE_PREFIX/jmespath/ \
   && rm -rdf $PACKAGE_PREFIX/s3transfer/ \
