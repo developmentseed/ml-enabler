@@ -7,14 +7,10 @@ from download_and_predict.custom_types import SQSEvent
 
 def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
     # read all our environment variables to throw errors early
-    model_id = os.getenv('MODEL_ID')
-    prediction_id = os.getenv('PREDICTION_ID')
     prediction_endpoint = os.getenv('PREDICTION_ENDPOINT')
     mlenabler_endpoint = os.getenv('MLENABLER_ENDPOINT')
     super_tile = os.getenv('INF_SUPERTILE')
 
-    assert(model_id)
-    assert(prediction_id)
     assert(prediction_endpoint)
     assert(mlenabler_endpoint)
 

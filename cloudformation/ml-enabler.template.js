@@ -249,6 +249,7 @@ const Resources = {
                         Effect: 'Allow', // These are all required to spin up a prediction stack
                         Action: [
                             'deliverystream:*',
+                            'firehose:*',
                             'iam:PassRole',
                             'logs:DescribeLogGroups',
                             'ecs:CreateService',

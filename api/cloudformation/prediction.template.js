@@ -114,8 +114,6 @@ module.exports = {
                         "StackName": { "Ref": "AWS::StackName" },
                         "INFERENCES": cf.ref('Inferences'),
                         "INF_SUPERTILE": cf.ref('InfSupertile'),
-                        "ITERATION_ID": cf.ref('IterationId'),
-                        "PROJECT_ID": cf.ref('ProjectId'),
                         "IMAGERY_ID": cf.ref('ImageryId'),
                         "PREDICTION_ENDPOINT": cf.join('', [
                             'http://', cf.getAtt('PredELB', 'DNSName'), '/v1/models/default/versions/001'
