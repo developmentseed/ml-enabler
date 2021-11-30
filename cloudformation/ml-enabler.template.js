@@ -668,6 +668,14 @@ const Resources = {
                     },{
                         Effect: 'Allow',
                         Action: [
+                            'firehose:PutRecordBatch'
+                        ],
+                        Resource: cf.join([
+                            'arn:aws:firehose:', cf.region,':', cf.accountId, ':deliverystream/', cf.stackName, '-*'
+                        ])
+                    },{
+                        Effect: 'Allow',
+                        Action: [
                             'sqs:SendMessage',
                             'sqs:ReceiveMessage',
                             'sqs:ChangeMessageVisibility',

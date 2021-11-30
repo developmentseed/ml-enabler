@@ -272,9 +272,12 @@ export default {
                 this.queue = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/stack/queue`, {
                     method: 'DELETE'
                 });
+
             } catch (err) {
                 this.$emit('err', err);
             }
+
+            this.getQueue();
         },
         getQueue: async function() {
             this.loading.queue = true;
