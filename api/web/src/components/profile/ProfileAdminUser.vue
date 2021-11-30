@@ -48,7 +48,7 @@
 
                     <div class='col col--4'>
                         <label>Username</label>
-                        <input :disabled='newUser.password' v-model='newUser.name' type='text' class='input' placeholder='Username'/>
+                        <input :disabled='newUser.password' v-model='newUser.username' type='text' class='input' placeholder='Username'/>
                     </div>
                     <div class='col col--4'>
                         <label>Email</label>
@@ -101,7 +101,7 @@
             <div :key='user.id' v-for='user in users' class='col col--12 grid'>
                 <div @click='user._open = !user._open' class='grid col col--12 bg-gray-light-on-hover cursor-pointer px12 py12 round'>
                     <div class='col col--3'>
-                        <span v-text='user.name'/>
+                        <span v-text='user.username'/>
                     </div>
                     <div class='col col--6'>
                         <span v-text='user.email'/>
@@ -139,7 +139,7 @@ export default {
             users: [],
             newUser: {
                 show: false,
-                name: '',
+                username: '',
                 email: '',
                 access: 'user',
                 password: false
@@ -164,7 +164,7 @@ export default {
         },
         clear: function() {
             this.newUser.show = false;
-            this.newUser.name = '';
+            this.newUser.username = '';
             this.newUser.email = '';
             this.newUser.access = 'user';
             this.newUser.password = false;
@@ -192,30 +192,19 @@ export default {
                 this.$emit('err', err);
             }
         },
-        createUser: function() {
-            fetch(`${window.api}/v1/user`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    name: this.newUser.name,
-                    email: this.newUser.email,
-                    access: this.newUser.access
+        createUser: async function() {
+            try  {
+                const res = await window.std('/api/user', {
+                    method: 'POST',
+                    body: {
+                        username: this.newUser.username,
+                        email: this.newUser.email,
+                        access: this.newUser.access
+                    }
                 })
-            }).then((res) => {
-                if (!res.ok && res.statusCode !== 404 && res.message) {
-                    throw new Error(res.message);
-                } else if (!res.ok && res.statusCode !== 404) {
-                    throw new Error('Failed to create user');
-                }
-
-                return res.json();
-            }).then((res) => {
-                this.newUser.password = res.password;
-            }).catch((err) => {
+            } catch (err) {
                 this.$emit('err', err);
-            });
+            }
         }
     },
     components: {
