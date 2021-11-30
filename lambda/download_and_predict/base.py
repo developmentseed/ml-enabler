@@ -117,31 +117,34 @@ class DownloadAndPredict(object):
         return payload
 
     def cl_post_prediction(self, payload: Dict[str, Any], chips: List[dict], inferences: List[str]) -> Dict[str, Any]:
-        payload = json.dumps(payload)
-        r = requests.post(self.prediction_endpoint + ":predict", data=payload)
-        r.raise_for_status()
+        try:
+            payload = json.dumps(payload)
+            r = requests.post(self.prediction_endpoint + ":predict", data=payload)
+            r.raise_for_status()
 
-        preds = r.json()["predictions"]
-        pred_list = [];
+            preds = r.json()["predictions"]
+            pred_list = [];
 
-        for i in range(len(chips)):
-            pred_dict = {}
+            for i in range(len(chips)):
+                pred_dict = {}
 
-            for j in range(len(preds[i])):
-                pred_dict[inferences[j]] = preds[i][j]
+                for j in range(len(preds[i])):
+                    pred_dict[inferences[j]] = preds[i][j]
 
-            print('BOUNDS', chips[i].get('bounds'))
-            body = {
-                "geom": shapely.geometry.mapping(box(*chips[i].get('bounds'))),
-                "predictions": pred_dict,
-            }
+                print('BOUNDS', chips[i].get('bounds'))
+                body = {
+                    "geom": shapely.geometry.mapping(box(*chips[i].get('bounds'))),
+                    "predictions": pred_dict,
+                }
 
-            if chips[i].get('x') is not None and chips[i].get('y') is not None and chips[i].get('z') is not None:
-                body['quadkey'] = mercantile.quadkey(chips[i].get('x'), chips[i].get('y'), chips[i].get('z'))
+                if chips[i].get('x') is not None and chips[i].get('y') is not None and chips[i].get('z') is not None:
+                    body['quadkey'] = mercantile.quadkey(chips[i].get('x'), chips[i].get('y'), chips[i].get('z'))
 
-            pred_list.append(body)
+                pred_list.append(body)
 
-        return pred_list
+            return pred_list
+        except requests.exceptions.HTTPError as e:
+            print (e.response.text)
 
     def od_post_prediction(self, payload: str, chips: List[dict]) -> Dict[str, Any]:
         pred_list = [];
