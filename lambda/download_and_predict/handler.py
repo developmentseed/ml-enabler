@@ -38,7 +38,7 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
         print("TYPE: Object Detection")
 
         # send prediction request
-        preds = dap.od_post_prediction(payload, chips, prediction_id)
+        preds = dap.od_post_prediction(payload, chips)
 
         if len(preds["predictions"]) == 0:
             print('RESULT: No Predictions')
@@ -46,7 +46,7 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
             print('RESULT: ' + str(len(preds["predictions"])) + ' Predictions')
 
             # Save the prediction to ML-Enabler
-            dap.save_prediction(prediction_id, preds, auth)
+            dap.save_prediction(preds)
     elif model_type == ModelType.CLASSIFICATION:
         print("TYPE: Classification")
 
@@ -55,10 +55,10 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
         inferences = inferences.split(',')
 
         # send prediction request
-        preds = dap.cl_post_prediction(payload, chips, prediction_id, inferences)
+        preds = dap.cl_post_prediction(payload, chips, inferences)
 
         # Save the prediction to ML-Enabler
-        dap.save_prediction(prediction_id, preds, auth)
+        dap.save_prediction(preds)
     else:
         print("Unknown Model")
 

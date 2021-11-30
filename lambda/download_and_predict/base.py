@@ -4,6 +4,7 @@ to a remote ML serving image, and saving them
 @author:Development Seed
 """
 import json
+import base64
 import affine
 import geojson
 import requests
@@ -115,7 +116,7 @@ class DownloadAndPredict(object):
 
         return payload
 
-    def cl_post_prediction(self, payload: Dict[str, Any], chips: List[dict], prediction_id: str, inferences: List[str]) -> Dict[str, Any]:
+    def cl_post_prediction(self, payload: Dict[str, Any], chips: List[dict], inferences: List[str]) -> Dict[str, Any]:
         payload = json.dumps(payload)
         r = requests.post(self.prediction_endpoint + ":predict", data=payload)
         r.raise_for_status()
@@ -133,7 +134,6 @@ class DownloadAndPredict(object):
             body = {
                 "geom": shapely.geometry.mapping(box(*chips[i].get('bounds'))),
                 "predictions": pred_dict,
-                "prediction_id": prediction_id
             }
 
             if chips[i].get('x') is not None and chips[i].get('y') is not None and chips[i].get('z') is not None:
@@ -141,12 +141,9 @@ class DownloadAndPredict(object):
 
             pred_list.append(body)
 
-        return {
-            "predictionId": prediction_id,
-            "predictions": pred_list
-        }
+        return pred_list
 
-    def od_post_prediction(self, payload: str, chips: List[dict], prediction_id: str) -> Dict[str, Any]:
+    def od_post_prediction(self, payload: str, chips: List[dict]) -> Dict[str, Any]:
         pred_list = [];
 
         for i in range(len(chips)):
@@ -182,8 +179,7 @@ class DownloadAndPredict(object):
                     "geom": bbox,
                     "predictions": {
                         "default": score
-                    },
-                    "prediction_id": prediction_id
+                    }
                 }
 
                 if chips[i].get('x') is not None and chips[i].get('y') is not None and chips[i].get('z') is not None:
@@ -191,18 +187,15 @@ class DownloadAndPredict(object):
 
                 pred_list.append(body)
 
-        return {
-            "predictionId": prediction_id,
-            "predictions": pred_list
-        }
+        return pred_list
 
-    def save_prediction(self, prediction_id: str, payload, auth: str):
-        url = self.mlenabler_endpoint + "/v1/model/prediction/" + prediction_id + "/tiles"
-        r = requests.post(url, json=payload, auth=HTTPBasicAuth('machine', auth))
-
-        print(r.text)
-
-        r.raise_for_status()
+    def save_prediction(self, payload, stream):
+        firehose.put_record_batch(
+            DeliveryStreamName=stream,
+            Records=[{
+                "Data": base64.b64encode(json.dumps(p))
+            } for p in payload]
+        )
 
         return True
 
