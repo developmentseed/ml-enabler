@@ -412,8 +412,8 @@ module.exports = {
                     BucketARN: cf.join('', ['arn:aws:s3:::', cf.ref('StackName'), '-', cf.accountId, '-', cf.region]),
                     Prefix: cf.join('', [
                         'project/', cf.ref('ProjectId'),
-                        'iteration', cf.ref('IterationId'),
-                        'prediction'
+                        '/iteration/', cf.ref('IterationId'),
+                        '/prediction/'
                     ]),
                     BufferingHints: {
                         IntervalInSeconds: 60,
