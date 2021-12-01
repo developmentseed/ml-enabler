@@ -133,8 +133,9 @@ class DownloadAndPredict(object):
 
                 print('BOUNDS', chips[i].get('bounds'))
                 body = {
-                    "geom": shapely.geometry.mapping(box(*chips[i].get('bounds'))),
-                    "predictions": pred_dict,
+                    "type": "Feature",
+                    "geometry": shapely.geometry.mapping(box(*chips[i].get('bounds'))),
+                    "properties": pred_dict,
                 }
 
                 if chips[i].get('x') is not None and chips[i].get('y') is not None and chips[i].get('z') is not None:
@@ -179,10 +180,11 @@ class DownloadAndPredict(object):
                 score = preds["detection_scores"][j]
 
                 body = {
-                    "geom": bbox,
-                    "predictions": {
+                    "type": "Feature",
+                    "properties": {
                         "default": score
-                    }
+                    },
+                    "geometry": bbox,
                 }
 
                 if chips[i].get('x') is not None and chips[i].get('y') is not None and chips[i].get('z') is not None:
