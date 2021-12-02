@@ -155,13 +155,14 @@ const stack = {
                 },
                 Parameters: { },
                 ContainerProperties: {
-                    Command: ['python', './task.py'],
+                    Command: ['./task'],
                     Environment: [
                         { Name: 'StackName' , Value: cf.stackName },
                         { Name: 'BATCH_ECR' , Value: cf.ref('BatchECR') },
                         { Name: 'AWS_ACCOUNT_ID', Value: cf.accountId },
                         { Name: 'AWS_REGION', Value: cf.region },
-                        { Name: 'API_URL', Value: cf.join(['http://', cf.getAtt('MLEnablerELB', 'DNSName')]) }
+                        { Name: 'API_URL', Value: cf.join(['http://', cf.getAtt('MLEnablerELB', 'DNSName')]) },
+                        { Name: 'ASSET_BUCKET', Value: cf.ref('MLEnablerBucket') }
                     ],
                     Memory: 4000,
                     Privileged: true,

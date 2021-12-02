@@ -1,0 +1,16 @@
+set -euo pipefail
+
+if [[ -z ${ASSET_BUCKET} ]]; then
+    echo "ASSET_BUCKET env must be set"
+    exit 1
+elif [[ -z ${PROJECT_ID} ]]; then
+    echo "PROJECT_ID env must be set"
+    exit 1
+elif [[ -z ${ITERATION_ID} ]]; then
+    echo "ITERATION_ID env must be set"
+    exit 1
+fi
+
+mkdir data
+aws s3 cp --recursive s3://${ASSET_BUCKET}/project/${PROJECT_ID}/iteration/${ITERATION_ID}/ data/
+node index.js
