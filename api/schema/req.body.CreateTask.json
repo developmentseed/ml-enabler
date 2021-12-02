@@ -1,0 +1,16 @@
+{
+    "type": "object",
+    "required": [
+        "type"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "type": {
+            "type": "string",
+            "enum": [
+                "vectorize"
+            ],
+            "description": "The class of type to start"
+        }
+    }
+}

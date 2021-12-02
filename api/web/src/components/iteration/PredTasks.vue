@@ -62,6 +62,23 @@
                 </button>
             </div>
         </template>
+        <template v-else-if='create === "vectorize"'>
+            <div class='col col--12 grid'>
+                <div class='col col--12'>
+                    <button @click='create = false' class='btn fr round btn--stroke color-gray color-black-on-hover'>
+                        <svg class='icon'><use href='#icon-close'/></svg>
+                    </button>
+                </div>
+
+                <div class='col col--12'>
+                    <div class='flex-parent flex-parent--center-main pt12 pb36'>
+                        <button @click='createVectorize' class='flex-child btn btn--stroke round'>
+                            Vectorize Inferences
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </template>
         <template v-else-if='!tilejson'>
             <button @click='create = false' class='btn fr round btn--stroke color-gray color-black-on-hover'>
                 <svg class='icon'><use href='#icon-close'/></svg>
@@ -197,6 +214,20 @@ export default {
             if (!url) return;
 
             window.open(url, "_blank")
+        },
+        createVectorize: async function() {
+            try {
+                await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/task`, {
+                    method: 'POST',
+                    body: {
+                        type: 'vectorize'
+                    }
+                });
+
+                this.create = false;
+            } catch (err) {
+                this.$emit('err', err);
+            }
         },
         createRetrain: async function() {
             try {

@@ -37,6 +37,7 @@
                         <svg class='icon fl'><use href='#icon-chevron-down'/></svg>
 
                         <div class='round dropdown-content color-black' style='top: 24px;'>
+                            <div @click='$emit("create", "vectorize")' class='round bg-gray-faint-on-hover'>Vectorize</div>
                             <div @click='$emit("create", "tfrecords")' class='round bg-gray-faint-on-hover'>TFRecords</div>
                             <div @click='$emit("create", "retrain")' class='round bg-gray-faint-on-hover'>Retraining</div>
                         </div>

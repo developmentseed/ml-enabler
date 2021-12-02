@@ -5,6 +5,34 @@ async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
 
     /**
+     * @api {get} /api/project/:pid/iteration/:iterationid/task Create Task
+     * @apiVersion 1.0.0
+     * @apiName CreateTask
+     * @apiGroup Tasks
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Create a new task for a given iteration
+     *
+     * @apiSchema (Query) {jsonschema=../schema/req.body.CreateTask.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.Task.json} apiSuccess
+     */
+    await schema.post('/project/:pid/iteration/:iterationid/task', {
+        ':pid': 'integer',
+        ':iterationid': 'integer',
+        body: 'req.body.CreateTask.json',
+        res: 'res.Task.json'
+    }, async (req, res) => {
+        try {
+            await user.is_auth(req);
+
+            res.json({});
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {get} /api/project/:pid/iteration/:iterationid/task List Tasks
      * @apiVersion 1.0.0
      * @apiName ListTask
