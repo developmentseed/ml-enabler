@@ -1,6 +1,7 @@
 {
     "type": "object",
     "required": [
+        "model_type",
         "tile_zoom",
         "inf_list",
         "inf_type",
@@ -12,6 +13,12 @@
     ],
     "additionalProperties": false,
     "properties": {
+        "model_type": {
+            "type": "integer",
+            "enum": [
+                "tensorflow"
+            ]
+        },
         "tile_zoom": {
             "type": "integer"
         },

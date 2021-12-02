@@ -8,6 +8,7 @@
         "tile_zoom",
         "docker_link",
         "model_link",
+        "model_type",
         "checkpoint_link",
         "tfrecord_link",
         "save_link",
@@ -35,6 +36,12 @@
         },
         "model_link": {
             "type": "string"
+        },
+        "model_type": {
+            "type": "string",
+            "enum": [
+                "tensorflow"
+            ]
         },
         "checkpoint_link": {
             "type": "string"
