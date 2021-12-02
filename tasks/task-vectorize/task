@@ -13,8 +13,11 @@ fi
 
 mkdir ./data || true
 rm -rf ./data/*
+mkdir ./data/raw/
 
-aws s3 cp --recursive s3://${ASSET_BUCKET}/project/${PROJECT_ID}/iteration/${ITERATION_ID}/prediction/ data/
-find ./data/ -type f -exec gunzip {} +
+aws s3 cp --recursive s3://${ASSET_BUCKET}/project/${PROJECT_ID}/iteration/${ITERATION_ID}/prediction/ data/raw/
+find ./data/raw/ -type f -exec gunzip {} +
+cat $(find ./data/raw/ -type f) | base64 --decode > ./data/input.geojson
+rm -rf ./data/raw
 
 node index.js

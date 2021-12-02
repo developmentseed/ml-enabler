@@ -17,7 +17,7 @@ main();
 
 async function main() {
     await tippecanoe.tile(
-        fs.createReadStream(path.resolve(__dirname, 'input.geojson')),
+        fs.createReadStream(path.resolve(__dirname, './data/input.geojson')),
         path.resolve('fabric.mbtiles'),
         {
             layer: 'data',
