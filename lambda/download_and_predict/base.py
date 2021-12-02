@@ -219,11 +219,12 @@ class DownloadAndPredict(object):
         return geographic_bbox
 
 class SuperTileDownloader(DownloadAndPredict):
-    def __init__(self, mlenabler_endpoint: str, prediction_endpoint: str):
+    def __init__(self, mlenabler_endpoint: str, prediction_endpoint: str, aoi_id: str):
     # type annotatation error ignored, re: https://github.com/python/mypy/issues/5887
         super(DownloadAndPredict, self).__init__()
         self.mlenabler_endpoint = mlenabler_endpoint
         self.prediction_endpoint = prediction_endpoint
+        self.aoi_id = aoi_id
 
     def get_images(self, chips: List[dict]) -> Iterator[Tuple[dict, bytes]]:
         """return bounds of original tile filled with the 4 child chips 1 zoom level up in bytes"""
