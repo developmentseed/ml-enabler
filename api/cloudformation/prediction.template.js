@@ -420,10 +420,7 @@ module.exports = {
                         SizeInMBs: 100
                     },
                     CompressionFormat: 'GZIP',
-                    RoleArn: { "Fn::ImportValue": { "Fn::Join": [ "-", [
-                        { "Ref": "StackName" },
-                        "firehose-role"
-                    ]]}},
+                    RoleARN: cf.importValue(cf.join( '-', [ cf.ref('StackName'), "firehose-role" ]))
                 }
             },
         }
