@@ -408,7 +408,7 @@ module.exports = {
                     "-iteration-", cf.ref('IterationId')
                 ]),
                 DeliveryStreamType: 'DirectPut',
-                S3DestinationConfiguration: {
+                ExtendedS3DestinationConfiguration: {
                     BucketARN: cf.join('', ['arn:aws:s3:::', cf.ref('StackName'), '-', cf.accountId, '-', cf.region]),
                     Prefix: cf.join('', [
                         'project/', cf.ref('ProjectId'),
@@ -421,6 +421,22 @@ module.exports = {
                     },
                     CompressionFormat: 'GZIP',
                     RoleARN: cf.importValue(cf.join( '-', [ cf.ref('StackName'), "firehose-role" ]))
+                    DynamicPartitioningConfiguration: {
+                        Enabled: true,
+                        RetryOptions: {
+                            DurationInSeconds: 300
+                        }
+                        ProcessingConfiguration: {
+                            Enabled: true,
+                            Processors: [{
+                                Type: 'AppendDelimiterToRecord',
+                                Parameters: [{
+                                    ParameterName: 'Delimiter',
+                                    ParameterValue: '\\n'
+                                }]
+                            }]
+                        }
+                    }
                 }
             },
         }
