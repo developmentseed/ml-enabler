@@ -11,6 +11,8 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
     mlenabler_endpoint = os.getenv('MLENABLER_ENDPOINT')
     stream = os.getenv('StackName')
 
+    aoi_id = os.getenv('AOI_ID', default='default')
+
     super_tile = os.getenv('INF_SUPERTILE')
 
     assert(stream)
@@ -21,6 +23,7 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
     dap = DownloadAndPredict(
         mlenabler_endpoint=mlenabler_endpoint,
         prediction_endpoint=prediction_endpoint
+        aoi_id=aoi_id
     )
 
     # get tiles from our SQS event

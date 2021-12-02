@@ -413,7 +413,12 @@ module.exports = {
                     Prefix: cf.join('', [
                         'project/', cf.ref('ProjectId'),
                         '/iteration/', cf.ref('IterationId'),
-                        '/prediction/'
+                        '/prediction/aoi-!{partitionKeyFromQuery:aoi}'
+                    ]),
+                    ErrorOutputPrefix: cf.join('', [
+                        'project/', cf.ref('ProjectId'),
+                        '/iteration/', cf.ref('IterationId'),
+                        '/prediction-errors/aoi-!{partitionKeyFromQuery:aoi}/'
                     ]),
                     BufferingHints: {
                         IntervalInSeconds: 60,
@@ -421,15 +426,18 @@ module.exports = {
                     },
                     CompressionFormat: 'GZIP',
                     RoleARN: cf.importValue(cf.join( '-', [ cf.ref('StackName'), "firehose-role" ])),
-                    DynamicPartitioningConfiguration: {
-                        Enabled: true,
-                        RetryOptions: {
-                            DurationInSeconds: 300
-                        },
-                    },
                     ProcessingConfiguration: {
                         Enabled: true,
                         Processors: [{
+                            Type: 'MetadataExtraction',
+                            Parameters: [{
+                                ParameterName: 'MetadataExtractionQuery',
+                                ParameterValue: '{aoi:.aoi_id}'
+                            },{
+                                ParameterName: 'JsonParsingEngine',
+                                ParameterValue: 'JQ-1.6'
+                            }]
+                        },{
                             Type: 'AppendDelimiterToRecord',
                             Parameters: [{
                                 ParameterName: 'Delimiter',

@@ -44,11 +44,12 @@ class DownloadAndPredict(object):
     make machine learning predictions
     """
 
-    def __init__(self, mlenabler_endpoint: str, prediction_endpoint: str):
+    def __init__(self, mlenabler_endpoint: str, prediction_endpoint: str, aoi_id: str):
         super(DownloadAndPredict, self).__init__()
 
         self.mlenabler_endpoint = mlenabler_endpoint
         self.prediction_endpoint = prediction_endpoint
+        self.aoi_id = aoi_id
         self.meta = {}
 
     def get_meta(self) -> ModelType:
@@ -134,6 +135,7 @@ class DownloadAndPredict(object):
                 print('BOUNDS', chips[i].get('bounds'))
                 body = {
                     "type": "Feature",
+                    "aoi_id": self.aoi_id,
                     "geometry": shapely.geometry.mapping(box(*chips[i].get('bounds'))),
                     "properties": pred_dict,
                 }
@@ -181,6 +183,7 @@ class DownloadAndPredict(object):
 
                 body = {
                     "type": "Feature",
+                    "aoi_id": self.aoi_id,
                     "properties": {
                         "default": score
                     },
