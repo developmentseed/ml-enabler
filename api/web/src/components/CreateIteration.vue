@@ -9,14 +9,24 @@
         </div>
         <div class='border border--gray-light round col col--12 px12 py12 clearfix'>
             <div class='grid grid--gut12'>
-                <div class='col col--8 py6'>
+                <div class='col col--4 py6'>
                     <label><span v-text='type'/> Version</label>
                     <input v-model='iter.version' class='input' placeholder='0.0.0'/>
                 </div>
 
                 <div class='col col--4 py6'>
                     <label>Model Type:</label>
-                    <div class='select-container'>
+                    <div class='select-container w-full'>
+                        <select v-model='iter.model_type' class='select'>
+                            <option value='tensorflow'>Tensorflow</option>
+                        </select>
+                        <div class='select-arrow'></div>
+                    </div>
+                </div>
+
+                <div class='col col--4 py6'>
+                    <label>Inference Type:</label>
+                    <div class='select-container w-full'>
                         <select v-model='iter.inf_type' class='select'>
                             <option value='classification'>Classification</option>
                             <option value='detection'>Object Detection</option>
@@ -108,6 +118,7 @@ export default {
                 version: '',
                 tile_zoom: '18',
                 inf_list: '',
+                model_type: 'tensorflow',
                 inf_type: 'classification',
                 inf_binary: false,
                 inf_supertile: false
@@ -178,7 +189,8 @@ export default {
                         inf_list: this.iter.inf_list,
                         inf_type: this.iter.inf_type,
                         inf_binary: this.iter.inf_binary,
-                        inf_supertile: this.iter.inf_supertile
+                        inf_supertile: this.iter.inf_supertile,
+                        model_type: this.iter.model_type
                     }
                 });
 

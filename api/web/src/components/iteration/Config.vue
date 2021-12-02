@@ -9,14 +9,24 @@
         <h2 class='w-full align-center txt-h4 py12'><span v-text='iteration.hint.charAt(0).toUpperCase() + iteration.hint.slice(1)'/> Config</h2>
 
         <div class='grid grid--gut12'>
-            <div class='col col--8 py6'>
+            <div class='col col--4 py6'>
                 <label><span v-text='iteration.type'/> Version</label>
                 <input disabled :value='iteration.version' class='input' placeholder='0.0.0'/>
             </div>
 
             <div class='col col--4 py6'>
                 <label>Model Type:</label>
-                <div class='select-container'>
+                <div class='select-container w-full'>
+                    <select disabled v-model='iteration.model_type' class='select'>
+                        <option value='tensorflow'>Tensorflow</option>
+                    </select>
+                    <div class='select-arrow'></div>
+                </div>
+            </div>
+
+            <div class='col col--4 py6'>
+                <label>Model Type:</label>
+                <div class='select-container w-full'>
                     <select disabled :value='iteration.inf_type' class='select'>
                         <option value='classification'>Classification</option>
                         <option value='detection'>Object Detection</option>
