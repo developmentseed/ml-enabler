@@ -20,4 +20,6 @@ find ./data/raw/ -type f -exec gunzip {} +
 cat $(find ./data/raw/ -type f) | base64 --decode > ./data/input.geojson
 rm -rf ./data/raw
 
+aws s3 cp ./data/input.geojson s3://${ASSET_BUCKET}/project/${PROJECT_ID}/iteration/${ITERATION_ID}/prediction.geojson
+
 node index.js
