@@ -187,6 +187,8 @@ class ProjectTask extends Generic {
             jobDef = config.StackName + '-build-job';
         } else if (opts.type === 'pop') {
             jobDef = config.StackName + '-pop-job';
+        } else if (opts.type === 'vectorize') {
+            jobDef = config.StackName + '-vectorize-job';
         } else {
             throw new Err(400, null, 'Unsupported task type');
         }
@@ -221,7 +223,7 @@ class ProjectTask extends Generic {
             }).promise();
 
             task.batch_id = job.jobId;
-            await task.commit(config.pool);
+            return await task.commit(config.pool);
         } catch (err) {
             throw new Err(500, err, 'Failed to submit job');
         }

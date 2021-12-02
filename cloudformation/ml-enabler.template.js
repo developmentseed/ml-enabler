@@ -1,6 +1,8 @@
 const cf = require('@mapbox/cloudfriend');
-const batch = require('./batch');
 const alarms = require('batch-alarms');
+
+const jobs = require('./jobs');
+const batch = require('./batch');
 
 const Parameters = {
     GitSha: {
@@ -959,19 +961,23 @@ const Outputs = {
     }
 };
 
-module.exports = cf.merge({
-    Parameters,
-    Resources,
-    Mappings,
-    Conditions,
-    Outputs,
-},
-alarms({
-    prefix: 'MLEnabler',
-    apache: cf.stackName,
-    email: 'ingalls@developmentseed.org',
-    cluster: cf.ref('MLEnablerECSCluster'),
-    service: cf.getAtt('MLEnablerService', 'Name'),
-    loadbalancer: cf.getAtt('MLEnablerELB', 'LoadBalancerFullName'),
-    targetgroup: cf.getAtt('MLEnablerTargetGroup', 'TargetGroupFullName')
-}), batch);
+module.exports = cf.merge(
+    {
+        Parameters,
+        Resources,
+        Mappings,
+        Conditions,
+        Outputs,
+    },
+    alarms({
+        prefix: 'MLEnabler',
+        apache: cf.stackName,
+        email: 'ingalls@developmentseed.org',
+        cluster: cf.ref('MLEnablerECSCluster'),
+        service: cf.getAtt('MLEnablerService', 'Name'),
+        loadbalancer: cf.getAtt('MLEnablerELB', 'LoadBalancerFullName'),
+        targetgroup: cf.getAtt('MLEnablerTargetGroup', 'TargetGroupFullName')
+    }),
+    batch,
+    jobs
+);

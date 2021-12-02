@@ -26,7 +26,22 @@ async function router(schema, config) {
         try {
             await user.is_auth(req);
 
-            res.json({});
+            let task;
+            if (req.body.type === 'vectorize') {
+                task = await Task.batch(config, {
+                    type: 'vectorize',
+                    name: `vectorize-${req.params.pid}-${req.params.iterationid}`,
+                    iter_id: req.params.iterationid,
+                    environment: [{
+                        name: 'PROJECT_ID',
+                        value: req.params.pid
+                    },{
+                        name: 'ITERATION_ID',
+                        value: req.params.iterationid
+                    }]
+                });
+            }
+            res.json(task.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
