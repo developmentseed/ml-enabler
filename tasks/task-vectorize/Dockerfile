@@ -2,7 +2,7 @@ FROM alpine:3.14
 
 RUN apk add nodejs npm git make bash sqlite-dev zlib-dev gcc g++ python3 py3-pip
 
-RUN&& pip3 install --upgrade pip \
+RUN pip3 install --upgrade pip \
     && pip3 install --no-cache-dir awscli
 
 

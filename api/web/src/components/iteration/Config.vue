@@ -17,7 +17,7 @@
             <div class='col col--4 py6'>
                 <label>Model Type:</label>
                 <div class='select-container w-full'>
-                    <select disabled v-model='iteration.model_type' class='select'>
+                    <select disabled v-model='model_type' class='select'>
                         <option value='tensorflow'>Tensorflow</option>
                     </select>
                     <div class='select-arrow'></div>
@@ -96,6 +96,7 @@ export default {
             loading: {
                 imagery: true
             },
+            model_type: false,
             inf_supertile: false,
             inf_binary: false,
             imagery: []
@@ -104,6 +105,7 @@ export default {
     mounted: function() {
         this.getImagery();
 
+        this.model_type = this.iteration.model_type;
         this.inf_supertile = this.iteration.inf_supertile;
         this.inf_binary = this.iteration.inf_binary;
     },
