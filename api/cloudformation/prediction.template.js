@@ -426,16 +426,16 @@ module.exports = {
                         RetryOptions: {
                             DurationInSeconds: 300
                         },
-                        ProcessingConfiguration: {
-                            Enabled: true,
-                            Processors: [{
-                                Type: 'AppendDelimiterToRecord',
-                                Parameters: [{
-                                    ParameterName: 'Delimiter',
-                                    ParameterValue: '\\n'
-                                }]
+                    },
+                    ProcessingConfiguration: {
+                        Enabled: true,
+                        Processors: [{
+                            Type: 'AppendDelimiterToRecord',
+                            Parameters: [{
+                                ParameterName: 'Delimiter',
+                                ParameterValue: '\\n'
                             }]
-                        }
+                        }]
                     }
                 }
             },
