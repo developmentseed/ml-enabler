@@ -420,12 +420,12 @@ module.exports = {
                         SizeInMBs: 100
                     },
                     CompressionFormat: 'GZIP',
-                    RoleARN: cf.importValue(cf.join( '-', [ cf.ref('StackName'), "firehose-role" ]))
+                    RoleARN: cf.importValue(cf.join( '-', [ cf.ref('StackName'), "firehose-role" ])),
                     DynamicPartitioningConfiguration: {
                         Enabled: true,
                         RetryOptions: {
                             DurationInSeconds: 300
-                        }
+                        },
                         ProcessingConfiguration: {
                             Enabled: true,
                             Processors: [{
