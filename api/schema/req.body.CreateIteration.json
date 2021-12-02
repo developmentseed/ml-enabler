@@ -19,7 +19,12 @@
             "type": "string"
         },
         "inf_type": {
-            "type": "string"
+            "type": "string",
+            "enum": [
+                "segmentation",
+                "classification",
+                "detection"
+            ]
         },
         "inf_binary": {
             "type": "boolean"

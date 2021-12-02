@@ -20,6 +20,7 @@
                         <select v-model='iter.inf_type' class='select'>
                             <option value='classification'>Classification</option>
                             <option value='detection'>Object Detection</option>
+                            <option value='segmentation'>Segmentation</option>
                         </select>
                         <div class='select-arrow'></div>
                     </div>
