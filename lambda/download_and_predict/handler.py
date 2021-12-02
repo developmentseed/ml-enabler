@@ -22,7 +22,7 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
     # instantiate our DownloadAndPredict class
     dap = DownloadAndPredict(
         mlenabler_endpoint=mlenabler_endpoint,
-        prediction_endpoint=prediction_endpoint
+        prediction_endpoint=prediction_endpoint,
         aoi_id=aoi_id
     )
 

@@ -5,7 +5,7 @@ module.exports = {
     Parameters: {
         GitSha: {
             Type: 'String',
-            Description: "GitSha to Deploy"
+            Description: 'GitSha to Deploy'
         },
         StackName: {
             Type: 'String',
@@ -46,62 +46,47 @@ module.exports = {
             Description: 'Model was trained and should inference on supertiles'
         },
     },
-    "Resources" : {
-        "PredLambdaLogs": {
-            "Type": "AWS::Logs::LogGroup",
-            "Properties": {
-                "LogGroupName": { "Fn::Join": [ "", [
-                    "/aws/lambda/",
-                    { "Ref": "StackName" },
-                    "-project-",
-                    { "Ref": "ProjectId" },
-                    "-iteration-",
-                    { "Ref": "IterationId" },
-                    "-queue"
-                ]]},
-                "RetentionInDays": 7
+    Resources: {
+        PredLambdaLogs: {
+            Type: 'AWS::Logs::LogGroup',
+            Properties: {
+                LogGroupName: cf.join([
+                    '/aws/lambda/', cf.ref('StackName'),
+                    '-project-', cf.ref('ProjectId'),
+                    '-iteration-', cf.ref('IterationId'),
+                    '-queue'
+                ]),
+                RetentionInDays: 7
             }
         },
-        "PredLogs": {
-            "Type": "AWS::Logs::LogGroup",
-            "Properties": {
-                "LogGroupName": { "Fn::Join": [ "-", [
-                    { "Ref": "StackName" },
-                    { "Ref": "IterationId" }
-                ]]},
-                "RetentionInDays": 7
+        PredLogs: {
+            Type: 'AWS::Logs::LogGroup',
+            Properties: {
+                LogGroupName: cf.join('-', [
+                    cf.ref('StackName'),
+                    cf.ref('IterationId')
+                ]),
+                RetentionInDays: 7
             }
         },
-        "PredLambdaSource": {
-            "Type": "AWS::Lambda::EventSourceMapping",
-            "Properties": {
-                "Enabled": "True",
-                "EventSourceArn":  { "Fn::GetAtt": [ "PredTileQueue", "Arn" ] },
-                "FunctionName": { "Ref": "PredLambdaFunction" }
+        PredLambdaSource: {
+            Type: 'AWS::Lambda::EventSourceMapping',
+            Properties: {
+                Enabled: 'True',
+                EventSourceArn:  cf.getAtt('PredTileQueue', 'Arn'),
+                FunctionName: cf.ref('PredLambdaFunction')
             }
         },
-        "PredLambdaFunction": {
-            "Type": "AWS::Lambda::Function",
-            "Properties": {
-                "Layers": [
-                    "arn:aws:lambda:us-east-1:552188055668:layer:geolambda:2"
-                ],
-                "Code": {
-                    "S3Bucket": "devseed-artifacts",
-                    "S3Key": { "Fn::Join": [ "", [
-                        "ml-enabler/lambda-",
-                        { "Ref": "GitSha" },
-                        ".zip"
-                    ]]}
+        PredLambdaFunction: {
+            Type: 'AWS::Lambda::Function',
+            Properties: {
+                Layers: [ 'arn:aws:lambda:us-east-1:552188055668:layer:geolambda:2' ],
+                Code: {
+                    S3Bucket: 'devseed-artifacts',
+                    S3Key: cf.join(['ml-enabler/lambda-', cf.ref('GitSha'), '.zip' ])
                 },
-                "FunctionName": { "Fn::Join": ["-", [
-                    { "Ref": "AWS::StackName" },
-                    "queue"
-                ]] },
-                "Role": { "Fn::ImportValue": { "Fn::Join": [ "-", [
-                    { "Ref": "StackName" },
-                    "lambda-role"
-                ]]}},
+                FunctionName: cf.join([ cf.stackName, '-queue']),
+                Role: cf.importValue(cf.join([cf.ref('StackName'), '-lambda-role'])),
                 Handler: 'download_and_predict.handler.handler',
                 MemorySize: 512,
                 Runtime: 'python3.7',
@@ -109,13 +94,13 @@ module.exports = {
                 Timeout: 240,
                 Environment: {
                     Variables: {
-                        "GDAL_DATA": "/opt/share/gdal",
-                        "PROJ_LIB": "/opt/share/proj",
-                        "StackName": cf.stackName,
-                        "INFERENCES": cf.ref('Inferences'),
-                        "INF_SUPERTILE": cf.ref('InfSupertile'),
-                        "IMAGERY_ID": cf.ref('ImageryId'),
-                        "PREDICTION_ENDPOINT": cf.join('', [
+                        'GDAL_DATA': "/opt/share/gdal",
+                        'PROJ_LIB': "/opt/share/proj",
+                        'StackName': cf.stackName,
+                        'INFERENCES': cf.ref('Inferences'),
+                        'INF_SUPERTILE': cf.ref('InfSupertile'),
+                        'IMAGERY_ID': cf.ref('ImageryId'),
+                        'PREDICTION_ENDPOINT': cf.join([
                             'http://', cf.getAtt('PredELB', 'DNSName'), '/v1/models/default/versions/001'
                         ]),
                         "MLENABLER_ENDPOINT": { "Fn::ImportValue": cf.join('-', [
@@ -141,7 +126,7 @@ module.exports = {
                 "Port": 8501,
                 "Protocol": "HTTP",
                 "VpcId": { "Fn::ImportValue": { "Fn::Join": [ "-", [
-                    { "Ref": "StackName" },
+                    cf.ref('StackName'),
                     "vpc"
                 ]]}},
                 "HealthCheckPath": "/v1/models/default",
@@ -150,38 +135,38 @@ module.exports = {
                 }
             }
         },
-        "PredHTTPListener": {
-            "Type": "AWS::ElasticLoadBalancingV2::Listener",
-            "Properties": {
-                "DefaultActions": [{
-                    "Type": "forward",
-                    "TargetGroupArn": { "Ref": "PredTargetGroup" }
+        PredHTTPListener: {
+            Type: 'AWS::ElasticLoadBalancingV2::Listener',
+            Properties: {
+                DefaultActions: [{
+                    Type: 'forward',
+                    TargetGroupArn: cf.ref('PredTargetGroup')
                 }],
-                "LoadBalancerArn": { "Ref": "PredELB" },
-                "Port": 80,
-                "Protocol": "HTTP"
+                LoadBalancerArn: cf.ref('PredELB'),
+                Port: 80,
+                Protocol: 'HTTP'
             }
         },
-        "PredELB": {
-            "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
-            "Properties": {
+        PredELB: {
+            Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer',
+            Properties: {
                 "Type": "application",
-                "SecurityGroups": [{ "Ref": "PredELBSecurityGroup" }],
+                "SecurityGroups": [cf.ref('PredELBSecurityGroup')],
                 "LoadBalancerAttributes": [{
                     "Key": "idle_timeout.timeout_seconds",
                     "Value": 240
                 }],
                 "Subnets": [
-                    { "Fn::ImportValue": { "Fn::Join": [ "-", [ { "Ref": "StackName" }, "suba" ]]}},
-                    { "Fn::ImportValue": { "Fn::Join": [ "-", [ { "Ref": "StackName" }, "subb" ]]}}
+                    { "Fn::ImportValue": { "Fn::Join": [ "-", [ cf.ref('StackName'), "suba" ]]}},
+                    { "Fn::ImportValue": { "Fn::Join": [ "-", [ cf.ref('StackName'), "subb" ]]}}
                 ]
             }
         },
-        "PredELBSecurityGroup": {
+        PredELBSecurityGroup: {
             "Type" : "AWS::EC2::SecurityGroup",
             "Properties": {
                 "GroupDescription": { "Fn::Join": [ "-", [
-                    { "Ref": "StackName" },
+                    cf.ref('StackName'),
                     "pred-elb-sg"
                 ]]},
                 "SecurityGroupIngress": [{
@@ -191,7 +176,7 @@ module.exports = {
                     "ToPort": 80
                 }],
                 "VpcId": { "Fn::ImportValue": { "Fn::Join": [ "-", [
-                    { "Ref": "StackName" },
+                    cf.ref('StackName'),
                     "vpc"
                 ]]}}
             }
@@ -200,7 +185,7 @@ module.exports = {
             "Type": "AWS::SQS::Queue",
             "Properties": {
                 "QueueName": { "Fn::Join": [ "-", [
-                    { "Ref": "AWS::StackName" },
+                    cf.stackName,
                     "queue"
                 ]]},
                 "VisibilityTimeout": 2880,
@@ -214,7 +199,7 @@ module.exports = {
             "Type": "AWS::SQS::Queue",
             "Properties": {
                 "QueueName": { "Fn::Join": [ "-", [
-                    { "Ref": "AWS::StackName" },
+                    cf.stackName,
                     "dead-queue"
                 ]]}
             }
@@ -227,7 +212,7 @@ module.exports = {
                     "config" : {
                         "commands": {
                             "01_add_instance_to_cluster": {
-                                "command": { "Fn::Join": [ "", ["echo ECS_CLUSTER=", { "Fn::ImportValue": { "Fn::Join": [ "-", [ { "Ref": "StackName" }, "cluster" ]]}}, " >> /etc/ecs/ecs.config\n" ]] }
+                                "command": { "Fn::Join": [ "", ["echo ECS_CLUSTER=", { "Fn::ImportValue": { "Fn::Join": [ "-", [ cf.ref('StackName'), "cluster" ]]}}, " >> /etc/ecs/ecs.config\n" ]] }
                             }
                         },
                         "files": {
@@ -402,23 +387,23 @@ module.exports = {
         PredFirehose: {
             Type: 'AWS::KinesisFirehose::DeliveryStream',
             Properties: {
-                DeliveryStreamName: cf.join('', [
+                DeliveryStreamName: cf.join([
                     cf.ref('StackName'),
                     "-project-", cf.ref('ProjectId'),
                     "-iteration-", cf.ref('IterationId')
                 ]),
                 DeliveryStreamType: 'DirectPut',
                 ExtendedS3DestinationConfiguration: {
-                    BucketARN: cf.join('', ['arn:aws:s3:::', cf.ref('StackName'), '-', cf.accountId, '-', cf.region]),
-                    Prefix: cf.join('', [
+                    BucketARN: cf.join(['arn:aws:s3:::', cf.ref('StackName'), '-', cf.accountId, '-', cf.region]),
+                    Prefix: cf.join([
                         'project/', cf.ref('ProjectId'),
                         '/iteration/', cf.ref('IterationId'),
                         '/prediction/aoi-!{partitionKeyFromQuery:aoi}'
                     ]),
-                    ErrorOutputPrefix: cf.join('', [
+                    ErrorOutputPrefix: cf.join([
                         'project/', cf.ref('ProjectId'),
                         '/iteration/', cf.ref('IterationId'),
-                        '/prediction-errors/aoi-!{partitionKeyFromQuery:aoi}/'
+                        '/prediction-errors/!{firehose:error-output-type}/'
                     ]),
                     BufferingHints: {
                         IntervalInSeconds: 60,
@@ -426,6 +411,12 @@ module.exports = {
                     },
                     CompressionFormat: 'GZIP',
                     RoleARN: cf.importValue(cf.join( '-', [ cf.ref('StackName'), "firehose-role" ])),
+                    DynamicPartitioningConfiguration: {
+                        Enabled: true,
+                        RetryOptions: {
+                            DurationInSeconds: 300
+                        }
+                    },
                     ProcessingConfiguration: {
                         Enabled: true,
                         Processors: [{
@@ -449,7 +440,7 @@ module.exports = {
             },
         }
     },
-    "Mappings": {
+    Mappings: {
         "AWSRegionToAMI": {
             "DOCS": { "LIST": "http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html" },
             "us-east-1": { "AMIID": "ami-07eb64b216d4d3522" }

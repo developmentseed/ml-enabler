@@ -1,4 +1,4 @@
-set -euo pipefail
+set -xeuo pipefail
 
 if [[ -z ${ASSET_BUCKET} ]]; then
     echo "ASSET_BUCKET env must be set"
