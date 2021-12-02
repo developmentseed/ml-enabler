@@ -11,6 +11,10 @@ elif [[ -z ${ITERATION_ID} ]]; then
     exit 1
 fi
 
-mkdir data
-aws s3 cp --recursive s3://${ASSET_BUCKET}/project/${PROJECT_ID}/iteration/${ITERATION_ID}/ data/
+mkdir ./data || true
+rm -rf ./data/*
+
+aws s3 cp --recursive s3://${ASSET_BUCKET}/project/${PROJECT_ID}/iteration/${ITERATION_ID}/prediction/ data/
+find ./data/ -type f -exec gunzip {} +
+
 node index.js
