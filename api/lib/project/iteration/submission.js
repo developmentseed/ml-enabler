@@ -69,8 +69,8 @@ class Submission extends Generic {
                     iter_id,
                     type
                 ) VALUES (
-                    ${task.aoi_id || null},
-                    ${task.iter_id}
+                    ${submission.aoi_id || null},
+                    ${submission.iter_id}
                 ) RETURNING *
             `);
 
