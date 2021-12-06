@@ -12,6 +12,7 @@ const tippecanoe = new Tippecanoe();
 
 const PROJECT = process.env.PROJECT_ID;
 const ITERATION = process.env.ITERATION_ID;
+const SUBMISSION = process.env.SUBMISSION_ID;
 const ASSET_BUCKET = process.env.ASSET_BUCKET;
 
 main();
@@ -24,9 +25,9 @@ async function main() {
             layer: 'data',
             std: true,
             force: true,
-            name: `Project ${PROJECT} - Iteration ${ITERATION}`,
-            attribution: `Project ${PROJECT} - Iteration ${ITERATION}`,
-            description: `Project ${PROJECT} - Iteration ${ITERATION}`,
+            name: `Project ${PROJECT} - Iteration ${ITERATION} - Submission ${SUBMISSION}`,
+            attribution: `Project ${PROJECT} - Iteration ${ITERATION} - Submission ${SUBMISSION}`,
+            description: `Project ${PROJECT} - Iteration ${ITERATION} - Submission ${SUBMISSION}`,
             limit: {
                 features: false,
                 size: false
@@ -46,7 +47,7 @@ async function main() {
     await s3.putObject({
         ContentType: 'application/octet-stream',
         Bucket: ASSET_BUCKET,
-        Key: `project/${PROJECT}/iteration/${ITERATION}/fabric.tilebase`,
+        Key: `project/${PROJECT}/iteration/${ITERATION}/submission-${SUBMISSION}.tilebase`,
         Body: fs.createReadStream(path.resolve(__dirname, 'fabric.tilebase'))
     }).promise();
 

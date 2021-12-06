@@ -3,6 +3,9 @@
     "required": [],
     "additionalProperties": false,
     "properties": {
+        "aoi_id": {
+            "type": "integer"
+        },
         "geometry": {
             "$ref": "./util/polygon.json"
         }

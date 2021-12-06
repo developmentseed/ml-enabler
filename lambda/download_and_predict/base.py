@@ -44,12 +44,11 @@ class DownloadAndPredict(object):
     make machine learning predictions
     """
 
-    def __init__(self, mlenabler_endpoint: str, prediction_endpoint: str, aoi_id: str):
+    def __init__(self, mlenabler_endpoint: str, prediction_endpoint: str):
         super(DownloadAndPredict, self).__init__()
 
         self.mlenabler_endpoint = mlenabler_endpoint
         self.prediction_endpoint = prediction_endpoint
-        self.aoi_id = aoi_id
         self.meta = {}
 
     def get_meta(self) -> ModelType:
@@ -135,7 +134,7 @@ class DownloadAndPredict(object):
                 print('BOUNDS', chips[i].get('bounds'))
                 body = {
                     "type": "Feature",
-                    "aoi_id": self.aoi_id,
+                    "submission_id": chips[i].get('submission_id'),
                     "geometry": shapely.geometry.mapping(box(*chips[i].get('bounds'))),
                     "properties": pred_dict,
                 }
@@ -183,7 +182,7 @@ class DownloadAndPredict(object):
 
                 body = {
                     "type": "Feature",
-                    "aoi_id": self.aoi_id,
+                    "submission_id": chips[i].get('submission_id'),
                     "properties": {
                         "default": score
                     },
@@ -219,12 +218,11 @@ class DownloadAndPredict(object):
         return geographic_bbox
 
 class SuperTileDownloader(DownloadAndPredict):
-    def __init__(self, mlenabler_endpoint: str, prediction_endpoint: str, aoi_id: str):
+    def __init__(self, mlenabler_endpoint: str, prediction_endpoint: str):
     # type annotatation error ignored, re: https://github.com/python/mypy/issues/5887
         super(DownloadAndPredict, self).__init__()
         self.mlenabler_endpoint = mlenabler_endpoint
         self.prediction_endpoint = prediction_endpoint
-        self.aoi_id = aoi_id
 
     def get_images(self, chips: List[dict]) -> Iterator[Tuple[dict, bytes]]:
         """return bounds of original tile filled with the 4 child chips 1 zoom level up in bytes"""

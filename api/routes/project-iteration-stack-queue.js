@@ -3,6 +3,7 @@ const StackQueue = require('../lib/stack/queue');
 const Task = require('../lib/project/iteration/task');
 const Iteration = require('../lib/project/iteration');
 const Imagery = require('../lib/project/imagery');
+const Submission = require('../lib/project/iteration/submission');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
@@ -108,9 +109,16 @@ async function router(schema, config) {
                 throw new Err(400, null, 'Unknown imagery type');
             }
 
-            Task.batch(config, {
+            const submission = await Submission.generate(config.pool, {
+                aoi_id: req.body.aoi_id,
+                iter_id: req.params.iterationid
+            });
+
+            payload.submission = submission.id;
+
+            await Task.batch(config, {
                 type: 'pop',
-                name: `pop-${req.params.pid}-${req.params.iterationid}`,
+                name: `pop-${req.params.pid}-${req.params.iterationid}-${submission.id}`,
                 iter_id: req.params.iterationid,
                 environment: [{
                     name: 'TASK',

@@ -24,6 +24,7 @@ def handler(event) -> bool:
     queue = boto3.resource("sqs").get_queue_by_name(QueueName=queue_name)
 
     fmt = event['fmt']
+    submission = event['submission']
 
     if fmt == "list":
         url = event['url']
@@ -45,6 +46,7 @@ def handler(event) -> bool:
                     "Id": row[0],
                     "MessageBody": json.dumps({
                         "name": row[0],
+                        "submission": submission,
                         "url": row[1],
                         "bounds": list(map(lambda x: float(x), row[2].split(",")))
                     }),
@@ -94,6 +96,7 @@ def handler(event) -> bool:
                     "Id": str(tile.z) + "-" + str(tile.x) + "-" + str(tile.y),
                     "MessageBody": json.dumps(
                         {
+                            "submission": submission,
                             "name": "{x}-{y}-{z}".format(
                                 x=tile.x, y=tile.y, z=tile.z
                             ),

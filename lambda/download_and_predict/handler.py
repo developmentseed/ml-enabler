@@ -11,8 +11,6 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
     mlenabler_endpoint = os.getenv('MLENABLER_ENDPOINT')
     stream = os.getenv('StackName')
 
-    aoi_id = os.getenv('AOI_ID', default='default')
-
     super_tile = os.getenv('INF_SUPERTILE')
 
     assert(stream)
@@ -22,8 +20,7 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
     # instantiate our DownloadAndPredict class
     dap = DownloadAndPredict(
         mlenabler_endpoint=mlenabler_endpoint,
-        prediction_endpoint=prediction_endpoint,
-        aoi_id=aoi_id
+        prediction_endpoint=prediction_endpoint
     )
 
     # get tiles from our SQS event
@@ -35,7 +32,7 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
     # construct a payload for our prediction endpoint
 
     if super_tile == 'True':
-        dap = SuperTileDownloader(mlenabler_endpoint=mlenabler_endpoint, prediction_endpoint=prediction_endpoint, aoi_id=aoi_id)
+        dap = SuperTileDownloader(mlenabler_endpoint=mlenabler_endpoint, prediction_endpoint=prediction_endpoint)
         payload = dap.get_prediction_payload(chips, model_type)
     else:
         payload = dap.get_prediction_payload(chips, model_type)

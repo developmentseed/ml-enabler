@@ -398,7 +398,7 @@ module.exports = {
                     Prefix: cf.join([
                         'project/', cf.ref('ProjectId'),
                         '/iteration/', cf.ref('IterationId'),
-                        '/prediction/aoi-!{partitionKeyFromQuery:aoi}/'
+                        '/prediction/submission-!{partitionKeyFromQuery:submission}/'
                     ]),
                     ErrorOutputPrefix: cf.join([
                         'project/', cf.ref('ProjectId'),
@@ -423,7 +423,7 @@ module.exports = {
                             Type: 'MetadataExtraction',
                             Parameters: [{
                                 ParameterName: 'MetadataExtractionQuery',
-                                ParameterValue: '{aoi:.aoi_id}'
+                                ParameterValue: '{submission:.submission_id}'
                             },{
                                 ParameterName: 'JsonParsingEngine',
                                 ParameterValue: 'JQ-1.6'
