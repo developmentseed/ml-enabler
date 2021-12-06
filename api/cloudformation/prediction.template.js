@@ -398,7 +398,7 @@ module.exports = {
                     Prefix: cf.join([
                         'project/', cf.ref('ProjectId'),
                         '/iteration/', cf.ref('IterationId'),
-                        '/prediction/aoi-!{partitionKeyFromQuery:aoi}'
+                        '/prediction/aoi-!{partitionKeyFromQuery:aoi}/'
                     ]),
                     ErrorOutputPrefix: cf.join([
                         'project/', cf.ref('ProjectId'),
