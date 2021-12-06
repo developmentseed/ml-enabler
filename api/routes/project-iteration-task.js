@@ -5,7 +5,7 @@ async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
 
     /**
-     * @api {get} /api/project/:pid/iteration/:iterationid/task Create Task
+     * @api {post} /api/project/:pid/iteration/:iterationid/task Create Task
      * @apiVersion 1.0.0
      * @apiName CreateTask
      * @apiGroup Tasks
