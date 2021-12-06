@@ -8,7 +8,9 @@
         "updated",
         "type",
         "batch_id",
-        "log_link"
+        "log_link",
+        "status",
+        "statusReason"
     ],
     "properties": {
         "id": {
@@ -31,6 +33,12 @@
         },
         "log_link": {
             "type": ["string", "null"]
+        },
+        "status": {
+            "type": "string"
+        },
+        "statusReason": {
+            "type": "string"
         }
     }
 }
