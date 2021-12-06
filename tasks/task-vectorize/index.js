@@ -12,6 +12,7 @@ const tippecanoe = new Tippecanoe();
 
 const PROJECT = process.env.PROJECT_ID;
 const ITERATION = process.env.ITERATION_ID;
+const ASSET_BUCKET = process.env.ASSET_BUCKET;
 
 main();
 
@@ -44,7 +45,7 @@ async function main() {
 
     await s3.putObject({
         ContentType: 'application/octet-stream',
-        Bucket: process.env.Bucket,
+        Bucket: ASSET_BUCKET,
         Key: `project/${PROJECT}/iteration/${ITERATION}/fabric.tilebase`,
         Body: fs.createReadStream(path.resolve(__dirname, 'fabric.tilebase'))
     }).promise();

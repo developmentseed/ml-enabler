@@ -9,6 +9,9 @@ elif [[ -z ${PROJECT_ID} ]]; then
 elif [[ -z ${ITERATION_ID} ]]; then
     echo "ITERATION_ID env must be set"
     exit 1
+elif [[ -z ${AOI_ID} ]]; then
+    echo "AOI_ID env must be set"
+    exit 1
 fi
 
 mkdir ./data || true
@@ -17,7 +20,7 @@ mkdir ./data/raw/
 
 aws s3 cp --recursive s3://${ASSET_BUCKET}/project/${PROJECT_ID}/iteration/${ITERATION_ID}/prediction/ data/raw/
 find ./data/raw/ -type f -exec gunzip {} +
-cat $(find ./data/raw/ -type f) | base64 --decode > ./data/input.geojson
+cat $(find ./data/raw/ -type f) > ./data/input.geojson
 rm -rf ./data/raw
 
 aws s3 cp ./data/input.geojson s3://${ASSET_BUCKET}/project/${PROJECT_ID}/iteration/${ITERATION_ID}/prediction.geojson
