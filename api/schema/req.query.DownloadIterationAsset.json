@@ -11,7 +11,8 @@
             "enum": [
                 "model",
                 "tfrecord",
-                "checkpoint"
+                "checkpoint",
+                "container"
             ],
             "description": "Asset Type to upload"
         },
