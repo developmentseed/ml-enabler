@@ -113,7 +113,7 @@ export default {
         getMeta: async function() {
             try {
                 this.loading.meta = true;
-                this.meta = await window.std('/api');
+                this.meta = await window.std('/api/');
                 this.loading.meta = false;
             } catch (err) {
                 this.err = err;
