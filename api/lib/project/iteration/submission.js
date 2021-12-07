@@ -66,8 +66,7 @@ class Submission extends Generic {
             const pgres = await pool.query(sql`
                 INSERT INTO aoi_submission (
                     aoi_id,
-                    iter_id,
-                    type
+                    iter_id
                 ) VALUES (
                     ${submission.aoi_id || null},
                     ${submission.iter_id}
