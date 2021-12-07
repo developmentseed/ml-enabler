@@ -156,7 +156,7 @@ import Integrations from '../Integrations.vue';
 
 export default {
     name: 'Map',
-    props: ['meta', 'iteration', 'tilejson'],
+    props: ['meta', 'iteration'],
     data: function() {
         return {
             mode: 'visualize',

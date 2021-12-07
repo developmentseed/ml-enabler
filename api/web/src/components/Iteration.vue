@@ -24,7 +24,6 @@
                     :meta='meta'
                     :project='project'
                     :iteration='iteration'
-                    :tilejson='tilejson'
                     @refresh='refresh'
                     @err='$emit("err", $event)'
                 />
@@ -40,7 +39,6 @@ export default {
     data: function() {
         return {
             iteration: {},
-            tilejson: false,
             loading: {
                 iteration: true
             }
@@ -64,7 +62,6 @@ export default {
             window.open(url, "_blank")
         },
         refresh: function() {
-            this.getTilejson();
             this.getIteration();
         },
         getIteration: async function() {
@@ -75,19 +72,6 @@ export default {
                 this.$emit('err', err);
             }
             this.loading.iteration = false;
-        },
-        getTilejson: async function() {
-            try {
-                const body = await window.std(window.api + `/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/tiles`);
-                if (body.uploaded) {
-                    body.tiles[0] = window.api + body.tiles[0];
-                    this.tilejson = body;
-                } else {
-                    this.tilejson = false;
-                }
-            } catch (err) {
-                this.$emit('err', err);
-            }
         }
     }
 }
