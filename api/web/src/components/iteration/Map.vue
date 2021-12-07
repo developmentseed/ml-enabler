@@ -152,7 +152,6 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import buffer from '@turf/buffer';
 import bboxPolygon from '@turf/bbox-polygon';
 import IterationHeader from './IterationHeader.vue';
-import Integrations from '../Integrations.vue';
 
 export default {
     name: 'Map',
@@ -509,7 +508,6 @@ export default {
         },
     },
     components: {
-        Integrations,
         IterationHeader
     }
 }
