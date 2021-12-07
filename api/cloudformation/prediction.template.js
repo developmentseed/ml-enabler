@@ -79,6 +79,7 @@ module.exports = {
         },
         PredLambdaFunction: {
             Type: 'AWS::Lambda::Function',
+            DependsOn: ['PredLambdaLogs'],
             Properties: {
                 Layers: [ 'arn:aws:lambda:us-east-1:552188055668:layer:geolambda:2' ],
                 Code: {
