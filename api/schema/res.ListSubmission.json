@@ -19,7 +19,8 @@
                     "id",
                     "created",
                     "iter_id",
-                    "aoi_id"
+                    "aoi_id",
+                    "storage"
                 ],
                 "properties": {
                     "id": {
@@ -33,6 +34,9 @@
                     },
                     "aoi_id": {
                         "type": "integer"
+                    },
+                    "storage": {
+                        "type": "boolean"
                     }
                 }
             }

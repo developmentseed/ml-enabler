@@ -1,6 +1,7 @@
 const { Err } = require('@openaddresses/batch-schema');
 const { sql } = require('slonik');
 const Generic = require('../../generic');
+const S3 = require('../../s3');
 
 /**
  * @class
@@ -39,12 +40,15 @@ class Submission extends Generic {
             pgres = await pool.query(sql`
                 SELECT
                     count(*) OVER() AS count,
-                    id,
-                    iter_id,
-                    aoi_id,
-                    created
+                    aoi_submission.id,
+                    aoi_submission.iter_id,
+                    aoi_submission.aoi_id,
+                    aoi_submission.created,
+                    iterations.pid
                 FROM
                     aoi_submission
+                        LEFT JOIN iterations
+                            ON aoi_submission.iter_id = iterations.id
                 WHERE
                     iter_id = ${iteration}
                 ORDER BY
@@ -59,6 +63,12 @@ class Submission extends Generic {
         }
 
         return this.deserialize(pgres.rows, 'submissions');
+    }
+
+    static async list_s3(list) {
+        if (!list.submissions.length) return list;
+
+        const s3l = await S3.list(`project/${list.submissions[0].pid}/iteration/${list.submissions[0].iter_id}/`);
     }
 
     static async generate(pool, submission) {

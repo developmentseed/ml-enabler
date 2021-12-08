@@ -24,6 +24,21 @@ class S3 {
         }
     }
 
+    static async list(fragment) {
+        try {
+            if (!process.env.ASSET_BUCKET) throw new Err(400, null, 'ASSET_BUCKET not set');
+
+            const list =  await s3.listObjectsV2({
+                Bucket: process.env.ASSET_BUCKET,
+                Prefix: fragment,
+            }).promise();
+
+            return list.Contents;
+        } catch (err) {
+            throw new Err(500, err, 'Failed to list files');
+        }
+    }
+
     static async del(key) {
         if (!process.env.ASSET_BUCKET) return;
 
