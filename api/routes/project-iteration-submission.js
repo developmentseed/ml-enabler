@@ -84,7 +84,10 @@ async function router(schema, config) {
 
             const sub = await Submission.from(config.pool, req.params.subid);
 
-            return res.json(sub.serialize());
+            const m = {};
+            m.token = config.Mapbox;
+
+            return res.json(m);
         } catch (err) {
             return Err.respond(err, res);
         }
