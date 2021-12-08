@@ -164,10 +164,11 @@ export default {
     },
     methods: {
         getExport: function() {
-            const url = new URL(`${window.api}/v1/model/${this.$route.params.modelid}/iteration/${this.$route.params.predid}/export`);
+            const url = new URL(`${window.api}/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/export`);
 
             url.searchParams.set('format', this.params.format);
             url.searchParams.set('inferences', this.params.inferences);
+            url.searchParams.set('submission', this.params.submission);
 
             if (this.params.inferences !== 'all') {
                 url.searchParams.set('threshold', this.params.threshold / 100);
@@ -179,10 +180,6 @@ export default {
                 } else {
                     url.searchParams.set('validity', 'both');
                 }
-            }
-
-            if (this.params.submission !== 'all') {
-                url.searchParams.set('submission', this.params.submission);
             }
 
             this.external(url);
