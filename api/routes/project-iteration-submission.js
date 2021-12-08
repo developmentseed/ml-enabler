@@ -60,6 +60,35 @@ async function router(schema, config) {
             return Err.respond(err, res);
         }
     });
+
+    /**
+     * @api {get} /api/project/:pid/iteration/:iterationid/submission/:subid/tiles TileJSON
+     * @apiVersion 1.0.0
+     * @apiName TileJSONSubmission
+     * @apiGroup Submissions
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Return a TileJSON for the given submission
+     *
+     * @apiSchema {jsonschema=../schema/res.Task.json} apiSuccess
+     */
+    await schema.get('/project/:pid/iteration/:iterationid/submission/:subid/tiles', {
+        ':pid': 'integer',
+        ':iterationid': 'integer',
+        ':subid': 'integer',
+        res: 'res.TileJSON.json'
+    }, async (req, res) => {
+        try {
+            await user.is_auth(req);
+
+            const sub = await Submission.from(config.pool, req.params.subid);
+
+            return res.json(sub.serialize());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 }
 
 module.exports = router;

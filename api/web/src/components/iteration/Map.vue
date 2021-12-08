@@ -27,7 +27,7 @@
                             <label>Inference Type</label>
                             <div class='select-container w-full'>
                                 <select v-model='inf' class='select select--s'>
-                                    <template v-for='inf in tilejson.inferences'>
+                                    <template v-for='inf in iteration.inf_list.split(",")'>
                                         <option v-bind:key='inf' v-text='inf'></option>
                                     </template>
                                 </select>
@@ -175,6 +175,7 @@ export default {
             imagery: [],
             aoi: 'aoi',
             aois: [],
+            submission: false,
             submissions: [],
             tilejson: {
                 inferences: []
@@ -193,6 +194,9 @@ export default {
                 ]);
             }
             this.aoi = 'aoi';
+        },
+        submission: async function() {
+            await this.getSubmissionTileJSON();
         },
         bg: function() {
             this.layers();
@@ -220,7 +224,12 @@ export default {
         await this.getSubmissions();
         this.getImagery();
 
+        this.inf = this.iteration.inf_list.split(',')[0];
+
         if (this.submissions.length) {
+            this.submission = this.submissions[0].id;
+            await this.getSubmissionTileJSON();
+
             this.$nextTick(() => {
                 this.init();
             });
@@ -467,7 +476,6 @@ export default {
             }
             this.clickListener = true;
 
-            this.inf = this.tilejson.inferences[0];
             this.hide();
         },
         fullscreen: function() {
@@ -483,6 +491,14 @@ export default {
             try {
                 const res = await window.std(`/api/project/${this.$route.params.projectid}/imagery`);
                 this.imagery = res.imagery;
+            } catch (err) {
+                this.$emit('err', err);
+            }
+        },
+        getSubmissionTileJSON: async function() {
+            try {
+                const res = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/submission/${this.submission}/tiles`);
+                this.tilejson = res;
             } catch (err) {
                 this.$emit('err', err);
             }
