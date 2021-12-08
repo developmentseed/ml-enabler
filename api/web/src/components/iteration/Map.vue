@@ -24,6 +24,17 @@
                 <div id='map-container' class="col col--12 h-full w-full relative">
                     <div class='bg-white round absolute top left z5 px12 py12 mx12 my12 w180'>
                         <div class='col col--12'>
+                            <label>Submission #</label>
+                            <div class='select-container w-full'>
+                                <select v-model='submission' class='select select--s'>
+                                    <template v-for='s in submissions'>
+                                        <option v-bind:key='s.id' v-text='s.id'></option>
+                                    </template>
+                                </select>
+                                <div class='select-arrow'></div>
+                            </div>
+                        </div>
+                        <div class='col col--12'>
                             <label>Inference Type</label>
                             <div class='select-container w-full'>
                                 <select v-model='inf' class='select select--s'>
