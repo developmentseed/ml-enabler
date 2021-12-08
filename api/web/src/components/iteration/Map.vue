@@ -39,7 +39,9 @@
                                 <select v-model='aoi' class='select select--s'>
                                     <option default value='aoi'>AOI</option>
                                     <template v-for='aoi in aois'>
-                                        <option v-bind:key='aoi.bounds' v-text='aoi.name'></option>
+                                        <template v-if='aoi.name.trim().length'>
+                                            <option v-bind:key='aoi.id' v-text='aoi.name'></option>
+                                        </template>
                                     </template>
                                 </select>
                                 <div class='select-arrow'></div>
@@ -173,7 +175,10 @@ export default {
             imagery: [],
             aoi: 'aoi',
             aois: [],
-            submissions: []
+            submissions: [],
+            tilejson: {
+                inferences: []
+            }
         };
     },
     watch: {
@@ -191,14 +196,6 @@ export default {
         },
         bg: function() {
             this.layers();
-        },
-        tilejson: function() {
-            if (this.map) this.map.remove();
-            if (this.tilejson) {
-                this.$nextTick(() => {
-                    this.init();
-                });
-            }
         },
         opacity: function() {
             for (const inf of this.tilejson.inferences) {
@@ -223,7 +220,7 @@ export default {
         await this.getSubmissions();
         this.getImagery();
 
-        if (this.tilejson) {
+        if (this.submissions.length) {
             this.$nextTick(() => {
                 this.init();
             });
