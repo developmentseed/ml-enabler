@@ -1,3 +1,5 @@
+#!/bin/bash
+
 set -xeuo pipefail
 
 if [[ -z ${ASSET_BUCKET} ]]; then

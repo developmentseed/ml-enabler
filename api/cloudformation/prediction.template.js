@@ -95,18 +95,16 @@ module.exports = {
                 Timeout: 240,
                 Environment: {
                     Variables: {
-                        'GDAL_DATA': "/opt/share/gdal",
-                        'PROJ_LIB': "/opt/share/proj",
-                        'StackName': cf.stackName,
-                        'INFERENCES': cf.ref('Inferences'),
-                        'INF_SUPERTILE': cf.ref('InfSupertile'),
-                        'IMAGERY_ID': cf.ref('ImageryId'),
-                        'PREDICTION_ENDPOINT': cf.join([
+                        GDAL_DATA: '/opt/share/gdal',
+                        PROJ_LIB: '/opt/share/proj',
+                        StackName: cf.stackName,
+                        INFERENCES: cf.ref('Inferences'),
+                        INF_SUPERTILE: cf.ref('InfSupertile'),
+                        IMAGERY_ID: cf.ref('ImageryId'),
+                        PREDICTION_ENDPOINT: cf.join([
                             'http://', cf.getAtt('PredELB', 'DNSName'), '/v1/models/default/versions/001'
                         ]),
-                        "MLENABLER_ENDPOINT": { "Fn::ImportValue": cf.join('-', [
-                            cf.ref('StackName'), 'api'
-                        ])}
+                        MLENABLER_ENDPOINT: cf.importValue(cf.join([cf.ref('StackName'), '-api']))
                     }
                 }
             }
@@ -115,9 +113,7 @@ module.exports = {
             Type: 'AWS::IAM::InstanceProfile',
             Properties: {
                 Path: '/',
-                Roles: [{ "Fn::ImportValue": cf.join('-', [
-                    cf.ref('StackName'), "exec-role-name"
-                ])}]
+                Roles: [ cf.importValue(cf.join([cf.ref('StackName'), '-exec-role-name'])) ]
             }
         },
         PredTargetGroup: {
@@ -161,48 +157,39 @@ module.exports = {
             }
         },
         PredELBSecurityGroup: {
-            "Type" : "AWS::EC2::SecurityGroup",
-            "Properties": {
-                "GroupDescription": { "Fn::Join": [ "-", [
-                    cf.ref('StackName'),
-                    "pred-elb-sg"
-                ]]},
-                "SecurityGroupIngress": [{
-                    "CidrIp": "0.0.0.0/0",
-                    "IpProtocol": "tcp",
-                    "FromPort": 80,
-                    "ToPort": 80
+            Type : 'AWS::EC2::SecurityGroup',
+            Properties: {
+                GroupDescription: cf.join([cf.ref('StackName'), '-pred-elb-sg']),
+                SecurityGroupIngress: [{
+                    CidrIp: '0.0.0.0/0',
+                    IpProtocol: 'tcp',
+                    FromPort: 80,
+                    ToPort: 80
                 }],
                 VpcId: cf.importValue(cf.join([ cf.ref('StackName'), '-vpc']))
             }
         },
-        "PredTileQueue": {
-            "Type": "AWS::SQS::Queue",
-            "Properties": {
-                "QueueName": { "Fn::Join": [ "-", [
-                    cf.stackName,
-                    "queue"
-                ]]},
-                "VisibilityTimeout": 2880,
-                "RedrivePolicy": {
-                    "deadLetterTargetArn": { "Fn::GetAtt": [ "PredDeadQueue", "Arn" ] },
-                    "maxReceiveCount": 3
+        PredTileQueue: {
+            Type: 'AWS::SQS::Queue',
+            Properties: {
+                QueueName: cf.join([cf.stackName, '-queue' ]),
+                VisibilityTimeout: 2880,
+                RedrivePolicy: {
+                    deadLetterTargetArn: cf.getAtt('PredDeadQueue', 'Arn'),
+                    maxReceiveCount: 3
                 }
             }
         },
-        "PredDeadQueue": {
-            "Type": "AWS::SQS::Queue",
-            "Properties": {
-                "QueueName": { "Fn::Join": [ "-", [
-                    cf.stackName,
-                    "dead-queue"
-                ]]}
+        PredDeadQueue: {
+            Type: 'AWS::SQS::Queue',
+            Properties: {
+                QueueName: cf.join([cf.stackName, '-dead-queue'])
             }
         },
-        "PredContainerInstanceLaunch": {
-            "Type": "AWS::AutoScaling::LaunchConfiguration",
-            "DependsOn": "PredECSHostSecurityGroup",
-            "Metadata": {
+        PredContainerInstanceLaunch: {
+            Type: 'AWS::AutoScaling::LaunchConfiguration',
+            DependsOn: 'PredECSHostSecurityGroup',
+            Metadata: {
                 "AWS::CloudFormation::Init": {
                     "config" : {
                         "commands": {
@@ -298,8 +285,8 @@ module.exports = {
                 "MaxSize": { "Ref": "MaxSize" },
                 "DesiredCapacity": { "Ref": "MaxSize" },
                 "VPCZoneIdentifier": [
-                    { "Fn::ImportValue": { "Fn::Join": [ "-", [ { "Ref": "StackName" }, "suba" ]]}},
-                    { "Fn::ImportValue": { "Fn::Join": [ "-", [ { "Ref": "StackName" }, "subb" ]]}}
+                    cf.importValue(cf.join([cf.ref('StackName'), '-suba'])),
+                    cf.importValue(cf.join([cf.ref('StackName'), '-subb'])),
                 ]
             }
         },
@@ -314,63 +301,62 @@ module.exports = {
                 }]
             }
         },
-        "PredService": {
-            "Type": "AWS::ECS::Service",
-            "DependsOn": [
-                "PredECSAutoScalingGroup",
-                "PredHTTPListener",
-                "PredTargetGroup"
+        PredService: {
+            Type: 'AWS::ECS::Service',
+            DependsOn: [
+                'PredECSAutoScalingGroup',
+                'PredHTTPListener',
+                'PredTargetGroup'
             ],
             "Properties": {
-                "ServiceName": { "Ref": "ImageTag" },
-                "Cluster": { "Fn::ImportValue": { "Fn::Join": [ "-", [ { "Ref": "StackName" }, "cluster" ]]}},
-                "TaskDefinition": { "Ref": "PredTaskDefinition" },
-                "DesiredCount": 1,
-                "DeploymentConfiguration": {
-                    "MaximumPercent": 100,
-                    "MinimumHealthyPercent": 0
+                ServiceName: cf.ref('ImageTag'),
+                Cluster: cf.importValue(cf.join([ cf.ref('StackName'), '-cluster' ])),
+                TaskDefinition: cf.ref('PredTaskDefinition'),
+                DesiredCount: 1,
+                DeploymentConfiguration: {
+                    MaximumPercent: 100,
+                    MinimumHealthyPercent: 0
                 },
-                "LoadBalancers": [{
-                    "ContainerName": "pred-app",
-                    "ContainerPort": 8501,
-                    "TargetGroupArn": { "Ref": "PredTargetGroup" }
+                LoadBalancers: [{
+                    ContainerName: 'pred-app',
+                    ContainerPort: 8501,
+                    TargetGroupArn: cf.ref('PredTargetGroup')
                 }]
             }
         },
-        "PredTaskDefinition": {
-            "Type": "AWS::ECS::TaskDefinition",
-            "Properties": {
-                "Family": { "Ref" : "ImageTag" },
-                "Cpu": 8192,
-                "Memory": 61401,
-                "TaskRoleArn": { "Fn::ImportValue": { "Fn::Join": [ "-", [
-                    { "Ref": "StackName" },
-                    "task-role"
-                ]]}},
-                "ContainerDefinitions": [{
-                    "Name": "pred-app",
-                    "Essential": true,
-                    "Image": { "Fn::Join" : [ "", [
-                        { "Ref": "AWS::AccountId" },
-                        ".dkr.ecr.",
-                        { "Ref": "AWS::Region" },
-                        ".amazonaws.com/",
-                        { "Ref": "StackName" },
-                        "-ecr:",
-                        { "Ref": "ImageTag" }
-                    ] ] },
-                    "PortMappings": [{
-                        "ContainerPort": 8501
+        PredTaskDefinition: {
+            Type: 'AWS::ECS::TaskDefinition',
+            Properties: {
+                Family: cf.ref('ImageTag'),
+                Cpu: 8192,
+                Memory: 61401,
+                TaskRoleArn: cf.importValue(cf.join([
+                    cf.ref('StackName'), '-task-role'
+                ])),
+                ContainerDefinitions: [{
+                    Name: 'pred-app',
+                    Essential: true,
+                    Image: cf.join([
+                        cf.accountId,
+                        '.dkr.ecr.',
+                        cf.region,
+                        '.amazonaws.com/',
+                        cf.ref('StackName'),
+                        '-ecr:',
+                        cf.ref('ImageTag'),
+                    ]),
+                    PortMappings: [{
+                        ContainerPort: 8501
                     }],
-                    "Environment": [],
-                    "LogConfiguration": {
-                        "LogDriver": "awslogs",
-                        "Options": {
-                            "awslogs-group": { "Fn::Join": [ "-", [
-                                { "Ref": "StackName" },
-                                { "Ref": "IterationId" }
-                            ]]},
-                            "awslogs-region": { "Ref": "AWS::Region" }
+                    Environment: [],
+                    LogConfiguration: {
+                        LogDriver: 'awslogs',
+                        Options: {
+                            'awslogs-group': cf.join('-', [
+                                cf.ref('StackName'),
+                                cf.ref('IterationId')
+                            ]),
+                            'awslogs-region': cf.region
                         }
                     }
                 }]
@@ -381,8 +367,8 @@ module.exports = {
             Properties: {
                 DeliveryStreamName: cf.join([
                     cf.ref('StackName'),
-                    "-project-", cf.ref('ProjectId'),
-                    "-iteration-", cf.ref('IterationId')
+                    '-project-', cf.ref('ProjectId'),
+                    '-iteration-', cf.ref('IterationId')
                 ]),
                 DeliveryStreamType: 'DirectPut',
                 ExtendedS3DestinationConfiguration: {
@@ -433,20 +419,20 @@ module.exports = {
         }
     },
     Mappings: {
-        "AWSRegionToAMI": {
-            "DOCS": { "LIST": "http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html" },
-            "us-east-1": { "AMIID": "ami-07eb64b216d4d3522" }
+        AWSRegionToAMI: {
+            DOCS: { LIST: 'http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html' },
+            'us-east-1': { AMIID: 'ami-07eb64b216d4d3522' }
         },
-        "AWSRegion2AZ": {
-            "us-east-1": { "1": "us-east-1b", "2": "us-east-1c", "3": "us-east-1d", "4": "us-east-1e" },
-            "us-west-1": { "1": "us-west-1b", "2": "us-west-1c" },
-            "us-west-2": { "1": "us-west-2a", "2": "us-west-2b", "3": "us-west-2c" }
+        AWSRegion2AZ: {
+            'us-east-1': { "1": "us-east-1b", "2": "us-east-1c", "3": "us-east-1d", "4": "us-east-1e" },
+            'us-west-1': { "1": "us-west-1b", "2": "us-west-1c" },
+            'us-west-2': { "1": "us-west-2a", "2": "us-west-2b", "3": "us-west-2c" }
         }
     },
-    "Outputs" : {
-        "API": {
-            "Description": "API",
-            "Value": { "Fn::Join": ["", ["http://", { "Fn::GetAtt": ["PredELB", "DNSName"]}]]}
+    Outputs : {
+        API: {
+            Description: 'API',
+            Value: cf.join(['http://', cf.join('PredELB', 'DNSName')])
         }
     }
 }
