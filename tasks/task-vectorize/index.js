@@ -20,7 +20,7 @@ main();
 async function main() {
     await tippecanoe.tile(
         fs.createReadStream(path.resolve(__dirname, './data/input.geojson')),
-        path.resolve('fabric.mbtiles'),
+        path.resolve(__dirname, './data/fabric.mbtiles'),
         {
             layer: 'data',
             std: true,
@@ -40,15 +40,15 @@ async function main() {
     );
 
     await TileBase.to_tb(
-        path.resolve(__dirname, 'fabric.mbtiles'),
-        path.resolve(__dirname, 'fabric.tilebase')
+        path.resolve(__dirname, './data/fabric.mbtiles'),
+        path.resolve(__dirname, './data/fabric.tilebase')
     );
 
     await s3.putObject({
         ContentType: 'application/octet-stream',
         Bucket: ASSET_BUCKET,
         Key: `project/${PROJECT}/iteration/${ITERATION}/submission-${SUBMISSION}.tilebase`,
-        Body: fs.createReadStream(path.resolve(__dirname, 'fabric.tilebase'))
+        Body: fs.createReadStream(path.resolve(__dirname, './data/fabric.tilebase'))
     }).promise();
 
 }
