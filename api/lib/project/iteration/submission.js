@@ -68,7 +68,16 @@ class Submission extends Generic {
     static async list_s3(list) {
         if (!list.submissions.length) return list;
 
-        const s3l = await S3.list(`project/${list.submissions[0].pid}/iteration/${list.submissions[0].iter_id}/`);
+        const s3m = {};
+        await S3.list(`project/${list.submissions[0].pid}/iteration/${list.submissions[0].iter_id}/`).forEach((l) => {
+            s3m['aoi'] = l;
+        });
+
+        for (const sub of list.submissioms) {
+            sub.storage = s3m.includes(sub.id);
+        }
+
+        return list;
     }
 
     static async generate(pool, submission) {

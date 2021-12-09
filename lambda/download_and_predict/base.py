@@ -134,7 +134,7 @@ class DownloadAndPredict(object):
                 print('BOUNDS', chips[i].get('bounds'))
                 body = {
                     "type": "Feature",
-                    "submission_id": chips[i].get('submission_id'),
+                    "submission_id": chips[i].get('submission'),
                     "geometry": shapely.geometry.mapping(box(*chips[i].get('bounds'))),
                     "properties": pred_dict,
                 }
@@ -182,7 +182,7 @@ class DownloadAndPredict(object):
 
                 body = {
                     "type": "Feature",
-                    "submission_id": chips[i].get('submission_id'),
+                    "submission_id": chips[i].get('submission'),
                     "properties": {
                         "default": score
                     },

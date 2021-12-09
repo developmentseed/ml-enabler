@@ -82,7 +82,7 @@ async function router(schema, config) {
         try {
             await user.is_auth(req);
 
-            const sub = await Submission.from(config.pool, req.params.subid);
+            // const sub = await Submission.from(config.pool, req.params.subid);
 
             const m = {};
             m.token = config.Mapbox;

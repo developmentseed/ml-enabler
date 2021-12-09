@@ -120,19 +120,16 @@ module.exports = {
                 ])}]
             }
         },
-        "PredTargetGroup": {
-            "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
-            "DependsOn": "PredELB",
-            "Properties": {
-                "Port": 8501,
-                "Protocol": "HTTP",
-                "VpcId": { "Fn::ImportValue": { "Fn::Join": [ "-", [
-                    cf.ref('StackName'),
-                    "vpc"
-                ]]}},
-                "HealthCheckPath": "/v1/models/default",
-                "Matcher": {
-                    "HttpCode": "200,202,302,304"
+        PredTargetGroup: {
+            Type: 'AWS::ElasticLoadBalancingV2::TargetGroup',
+            DependsOn: 'PredELB',
+            Properties: {
+                Port: 8501,
+                Protocol: 'HTTP',
+                VpcId: cf.importValue(cf.join([cf.ref('StackName'), '-vpc'])),
+                HealthCheckPath: '/v1/models/default',
+                Matcher: {
+                    HttpCode: '200,202,302,304'
                 }
             }
         },
@@ -151,15 +148,15 @@ module.exports = {
         PredELB: {
             Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer',
             Properties: {
-                "Type": "application",
-                "SecurityGroups": [cf.ref('PredELBSecurityGroup')],
-                "LoadBalancerAttributes": [{
-                    "Key": "idle_timeout.timeout_seconds",
-                    "Value": 240
+                Type: 'application',
+                SecurityGroups: [cf.ref('PredELBSecurityGroup')],
+                LoadBalancerAttributes: [{
+                    Key: 'idle_timeout.timeout_seconds',
+                    Value: 240
                 }],
-                "Subnets": [
-                    { "Fn::ImportValue": { "Fn::Join": [ "-", [ cf.ref('StackName'), "suba" ]]}},
-                    { "Fn::ImportValue": { "Fn::Join": [ "-", [ cf.ref('StackName'), "subb" ]]}}
+                Subnets: [
+                    cf.importValue(cf.join([cf.ref('StackName'), '-suba'])),
+                    cf.importValue(cf.join([cf.ref('StackName'), '-subb'])),
                 ]
             }
         },
@@ -176,10 +173,7 @@ module.exports = {
                     "FromPort": 80,
                     "ToPort": 80
                 }],
-                "VpcId": { "Fn::ImportValue": { "Fn::Join": [ "-", [
-                    cf.ref('StackName'),
-                    "vpc"
-                ]]}}
+                VpcId: cf.importValue(cf.join([ cf.ref('StackName'), '-vpc']))
             }
         },
         "PredTileQueue": {
@@ -312,14 +306,11 @@ module.exports = {
         "PredECSHostSecurityGroup": {
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
-                "VpcId": { "Fn::ImportValue": { "Fn::Join": [ "-", [
-                    { "Ref": "StackName" },
-                    "vpc"
-                ]]}},
-                "GroupDescription": "Access to the ECS hosts and the tasks/containers that run on them",
-                "SecurityGroupIngress": [{
-                    "SourceSecurityGroupId": { "Ref": "PredELBSecurityGroup" },
-                    "IpProtocol": -1
+                VpcId: cf.importValue(cf.join([ cf.ref('StackName'), '-vpc']))
+                GroupDescription: "Access to the ECS hosts and the tasks/containers that run on them",
+                SecurityGroupIngress: [{
+                    SourceSecurityGroupId: cf.ref('PredELBSecurityGroup'),
+                    IpProtocol: -1
                 }]
             }
         },

@@ -30,7 +30,7 @@ class S3 {
 
             const list =  await s3.listObjectsV2({
                 Bucket: process.env.ASSET_BUCKET,
-                Prefix: fragment,
+                Prefix: fragment
             }).promise();
 
             return list.Contents;
