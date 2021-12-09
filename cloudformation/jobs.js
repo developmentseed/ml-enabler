@@ -43,6 +43,7 @@ const stack = {
                         },{
                             Effect: 'Allow',
                             Action: [
+                                's3:ListBucket',
                                 's3:GetObject',
                                 's3:DeleteObject',
                                 's3:AbortMultipartUpload',
@@ -51,7 +52,10 @@ const stack = {
                                 's3:PutObject',
                                 's3:PutObjectAcl'
                             ],
-                            Resource: [ cf.join(['arn:aws:s3:::', cf.ref('MLEnablerBucket'), '/*']) ]
+                            Resource: [
+                                cf.join(['arn:aws:s3:::', cf.ref('MLEnablerBucket') ]),
+                                cf.join(['arn:aws:s3:::', cf.ref('MLEnablerBucket'), '/*'])
+                            ]
                         },{
                             Effect: 'Allow',
                             Action: [
