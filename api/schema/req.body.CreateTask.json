@@ -11,6 +11,16 @@
                 "vectorize"
             ],
             "description": "The class of type to start"
+        },
+        "data": {
+            "oneOf": [{
+                "type": "object",
+                "properties": {
+                    "submission": {
+                        "type": "integer"
+                    }
+                }
+            }]
         }
     }
 }

@@ -306,7 +306,7 @@ module.exports = {
         "PredECSHostSecurityGroup": {
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
-                VpcId: cf.importValue(cf.join([ cf.ref('StackName'), '-vpc']))
+                VpcId: cf.importValue(cf.join([ cf.ref('StackName'), '-vpc'])),
                 GroupDescription: "Access to the ECS hosts and the tasks/containers that run on them",
                 SecurityGroupIngress: [{
                     SourceSecurityGroupId: cf.ref('PredELBSecurityGroup'),

@@ -34,10 +34,13 @@ async function router(schema, config) {
                     iter_id: req.params.iterationid,
                     environment: [{
                         name: 'PROJECT_ID',
-                        value: req.params.pid
+                        value: String(req.params.pid)
                     },{
                         name: 'ITERATION_ID',
-                        value: req.params.iterationid
+                        value: String(req.params.iterationid)
+                    },{
+                        name: 'SUBMISSION_ID',
+                        value: String(req.body.data.submission)
                     }]
                 });
             }

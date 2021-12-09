@@ -63,21 +63,7 @@
             </div>
         </template>
         <template v-else-if='create === "vectorize"'>
-            <div class='col col--12 grid'>
-                <div class='col col--12'>
-                    <button @click='create = false' class='btn fr round btn--stroke color-gray color-black-on-hover'>
-                        <svg class='icon'><use href='#icon-close'/></svg>
-                    </button>
-                </div>
-
-                <div class='col col--12'>
-                    <div class='flex-parent flex-parent--center-main pt12 pb36'>
-                        <button @click='createVectorize' class='flex-child btn btn--stroke round'>
-                            Vectorize Inferences
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <TaskVectorize @close='create = false'/>
         </template>
         <template v-else-if='!tilejson'>
             <button @click='create = false' class='btn fr round btn--stroke color-gray color-black-on-hover'>
@@ -179,6 +165,8 @@ import Tasks from './Tasks.vue';
 import IterationHeader from './IterationHeader.vue';
 import UploadPrediction from './UploadPrediction.vue';
 
+import TaskVectorize from './tasks/Vectorize.vue';
+
 export default {
     name: 'PredTasks',
     props: ['meta', 'iteration', 'tilejson'],
@@ -201,6 +189,7 @@ export default {
     },
     components: {
         Tasks,
+        TaskVectorize,
         UploadPrediction,
         IterationHeader
     },
