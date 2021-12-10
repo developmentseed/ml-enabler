@@ -41,6 +41,14 @@
                 </div>
             </div>
         </template>
+
+        <template v-if='tasks.length > 0 && !loading.queue'>
+            <div class='align-center w-full'>Queue Population Tasks</div>
+
+            <div :key='task.id' v-for='task in tasks' class='col col--12 grid'>
+                <div class='col col--6' v-text='task.id'></div>
+            </div>
+        </template>
     </div>
 </div>
 </template>
@@ -53,6 +61,7 @@ export default {
             loading: {
                 queue: true
             },
+            tasks: [],
             queue: {
                 queued: 0,
                 inflight: 0,
@@ -67,6 +76,15 @@ export default {
     methods: {
         refresh: function() {
             this.getQueue();
+            this.getTasks();
+        },
+        getTasks: async function() {
+            try {
+                const res = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/task`);
+                this.tasks = res.tasks;
+            } catch (err) {
+                this.$emit('err', err);
+            }
         },
         purgeQueue: async function() {
             this.loading.queue = true;
@@ -89,7 +107,7 @@ export default {
                 this.queue = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/stack/queue`);
 
             } catch (err) {
-                //this.$emit('err', err);
+                this.$emit('err', err);
             }
 
             this.loading.queue = false;

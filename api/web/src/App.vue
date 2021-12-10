@@ -7,6 +7,10 @@
                     <h1 @click='$router.push({ path: "/" })' class='align-center txt-h3 cursor-default txt-underline-on-hover cursor-pointer'>ML Enabler</h1>
                 </div>
                 <div v-if='!loading.user && $route.path !== "/login"' class='col col--3'>
+                    <button @click='external("/docs/")' class='btn btn--stroke round color-gray' style='height: 33px;'>
+                        <svg class='icon'><use href='#icon-book'/></svg>
+                    </button>
+
                     <button v-if='user.username' @click='$router.push({ path: "/profile" })' class='dropdown btn fr mr6 mb6 pb3 round btn--stroke color-gray color-blue-on-hover'>
                         <svg class='icon inline'><use href='#icon-chevron-down'/></svg>
                         <span v-text='user.username'/>
