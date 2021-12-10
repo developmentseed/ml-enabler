@@ -1,4 +1,5 @@
 {
+    "version": "3.0.0",
     "dependencies": {
         "@mapbox/cloudfriend": "^5.1.0",
         "batch-alarms": "^2.0.0"
