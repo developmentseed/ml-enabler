@@ -8,7 +8,7 @@
         "lint": "eslint index.js 'lib/**/*.js' 'routes/**/*.js' 'test/**/*.js'",
         "test": "tape test/*.test.js | tap-dot",
         "start": "node index.js --email",
-        "dev": "nodemon index.js",
+        "dev": "nodemon index.js -i web/",
         "cov-html": "nyc tape 'test/**/*.js' && nyc report --reporter=html",
         "cov": "nyc tape 'test/**/*.js' && nyc report --reporter=text-lcov > coverage.lcov && codecov"
     },

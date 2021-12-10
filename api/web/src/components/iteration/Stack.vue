@@ -112,6 +112,24 @@
                 <div class='col col--12 pt12'>
                     Imagery Chip Submission
 
+                    <button class='dropdown round color-gray color-blue-on-hover mx12 mt3'>
+                        <svg class='icon inline'><use href='#icon-options'/></svg>
+
+                        <div class='round dropdown-content w180 color-black' style='top: 24px;'>
+                            <label class='switch-container px6 fr'>
+                                <span class='mr6'>Auto Terminate</span>
+                                <input v-model='autoTerminate' type='checkbox' />
+                                <div class='switch'></div>
+                            </label>
+
+                            <label class='switch-container px6 fr'>
+                                <span class='mr6'>Auto Vectorize</span>
+                                <input v-model='autoVectorize' type='checkbox' />
+                                <div class='switch'></div>
+                            </label>
+                        </div>
+                    </button>
+
                     <div v-if='imagery.fmt !== "list"' class='fr'>
                         <button @click='mode = "bbox"' :class='{
                             "btn--stroke": mode !== "bbox"
@@ -188,6 +206,8 @@ export default {
                 inflight: 0,
                 dead: 0
             },
+            autoTerminate: true,
+            autoVectorize: true,
             looping: false,
             params: {
                 image: false,
@@ -266,8 +286,11 @@ export default {
             } else if (payload) {
                 reqbody = payload
             } else {
-                reqbody = false;
+                reqbody = {};
             }
+
+            reqbody.autoTerminate = this.autoTerminate;
+            reqbody.autoVectorize = this.autoVectorize;
 
             try {
                 await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/stack/queue`, {
@@ -386,3 +409,23 @@ export default {
     }
 }
 </script>
+
+<style>
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 6px 12px;
+    z-index: 1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+</style>

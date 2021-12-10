@@ -8,6 +8,16 @@
         },
         "geometry": {
             "$ref": "./util/polygon.json"
+        },
+        "autoTerminate": {
+            "type": "boolean",
+            "default": true,
+            "description": "If true, delete the stack after the SQS queue has emptied and inferencing is finished"
+        },
+        "autoVectorize": {
+            "type": "boolean",
+            "default": true,
+            "description": "If true, automatically start a vectorize task to compile inferences after sqs queue has emptied and inferencing is finished"
         }
     }
 }
