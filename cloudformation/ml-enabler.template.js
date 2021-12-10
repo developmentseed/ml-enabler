@@ -55,6 +55,26 @@ const Parameters = {
 };
 
 const Resources = {
+    MLEnablerNotifyVectorize: {
+        Type: 'AWS::SNS::Topic',
+        Properties: {
+            TopicName: cf.join([cf.stackName, '-vectorize']),
+            Subscription: [{
+                Protocol: 'http',
+                Endpoint: cf.join(['http://', cf.getAtt('MLEnablerELB', 'DNSName'), '/api/sns']),
+            }]
+        }
+    },
+    MLEnablerNotifyDelete: {
+        Type: 'AWS::SNS::Topic',
+        Properties: {
+            TopicName: cf.join([cf.stackName, '-delete']),
+            Subscription: [{
+                Protocol: 'http',
+                Endpoint: cf.join(['http://', cf.getAtt('MLEnablerELB', 'DNSName'), '/api/sns']),
+            }]
+        }
+    },
     MLEnablerLogs: {
         Type: 'AWS::Logs::LogGroup',
         Properties: {
