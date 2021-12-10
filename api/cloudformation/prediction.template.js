@@ -50,9 +50,7 @@ module.exports = {
         PredSQSAlarn: {
             Type: 'AWS::CloudWatch::Alarm',
             Properties: {
-                AlarmName: cf.join('-', [cf.stackName, '-sqs-empty']),
-                Namespace: 'AWS/SQS',
-                MetricName: 'MemoryUtilization',
+                AlarmName: cf.join([cf.stackName, '-sqs-empty']),
                 AlarmDescription: 'Set an alarm to breach when SQS list is at 0',
                 ActionsEnabled: true,
                 OKActions: [ 'arn:aws:sns:us-east-1:552819999234:ml-enabler-prod-topic' ],
@@ -502,7 +500,7 @@ module.exports = {
     Outputs : {
         API: {
             Description: 'API',
-            Value: cf.join(['http://', cf.join('PredELB', 'DNSName')])
+            Value: cf.join(['http://', cf.getAtt('PredELB', 'DNSName')])
         }
     }
 }
