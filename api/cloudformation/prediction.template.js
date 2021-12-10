@@ -47,6 +47,76 @@ module.exports = {
         },
     },
     Resources: {
+        PredSQSAlarn: {
+            Type: 'AWS::CloudWatch::Alarm',
+            Properties: {
+                AlarmName: cf.join('-', [cf.stackName, '-sqs-empty']),
+                Namespace: 'AWS/SQS',
+                MetricName: 'MemoryUtilization',
+                AlarmDescription: 'Set an alarm to breach when SQS list is at 0',
+                ActionsEnabled: true,
+                OKActions: [ 'arn:aws:sns:us-east-1:552819999234:ml-enabler-prod-topic' ],
+                AlarmActions: [],
+                InsufficientDataActions: [],
+                Dimensions: [],
+                EvaluationPeriods: 5,
+                DatapointsToAlarm: 5,
+                Threshold: 0,
+                ComparisonOperator: 'LessThanOrEqualToThreshold',
+                TreatMissingData: 'missing',
+                Metrics: [{
+                    Id: 'total',
+                    Label: 'TotalSQS',
+                    ReturnData: true,
+                    Expression: 'SUM(METRICS())'
+                },{
+                    Id: 'm1',
+                    ReturnData: false,
+                    MetricStat: {
+                        Metric: {
+                            Namespace: 'AWS/SQS',
+                            MetricName: 'ApproximateNumberOfMessagesNotVisible',
+                            Dimensions: [{
+                                Name: 'QueueName',
+                                Value: cf.join([cf.stackName, '-queue'])
+                            }]
+                        },
+                        Period: 60,
+                        Stat: 'Average'
+                    }
+                },{
+                    Id: 'm2',
+                    ReturnData: false,
+                    MetricStat: {
+                        Metric: {
+                            Namespace: 'AWS/SQS',
+                            MetricName: 'ApproximateNumberOfMessagesVisible',
+                            Dimensions: [{
+                                Name: 'QueueName',
+                                Value: cf.join([cf.stackName, '-queue'])
+                            }]
+                        },
+                        Period: 60,
+                        Stat: 'Average'
+                    }
+                },{
+                    Id: 'm3',
+                    ReturnData: false,
+                    MetricStat: {
+                        Metric: {
+                            Namespace: 'AWS/SQS',
+                            MetricName: 'ApproximateNumberOfMessagesDelayed',
+                            Dimensions: [{
+                                    Name: 'QueueName',
+                                    Value: cf.join([cf.stackName, '-queue'])
+                                }]
+                        },
+                        Period: 60,
+                        Stat: 'Average'
+                    }
+                }]
+            }
+        },
         PredLambdaLogs: {
             Type: 'AWS::Logs::LogGroup',
             Properties: {
