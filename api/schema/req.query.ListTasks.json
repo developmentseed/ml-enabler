@@ -11,6 +11,15 @@
         "order": {
             "$ref": "./util/order.json"
         },
+        "type": {
+            "type": "string",
+            "description": "Limit tasks to a specific type",
+            "enum": [
+                "pop",
+                "ecr",
+                "vectorize"
+            ]
+        },
         "sort": {
             "type": "string",
             "default": "created",

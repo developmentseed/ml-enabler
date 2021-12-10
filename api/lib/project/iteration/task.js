@@ -32,6 +32,7 @@ class ProjectTask extends Generic {
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
 
+        if (!query.type) query.type = null;
         if (!query.sort) query.sort = 'created';
         if (!query.order || query.order === 'asc') {
             query.order = sql`asc`;
@@ -55,6 +56,7 @@ class ProjectTask extends Generic {
                     tasks
                 WHERE
                     iter_id = ${iteration}
+                    AND (${query.type}::TEXT IS NULL OR type = ${query.type}::TEXT)
                 ORDER BY
                     ${sql.identifier(['tasks', query.sort])} ${query.order}
                 LIMIT

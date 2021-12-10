@@ -1,5 +1,3 @@
-
-
 const memjs = require('memjs');
 
 /**

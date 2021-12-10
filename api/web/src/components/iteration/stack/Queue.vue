@@ -43,10 +43,20 @@
         </template>
 
         <template v-if='tasks.length > 0 && !loading.queue'>
-            <div class='align-center w-full'>Queue Population Tasks</div>
+            <div class='col col--12 px12'>
+                <div class='align-center w-full'>Recent Queue Population Tasks</div>
 
-            <div :key='task.id' v-for='task in tasks' class='col col--12 grid'>
-                <div class='col col--6' v-text='task.id'></div>
+                <div :key='task.id' v-for='task in tasks' class='col col--12 grid'>
+                    <div class='col col--4'>
+                        <div v-text='datefmt(task.created)'></div>
+                    </div>
+                    <div class='col col--2'>
+                        <div class='align-center w-full' v-text='task.status'></div>
+                    </div>
+                    <div class='col col--6 clearfix'>
+                        <div class='fr' v-text='task.statusReason'></div>
+                    </div>
+                </div>
             </div>
         </template>
     </div>
@@ -74,6 +84,16 @@ export default {
         this.refresh();
     },
     methods: {
+        datefmt: function(dt) {
+             const date = new Date(dt);
+
+             return date.getFullYear()
+                + '-' + ('0' + date.getMonth()).substr(-2)
+                + '-' + ('0' + date.getDay()).substr(-2)
+                + ' ' + ('0' + date.getHours()).substr(-2)
+                + ':' + ('0' + date.getMinutes()).substr(-2)
+                + ':' + ('0' + date.getSeconds()).substr(-2);
+        },
         refresh: function() {
             this.getQueue();
             this.getTasks();
@@ -81,7 +101,13 @@ export default {
         getTasks: async function() {
             try {
                 const res = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/task`);
-                this.tasks = res.tasks;
+
+                const tasks = [];
+                for (const task of res.tasks) {
+                    tasks.push(window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/task/${task.id}`));
+                }
+
+                this.tasks = await Promise.all(tasks);
             } catch (err) {
                 this.$emit('err', err);
             }
