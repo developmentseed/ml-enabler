@@ -105,7 +105,9 @@
                     <span v-text='stack.name'/>
                 </div>
 
-                <StackQueue/>
+                <StackQueue
+                    @err='$emit("err", $event)'
+                />
 
                 <div class='col col--12 pt12'>
                     Imagery Chip Submission

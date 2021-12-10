@@ -7,13 +7,13 @@
             <button @click='purgeQueue' class='btn mx3 round btn--stroke btn--gray btn--red-on-hover'>
                 <svg class='icon'><use href='#icon-trash'/></svg>
             </button>
-            <button @click='getQueue' class='btn mx3 round btn--stroke btn--gray'>
+            <button @click='refresh' class='btn mx3 round btn--stroke btn--gray'>
                 <svg class='icon'><use href='#icon-refresh'/></svg>
             </button>
         </div>
     </div>
     <div class='col col--12 border border--gray-light grid round'>
-        <template v-if='loading.queue'>
+        <template v-if='loading'>
             <div class='flex-parent flex-parent--center-main w-full py24'>
                 <div class='flex-child loading py24'></div>
             </div>
@@ -42,7 +42,7 @@
             </div>
         </template>
 
-        <template v-if='tasks.length > 0 && !loading.queue'>
+        <template v-if='tasks.length > 0 && !loading'>
             <div class='col col--12 px12'>
                 <div class='align-center w-full'>Recent Queue Population Tasks</div>
 
@@ -64,13 +64,13 @@
 </template>
 
 <script>
+import moment from 'moment';
+
 export default {
     name: 'StackQueue',
     data: function() {
         return {
-            loading: {
-                queue: true
-            },
+            loading: true,
             tasks: [],
             queue: {
                 queued: 0,
@@ -94,13 +94,20 @@ export default {
                 + ':' + ('0' + date.getMinutes()).substr(-2)
                 + ':' + ('0' + date.getSeconds()).substr(-2);
         },
-        refresh: function() {
-            this.getQueue();
-            this.getTasks();
+        refresh: async function() {
+            this.loading = true;
+
+            await this.getQueue();
+            await this.getTasks();
+
+            this.loading = false;
         },
         getTasks: async function() {
             try {
-                const res = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/task`);
+                const url = new URL(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/task`, window.api);
+                url.searchParams.append('type', 'pop');
+                url.searchParams.append('after', moment().add(-12, 'hours').toISOString());
+                const res = await window.std(url);
 
                 const tasks = [];
                 for (const task of res.tasks) {
@@ -113,7 +120,7 @@ export default {
             }
         },
         purgeQueue: async function() {
-            this.loading.queue = true;
+            this.loading = true;
 
             try {
                 this.queue = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/stack/queue`, {
@@ -127,16 +134,12 @@ export default {
             this.getQueue();
         },
         getQueue: async function() {
-            this.loading.queue = true;
-
             try {
                 this.queue = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/stack/queue`);
 
             } catch (err) {
                 this.$emit('err', err);
             }
-
-            this.loading.queue = false;
         },
     }
 }

@@ -20,6 +20,14 @@
                 "vectorize"
             ]
         },
+        "before": {
+            "type": "string",
+            "description": "Query users that were created before the given ISO Date"
+        },
+        "after": {
+            "type": "string",
+            "description": "Query users that were created after the given ISO Date"
+        },
         "sort": {
             "type": "string",
             "default": "created",
