@@ -1,6 +1,6 @@
 <h1 align=center>ML Enabler</h1>
 
-<p align=center>A service that integrates ML models to applications like Tasking Manager.</p>
+<p align=center>Frictonless TF based model storage, inferencing & discovery</p>
 
 ## Background
 
@@ -13,19 +13,21 @@ The API uses the following terms:
 A model is a machine learning model. With ml-enabler, we use the [TFService](https://www.tensorflow.org/tfx/tutorials/serving/rest_simple) convention of publishing models. This allows to spin up containers of the model for prediction and query the data for storage. For an example of a complete implementation, see Development Seed's [looking-glass](https://github.com/developmentseed/looking-glass-pub/). ml-enabler-api can store data from several versions of the same model.
 
 * **Prediction** --
-A prediction is a set of results from an ML Model for a bounding box (region) and at a specific tile level. For results that are not at tile level, the ml-enabler-cli will ensure this is aggregated a granular yet performant level. Predictions are tied to specific versions of a model.
+A prediction is a set of results from an ML Model for a bounding box (region) and at a specific tile level.
 
 * **Prediction tiles** --
 Prediction tiles are the results of the prediction. The tiles are indexed using quadkeys for easy spatial search.
 
 ## Deploying
 
-The CloudFormation template is designed to be AWS Account agnostic and will create all necessary resources with the exception of an SSL certificate (leave blank to disable https)
+The CloudFormation template is designed to be AWS Account agnostic and will create all necessary resources with
+the exception of an SSL certificate (leave blank to disable https) and initial ECS images.
 
 ### Deploy Tools
 
-The cloudformation template is designed to be deployed with [cfn-config](https://github.com/mapbox/cfn-config), or a cfn-config compatible client.
-[OpenAddresses/Deploy](https://github.com/openaddresses/deploy) is a compatible client with a bunch of extra nice features.
+The cloudformation template is designed to be deployed with [cfn-config](https://github.com/mapbox/cfn-config),
+or a cfn-config compatible client.  [OpenAddresses/Deploy](https://github.com/openaddresses/deploy) is a compatible
+client with a bunch of extra nice features.
 
 ### Paramaters
 
