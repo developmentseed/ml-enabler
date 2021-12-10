@@ -1,0 +1,44 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "total",
+        "users"
+    ],
+    "properties": {
+        "total": {
+            "type": "integer",
+            "description": "Total number of items"
+        },
+        "users": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "username": {
+                        "type": "string"
+                    },
+                    "created": {
+                        "type": "integer"
+                    },
+                    "updated": {
+                        "type": "integer"
+                    },
+                    "uid": {
+                        "type": "integer"
+                    },
+                    "access": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}

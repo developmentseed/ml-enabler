@@ -1,0 +1,13 @@
+{
+    "type": "object",
+    "required": [
+        "name"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "Human Readable name of the API Token"
+        }
+    }
+}

@@ -7,22 +7,22 @@ ENV PACKAGE_PREFIX /tmp/python
 ################################################################################
 #                            CREATE PACKAGE                                    #
 ################################################################################
-COPY download_and_predict download_and_predict
-COPY requirements.txt requirements.txt
 
 ENV \
   LANG=en_US.UTF-8 \
   LC_ALL=en_US.UTF-8 \
   CFLAGS="--std=c99"
 
+ADD requirements.txt requirements.txt
+
 RUN pip3 install -r requirements.txt --no-binary rasterio,shapely,numpy -t $PACKAGE_PREFIX -U
+
+COPY download_and_predict download_and_predict
 
 ################################################################################
 #                            REDUCE PACKAGE SIZE                               #
 ################################################################################
-RUN rm -rdf $PACKAGE_PREFIX/boto3/ \
-  && rm -rdf $PACKAGE_PREFIX/botocore/ \
-  && rm -rdf $PACKAGE_PREFIX/docutils/ \
+RUN rm -rdf $PACKAGE_PREFIX/docutils/ \
   && rm -rdf $PACKAGE_PREFIX/dateutil/ \
   && rm -rdf $PACKAGE_PREFIX/jmespath/ \
   && rm -rdf $PACKAGE_PREFIX/s3transfer/ \

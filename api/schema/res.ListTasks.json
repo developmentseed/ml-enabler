@@ -1,0 +1,53 @@
+{
+    "type": "object",
+    "required": [
+        "total",
+        "tasks"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "total": {
+            "type": "integer",
+            "description": "Total number of items"
+        },
+        "tasks": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "id",
+                    "iter_id",
+                    "created",
+                    "updated",
+                    "type",
+                    "batch_id",
+                    "log_link"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "iter_id": {
+                        "type": "integer"
+                    },
+                    "created": {
+                        "type": "integer"
+                    },
+                    "updated": {
+                        "type": "integer"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "batch_id": {
+                        "type": "integer"
+                    },
+                    "log_link": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}

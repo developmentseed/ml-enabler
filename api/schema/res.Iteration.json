@@ -1,0 +1,80 @@
+{
+    "type": "object",
+    "required": [
+        "id",
+        "created",
+        "updated",
+        "pid",
+        "tile_zoom",
+        "docker_link",
+        "model_link",
+        "model_type",
+        "checkpoint_link",
+        "tfrecord_link",
+        "save_link",
+        "inf_list",
+        "inf_type",
+        "inf_binary",
+        "inf_supertile",
+        "version",
+        "hint",
+        "imagery_id"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "created": {
+            "type": "integer"
+        },
+        "updated": {
+            "type": "integer"
+        },
+        "docker_link": {
+            "type": "string"
+        },
+        "model_link": {
+            "type": "string"
+        },
+        "model_type": {
+            "type": "string",
+            "enum": [
+                "tensorflow"
+            ]
+        },
+        "checkpoint_link": {
+            "type": "string"
+        },
+        "tfrecord_link": {
+            "type": "string"
+        },
+        "save_link": {
+            "type": "string"
+        },
+        "tile_zoom": {
+            "type": "integer"
+        },
+        "inf_list": {
+            "type": "string"
+        },
+        "inf_type": {
+            "type": "string"
+        },
+        "inf_binary": {
+            "type": "boolean"
+        },
+        "inf_supertile": {
+            "type": "boolean"
+        },
+        "version": {
+            "type": "string"
+        },
+        "hint": {
+            "type": "string"
+        },
+        "imagery_id": {
+            "type": "integer"
+        }
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "type": "object",
+    "required": [
+        "id",
+        "username",
+        "email",
+        "access",
+        "validated"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Unique ID of User"
+        },
+        "validated": {
+            "$ref": "./util/validated.json"
+        },
+        "username": {
+            "type": "string",
+            "description": "Unique Username"
+        },
+        "email": {
+            "type": "string",
+            "description": "Unique Email"
+        },
+        "access": {
+            "$ref": "./util/access.json"
+        }
+    }
+}

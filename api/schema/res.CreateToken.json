@@ -1,0 +1,25 @@
+{
+    "type": "object",
+    "required": [
+        "id",
+        "name",
+        "token",
+        "created"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "name": {
+            "type": "string",
+            "description": "Human Readable name of the API Token"
+        },
+        "token": {
+            "type": "string"
+        },
+        "created": {
+            "type": "integer"
+        }
+    }
+}

@@ -1,0 +1,21 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "docker_link": {
+            "type": "string"
+        },
+        "model_link": {
+            "type": "string"
+        },
+        "checkpoint_link": {
+            "type": "string"
+        },
+        "tfrecord_link": {
+            "type": "string"
+        },
+        "save_link": {
+            "type": "string"
+        }
+    }
+}

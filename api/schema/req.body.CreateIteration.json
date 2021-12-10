@@ -1,0 +1,56 @@
+{
+    "type": "object",
+    "required": [
+        "model_type",
+        "tile_zoom",
+        "inf_list",
+        "inf_type",
+        "inf_binary",
+        "inf_supertile",
+        "version",
+        "hint",
+        "imagery_id"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "model_type": {
+            "type": "integer",
+            "enum": [
+                "tensorflow"
+            ]
+        },
+        "tile_zoom": {
+            "type": "integer"
+        },
+        "inf_list": {
+            "type": "string"
+        },
+        "inf_type": {
+            "type": "string",
+            "enum": [
+                "segmentation",
+                "classification",
+                "detection"
+            ]
+        },
+        "inf_binary": {
+            "type": "boolean"
+        },
+        "inf_supertile": {
+            "type": "boolean"
+        },
+        "version": {
+            "$ref": "./util/version.json"
+        },
+        "hint": {
+            "type": "string",
+            "enum": [
+                "iteration",
+                "training"
+            ]
+        },
+        "imagery_id": {
+            "type": "integer"
+        }
+    }
+}

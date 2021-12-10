@@ -1,0 +1,18 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "type"
+    ],
+    "properties": {
+        "type": {
+            "type": "string",
+            "enum": [
+                "model",
+                "tfrecord",
+                "checkpoint"
+            ],
+            "description": "Asset Type to upload"
+        }
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "access": {
+            "$ref": "./util/access.json"
+        },
+        "validated": {
+            "$ref": "./util/validated.json"
+        }
+    }
+}

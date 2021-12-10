@@ -1,0 +1,27 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "id",
+        "uid",
+        "pid",
+        "access"
+    ],
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "Project Access ID"
+        },
+        "uid": {
+            "type": "integer",
+            "description": "User ID"
+        },
+        "pid": {
+            "type": "integer",
+            "description": "Project ID"
+        },
+        "access": {
+            "$ref": "./util/access.json"
+        }
+    }
+}

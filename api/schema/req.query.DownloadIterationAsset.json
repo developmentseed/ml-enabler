@@ -1,0 +1,24 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "type",
+        "token"
+    ],
+    "properties": {
+        "type": {
+            "type": "string",
+            "enum": [
+                "model",
+                "tfrecord",
+                "checkpoint",
+                "container"
+            ],
+            "description": "Asset Type to upload"
+        },
+        "token": {
+            "type": "string",
+            "description": "Authentication Token"
+        }
+    }
+}

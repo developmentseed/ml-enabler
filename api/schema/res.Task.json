@@ -1,0 +1,44 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "id",
+        "iter_id",
+        "created",
+        "updated",
+        "type",
+        "batch_id",
+        "log_link",
+        "status",
+        "statusReason"
+    ],
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "iter_id": {
+            "type": "integer"
+        },
+        "created": {
+            "type": "integer"
+        },
+        "updated": {
+            "type": "integer"
+        },
+        "type": {
+            "type": "string"
+        },
+        "batch_id": {
+            "type": "integer"
+        },
+        "log_link": {
+            "type": ["string", "null"]
+        },
+        "status": {
+            "type": "string"
+        },
+        "statusReason": {
+            "type": "string"
+        }
+    }
+}

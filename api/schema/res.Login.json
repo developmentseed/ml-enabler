@@ -1,0 +1,31 @@
+{
+    "type": "object",
+    "required": [
+        "uid",
+        "username",
+        "email",
+        "access"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "uid": {
+            "type": "integer"
+        },
+        "username": {
+            "type": "string"
+        },
+        "email": {
+            "type": "string"
+        },
+        "access": {
+            "$ref": "./util/access.json"
+        },
+        "validated": {
+            "$ref": "./util/validated.json"
+        },
+        "token": {
+            "type": "string",
+            "description": "JSON Web Token to use for subsequent auth"
+        }
+    }
+}

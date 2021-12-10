@@ -4,11 +4,13 @@ to a remote ML serving image, and saving them
 @author:Development Seed
 """
 import json
+import base64
 import affine
 import geojson
 import requests
 import rasterio
 import shapely
+import boto3
 
 from shapely.geometry import box
 from requests.auth import HTTPBasicAuth
@@ -30,6 +32,7 @@ import numpy as np
 
 from download_and_predict.custom_types import SQSEvent
 
+firehose = boto3.client('firehose')
 
 class ModelType(Enum):
     OBJECT_DETECT = 1
@@ -113,38 +116,39 @@ class DownloadAndPredict(object):
 
         return payload
 
-    def cl_post_prediction(self, payload: Dict[str, Any], chips: List[dict], prediction_id: str, inferences: List[str]) -> Dict[str, Any]:
-        payload = json.dumps(payload)
-        r = requests.post(self.prediction_endpoint + ":predict", data=payload)
-        r.raise_for_status()
+    def cl_post_prediction(self, payload: Dict[str, Any], chips: List[dict], inferences: List[str]) -> Dict[str, Any]:
+        try:
+            payload = json.dumps(payload)
+            r = requests.post(self.prediction_endpoint + ":predict", data=payload)
+            r.raise_for_status()
 
-        preds = r.json()["predictions"]
-        pred_list = [];
+            preds = r.json()["predictions"]
+            pred_list = [];
 
-        for i in range(len(chips)):
-            pred_dict = {}
+            for i in range(len(chips)):
+                pred_dict = {}
 
-            for j in range(len(preds[i])):
-                pred_dict[inferences[j]] = preds[i][j]
+                for j in range(len(preds[i])):
+                    pred_dict[inferences[j]] = preds[i][j]
 
-            print('BOUNDS', chips[i].get('bounds'))
-            body = {
-                "geom": shapely.geometry.mapping(box(*chips[i].get('bounds'))),
-                "predictions": pred_dict,
-                "prediction_id": prediction_id
-            }
+                print('BOUNDS', chips[i].get('bounds'))
+                body = {
+                    "type": "Feature",
+                    "submission_id": chips[i].get('submission'),
+                    "geometry": shapely.geometry.mapping(box(*chips[i].get('bounds'))),
+                    "properties": pred_dict,
+                }
 
-            if chips[i].get('x') is not None and chips[i].get('y') is not None and chips[i].get('z') is not None:
-                body['quadkey'] = mercantile.quadkey(chips[i].get('x'), chips[i].get('y'), chips[i].get('z'))
+                if chips[i].get('x') is not None and chips[i].get('y') is not None and chips[i].get('z') is not None:
+                    body['quadkey'] = mercantile.quadkey(chips[i].get('x'), chips[i].get('y'), chips[i].get('z'))
 
-            pred_list.append(body)
+                pred_list.append(body)
 
-        return {
-            "predictionId": prediction_id,
-            "predictions": pred_list
-        }
+            return pred_list
+        except requests.exceptions.HTTPError as e:
+            print (e.response.text)
 
-    def od_post_prediction(self, payload: str, chips: List[dict], prediction_id: str) -> Dict[str, Any]:
+    def od_post_prediction(self, payload: str, chips: List[dict]) -> Dict[str, Any]:
         pred_list = [];
 
         for i in range(len(chips)):
@@ -177,11 +181,12 @@ class DownloadAndPredict(object):
                 score = preds["detection_scores"][j]
 
                 body = {
-                    "geom": bbox,
-                    "predictions": {
+                    "type": "Feature",
+                    "submission_id": chips[i].get('submission'),
+                    "properties": {
                         "default": score
                     },
-                    "prediction_id": prediction_id
+                    "geometry": bbox,
                 }
 
                 if chips[i].get('x') is not None and chips[i].get('y') is not None and chips[i].get('z') is not None:
@@ -189,18 +194,15 @@ class DownloadAndPredict(object):
 
                 pred_list.append(body)
 
-        return {
-            "predictionId": prediction_id,
-            "predictions": pred_list
-        }
+        return pred_list
 
-    def save_prediction(self, prediction_id: str, payload, auth: str):
-        url = self.mlenabler_endpoint + "/v1/model/prediction/" + prediction_id + "/tiles"
-        r = requests.post(url, json=payload, auth=HTTPBasicAuth('machine', auth))
-
-        print(r.text)
-
-        r.raise_for_status()
+    def save_prediction(self, payload, stream):
+        firehose.put_record_batch(
+            DeliveryStreamName=stream,
+            Records=[{
+                "Data": json.dumps(p)
+            } for p in payload]
+        )
 
         return True
 

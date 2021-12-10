@@ -1,0 +1,20 @@
+{
+    "type": "object",
+    "required": [
+        "queued",
+        "inflight",
+        "dead"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "queued": {
+            "type": "integer"
+        },
+        "inflight": {
+            "type": "integer"
+        },
+        "dead": {
+            "type": "integer"
+        }
+    }
+}

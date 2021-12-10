@@ -1,0 +1,27 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "name": {
+            "type": "string"
+        },
+        "source": {
+            "type": "string"
+        },
+        "project_url": {
+            "type": "string"
+        },
+        "archived": {
+            "type": "boolean"
+        },
+        "tags": {
+            "$ref": "./util/project-tags.json"
+        },
+        "access": {
+            "$ref": "./util/project-access.json"
+        },
+        "notes": {
+            "type": "string"
+        }
+    }
+}

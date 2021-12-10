@@ -1,0 +1,13 @@
+{
+    "type": "object",
+    "required": [
+        "user"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "user": {
+            "type": "string",
+            "description": "username or email to reset password of"
+        }
+    }
+}

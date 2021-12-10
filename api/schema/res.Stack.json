@@ -1,0 +1,23 @@
+{
+    "type": "object",
+    "required": [
+        "id",
+        "name",
+        "status"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "type": "string",
+            "description": "AWS ARN ID"
+        },
+        "name": {
+            "type": "string",
+            "description": "Human Readable CloudFormation Stack Name"
+        },
+        "status": {
+            "type": "string",
+            "description": "CloudFormation Status Enum"
+        }
+    }
+}

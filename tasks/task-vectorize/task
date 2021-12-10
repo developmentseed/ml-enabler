@@ -1,0 +1,30 @@
+#!/bin/bash
+
+set -xeuo pipefail
+
+if [[ -z ${ASSET_BUCKET} ]]; then
+    echo "ASSET_BUCKET env must be set"
+    exit 1
+elif [[ -z ${PROJECT_ID} ]]; then
+    echo "PROJECT_ID env must be set"
+    exit 1
+elif [[ -z ${ITERATION_ID} ]]; then
+    echo "ITERATION_ID env must be set"
+    exit 1
+elif [[ -z ${SUBMISSION_ID} ]]; then
+    echo "SUBMISSION_ID env must be set"
+    exit 1
+fi
+
+mkdir ./data || true
+rm -rf ./data/*
+mkdir ./data/raw/
+
+aws s3 cp --recursive s3://${ASSET_BUCKET}/project/${PROJECT_ID}/iteration/${ITERATION_ID}/prediction/submission-${SUBMISSION_ID} data/raw/
+find ./data/raw/ -type f -exec gunzip {} +
+cat $(find ./data/raw/ -type f) > ./data/input.geojson
+rm -rf ./data/raw
+
+aws s3 cp ./data/input.geojson s3://${ASSET_BUCKET}/project/${PROJECT_ID}/iteration/${ITERATION_ID}/submission-${SUBMISSION_ID}.geojson
+
+node index.js

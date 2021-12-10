@@ -1,0 +1,45 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "total",
+        "submissions"
+    ],
+    "properties": {
+        "total": {
+            "type": "integer",
+            "description": "Total number of items"
+        },
+        "submissions": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                    "id",
+                    "created",
+                    "iter_id",
+                    "aoi_id",
+                    "storage"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "created": {
+                        "type": "integer"
+                    },
+                    "iter_id": {
+                        "type": "integer"
+                    },
+                    "aoi_id": {
+                        "type": "integer"
+                    },
+                    "storage": {
+                        "type": "boolean"
+                    }
+                }
+            }
+        }
+    }
+}

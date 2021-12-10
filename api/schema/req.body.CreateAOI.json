@@ -1,0 +1,22 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "bounds",
+        "name"
+    ],
+    "properties": {
+        "iter_id": {
+            "type": "integer"
+        },
+        "name": {
+            "type": "string"
+        },
+        "bounds": {
+            "type": "array",
+            "items": {
+                "type": "number"
+            }
+        }
+    }
+}

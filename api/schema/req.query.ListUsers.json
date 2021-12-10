@@ -1,0 +1,36 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "limit": {
+            "$ref": "./util/limit.json"
+        },
+        "page": {
+            "$ref": "./util/page.json"
+        },
+        "filter": {
+            "type": "string",
+            "default": "",
+            "description": "Filter a complete or partial username/email"
+        },
+        "access": {
+            "$ref": "./util/access.json"
+        },
+        "order": {
+            "$ref": "./util/order.json"
+        },
+        "sort": {
+            "type": "string",
+            "default": "created",
+            "enum": [
+                "id",
+                "created",
+                "username",
+                "access",
+                "validated",
+                "email"
+            ],
+            "description": "Field to sort order by"
+        }
+    }
+}

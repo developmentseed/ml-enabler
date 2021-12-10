@@ -1,0 +1,36 @@
+{
+    "type": "object",
+    "required": [
+        "id",
+        "pid",
+        "name",
+        "url",
+        "created",
+        "updated",
+        "fmt"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "pid": {
+            "type": "integer"
+        },
+        "created": {
+            "type": "integer"
+        },
+        "updated": {
+            "type": "integer"
+        },
+        "name": {
+            "type": "string"
+        },
+        "url": {
+            "type": "string"
+        },
+        "fmt": {
+            "type": "string"
+        }
+    }
+}

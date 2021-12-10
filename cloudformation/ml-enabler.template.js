@@ -1,14 +1,16 @@
 const cf = require('@mapbox/cloudfriend');
-const batch = require('./batch');
 const alarms = require('batch-alarms');
+
+const jobs = require('./jobs');
+const batch = require('./batch');
 
 const Parameters = {
     GitSha: {
         Type: 'String',
         Description: 'GitSha to Deploy'
     },
-    MachineAuth: {
-        Description: 'The password for the default machine user',
+    SigningSecret: {
+        Description: 'Secret to signing JWT Tokens',
         Type: 'String'
     },
     ContainerCpu: {
@@ -68,7 +70,7 @@ const Resources = {
             CidrBlock: '172.31.0.0/16',
             Tags: [{
                 Key: 'Name',
-                Value: cf.join('-', [cf.stackName, 'vpc'])
+                Value: cf.join([cf.stackName, '-vpc'])
             }]
         }
     },
@@ -95,7 +97,7 @@ const Resources = {
         Properties: {
             Tags: [{
                 Key: 'Name',
-                Value: cf.join('-', [cf.stackName, 'gateway'])
+                Value: cf.join([cf.stackName, '-gateway'])
             },{
                 Key: 'Network',
                 Value: 'Public'
@@ -160,7 +162,7 @@ const Resources = {
     MLEnablerECSCluster: {
         Type: 'AWS::ECS::Cluster',
         Properties: {
-            ClusterName: cf.join('-', [cf.stackName, 'cluster'])
+            ClusterName: cf.join([cf.stackName, '-cluster'])
         }
     },
     MLEnablerExecRole: {
@@ -248,6 +250,8 @@ const Resources = {
                     },{
                         Effect: 'Allow', // These are all required to spin up a prediction stack
                         Action: [
+                            'deliverystream:*',
+                            'firehose:*',
                             'iam:PassRole',
                             'logs:DescribeLogGroups',
                             'ecs:CreateService',
@@ -396,40 +400,30 @@ const Resources = {
                 Name: 'app',
                 Image: cf.join([cf.accountId, '.dkr.ecr.', cf.region, '.amazonaws.com/ml-enabler:', cf.ref('GitSha')]),
                 PortMappings: [{
-                    ContainerPort: 5000
+                    ContainerPort: 2000
                 }],
                 Environment: [{
-                    Name:'POSTGRES_DB',
-                    Value: 'mlenabler'
+                    Name: 'POSTGRES',
+                    Value: cf.join([
+                        'postgresql://',
+                        cf.ref('DatabaseUser'),
+                        ':',
+                        cf.ref('DatabasePassword'),
+                        '@',
+                        cf.getAtt('MLEnablerRDS', 'Endpoint.Address'),
+                        ':5432/mlenabler'
+                    ])
                 },{
                     Name: 'ENVIRONMENT',
                     Value: 'aws'
                 },{
-                    Name: 'MACHINE_AUTH',
-                    Value: cf.ref('MachineAuth')
-                },{
-                    Name:'POSTGRES_USER',
-                    Value: cf.ref('DatabaseUser')
-                },{
-                    Name:'POSTGRES_PASSWORD',
-                    Value: cf.ref('DatabasePassword')
-                },{
-                    Name:'POSTGRES_ENDPOINT',
-                    Value: cf.getAtt('MLEnablerRDS', 'Endpoint.Address')
-                },{
-                    Name:'POSTGRES_PORT',
-                    Value: '5432'
-                },{
-                    Name: 'FLASK_APP',
-                    Value: 'ml_enabler'
-                },{
-                    Name: 'ECS_LOG_LEVEL',
-                    Value: 'debug'
+                    Name: 'SigningSecret',
+                    Value: cf.ref('SigningSecret')
                 },{
                     Name: 'GitSha',
                     Value: cf.ref('GitSha')
                 },{
-                    Name: 'STACK',
+                    Name: 'StackName',
                     Value: cf.stackName
                 },{
                     Name: 'MAPBOX_TOKEN',
@@ -437,16 +431,13 @@ const Resources = {
                 },{
                     Name: 'ASSET_BUCKET',
                     Value: cf.ref('MLEnablerBucket')
-                },{
-                    Name: 'INTERACTIVE',
-                    Value: 'false'
                 }],
                 LogConfiguration: {
                     LogDriver: 'awslogs',
                     Options: {
                         'awslogs-group': cf.stackName,
                         'awslogs-region': cf.region,
-                        'awslogs-stream-prefix': cf.join('-', ['awslogs', cf.stackName])
+                        'awslogs-stream-prefix': cf.stackName
                     }
                 },
                 Essential: true
@@ -456,7 +447,7 @@ const Resources = {
     MLEnablerService: {
         Type: 'AWS::ECS::Service',
         Properties: {
-            ServiceName: cf.join('-', [cf.stackName, 'Service']),
+            ServiceName: cf.join([cf.stackName, '-service']),
             Cluster: cf.ref('MLEnablerECSCluster'),
             TaskDefinition: cf.ref('MLEnablerTaskDefinition'),
             LaunchType: 'FARGATE',
@@ -473,7 +464,7 @@ const Resources = {
             },
             LoadBalancers: [{
                 ContainerName: 'app',
-                ContainerPort: 5000,
+                ContainerPort: 2000,
                 TargetGroupArn: cf.ref('MLEnablerTargetGroup')
             }]
         }
@@ -481,13 +472,13 @@ const Resources = {
     MLEnablerServiceSecurityGroup: {
         Type: 'AWS::EC2::SecurityGroup',
         Properties: {
-            GroupDescription: cf.join('-', [cf.stackName, 'ec2-sg']),
+            GroupDescription: cf.join([cf.stackName, '-ec2-sg']),
             VpcId: cf.ref('MLEnablerVPC'),
             SecurityGroupIngress: [{
                 CidrIp: '0.0.0.0/0',
                 IpProtocol: 'tcp',
-                FromPort: 5000,
-                ToPort: 5000
+                FromPort: 2000,
+                ToPort: 2000
             },{
                 CidrIp: '0.0.0.0/0',
                 IpProtocol: 'tcp',
@@ -515,7 +506,10 @@ const Resources = {
     MLEnablerTargetGroup: {
         Type: 'AWS::ElasticLoadBalancingV2::TargetGroup',
         Properties: {
-            Port: 5000,
+            HealthCheckEnabled: true,
+            HealthCheckIntervalSeconds: 30,
+            HealthCheckPath: '/health',
+            Port: 2000,
             Protocol: 'HTTP',
             VpcId: cf.ref('MLEnablerVPC'),
             TargetType: 'ip',
@@ -539,7 +533,7 @@ const Resources = {
     MLEnablerELBSecurityGroup: {
         Type: 'AWS::EC2::SecurityGroup',
         Properties: {
-            GroupDescription: cf.join('-', [cf.stackName, 'alb-sg']),
+            GroupDescription: cf.join([cf.stackName, '-alb-sg']),
             SecurityGroupIngress: [{
                 CidrIp: '0.0.0.0/0',
                 IpProtocol: 'tcp',
@@ -608,7 +602,7 @@ const Resources = {
         Properties: {
             Engine: 'postgres',
             DBName: 'mlenabler',
-            EngineVersion: '12.4',
+            EngineVersion: '13.3',
             MasterUsername: cf.ref('DatabaseUser'),
             MasterUserPassword: cf.ref('DatabasePassword'),
             AllocatedStorage: 100,
@@ -624,7 +618,7 @@ const Resources = {
     MLEnablerRDSSubnet: {
         Type: 'AWS::RDS::DBSubnetGroup',
         Properties: {
-            DBSubnetGroupDescription: cf.join('-', [cf.stackName, 'rds-subnets']),
+            DBSubnetGroupDescription: cf.join([cf.stackName, '-rds-subnets']),
             SubnetIds: [
                 cf.ref('MLEnablerSubA'),
                 cf.ref('MLEnablerSubB')
@@ -634,7 +628,7 @@ const Resources = {
     MLEnablerRDSSecurityGroup: {
         Type: 'AWS::RDS::DBSecurityGroup',
         Properties: {
-            GroupDescription: cf.join('-', [cf.stackName, 'rds-sg']),
+            GroupDescription: cf.join([cf.stackName, '-rds-sg']),
             EC2VpcId: cf.ref('MLEnablerVPC'),
             DBSecurityGroupIngress: [{
                 EC2SecurityGroupId: cf.getAtt('MLEnablerServiceSecurityGroup', 'GroupId')
@@ -646,7 +640,7 @@ const Resources = {
     PredLambdaFunctionRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
-            RoleName: cf.join('-', [ cf.ref('AWS::StackName'), 'queue-role' ]),
+            RoleName: cf.join([ cf.stackName, '-queue-role' ]),
             AssumeRolePolicyDocument: {
                 Version: '2012-10-17',
                 Statement: [{
@@ -659,7 +653,7 @@ const Resources = {
             },
             Path: '/',
             Policies: [{
-                PolicyName: cf.join('-', [ cf.ref('AWS::StackName'), 'queue-policy' ]),
+                PolicyName: cf.join([ cf.stackName, '-queue-policy' ]),
                 PolicyDocument: {
                     Version: '2012-10-17',
                     Statement: [{
@@ -673,6 +667,14 @@ const Resources = {
                             'logs:PutLogEvents'
                         ],
                         Resource: '*'
+                    },{
+                        Effect: 'Allow',
+                        Action: [
+                            'firehose:PutRecordBatch'
+                        ],
+                        Resource: cf.join([
+                            'arn:aws:firehose:', cf.region,':', cf.accountId, ':deliverystream/', cf.stackName, '-*'
+                        ])
                     },{
                         Effect: 'Allow',
                         Action: [
@@ -766,6 +768,45 @@ const Resources = {
             Path: '/service-role/'
         }
     },
+    PredFirehoseRole: {
+        Type: 'AWS::IAM::Role',
+        Properties: {
+            AssumeRolePolicyDocument: {
+                Version: '2012-10-17',
+                Statement: [ {
+                    Effect: 'Allow',
+                    Principal: {
+                        Service: 'firehose.amazonaws.com'
+                    },
+                    Action: 'sts:AssumeRole'
+                }]
+            }
+        }
+    },
+    PredFirehoseRolePolicy: {
+        Type: 'AWS::IAM::Policy',
+        Properties: {
+            PolicyName: cf.join('', [ cf.stackName, "-firehose" ]),
+            PolicyDocument: {
+                Version: '2012-10-17',
+                Statement: [{
+                    Effect: 'Allow',
+                    Action: [
+                        's3:AbortMultipartUpload',
+                        's3:GetBucketLocation',
+                        's3:GetObject',
+                        's3:ListBucket',
+                        's3:ListBucketMultipartUploads',
+                        's3:PutObject'
+                    ],
+                    Resource: [ cf.join([
+                        'arn:aws:s3:::', cf.stackName, '-', cf.accountId, '-', cf.region, '/*',
+                    ]) ],
+                }]
+            },
+            Roles: [ cf.ref('PredFirehoseRole') ]
+        },
+    },
     PredTaskRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
@@ -785,10 +826,7 @@ const Resources = {
     PredServiceSecurityGroup: {
         Type : 'AWS::EC2::SecurityGroup',
         Properties: {
-            GroupDescription: cf.join('-', [
-                cf.ref('AWS::StackName'),
-                'pred-ec2-sg'
-            ]),
+            GroupDescription: cf.join([cf.stackName, '-pred-ec2-sg']),
             VpcId: cf.ref('MLEnablerVPC'),
             SecurityGroupIngress: [{
                 CidrIp: '0.0.0.0/0',
@@ -818,82 +856,89 @@ const Outputs = {
         Description: 'Service SG',
         Value: cf.ref('PredServiceSecurityGroup'),
         Export: {
-            Name: cf.join('-', [cf.stackName, 'sg'])
+            Name: cf.join([cf.stackName, '-sg'])
+        }
+    },
+    InternalFirehoseRole: {
+        Description: 'Firehose Role',
+        Value: cf.getAtt('PredFirehoseRole', 'Arn'),
+        Export: {
+            Name: cf.join([cf.stackName, '-firehose-role'])
         }
     },
     InternalLambdaRole: {
         Description: 'Lambda Function Role',
         Value: cf.getAtt('PredLambdaFunctionRole', 'Arn'),
         Export: {
-            Name: cf.join('-', [cf.stackName, 'lambda-role'])
+            Name: cf.join([cf.stackName, '-lambda-role'])
         }
     },
     InternalScalingRole: {
         Description: 'Scaling Role',
         Value: cf.getAtt('PredServiceScalingRole', 'Arn'),
         Export: {
-            Name: cf.join('-', [cf.stackName, 'scaling-role'])
+            Name: cf.join([cf.stackName, '-scaling-role'])
         }
     },
     InternalExecRoleARN: {
         Description: 'Container Exec Role',
         Value: cf.getAtt('PredExecRole', 'Arn'),
         Export: {
-            Name: cf.join('-', [cf.stackName, 'exec-role-arn'])
+            Name: cf.join([cf.stackName, '-exec-role-arn'])
         }
     },
     InternalExecRoleName: {
         Description: 'Container Exec Role',
         Value: cf.ref('PredExecRole'),
         Export: {
-            Name: cf.join('-', [cf.stackName, 'exec-role-name'])
+            Name: cf.join([cf.stackName, '-exec-role-name'])
         }
     },
     InternalTaskRole: {
         Description: 'Container Exec Role',
         Value: cf.getAtt('PredTaskRole', 'Arn'),
         Export: {
-            Name: cf.join('-', [cf.stackName, 'task-role'])
+            Name: cf.join([cf.stackName, '-task-role'])
         }
     },
     InternalVPC: {
         Description: 'The ARN of the VPC',
         Value: cf.ref('MLEnablerVPC'),
         Export: {
-            Name: cf.join('-', [cf.stackName, 'vpc'])
+            Name: cf.join([cf.stackName, '-vpc'])
         }
     },
     InternalCluster: {
         Description: 'The ARN of the Cluster',
         Value: cf.ref('MLEnablerECSCluster'),
         Export: {
-            Name: cf.join('-', [cf.stackName, 'cluster'])
+            Name: cf.join([cf.stackName, '-cluster'])
         }
     },
     InternalSubA: {
         Description: 'SubnetA',
         Value: cf.ref('MLEnablerSubA'),
         Export: {
-            Name: cf.join('-', [cf.stackName, 'suba'])
+            Name: cf.join([cf.stackName, '-suba'])
         }
     },
     InternalSubB: {
         Description: 'SubnetA',
         Value: cf.ref('MLEnablerSubB'),
         Export: {
-            Name: cf.join('-', [cf.stackName, 'subb'])
+            Name: cf.join([cf.stackName, '-subb'])
         }
     },
     API: {
         Description: 'API URL',
         Value: cf.join(['http://', cf.getAtt('MLEnablerELB', 'DNSName')]),
         Export: {
-            Name: cf.join('-', [cf.stackName, 'api'])
+            Name: cf.join([cf.stackName, '-api'])
         }
     },
     UI: {
         Description: 'UI URL',
-        Value: cf.join(['http://', cf.getAtt('MLEnablerELB', 'DNSName'), '/admin/'])
+        Value: cf.getAtt('MLEnablerELB', 'DNSName')
     },
     S3: {
         Description: 'Asset Storage',
@@ -913,18 +958,23 @@ const Outputs = {
     }
 };
 
-module.exports = cf.merge({
-    Parameters,
-    Resources,
-    Mappings,
-    Conditions,
-    Outputs,
-},
-alarms({
-    prefix: 'MLEnabler',
-    email: 'ingalls@developmentseed.org',
-    cluster: cf.ref('MLEnablerECSCluster'),
-    service: cf.getAtt('MLEnablerService', 'Name'),
-    loadbalancer: cf.getAtt('MLEnablerELB', 'LoadBalancerFullName'),
-    targetgroup: cf.getAtt('MLEnablerTargetGroup', 'TargetGroupFullName')
-}), batch);
+module.exports = cf.merge(
+    {
+        Parameters,
+        Resources,
+        Mappings,
+        Conditions,
+        Outputs,
+    },
+    alarms({
+        prefix: 'MLEnabler',
+        apache: cf.stackName,
+        email: 'ingalls@developmentseed.org',
+        cluster: cf.ref('MLEnablerECSCluster'),
+        service: cf.getAtt('MLEnablerService', 'Name'),
+        loadbalancer: cf.getAtt('MLEnablerELB', 'LoadBalancerFullName'),
+        targetgroup: cf.getAtt('MLEnablerTargetGroup', 'TargetGroupFullName')
+    }),
+    batch,
+    jobs
+);

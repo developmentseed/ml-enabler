@@ -1,0 +1,78 @@
+<template>
+    <div class="col col--12">
+        <div class='col col--12 clearfix py6'>
+            <h2 @click='$router.push({ name: "home" })' class='fl cursor-pointer txt-underline-on-hover'>Projects</h2>
+            <h2 class='fl px6'>&gt;</h2>
+            <h2 @click='$router.push({ name: "project", params: { projectid: $route.params.projectid } })' class='fl cursor-pointer txt-underline-on-hover' v-text='$route.params.projectid'></h2>
+            <h2 class='fl px6'>&gt;</h2>
+            <h2 class='fl cursor-default cursor-pointer txt-underline-on-hover' v-text='"v" + iteration.version'></h2>
+
+            <button @click='$router.push({ name: "project", params: { projectid: $route.params.projectid } })' class='btn fr round btn--stroke color-gray color-black-on-hover'>
+                <svg class='icon'><use href='#icon-close'/></svg>
+            </button>
+
+            <span class='fr mr6 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer' v-text='"id: " + iteration.id'/>
+        </div>
+        <div class='border border--gray-light round col col--12 px12 py12 clearfix'>
+            <template v-if='loading.iteration'>
+                <div class='flex-parent flex-parent--center-main w-full py24'>
+                    <div class='flex-child loading py24'></div>
+                </div>
+            </template>
+            <template v-else>
+                <router-view
+                    :meta='meta'
+                    :project='project'
+                    :iteration='iteration'
+                    @refresh='refresh'
+                    @err='$emit("err", $event)'
+                />
+            </template>
+        </div>
+    </div>
+</template>
+
+<script>
+export default {
+    name: 'Iteration',
+    props: ['meta', 'project'],
+    data: function() {
+        return {
+            iteration: {},
+            loading: {
+                iteration: true
+            }
+        }
+    },
+    mounted: function() {
+        this.refresh();
+    },
+    methods: {
+        ecrLink(ecr) {
+            const url = `https://console.aws.amazon.com/ecr/repositories/${ecr.split(':')[0]}/`;
+            this.external(url);
+        },
+        logLink: function(stream) {
+            const url = `https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/%252Faws%252Fbatch%252Fjob/log-events/${encodeURIComponent(stream)}`
+            this.external(url);
+        },
+        external: function(url) {
+            if (!url) return;
+
+            window.open(url, "_blank")
+        },
+        refresh: function() {
+            this.getIteration();
+        },
+        getIteration: async function() {
+            this.loading.iteration = true;
+            try {
+                this.iteration = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}`);
+            } catch (err) {
+                this.$emit('err', err);
+            }
+            this.loading.iteration = false;
+        }
+    }
+}
+</script>

@@ -1,0 +1,15 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "name": {
+            "type": "string"
+        },
+        "url": {
+            "type": "string"
+        },
+        "fmt": {
+            "type": "string"
+        }
+    }
+}
