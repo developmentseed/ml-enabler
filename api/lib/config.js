@@ -3,6 +3,13 @@ const { sql, createPool, createTypeParserPreset } = require('slonik');
 const { Err } = require('@openaddresses/batch-schema');
 const wkx = require('wkx');
 const bbox = require('@turf/bbox').default;
+const AWS = require('aws-sdk');
+const SNS = new AWS.SNS({
+    region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
+});
+const STS = new AWS.STS({
+    region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
+});
 
 /**
  * @class
@@ -101,6 +108,29 @@ class Config {
     is_aws() {
         if (this.Environment !== 'aws') throw new Err(400, null, 'Deployment must be in AWS Environment to use this endpoint');
         return true;
+    }
+
+    async confirm_sns() {
+        if (!this.is_aws()) return;
+
+
+        const account = await STS.getCallerIdentity().promise();
+
+        for (const type of ['vectorize', 'delete']) {
+            const TopicArn = `arn:aws:sns:${process.env.AWS_DEFAULT_REGION}:${account.Account}:${this.StackName}-${type}`;
+
+            const attr = await SNS.listSubscriptionsByTopic({
+                TopicArn: `arn:aws:sns:${process.env.AWS_DEFAULT_REGION}:${account.Account}:${this.StackName}-${type}`
+            }).promise();
+
+            if (attr.Subscriptions[0].SubscriptionArn === 'PendingConfirmation') {
+                await SNS.subscribe({
+                    TopicArn,
+                    Protocol: attr.Subscriptions[0].Protocol,
+                    Endpoint: attr.Subscriptions[0].Endpoint
+                }).promise();
+            }
+        }
     }
 }
 
