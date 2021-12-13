@@ -1,4 +1,10 @@
 const { Err } = require('@openaddresses/batch-schema');
+const AWS = require('aws-sdk');
+const bodyParser = require('body-parser')
+const express = require('express');
+const SNS = new AWS.SNS({
+    region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
+});
 
 async function router(schema, config) {
     /**
@@ -15,17 +21,29 @@ async function router(schema, config) {
      */
     await schema.post('/sns', {
         res: 'res.Standard.json'
-    }, async (req, res) => {
+    }, express.text(), async (req, res) => {
         try {
             //TODO await user.is_auth(req);
 
-            console.error(req.body, req.headers);
+            if (typeof res.body === 'string') {
+                res.body = JSON.parse(res.body);
+            }
+
+            if (res.headers['x-amz-sns-message-type'] === 'SubscriptionConfirmation') {
+                await SNS.confirmSubscription({
+                    TopicArn: body.TopicArn,
+                    Token : body.Token
+                }).promise();
+            } else {
+                console.error(res.body, res.headers);
+            }
 
             res.json({
                 status: 200,
                 message: 'Webhook Accepted'
             });
         } catch (err) {
+            if (err) console.error(err);
             return Err.respond(err, res);
         }
     });
