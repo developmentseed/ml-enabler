@@ -19,7 +19,7 @@ async function router(schema, config) {
         try {
             //TODO await user.is_auth(req);
 
-            console.error(req.body);
+            console.error(req.body, req.headers);
 
             res.json({
                 status: 200,
