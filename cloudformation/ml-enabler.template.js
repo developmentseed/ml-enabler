@@ -272,6 +272,8 @@ const Resources = {
                         Action: [
                             'deliverystream:*',
                             'firehose:*',
+                            'cloudwatch:DescribeAlarms',
+                            'cloudwatch:PutMetricAlarm',
                             'iam:PassRole',
                             'logs:DescribeLogGroups',
                             'ecs:CreateService',
