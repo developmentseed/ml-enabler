@@ -268,6 +268,14 @@ const Resources = {
                         ],
                         Resource: [ 'arn:aws:s3:::devseed-artifacts/ml-enabler/*' ]
                     },{
+                        Effect: 'Allow',
+                        Action: [
+                            'sns:*'
+                        ],
+                        Resource: [
+                            cf.join(['arn:aws:sns:', cf.region, ':', cf.accountId, ':', cf.stackName, '-*'])
+                        ]
+                    },{
                         Effect: 'Allow', // These are all required to spin up a prediction stack
                         Action: [
                             'deliverystream:*',
