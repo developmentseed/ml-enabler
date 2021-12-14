@@ -175,7 +175,7 @@ async function server(args, config, cb) {
         });
     });
 
-    await config.confirm_sns();
+    config.confirm_sns();
 
     const srv = app.listen(2001, (err) => {
         if (err) return err;

@@ -25,17 +25,18 @@ async function router(schema, config) {
         try {
             //TODO await user.is_auth(req);
 
-            if (typeof res.body === 'string') {
-                res.body = JSON.parse(res.body);
+            console.error(req.body);
+            if (typeof req.body === 'string') {
+                req.body = JSON.parse(req.body);
             }
 
-            if (res.headers['x-amz-sns-message-type'] === 'SubscriptionConfirmation') {
+            if (req.headers['x-amz-sns-message-type'] === 'SubscriptionConfirmation') {
                 await SNS.confirmSubscription({
-                    TopicArn: body.TopicArn,
-                    Token : body.Token
+                    TopicArn: req.body.TopicArn,
+                    Token : req.body.Token
                 }).promise();
             } else {
-                console.error(res.body, res.headers);
+                console.error(req.body, req.headers);
             }
 
             res.json({
