@@ -28,6 +28,7 @@ class Config {
 
         cnf.postgres = args.postgres || process.env.POSTGRES || 'postgres://postgres@localhost:5432/mlenabler';
         cnf.Environment = process.env.ENVIRONMENT || 'docker';
+        cnf.region = process.env.AWS_DEFAULT_REGION || 'us-east-1';
 
         if (cnf.Environment === 'aws') {
             cnf.StackName = process.env.StackName;
@@ -102,6 +103,17 @@ class Config {
             }
         } while (!cnf.pool);
 
+        if (cnf.is_aws()) {
+            try {
+                const account = await STS.getCallerIdentity().promise();
+                cnf.account = account.Account;
+            } catch (err) {
+                throw new Error(err);
+            }
+        } else {
+            cnf.account = false;
+        }
+
         return cnf;
     }
 
@@ -113,23 +125,24 @@ class Config {
     async confirm_sns() {
         if (!this.is_aws()) return;
 
+        try {
+            for (const type of ['vectorize', 'delete']) {
+                const TopicArn = `arn:aws:sns:${process.env.AWS_DEFAULT_REGION}:${this.account}:${this.StackName}-${type}`;
 
-        const account = await STS.getCallerIdentity().promise();
-
-        for (const type of ['vectorize', 'delete']) {
-            const TopicArn = `arn:aws:sns:${process.env.AWS_DEFAULT_REGION}:${account.Account}:${this.StackName}-${type}`;
-
-            const attr = await SNS.listSubscriptionsByTopic({
-                TopicArn: `arn:aws:sns:${process.env.AWS_DEFAULT_REGION}:${account.Account}:${this.StackName}-${type}`
-            }).promise();
-
-            if (attr.Subscriptions[0].SubscriptionArn === 'PendingConfirmation') {
-                await SNS.subscribe({
-                    TopicArn,
-                    Protocol: attr.Subscriptions[0].Protocol,
-                    Endpoint: attr.Subscriptions[0].Endpoint
+                const attr = await SNS.listSubscriptionsByTopic({
+                    TopicArn: `arn:aws:sns:${process.env.AWS_DEFAULT_REGION}:${this.account}:${this.StackName}-${type}`
                 }).promise();
+
+                if (attr.Subscriptions[0].SubscriptionArn === 'PendingConfirmation') {
+                    await SNS.subscribe({
+                        TopicArn,
+                        Protocol: attr.Subscriptions[0].Protocol,
+                        Endpoint: attr.Subscriptions[0].Endpoint
+                    }).promise();
+                }
             }
+        } catch (err) {
+            throw new Error(err);
         }
     }
 }
