@@ -60,6 +60,7 @@ const stack = {
                             Effect: 'Allow',
                             Action: [
                                 'cloudwatch:DescribeAlarms',
+                                'cloudwatch:SetAlarmState',
                                 'cloudwatch:PutMetricAlarm'
                             ],
                             Resource: [

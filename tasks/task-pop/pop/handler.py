@@ -22,7 +22,7 @@ def handler(event) -> bool:
     queue_name = event['queue']
     assert(queue_name)
 
-    project_id = os.getenv('ALARM')
+    alarm = os.getenv('ALARM')
     assert(alarm)
 
     queue = boto3.resource("sqs").get_queue_by_name(QueueName=queue_name)
