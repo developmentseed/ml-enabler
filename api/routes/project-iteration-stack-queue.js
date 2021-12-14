@@ -8,7 +8,7 @@ const CWAlarm = require('../lib/cw-alarm');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
-    const alarms = new CWAlarm(config);
+    const alarm = new CWAlarm(config);
 
     /**
      * @api {get} /api/project/:pid/iteration/:iterationid/stack/queue Get Queue
@@ -118,7 +118,7 @@ async function router(schema, config) {
 
             payload.submission = submission.id;
 
-            await CWAlarm.update(`${config.StackName}-project-${req.params.pid}-iteration-${req.params.iterationid}`, {
+            await alarm.update(`${config.StackName}-project-${req.params.pid}-iteration-${req.params.iterationid}`, {
                 terminate: req.body.autoTerminate,
                 vectorize: req.body.autoVectorize
             });

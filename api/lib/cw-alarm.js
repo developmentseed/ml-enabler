@@ -37,7 +37,6 @@ class CWAlarm {
                 ActionsEnabled: true,
                 AlarmDescription: a.AlarmDescription,
                 DatapointsToAlarm: a.DatapointsToAlarm,
-                Dimensions: a.Dimensions,
                 Metrics: a.Metrics,
                 Threshold: a.Threshold,
                 TreatMissingData: a.TreatMissingData,

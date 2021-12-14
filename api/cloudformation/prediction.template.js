@@ -53,7 +53,7 @@ module.exports = {
                 AlarmName: cf.join([cf.stackName, '-sqs-empty']),
                 AlarmDescription: 'Set an alarm to breach when SQS list is at 0',
                 ActionsEnabled: true,
-                OKActions: [ ],
+                OKActions: [],
                 AlarmActions: [],
                 InsufficientDataActions: [],
                 Dimensions: [],
