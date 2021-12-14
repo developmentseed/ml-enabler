@@ -25,15 +25,15 @@ class CWAlarm {
             AlarmNamePrefix: alarm
         }).promise();
 
-        const alarms = [];
-        if (actions.terminate) alarms.push(`arn:aws:sns:${this.config.region}:${this.config.account}:${this.config.StackName}-delete`);
-        if (actions.vectorize) alarms.push(`arn:aws:sns:${this.config.region}:${this.config.account}:${this.config.StackName}-vectorize`);
+        const new_alarms = [];
+        if (actions.terminate) new_alarms.push(`arn:aws:sns:${this.config.region}:${this.config.account}:${this.config.StackName}-delete`);
+        if (actions.vectorize) new_alarms.push(`arn:aws:sns:${this.config.region}:${this.config.account}:${this.config.StackName}-vectorize`);
 
         for (const a of alarms.MetricAlarms) {
             await CW.setAlarmState({
                 AlarmName: a.AlarmName,
                 StateReason: 'Pending Queue Population',
-                StateValue: 'OK',
+                StateValue: 'OK'
             }).promise();
 
             await CW.putMetricAlarm({
@@ -48,9 +48,9 @@ class CWAlarm {
                 Metrics: a.Metrics,
                 Threshold: a.Threshold,
                 TreatMissingData: a.TreatMissingData,
-                AlarmActions: alarms,
+                AlarmActions: new_alarms,
                 InsufficientDataActions: [],
-                OKActions: [],
+                OKActions: []
             }).promise();
         }
     }

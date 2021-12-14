@@ -1,12 +1,11 @@
 const { Err } = require('@openaddresses/batch-schema');
 const AWS = require('aws-sdk');
-const bodyParser = require('body-parser')
 const express = require('express');
 const SNS = new AWS.SNS({
     region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
 });
 
-async function router(schema, config) {
+async function router(schema) {
     /**
      * @api {post} /api/sns SNS Webhook
      * @apiVersion 1.0.0
@@ -23,7 +22,7 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, express.text(), async (req, res) => {
         try {
-            //TODO await user.is_auth(req);
+            // TODO await user.is_auth(req);
 
             console.error(req.body);
             if (typeof req.body === 'string') {
