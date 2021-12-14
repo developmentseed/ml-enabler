@@ -118,7 +118,9 @@ async function router(schema, config) {
 
             payload.submission = submission.id;
 
-            await alarm.update(`${config.StackName}-project-${req.params.pid}-iteration-${req.params.iterationid}`, {
+            const sqs_alarm = `${config.StackName}-project-${req.params.pid}-iteration-${req.params.iterationid}-sqs-empty`;
+
+            await alarm.update(sqs_alarm, {
                 terminate: req.body.autoTerminate,
                 vectorize: req.body.autoVectorize
             });
@@ -130,6 +132,9 @@ async function router(schema, config) {
                 environment: [{
                     name: 'TASK',
                     value: JSON.stringify(payload)
+                },{
+                    name: 'ALARM',
+                    value: sqs_alarm
                 }]
             });
 

@@ -14,35 +14,43 @@ class CWAlarm {
     }
 
     /**
-     * @param {String} prefix Stack Prefix
+     * @param {String} alarm Alarm Name
      *
      * @param {Object} actions
      * @param {Boolean} actions.terminate
      * @param {Boolean} actions.vectorize
      */
-    async update(prefix, actions = {}) {
+    async update(alarm, actions = {}) {
         const alarms = await CW.describeAlarms({
-            AlarmNamePrefix: `${prefix}-sqs-empty`
+            AlarmNamePrefix: alarm
         }).promise();
 
-        const oks = [];
-        if (actions.terminate) oks.push(`arn:aws:sns:${this.config.region}:${this.config.account}:${this.config.StackName}-delete`);
-        if (actions.vectorize) oks.push(`arn:aws:sns:${this.config.region}:${this.config.account}:${this.config.StackName}-vectorize`);
+        const alarms = [];
+        if (actions.terminate) alarms.push(`arn:aws:sns:${this.config.region}:${this.config.account}:${this.config.StackName}-delete`);
+        if (actions.vectorize) alarms.push(`arn:aws:sns:${this.config.region}:${this.config.account}:${this.config.StackName}-vectorize`);
 
         for (const a of alarms.MetricAlarms) {
-            CW.putMetricAlarm({
+            await CW.setAlarmState({
+                AlarmName: a.AlarmName,
+                StateReason: 'Pending Queue Population',
+                StateValue: 'OK',
+            }).promise();
+
+            await CW.putMetricAlarm({
                 AlarmName: a.AlarmName,
                 ComparisonOperator: a.ComparisonOperator,
                 EvaluationPeriods: a.EvaluationPeriods,
-                ActionsEnabled: true,
+                // The API sets up desired alarm actions - but the populate task
+                // enables them once the queue is populated
+                ActionsEnabled: false,
                 AlarmDescription: a.AlarmDescription,
                 DatapointsToAlarm: a.DatapointsToAlarm,
                 Metrics: a.Metrics,
                 Threshold: a.Threshold,
                 TreatMissingData: a.TreatMissingData,
-                AlarmActions: [],
+                AlarmActions: alarms,
                 InsufficientDataActions: [],
-                OKActions: oks,
+                OKActions: [],
             }).promise();
         }
     }
