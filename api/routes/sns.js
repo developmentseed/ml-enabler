@@ -1,11 +1,14 @@
 const { Err } = require('@openaddresses/batch-schema');
 const AWS = require('aws-sdk');
 const express = require('express');
+const Task = require('../lib/project/iteration/task');
+const Stack = require('../lib/stack');
+
 const SNS = new AWS.SNS({
     region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
 });
 
-async function router(schema) {
+async function router(schema, config) {
     /**
      * @api {post} /api/sns SNS Webhook
      * @apiVersion 1.0.0
@@ -24,7 +27,6 @@ async function router(schema) {
         try {
             // TODO await user.is_auth(req);
 
-            console.error(req.body);
             if (typeof req.body === 'string') {
                 req.body = JSON.parse(req.body);
             }
@@ -37,13 +39,40 @@ async function router(schema) {
             } else if (req.headers['x-amz-sns-message-type'] === 'Notification') {
                 req.body.Message = JSON.parse(req.body.Message);
 
-                // Format: arn:aws:sns:<region>:<accountid>:<stackname>-delete
-                const action = req.body.TopicArn.match();
-
                 // Format: <stackname>-project-<project id>-iteration-<iteration id>-sqs-empty
-                const subject = msg.body.Message.AlarmArn;
+                const stk_match = req.body.Message.AlarmArn.match(/.*project-(\d+)-iteration-(\d+)-sqs-empty/);
+                if (!stk_match) throw new Error('Unknown Stack');
+                const project_id = stk_match[1];
+                const iter_id = stk_match[2];
+
+                // Format: arn:aws:sns:<region>:<accountid>:<stackname>-delete
+                if (req.body.TopicArn.match(/-delete$/)) {
+                    console.error('DELETE', project_id, iter_id);
+
+                    const stack = await Stack.from(project_id, iter_id);
+                    await stack.delete();
+                } else if (req.body.TopicArn.match(/-vectorize$/)) {
+                    console.error('VECTORIZE', project_id, iter_id);
+
+                    // TODO Figure out Submission ID
+                    await Task.batch(config, {
+                        type: 'vectorize',
+                        name: `vectorize-${project_id}-${iter_id}-${1}`,
+                        iter_id: req.params.iterationid,
+                        environment: [{
+                            name: 'PROJECT_ID',
+                            value: String(project_id)
+                        },{
+                            name: 'ITERATION_ID',
+                            value: String(iter_id)
+                        },{
+                            name: 'SUBMISSION_ID',
+                            value: String(1)
+                        }]
+                    });
+                }
             } else {
-                console.error(req.body, req.headers);
+                console.error('UNKNOWN', req.headers, req.body);
             }
 
             res.json({
