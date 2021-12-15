@@ -31,7 +31,7 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, express.text(), async (req, res) => {
         try {
-            await validate(message);
+            await validate(req.body);
         } catch (err) {
             console.error(err);
             return res.json({
@@ -69,22 +69,27 @@ async function router(schema, config) {
                 } else if (req.body.TopicArn.match(/-vectorize$/)) {
                     console.error('VECTORIZE', project_id, iter_id);
 
-                    // TODO Figure out Submission ID
-                    await Task.batch(config, {
-                        type: 'vectorize',
-                        name: `vectorize-${project_id}-${iter_id}-${1}`,
-                        iter_id: iter_id,
-                        environment: [{
-                            name: 'PROJECT_ID',
-                            value: String(project_id)
-                        },{
-                            name: 'ITERATION_ID',
-                            value: String(iter_id)
-                        },{
-                            name: 'SUBMISSION_ID',
-                            value: String(1)
-                        }]
-                    });
+                    const list = await Submission.list(config.pool, iter_id);
+
+                    for (const sub of list.submissions) {
+                        if (sub.storage) continue;
+
+                        await Task.batch(config, {
+                            type: 'vectorize',
+                            name: `vectorize-${project_id}-${iter_id}-${1}`,
+                            iter_id: iter_id,
+                            environment: [{
+                                name: 'PROJECT_ID',
+                                value: String(project_id)
+                            },{
+                                name: 'ITERATION_ID',
+                                value: String(iter_id)
+                            },{
+                                name: 'SUBMISSION_ID',
+                                value: String(sub.id)
+                            }]
+                        });
+                    }
                 }
             } else {
                 console.error('UNKNOWN', req.headers, req.body);
