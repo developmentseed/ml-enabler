@@ -49,7 +49,6 @@
                 <router-view
                     :user='user'
                     :meta='meta'
-                    :stacks='stacks'
                     @err='err = $event'
                     @auth='refresh($event)'
                 />
@@ -75,11 +74,6 @@ export default {
             user: {
                 name: false
             },
-            stacks: {
-                models: [],
-                predictions: [],
-                stacks: []
-            },
             meta: {
                 version: 1,
                 environment: 'docker',
@@ -100,7 +94,6 @@ export default {
 
             await this.getMeta();
             await this.getUser();
-            this.getStacks();
         },
         external: function(url) {
             if (!url) return;
@@ -129,13 +122,6 @@ export default {
                 this.user = await window.std('/api/login', {}, false);
                 this.loading.user = false;
             } catch (err) {
-                console.error(err);
-            }
-        },
-        getStacks: async function() {
-            try {
-                this.stacks = await window.std('/api/stack', {}, false);
-            } catch(err) {
                 console.error(err);
             }
         }

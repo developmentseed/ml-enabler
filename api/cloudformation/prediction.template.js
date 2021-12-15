@@ -258,36 +258,34 @@ module.exports = {
             Type: 'AWS::AutoScaling::LaunchConfiguration',
             DependsOn: 'PredECSHostSecurityGroup',
             Metadata: {
-                "AWS::CloudFormation::Init": {
-                    "config" : {
-                        "commands": {
-                            "01_add_instance_to_cluster": {
-                                "command": { "Fn::Join": [ "", ["echo ECS_CLUSTER=", { "Fn::ImportValue": { "Fn::Join": [ "-", [ cf.ref('StackName'), "cluster" ]]}}, " >> /etc/ecs/ecs.config\n" ]] }
+                'AWS::CloudFormation::Init': {
+                    config : {
+                        commands: {
+                            '01_add_instance_to_cluster': {
+                                command: cf.join([
+                                    "echo ECS_CLUSTER=", cf.importValue(cf.join([cf.ref('StackName'), "-cluster" ])), " >> /etc/ecs/ecs.config\n"
+                                ])
                             }
                         },
                         "files": {
                             "/etc/cfn/cfn-hup.conf": {
-                                "content": {
-                                    "Fn::Join": [ "", [
-                                        "[main]\n",
-                                        "stack=", { "Ref": "AWS::StackId" }, "\n",
-                                        "region=", { "Ref": "AWS::Region" }, "\n"
-                                    ]]
-                                },
-                                "mode": "000400",
-                                "owner": "root",
-                                "group": "root"
+                                "content": cf.join([
+                                    "[main]\n",
+                                    "stack=", cf.stackId, "\n",
+                                    "region=", cf.region, "\n"
+                                ]),
+                                mode: "000400",
+                                owner: "root",
+                                group: "root"
                             },
                             "/etc/cfn/hooks.d/cfn-auto-reloader.conf": {
-                                "content": {
-                                    "Fn::Join": [ "", [
-                                        "[cfn-auto-reloader-hook]\n",
-                                        "triggers=post.update\n",
-                                        "path=Resources.PredContainerInstanceLaunch.Metadata.AWS::CloudFormation::Init\n",
-                                        "action=/opt/aws/bin/cfn-init -v --stack ", { "Ref": "AWS::StackName" }, " --resource PredContainerInstanceLaunch --region ", { "Ref": "AWS::Region" }, "\n",
-                                        "runas=root\n"
-                                    ]]
-                                }
+                                "content": cf.join([
+                                    "[cfn-auto-reloader-hook]\n",
+                                    "triggers=post.update\n",
+                                    "path=Resources.PredContainerInstanceLaunch.Metadata.AWS::CloudFormation::Init\n",
+                                    "action=/opt/aws/bin/cfn-init -v --stack ", cf.stackName, " --resource PredContainerInstanceLaunch --region ", cf.region, "\n",
+                                    "runas=root\n"
+                                ])
                             }
                         },
                         "services": {
@@ -305,62 +303,58 @@ module.exports = {
                     }
                 }
             },
-            "Properties": {
-                "SecurityGroups": [{ "Ref": "PredECSHostSecurityGroup" }],
-                "ImageId": { "Fn::FindInMap": [ "AWSRegionToAMI", { "Ref": "AWS::Region" }, "AMIID" ] },
-                "InstanceType": "p3.2xlarge",
-                "IamInstanceProfile": { "Ref": "PredInstanceProfile" },
-                "BlockDeviceMappings": [{
-                    "DeviceName": "/dev/xvdcz",
-                    "Ebs": {
-                        "DeleteOnTermination": true,
-                        "VolumeSize": 100,
-                        "VolumeType": "gp2"
+            Properties: {
+                SecurityGroups: [ cf.ref('PredECSHostSecurityGroup') ],
+                ImageId: { "Fn::FindInMap": [ "AWSRegionToAMI", cf.region, "AMIID" ] },
+                InstanceType: "p3.2xlarge",
+                IamInstanceProfile: cf.ref('PredInstanceProfile'),
+                BlockDeviceMappings: [{
+                    DeviceName: '/dev/xvdcz',
+                    Ebs: {
+                        DeleteOnTermination: true,
+                        VolumeSize: 100,
+                        VolumeType: 'gp2'
                     }
                 }],
-                "UserData": {
-                    "Fn::Base64": {
-                        "Fn::Join": ["", [
-                            "#!/bin/bash -xe\n",
-                            "yum install -y aws-cfn-bootstrap\n",
-                            "/opt/aws/bin/cfn-init -v --region ", { "Ref": "AWS::Region" }, " --stack ", { "Ref": "AWS::StackName" }, " --resource PredContainerInstanceLaunch\n",
-                            "/opt/aws/bin/cfn-signal -e $? --region ", { "Ref": "AWS::Region" }, " --stack ", { "Ref": "AWS::StackName" }, " --resource PredECSAutoScalingGroup\n"
-                        ]]
-                    }
-                }
+                UserData: cf.base64(cf.join([
+                    "#!/bin/bash -xe\n",
+                    "yum install -y aws-cfn-bootstrap\n",
+                    "/opt/aws/bin/cfn-init -v --region ", cf.region, " --stack ", cf.stackName, " --resource PredContainerInstanceLaunch\n",
+                    "/opt/aws/bin/cfn-signal -e $? --region ", cf.region, " --stack ", cf.stackName, " --resource PredECSAutoScalingGroup\n"
+                ]))
             }
         },
-        "PredECSAutoScalingGroup": {
-            "Type": "AWS::AutoScaling::AutoScalingGroup",
-            "CreationPolicy" : {
-                "ResourceSignal" : {
-                    "Timeout" : "PT10M",
-                    "Count"   : "1"
+        PredECSAutoScalingGroup: {
+            Type: 'AWS::AutoScaling::AutoScalingGroup',
+            CreationPolicy : {
+                ResourceSignal: {
+                    Timeout: 'PT10M',
+                    Count: '1'
                 }
             },
-            "UpdatePolicy": {
-                "AutoScalingRollingUpdate": {
-                    "MinInstancesInService": 0
+            UpdatePolicy: {
+                AutoScalingRollingUpdate: {
+                    MinInstancesInService: 0
                 }
             },
-            "Properties": {
-                "AvailabilityZones": [
-                    { "Fn::FindInMap": ["AWSRegion2AZ", { "Ref": "AWS::Region" }, "1"] },
-                    { "Fn::FindInMap": ["AWSRegion2AZ", { "Ref": "AWS::Region" }, "2"] }
+            Properties: {
+                AvailabilityZones: [
+                    cf.findInMap('AWSRegion2AZ', cf.region, '1'),
+                    cf.findInMap('AWSRegion2AZ', cf.region, '2')
                 ],
-                "LaunchConfigurationName": { "Ref": "PredContainerInstanceLaunch" },
-                "MinSize": 1,
-                "MaxSize": { "Ref": "MaxSize" },
-                "DesiredCapacity": { "Ref": "MaxSize" },
-                "VPCZoneIdentifier": [
+                LaunchConfigurationName: cf.ref('PredContainerInstanceLaunch'),
+                MinSize: 1,
+                MaxSize: cf.ref('MaxSize'),
+                DesiredCapacity: cf.ref('MaxSize'),
+                VPCZoneIdentifier: [
                     cf.importValue(cf.join([cf.ref('StackName'), '-suba'])),
                     cf.importValue(cf.join([cf.ref('StackName'), '-subb'])),
                 ]
             }
         },
-        "PredECSHostSecurityGroup": {
-            "Type": "AWS::EC2::SecurityGroup",
-            "Properties": {
+        PredECSHostSecurityGroup: {
+            Type: 'AWS::EC2::SecurityGroup',
+            Properties: {
                 VpcId: cf.importValue(cf.join([ cf.ref('StackName'), '-vpc'])),
                 GroupDescription: "Access to the ECS hosts and the tasks/containers that run on them",
                 SecurityGroupIngress: [{

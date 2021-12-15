@@ -34,6 +34,14 @@ async function router(schema) {
                     TopicArn: req.body.TopicArn,
                     Token : req.body.Token
                 }).promise();
+            } else if (req.headers['x-amz-sns-message-type'] === 'Notification') {
+                req.body.Message = JSON.parse(req.body.Message);
+
+                // Format: arn:aws:sns:<region>:<accountid>:<stackname>-delete
+                const action = req.body.TopicArn.match();
+
+                // Format: <stackname>-project-<project id>-iteration-<iteration id>-sqs-empty
+                const subject = msg.body.Message.AlarmArn;
             } else {
                 console.error(req.body, req.headers);
             }

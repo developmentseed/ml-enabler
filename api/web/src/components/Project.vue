@@ -89,7 +89,7 @@
                                     <div v-if='iter.save_link' class='fr mx3 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>
                                         Container
                                     </div>
-                                    <div v-if='stacks.iterations.includes(iter.id)' class='fr bg-green-faint bg-green-on-hover color-white-on-hover color-green inline-block px6 py3 round txt-xs txt-bold mr3'>
+                                    <div v-if='false' class='fr bg-green-faint bg-green-on-hover color-white-on-hover color-green inline-block px6 py3 round txt-xs txt-bold mr3'>
                                         Active Stack
                                     </div>
                                 </div>
@@ -190,7 +190,7 @@ import Integrations from './Integrations.vue';
 
 export default {
     name: 'Project',
-    props: ['meta', 'stacks', 'user'],
+    props: ['meta', 'user'],
     data: function() {
         return {
             iterations: [],

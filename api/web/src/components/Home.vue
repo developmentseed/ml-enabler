@@ -69,7 +69,7 @@
                                     Project Page
                                 </div>
 
-                                <div v-if='stacks.models.includes(project.modelId)' class='fr bg-green-faint bg-green-on-hover color-white-on-hover color-green inline-block px6 py3 round txt-xs txt-bold mr3'>
+                                <div v-if='false' class='fr bg-green-faint bg-green-on-hover color-white-on-hover color-green inline-block px6 py3 round txt-xs txt-bold mr3'>
                                     Active Stack
                                 </div>
                                 <div v-if='project.archived' class='fr bg-gray-faint bg-gray-on-hover color-white-on-hover color-gray inline-block px6 py3 round txt-xs txt-bold mr3'>
@@ -95,7 +95,7 @@ import Pager from './util/Pager.vue';
 
 export default {
     name: 'Home',
-    props: ['meta', 'stacks'],
+    props: ['meta'],
     data: function() {
         return {
             page: 0,

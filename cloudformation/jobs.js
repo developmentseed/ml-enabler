@@ -61,7 +61,8 @@ const stack = {
                             Action: [
                                 'cloudwatch:DescribeAlarms',
                                 'cloudwatch:SetAlarmState',
-                                'cloudwatch:PutMetricAlarm'
+                                'cloudwatch:PutMetricAlarm',
+                                'cloudwatch:EnableAlarmActions'
                             ],
                             Resource: [
                                 cf.join(['arn:aws:cloudwatch:', cf.region, ':', cf.accountId, ':alarm:', cf.stackName, '-*'])
