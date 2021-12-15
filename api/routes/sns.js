@@ -5,15 +5,32 @@ const Task = require('../lib/project/iteration/task');
 const Stack = require('../lib/stack');
 const Submission = require('../lib/project/iteration/submission');
 const MessageValidator = require('sns-validator');
-const { promisify } = require('util');
 
 const SNS = new AWS.SNS({
     region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
 });
 
+/**
+ * @class validator
+ */
+class Validator {
+    constructor() {
+        this.validator = new MessageValidator();
+    }
+
+    validate(message) {
+        return new Promise((resolve, reject) => {
+            this.validator.validate(message, (err, message) => {
+                if (err) return reject(err);
+                return resolve(message);
+            });
+        });
+    }
+
+}
+
 async function router(schema, config) {
-    const validator = new MessageValidator();
-    const validate = promisify(validator.validate);
+    const validator = new Validator();
 
     /**
      * @api {post} /api/sns SNS Webhook
@@ -31,7 +48,7 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, express.text(), async (req, res) => {
         try {
-            await validate(req.body);
+            await validator.validate(req.body);
         } catch (err) {
             console.error(err);
             return res.json({
