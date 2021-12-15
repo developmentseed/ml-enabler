@@ -3,12 +3,18 @@ const AWS = require('aws-sdk');
 const express = require('express');
 const Task = require('../lib/project/iteration/task');
 const Stack = require('../lib/stack');
+const Submission = require('../lib/project/iteration/submission');
+const MessageValidator = require('sns-validator');
+const { promisify } = require('util');
 
 const SNS = new AWS.SNS({
     region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
 });
 
 async function router(schema, config) {
+    const validator = new MessageValidator();
+    const validate = promisify(validator.validate);
+
     /**
      * @api {post} /api/sns SNS Webhook
      * @apiVersion 1.0.0
@@ -25,7 +31,16 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, express.text(), async (req, res) => {
         try {
-            // TODO await user.is_auth(req);
+            await validate(message);
+        } catch (err) {
+            console.error(err);
+            return res.json({
+                status: 401,
+                message: 'Invalid SNS Message'
+            });
+        }
+
+        try {
 
             if (typeof req.body === 'string') {
                 req.body = JSON.parse(req.body);
