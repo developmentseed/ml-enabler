@@ -58,7 +58,7 @@ async function router(schema, config) {
                     await Task.batch(config, {
                         type: 'vectorize',
                         name: `vectorize-${project_id}-${iter_id}-${1}`,
-                        iter_id: req.params.iterationid,
+                        iter_id: iter_id,
                         environment: [{
                             name: 'PROJECT_ID',
                             value: String(project_id)
