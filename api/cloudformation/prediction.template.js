@@ -450,7 +450,7 @@ module.exports = {
                         SizeInMBs: 100
                     },
                     CompressionFormat: 'GZIP',
-                    RoleARN: cf.importValue(cf.join( '-', [ cf.ref('StackName'), "firehose-role" ])),
+                    RoleARN: cf.importValue(cf.join([ cf.ref('StackName'), '-firehose-role' ])),
                     DynamicPartitioningConfiguration: {
                         Enabled: true,
                         RetryOptions: {
@@ -486,9 +486,21 @@ module.exports = {
             'us-east-1': { AMIID: 'ami-07eb64b216d4d3522' }
         },
         AWSRegion2AZ: {
-            'us-east-1': { "1": "us-east-1b", "2": "us-east-1c", "3": "us-east-1d", "4": "us-east-1e" },
-            'us-west-1': { "1": "us-west-1b", "2": "us-west-1c" },
-            'us-west-2': { "1": "us-west-2a", "2": "us-west-2b", "3": "us-west-2c" }
+            'us-east-1': {
+                1: 'us-east-1b',
+                2: 'us-east-1c',
+                3: 'us-east-1d',
+                4: 'us-east-1e'
+            },
+            'us-west-1': {
+                1: 'us-west-1b',
+                2: 'us-west-1c'
+            },
+            'us-west-2': {
+                1: 'us-west-2a',
+                2: 'us-west-2b',
+                3: 'us-west-2c'
+            }
         }
     },
     Outputs : {

@@ -62,19 +62,24 @@ class Submission extends Generic {
             throw new Err(500, err, 'Internal Tasks Error');
         }
 
-        return this.deserialize(pgres.rows, 'submissions');
+        const list = this.deserialize(pgres.rows, 'submissions');
+
+        return this.list_s3(list);
     }
 
     static async list_s3(list) {
         if (!list.submissions.length) return list;
 
         const s3m = {};
-        await S3.list(`project/${list.submissions[0].pid}/iteration/${list.submissions[0].iter_id}/`).forEach((l) => {
-            s3m['aoi'] = l;
+        (await S3.list(`project/${list.submissions[0].pid}/iteration/${list.submissions[0].iter_id}/submission-`)).forEach((l) => {
+            const match = l.Key.match(/submission-(\d+).geojson/);
+            if (!match) return;
+
+            s3m[match[1]] = l.Key;
         });
 
-        for (const sub of list.submissioms) {
-            sub.storage = s3m.includes(sub.id);
+        for (const sub of list.submissions) {
+            sub.storage = !!s3m[sub.id];
         }
 
         return list;

@@ -28,7 +28,7 @@ class S3 {
         try {
             if (!process.env.ASSET_BUCKET) throw new Err(400, null, 'ASSET_BUCKET not set');
 
-            const list =  await s3.listObjectsV2({
+            const list = await s3.listObjectsV2({
                 Bucket: process.env.ASSET_BUCKET,
                 Prefix: fragment
             }).promise();

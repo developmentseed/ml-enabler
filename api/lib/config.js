@@ -36,7 +36,7 @@ class Config {
             if (!cnf.StackName) throw new Error('StackName Required');
 
             if (process.env.AWS_ACCOUNT_ID && process.env.AWS_DEFAULT_REGION && cnf.StackName) {
-                process.env.ASSET_BUCKET = `${cnf.stackName}-${process.env.AWS_ACCOUNT_ID}-${process.env.AWS_DEFAULT_REGION}`;
+                process.env.ASSET_BUCKET = `${cnf.StackName}-${process.env.AWS_ACCOUNT_ID}-${process.env.AWS_DEFAULT_REGION}`;
             }
 
             cnf.bucket = process.env.ASSET_BUCKET;
