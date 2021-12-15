@@ -62,9 +62,7 @@ class Submission extends Generic {
             throw new Err(500, err, 'Internal Tasks Error');
         }
 
-        const list = this.deserialize(pgres.rows, 'submissions');
-
-        return this.list_s3(list);
+        return await this.list_s3(this.deserialize(pgres.rows, 'submissions'));
     }
 
     static async list_s3(list) {
