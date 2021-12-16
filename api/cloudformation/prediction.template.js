@@ -95,7 +95,7 @@ module.exports = {
                             }]
                         },
                         Period: 60,
-                        Stat: 'Maxumum'
+                        Stat: 'Maximum'
                     }
                 },{
                     Id: 'm3',
@@ -110,7 +110,7 @@ module.exports = {
                                 }]
                         },
                         Period: 60,
-                        Stat: 'Maxumum'
+                        Stat: 'Maximum'
                     }
                 }]
             }
