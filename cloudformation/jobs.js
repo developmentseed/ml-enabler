@@ -59,6 +59,17 @@ const stack = {
                         },{
                             Effect: 'Allow',
                             Action: [
+                                'cloudwatch:DescribeAlarms',
+                                'cloudwatch:SetAlarmState',
+                                'cloudwatch:PutMetricAlarm',
+                                'cloudwatch:EnableAlarmActions'
+                            ],
+                            Resource: [
+                                cf.join(['arn:aws:cloudwatch:', cf.region, ':', cf.accountId, ':alarm:', cf.stackName, '-*'])
+                            ]
+                        },{
+                            Effect: 'Allow',
+                            Action: [
                                 'sqs:SendMessage',
                                 'sqs:ReceiveMessage',
                                 'sqs:ChangeMessageVisibility',
@@ -66,7 +77,9 @@ const stack = {
                                 'sqs:GetQueueUrl',
                                 'sqs:GetQueueAttributes'
                             ],
-                            Resource: '*'
+                            Resource: [
+                                cf.join(['arn:aws:sqs:', cf.region, ':', cf.accountId, ':', cf.stackName, '-*'])
+                            ]
                         }]
                     }
                 }],
@@ -84,6 +97,9 @@ const stack = {
                 Parameters: { },
                 ContainerProperties: {
                     Environment: [
+                        { Name: 'StackName' , Value: cf.stackName },
+                        { Name: 'AWS_ACCOUNT_ID', Value: cf.accountId },
+                        { Name: 'AWS_REGION', Value: cf.region },
                         { Name: 'AWS_DEFAULT_REGION' , Value: cf.region },
                     ],
                     Memory: 512,

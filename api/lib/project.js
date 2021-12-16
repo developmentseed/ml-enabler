@@ -1,5 +1,3 @@
-
-
 const { Err } = require('@openaddresses/batch-schema');
 const Generic = require('./generic');
 const { sql } = require('slonik');

@@ -5,6 +5,7 @@ const AWS = require('aws-sdk');
 const batch = new AWS.Batch({ region: process.env.AWS_DEFAULT_REGION });
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
 const jwt = require('jsonwebtoken');
+const moment = require('moment');
 
 /**
  * @class
@@ -22,6 +23,9 @@ class ProjectTask extends Generic {
      * @param {Number} iteration Iteration to list tasks for
      *
      * @param {Object} query - Query Object
+     * @param {String} [query.type] - Filter by specific task type
+     * @param {String} [query.before] - Only show tasks before the given date
+     * @param {String} [query.after] - Only show jobs after the given date
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page of users to return
      * @param {String} [query.sort=created] Field to sort by
@@ -32,6 +36,27 @@ class ProjectTask extends Generic {
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
 
+        if (query.after) {
+            try {
+                query.after = moment(query.after);
+            } catch (err) {
+                throw new Err(400, err, 'after param is not recognized as a valid date');
+            }
+        } else {
+            query.after = null;
+        }
+
+        if (query.before) {
+            try {
+                query.before = moment(query.before);
+            } catch (err) {
+                throw new Err(400, err, 'before param is not recognized as a valid date');
+            }
+        } else {
+            query.before = null;
+        }
+
+        if (!query.type) query.type = null;
         if (!query.sort) query.sort = 'created';
         if (!query.order || query.order === 'asc') {
             query.order = sql`asc`;
@@ -55,6 +80,9 @@ class ProjectTask extends Generic {
                     tasks
                 WHERE
                     iter_id = ${iteration}
+                    AND (${query.type}::TEXT IS NULL OR type = ${query.type}::TEXT)
+                    AND (${query.after ? query.after.toDate().toISOString() : null}::TIMESTAMP IS NULL OR tasks.created > ${query.after ? query.after.toDate().toISOString() : null}::TIMESTAMP)
+                    AND (${query.before ? query.before.toDate().toISOString() : null}::TIMESTAMP IS NULL OR tasks.created < ${query.before ? query.before.toDate().toISOString() : null}::TIMESTAMP)
                 ORDER BY
                     ${sql.identifier(['tasks', query.sort])} ${query.order}
                 LIMIT

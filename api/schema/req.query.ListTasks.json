@@ -11,6 +11,23 @@
         "order": {
             "$ref": "./util/order.json"
         },
+        "type": {
+            "type": "string",
+            "description": "Limit tasks to a specific type",
+            "enum": [
+                "pop",
+                "ecr",
+                "vectorize"
+            ]
+        },
+        "before": {
+            "type": "string",
+            "description": "Query users that were created before the given ISO Date"
+        },
+        "after": {
+            "type": "string",
+            "description": "Query users that were created after the given ISO Date"
+        },
         "sort": {
             "type": "string",
             "default": "created",

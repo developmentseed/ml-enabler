@@ -1,20 +1,22 @@
 <template>
-    <div class='grid grid--gut12 col col--12'>
-        <div class='col col--6'>
-            <div class='col col--12 clearfix'>
-                <label class='fl'>Area Of Interest</label>
+<div class='col col--12 grid mb24'>
+    <div class='col col--12 clearfix mb6'>
+        <label class='fl'>Area Of Interest</label>
 
-                <div class='fr'>
-                    <button @click='mode = "new"' :class='{
-                        "btn--stroke": mode !== "new"
-                    }' class="btn btn--pill btn--pill-stroke btn--s btn--pill-hl round">New</button>
-                    <button @click='mode = "existing"' :class='{
-                        "btn--stroke": mode !== "existing"
-                    }' class="btn btn--pill btn--s btn--pill-hr btn--pill-stroke round">Existing</button>
-                </div>
-            </div>
+        <div class='fr'>
+            <button @click='mode = "new"' :class='{
+                "btn--stroke": mode !== "new"
+            }' class="btn btn--pill btn--pill-stroke btn--s btn--pill-hl round">New</button>
+            <button @click='mode = "existing"' :class='{
+                "btn--stroke": mode !== "existing"
+            }' class="btn btn--pill btn--s btn--pill-hr btn--pill-stroke round">Existing</button>
+        </div>
+    </div>
 
+    <div class='col col--12 grid border border--gray-light round px12 py12'>
+        <div class='col col--6 px6'>
             <div class='col col--12 mt6'>
+                <label>AOI Name</label>
                 <template v-if='mode === "existing"'>
                     <vSelect
                         class='w-full'
@@ -27,7 +29,8 @@
                 </template>
             </div>
         </div>
-        <div class='col col--6'>
+
+        <div class='col col--6 px6'>
             <label>Bounding Box</label>
             <input :disabled='mode === "existing"' v-model='selected.bounds' type='text' class='input mt6' placeholder='minX, minY, maxX, maxY'/>
         </div>
@@ -36,6 +39,7 @@
             <button :disabled='isSubmittable' @click='postAOI' class='fr btn btn--stroke round'>Submit</button>
         </div>
     </div>
+</div>
 </template>
 
 <script>

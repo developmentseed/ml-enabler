@@ -105,51 +105,30 @@
                     <span v-text='stack.name'/>
                 </div>
 
-                <div class='col col--12 pt12 pb6'>
-                    Queue Status
-
-                    <div class='fr'>
-                        <button @click='purgeQueue' class='btn mx3 round btn--stroke btn--gray btn--red-on-hover'>
-                            <svg class='icon'><use href='#icon-trash'/></svg>
-                        </button>
-                        <button @click='getQueue' class='btn mx3 round btn--stroke btn--gray'>
-                            <svg class='icon'><use href='#icon-refresh'/></svg>
-                        </button>
-                    </div>
-                </div>
-                <div class='col col--12 border border--gray-light grid round'>
-                    <template v-if='loading.queue'>
-                        <div class='flex-parent flex-parent--center-main w-full py24'>
-                            <div class='flex-child loading py24'></div>
-                        </div>
-                    </template>
-                    <template v-else>
-                        <div class='col col--4'>
-                            <div class='align-center'>Queued</div>
-
-                            <div class='align-center' v-text='queue.queued'></div>
-                        </div>
-                        <div class='col col--4'>
-                            <div class='align-center'>Inflight</div>
-
-                            <div class='align-center' v-text='queue.inflight'></div>
-                        </div>
-                        <div class='col col--4'>
-                            <div class='align-center'>Failed</div>
-
-                            <div class='align-center' v-text='queue.dead'></div>
-
-                            <div class='flex-parent flex-parent--center-main col col--12 pb6'>
-                                <div class='flex-child'>
-                                    <button :disabled='queue.dead === 0' class='btn btn--gray round btn--stroke btn--s'>Resubmit</button>
-                                </div>
-                            </div>
-                        </div>
-                    </template>
-                </div>
+                <StackQueue
+                    @err='$emit("err", $event)'
+                />
 
                 <div class='col col--12 pt12'>
                     Imagery Chip Submission
+
+                    <button class='dropdown round color-gray color-blue-on-hover mx12 mt3'>
+                        <svg class='icon inline'><use href='#icon-options'/></svg>
+
+                        <div class='round dropdown-content w180 color-black' style='top: 24px;'>
+                            <label class='switch-container px6 fr'>
+                                <span class='mr6'>Auto Terminate</span>
+                                <input v-model='autoTerminate' type='checkbox' />
+                                <div class='switch'></div>
+                            </label>
+
+                            <label class='switch-container px6 fr'>
+                                <span class='mr6'>Auto Vectorize</span>
+                                <input v-model='autoVectorize' type='checkbox' />
+                                <div class='switch'></div>
+                            </label>
+                        </div>
+                    </button>
 
                     <div v-if='imagery.fmt !== "list"' class='fr'>
                         <button @click='mode = "bbox"' :class='{
@@ -163,17 +142,17 @@
                 </div>
                 <div class='col col--12'>
                     <template v-if='imagery.fmt === "wms" && mode === "bbox"'>
-                        <StackMap
+                        <StackQueueAOI
                             v-on:queue='postQueue($event)'
                         />
                     </template>
                     <template v-else-if='imagery.fmt === "wms" && mode === "xyz"'>
-                        <StackXYZ
+                        <StackQueueXYZ
                             v-on:queue='postQueue($event)'
                         />
                     </template>
                     <template v-else-if='imagery.fmt === "list"'>
-                        <StackList
+                        <StackQueueList
                             :imagery='imagery'
                             v-on:queue='postQueue($event)'
                         />
@@ -199,9 +178,12 @@
 
 <script>
 import IterationHeader from './IterationHeader.vue';
-import StackList from './StackList.vue';
-import StackXYZ from './StackXYZ.vue';
-import StackMap from './StackMap.vue';
+
+import StackQueueList from './stack/QueueList.vue';
+import StackQueueXYZ from './stack/QueueXYZ.vue';
+import StackQueueAOI from './stack/QueueAOI.vue';
+
+import StackQueue from './stack/Queue.vue';
 
 export default {
     name: 'Stack',
@@ -224,6 +206,8 @@ export default {
                 inflight: 0,
                 dead: 0
             },
+            autoTerminate: true,
+            autoVectorize: true,
             looping: false,
             params: {
                 image: false,
@@ -302,8 +286,11 @@ export default {
             } else if (payload) {
                 reqbody = payload
             } else {
-                reqbody = false;
+                reqbody = {};
             }
+
+            reqbody.autoTerminate = this.autoTerminate;
+            reqbody.autoVectorize = this.autoVectorize;
 
             try {
                 await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/stack/queue`, {
@@ -415,9 +402,30 @@ export default {
     },
     components: {
         IterationHeader,
-        StackList,
-        StackXYZ,
-        StackMap
+        StackQueueList,
+        StackQueueXYZ,
+        StackQueueAOI,
+        StackQueue
     }
 }
 </script>
+
+<style>
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 6px 12px;
+    z-index: 1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+</style>

@@ -16,10 +16,14 @@ from contextlib import closing
 
 tiler = tileschemes.WebMercator()
 
+cw = boto3.client("cloudwatch")
 
 def handler(event) -> bool:
     queue_name = event['queue']
     assert(queue_name)
+
+    alarm = os.getenv('ALARM')
+    assert(alarm)
 
     queue = boto3.resource("sqs").get_queue_by_name(QueueName=queue_name)
 
@@ -119,6 +123,10 @@ def handler(event) -> bool:
 
         if len(cache) > 0:
             queue.send_messages(Entries=cache)
+
+    cw.enable_alarm_actions(
+        AlarmNames=[alarm]
+    )
 
     return True
 
