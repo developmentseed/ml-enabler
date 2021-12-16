@@ -128,10 +128,11 @@ export default {
                 });
 
             } catch (err) {
+                this.loading = false;
                 this.$emit('err', err);
             }
 
-            this.getQueue();
+            this.refresh();
         },
         getQueue: async function() {
             try {
