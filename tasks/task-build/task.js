@@ -14,7 +14,7 @@ const path = require('path');
 const AWS = require('aws-sdk');
 
 const TFServing = require('./lib/tfserving');
-// const PyTorchServing = require('./lib/ptserving');
+const PTServing = require('./lib/ptserving');
 
 const batch = new AWS.Batch({ region: process.env.AWS_REGION || 'us-east-1' });
 const s3 = new AWS.S3({ region: process.env.AWS_REGION || 'us-east-1' });
@@ -57,11 +57,11 @@ async function main() {
 
         const iteration = await get_iteration(project_id, iteration_id);
 
-        await get_zip(tmp, model);
+        await get_zip(tmp, model, iteration);
 
         await std_model(tmp, iteration);
 
-        const finalLinks = await docker(tmp, model);
+        const finalLinks = await docker(tmp, model, iteration);
 
         links.save_link = finalLinks.save;
         links.docker_link = finalLinks.docker;
@@ -207,8 +207,8 @@ function std_model(tmp, iteration) {
             });
         });
     } else if (iteration.model_type === 'pytorch') {
-        return new Promise((resolve, reject) => {
-            return reject(new Error('Unimplemented'));
+        return new Promise((resolve) => {
+            return resolve(path.resolve(tmp, 'model.mar'));
         });
     } else {
         return new Promise((resolve, reject) => {
@@ -217,27 +217,45 @@ function std_model(tmp, iteration) {
     }
 }
 
-function get_zip(tmp, model) {
+function get_zip(tmp, model, iteration) {
     return new Promise((resolve, reject) => {
         console.error(`ok - fetching ${model}`);
 
-        const loc = path.resolve(tmp, 'model.zip');
+        if (iteration.model_type === 'tensorflow') {
+            const loc = path.resolve(tmp, 'model.zip');
 
-        pipeline(
-            s3.getObject({
-                Bucket: model.split('/')[0],
-                Key: model.split('/').splice(1).join('/')
-            }).createReadStream(),
-            unzipper.Extract({
-                path: path.resolve(tmp, '/src')
-            }),
-            (err) => {
-                if (err) return reject(err);
+            pipeline(
+                s3.getObject({
+                    Bucket: model.split('/')[0],
+                    Key: model.split('/').splice(1).join('/')
+                }).createReadStream(),
+                unzipper.Extract({
+                    path: path.resolve(tmp, '/src')
+                }
+                ), (err) => {
+                    if (err) return reject(err);
 
-                console.error(`ok - saved: ${loc}`);
+                    console.error(`ok - saved: ${loc}`);
 
-                return resolve(loc);
-            });
+                    return resolve(loc);
+                });
+        } else if (iteration.model_type === 'pytorch') {
+            const loc = path.resolve(tmp, 'model.mar');
+
+            pipeline(
+                s3.getObject({
+                    Bucket: model.split('/')[0],
+                    Key: model.split('/').splice(1).join('/')
+                }).createReadStream(),
+                fs.createWriteStream(loc),
+                (err) => {
+                    if (err) return reject(err);
+
+                    console.error(`ok - saved: ${loc}`);
+
+                    return resolve(loc);
+                });
+        }
     });
 }
 
@@ -261,10 +279,15 @@ function dockerd() {
     });
 }
 
-async function docker(tmp, model) {
+async function docker(tmp, model, iteration) {
     const tagged_model = model.split('/').splice(1).join('-').replace(/-model\.zip/, '');
 
-    const tag = TFServing(tmp, model, tagged_model);
+    let tag;
+    if (iteration.model_type === 'tensorflow') {
+        tag = TFServing(tmp, model, tagged_model);
+    } else {
+        tag = PTServing(tmp, model, tagged_model);
+    }
 
     const push = `${process.env.AWS_ACCOUNT_ID}.dkr.ecr.${process.env.AWS_REGION}.amazonaws.com/${process.env.BATCH_ECR}:${tagged_model}`;
     CP.execSync(`
