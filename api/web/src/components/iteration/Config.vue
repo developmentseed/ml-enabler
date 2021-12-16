@@ -19,6 +19,7 @@
                 <div class='select-container w-full'>
                     <select disabled v-model='model_type' class='select'>
                         <option value='tensorflow'>Tensorflow</option>
+                        <option value='pytorch'>PyTorch</option>
                     </select>
                     <div class='select-arrow'></div>
                 </div>

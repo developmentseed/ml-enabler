@@ -14,9 +14,10 @@
     "additionalProperties": false,
     "properties": {
         "model_type": {
-            "type": "integer",
+            "type": "string",
             "enum": [
-                "tensorflow"
+                "tensorflow",
+                "pytorch"
             ]
         },
         "tile_zoom": {

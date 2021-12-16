@@ -40,7 +40,8 @@
         "model_type": {
             "type": "string",
             "enum": [
-                "tensorflow"
+                "tensorflow",
+                "pytorch"
             ]
         },
         "checkpoint_link": {
