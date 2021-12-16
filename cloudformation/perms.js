@@ -189,10 +189,12 @@ module.exports = [{
         's3:AbortMultipartUpload',
         's3:GetObjectAcl',
         's3:ListMultipartUploadParts',
+        's3:ListBucket',
         's3:PutObject',
         's3:PutObjectAcl'
     ],
     Resource: [
+        cf.join(['arn:aws:s3:::', cf.ref('MLEnablerBucket') ])
         cf.join(['arn:aws:s3:::', cf.ref('MLEnablerBucket'), '/*'])
     ]
 }];
