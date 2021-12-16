@@ -1,10 +1,15 @@
-
-
 const CP = require('child_process');
 const { sql, createPool, createTypeParserPreset } = require('slonik');
 const { Err } = require('@openaddresses/batch-schema');
 const wkx = require('wkx');
 const bbox = require('@turf/bbox').default;
+const AWS = require('aws-sdk');
+const SNS = new AWS.SNS({
+    region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
+});
+const STS = new AWS.STS({
+    region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
+});
 
 /**
  * @class
@@ -23,6 +28,7 @@ class Config {
 
         cnf.postgres = args.postgres || process.env.POSTGRES || 'postgres://postgres@localhost:5432/mlenabler';
         cnf.Environment = process.env.ENVIRONMENT || 'docker';
+        cnf.region = process.env.AWS_DEFAULT_REGION || 'us-east-1';
 
         if (cnf.Environment === 'aws') {
             cnf.StackName = process.env.StackName;
@@ -30,7 +36,7 @@ class Config {
             if (!cnf.StackName) throw new Error('StackName Required');
 
             if (process.env.AWS_ACCOUNT_ID && process.env.AWS_DEFAULT_REGION && cnf.StackName) {
-                process.env.ASSET_BUCKET = `${cnf.stackName}-${process.env.AWS_ACCOUNT_ID}-${process.env.AWS_DEFAULT_REGION}`;
+                process.env.ASSET_BUCKET = `${cnf.StackName}-${process.env.AWS_ACCOUNT_ID}-${process.env.AWS_DEFAULT_REGION}`;
             }
 
             cnf.bucket = process.env.ASSET_BUCKET;
@@ -97,12 +103,47 @@ class Config {
             }
         } while (!cnf.pool);
 
+        if (cnf.is_aws()) {
+            try {
+                const account = await STS.getCallerIdentity().promise();
+                cnf.account = account.Account;
+            } catch (err) {
+                throw new Error(err);
+            }
+        } else {
+            cnf.account = false;
+        }
+
         return cnf;
     }
 
     is_aws() {
         if (this.Environment !== 'aws') throw new Err(400, null, 'Deployment must be in AWS Environment to use this endpoint');
         return true;
+    }
+
+    async confirm_sns() {
+        if (!this.is_aws()) return;
+
+        try {
+            for (const type of ['vectorize', 'delete']) {
+                const TopicArn = `arn:aws:sns:${process.env.AWS_DEFAULT_REGION}:${this.account}:${this.StackName}-${type}`;
+
+                const attr = await SNS.listSubscriptionsByTopic({
+                    TopicArn: `arn:aws:sns:${process.env.AWS_DEFAULT_REGION}:${this.account}:${this.StackName}-${type}`
+                }).promise();
+
+                if (attr.Subscriptions[0].SubscriptionArn === 'PendingConfirmation') {
+                    await SNS.subscribe({
+                        TopicArn,
+                        Protocol: attr.Subscriptions[0].Protocol,
+                        Endpoint: attr.Subscriptions[0].Endpoint
+                    }).promise();
+                }
+            }
+        } catch (err) {
+            throw new Error(err);
+        }
     }
 }
 

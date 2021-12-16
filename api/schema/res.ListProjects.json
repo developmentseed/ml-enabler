@@ -22,7 +22,8 @@
                     "source",
                     "archived",
                     "project_url",
-                    "access"
+                    "access",
+                    "stack"
                 ],
                 "additionalProperties": false,
                 "properties": {
@@ -46,6 +47,10 @@
                     },
                     "project_url": {
                         "type": "string"
+                    },
+                    "stack": {
+                        "type": "boolean",
+                        "description": "Is there an active stack present for the given project"
                     },
                     "access": {
                         "type": "string",

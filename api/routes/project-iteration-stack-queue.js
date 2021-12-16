@@ -4,9 +4,11 @@ const Task = require('../lib/project/iteration/task');
 const Iteration = require('../lib/project/iteration');
 const Imagery = require('../lib/project/imagery');
 const Submission = require('../lib/project/iteration/submission');
+const CWAlarm = require('../lib/cw-alarm');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
+    const alarm = new CWAlarm(config);
 
     /**
      * @api {get} /api/project/:pid/iteration/:iterationid/stack/queue Get Queue
@@ -116,6 +118,13 @@ async function router(schema, config) {
 
             payload.submission = submission.id;
 
+            const sqs_alarm = `${config.StackName}-project-${req.params.pid}-iteration-${req.params.iterationid}-sqs-empty`;
+
+            await alarm.update(sqs_alarm, {
+                terminate: req.body.autoTerminate,
+                vectorize: req.body.autoVectorize
+            });
+
             await Task.batch(config, {
                 type: 'pop',
                 name: `pop-${req.params.pid}-${req.params.iterationid}-${submission.id}`,
@@ -123,6 +132,9 @@ async function router(schema, config) {
                 environment: [{
                     name: 'TASK',
                     value: JSON.stringify(payload)
+                },{
+                    name: 'ALARM',
+                    value: sqs_alarm
                 }]
             });
 

@@ -1,5 +1,3 @@
-
-
 const { Err } = require('@openaddresses/batch-schema');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
