@@ -55,9 +55,11 @@ async function main() {
 
         const dd = await dockerd();
 
+        const iteration = await get_iteration(project_id, iteration_id);
+
         await get_zip(tmp, model);
 
-        await std_model(tmp);
+        await std_model(tmp, iteration);
 
         const finalLinks = await docker(tmp, model);
 
@@ -113,6 +115,26 @@ function get_log_link() {
     });
 }
 
+function get_iteration(project, iteration) {
+    return new Promise((resolve, reject) => {
+        request({
+            method: 'GET',
+            url: `${process.env.API_URL}/api/project/${project}/iteration/${iteration}`,
+            auth: {
+                bearer: process.env.TOKEN
+            }
+        }, (err, res) => {
+            if (err) return reject(err);
+
+            if (res.statusCode === 200) {
+                return resolve(res);
+            } else {
+                return reject(res.statusCode + ':' + typeof res.body === 'object' ? JSON.stringify(res.body) : res.body);
+            }
+        });
+    });
+}
+
 function set_log_link(project, iteration, task, log) {
     return new Promise((resolve, reject) => {
         console.error(`ok - saving log_link (proj ${project}), iteration (${iteration}) task: ${task} log: ${log}))`);
@@ -163,26 +185,36 @@ function set_link(project, iteration, patch) {
     });
 }
 
-function std_model(tmp) {
-    return new Promise((resolve, reject) => {
-        find.file('saved_model.pb', path.resolve(tmp, '/src'), (files) => {
+function std_model(tmp, iteration) {
+    if (iteration.model_type === 'tensorflow') {
+        return new Promise((resolve, reject) => {
+            find.file('saved_model.pb', path.resolve(tmp, '/src'), (files) => {
 
-            if (files.length !== 1) return reject(new Error('zip must contain exactly 1 model'));
+                if (files.length !== 1) return reject(new Error('zip must contain exactly 1 model'));
 
-            path.parse(files[0]).dir;
+                path.parse(files[0]).dir;
 
-            mkdir(tmp + '/MODEL/001');
+                mkdir(tmp + '/MODEL/001');
 
-            fse.move(path.parse(files[0]).dir, tmp + '/MODEL/001/', {
-                overwrite: true
-            }, (err) => {
-                if (err) return reject(err);
+                fse.move(path.parse(files[0]).dir, tmp + '/MODEL/001/', {
+                    overwrite: true
+                }, (err) => {
+                    if (err) return reject(err);
 
-                console.error(tmp + '/MODEL/001/');
-                return resolve(tmp + '/MODEL/001/');
+                    console.error(tmp + '/MODEL/001/');
+                    return resolve(tmp + '/MODEL/001/');
+                });
             });
         });
-    });
+    } else if (iteration.model_type === 'pytorch') {
+        return new Promise((resolve, reject) => {
+            return reject(new Error('Unimplemented'));
+        });
+    } else {
+        return new Promise((resolve, reject) => {
+            return reject(new Error('Unsupported Model Type'));
+        });
+    }
 }
 
 function get_zip(tmp, model) {
