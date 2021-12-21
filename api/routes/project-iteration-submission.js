@@ -1,5 +1,6 @@
 const { Err } = require('@openaddresses/batch-schema');
 const Submission = require('../lib/project/iteration/submission');
+const TileBase = require('tilebase');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
@@ -86,10 +87,13 @@ async function router(schema, config) {
 
             if (!sub.storage) throw new Err(404, null, 'Submission has no TileSet');
 
-            const m = {};
-            m.token = config.Mapbox;
+            const tb = new TileBase(`s3://${process.env.ASSET_BUCKET}/project/${req.params.pid}/iteration/${req.params.iterationid}/submission-${req.params.subid}.tilebase`);
+            await tb.open();
 
-            return res.json(m);
+            const tj = tb.tilejson();
+            tj.token = config.Mapbox;
+
+            return res.json(tj);
         } catch (err) {
             return Err.respond(err, res);
         }
