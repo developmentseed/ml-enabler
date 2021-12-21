@@ -65,6 +65,13 @@ class Submission extends Generic {
         return await this.list_s3(this.deserialize(pgres.rows, 'submissions'));
     }
 
+    static async from(pool, id, pid) {
+        const sub = await super.from(pool, id);
+        sub.storage = await S3.exists(`project/${pid}/iteration/${sub.iter_id}/submission-${sub.id}.geojson`);
+
+        return sub;
+    }
+
     static async list_s3(list) {
         if (!list.submissions.length) return list;
 

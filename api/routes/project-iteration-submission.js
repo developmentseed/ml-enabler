@@ -53,7 +53,7 @@ async function router(schema, config) {
         try {
             await user.is_auth(req);
 
-            const sub = await Submission.from(config.pool, req.params.subid);
+            const sub = await Submission.from(config.pool, req.params.subid, req.params.pid);
 
             return res.json(sub.serialize());
         } catch (err) {
@@ -82,7 +82,9 @@ async function router(schema, config) {
         try {
             await user.is_auth(req);
 
-            // const sub = await Submission.from(config.pool, req.params.subid);
+            const sub = await Submission.from(config.pool, req.params.subid, req.params.pid);
+
+            if (!sub.storage) throw new Err(404, null, 'Submission has no TileSet');
 
             const m = {};
             m.token = config.Mapbox;
