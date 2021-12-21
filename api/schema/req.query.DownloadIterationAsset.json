@@ -12,7 +12,7 @@
                 "model",
                 "tfrecord",
                 "checkpoint",
-                "container"
+                "save"
             ],
             "description": "Asset Type to upload"
         },

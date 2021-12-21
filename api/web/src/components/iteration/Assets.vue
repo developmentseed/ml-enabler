@@ -78,7 +78,7 @@
             <div v-if='iteration.save_link' class='col col--12 py3'>
                 <div class='col col--12 mb6'>
                     <span>TFServing Container</span>
-                    <button @click='dwn("container")' class='mt6 btn btn--s btn--stroke round fr btn--gray'><svg class='icon'><use href='#icon-arrow-down'/></svg></button>
+                    <button @click='dwn("save")' class='mt6 btn btn--s btn--stroke round fr btn--gray'><svg class='icon'><use href='#icon-arrow-down'/></svg></button>
                 </div>
                 <pre class='pre' v-text='"s3://" + iteration.save_link'></pre>
             </div>

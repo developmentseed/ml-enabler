@@ -102,7 +102,6 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             req.auth = req.token;
-
             await user.is_auth(req);
 
             config.is_aws();
@@ -114,7 +113,7 @@ async function router(schema, config) {
             res.type(path.parse('blob.zip').ext);
             const s3 = new S3({
                 Bucket: process.env.ASSET_BUCKET,
-                Key: iter[`${req.query.type}_link`]
+                Key: iter[`${req.query.type}_link`].replace(`${process.env.ASSET_BUCKET}/`, '')
             });
 
             return s3.stream(res, `project-${req.params.pid}-iteration-${req.params.iterationid}-${req.query.type}.zip`);
