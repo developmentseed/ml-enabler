@@ -120,6 +120,8 @@ async function router(schema, config) {
         ':y': 'integer'
     }, async (req, res) => {
         try {
+            req.auth = req.token;
+
             await user.is_auth(req);
 
             const encodings = req.headers['accept-encoding'].split(',').map((e) => e.trim());
