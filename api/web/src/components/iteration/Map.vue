@@ -188,9 +188,8 @@ export default {
             aois: [],
             submission: false,
             submissions: [],
-            tilejson: {
-                inferences: []
-            }
+            inferences: [],
+            tilejson: false
         };
     },
     watch: {
@@ -198,12 +197,13 @@ export default {
             for (const aoi of this.aois) {
                 if (aoi.name !== this.aoi) continue;
 
-                const bounds = aoi.bounds.split(',');
+                const bounds = aoi.bounds.bounds;
                 this.map.fitBounds([
                     [bounds[0], bounds[1]],
                     [bounds[2], bounds[3]]
                 ]);
             }
+
             this.aoi = 'aoi';
         },
         submission: async function() {
@@ -213,7 +213,7 @@ export default {
             this.layers();
         },
         opacity: function() {
-            for (const inf of this.tilejson.inferences) {
+            for (const inf of this.inferences) {
                 this.map.setPaintProperty(
                     `inf-${inf}`,
                     'fill-opacity',
@@ -222,7 +222,7 @@ export default {
             }
         },
         threshold: function() {
-            for (const inf of this.tilejson.inferences) {
+            for (const inf of this.inferences) {
                 this.filter(inf);
             }
         },
@@ -233,9 +233,10 @@ export default {
     mounted: async function() {
         await this.getAOIs();
         await this.getSubmissions();
-        this.getImagery();
+        await this.getImagery();
 
-        this.inf = this.iteration.inf_list.split(',')[0];
+        this.inferences = this.iteration.inf_list.split(',');
+        this.inf = this.inferences[0];
 
         if (this.submissions.length) {
             this.submission = this.submissions[0].id;
@@ -281,7 +282,9 @@ export default {
             }
         },
         hide: function() {
-            for (const inf of this.tilejson.inferences) {
+            if (!this.map) return;
+
+            for (const inf of this.inferences) {
                 this.map.setLayoutProperty(`inf-${inf}`, 'visibility', 'none');
             }
 
@@ -366,7 +369,7 @@ export default {
             };
 
             for (const aoi of this.aois) {
-                const bounds = aoi.bounds.split(',');
+                const bounds = aoi.bounds.bounds;
                 const aoipolyouter = buffer(bboxPolygon(bounds), 0.3);
                 const aoipolyinner = buffer(bboxPolygon(bounds), 0.1);
                 poly.features.push({
@@ -385,7 +388,7 @@ export default {
             if (!this.map.getSource('tiles')) {
                 this.map.addSource('tiles', {
                     type: 'vector',
-                    tiles: this.tilejson.tiles,
+                    tiles: [ window.location.origin + this.tilejson.tiles[0] + `?token=${encodeURIComponent(localStorage.token)}` ],
                     minzoom: this.tilejson.minzoom,
                     maxzoom: this.tilejson.maxzoom
                 });
@@ -410,7 +413,7 @@ export default {
                 });
             }
 
-            for (const inf of this.tilejson.inferences) {
+            for (const inf of this.inferences) {
                 this.map.addLayer({
                     id: `inf-${inf}`,
                     type: 'fill',
@@ -517,7 +520,9 @@ export default {
         getSubmissions: async function() {
             try {
                 const res = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/submission`);
-                this.submissions = res.submissions;
+                this.submissions = res.submissions.filter((s) => {
+                    return s.storage;
+                });
             } catch (err) {
                 this.$emit('err', err);
             }

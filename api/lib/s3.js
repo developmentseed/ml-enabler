@@ -24,6 +24,22 @@ class S3 {
         }
     }
 
+    static async exists(key) {
+        try {
+            if (!process.env.ASSET_BUCKET) throw new Err(400, null, 'ASSET_BUCKET not set');
+
+            const res = await s3.headObject({
+                Bucket: process.env.ASSET_BUCKET,
+                Key: key
+            }).promise();
+            return true;
+        } catch (err) {
+            if (err.code === 'NotFound') return false;
+
+            throw new Err(500, err, 'Failed to determine existance');
+        }
+    }
+
     static async list(fragment) {
         try {
             if (!process.env.ASSET_BUCKET) throw new Err(400, null, 'ASSET_BUCKET not set');
