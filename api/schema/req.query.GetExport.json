@@ -1,0 +1,23 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "token"
+    ],
+    "properties": {
+        "token": {
+            "type": "string",
+            "description": "Auth Token"
+        },
+        "format": {
+            "type": "string",
+            "default": "geojsonld",
+            "enum": [
+                "geojsonld"
+            ]
+        },
+        "submission": [
+            "type": "number"
+        ]
+    }
+}
