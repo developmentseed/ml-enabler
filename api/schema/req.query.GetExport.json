@@ -16,8 +16,24 @@
                 "geojsonld"
             ]
         },
-        "submission": [
+        "validation": {
+            "type": "string",
+            "default": "all",
+            "enum": [
+                "all",
+                "validated",
+                "unvalidated"
+            ]
+        },
+        "inferences": {
+            "type": "string"
+        },
+        "threshold": {
+            "type": "number",
+            "default": "50"
+        },
+        "submission": {
             "type": "number"
-        ]
+        }
     }
 }
