@@ -14,7 +14,7 @@
     },
     "dependencies": {
         "@mapbox/cloudfriend": "^5.1.0",
-        "@openaddresses/batch-schema": "^1.0.1",
+        "@openaddresses/batch-schema": "^2.1.0",
         "@turf/bbox": "^6.5.0",
         "@turf/bbox-polygon": "^6.5.0",
         "aws-sdk": "^2.904.0",
@@ -23,9 +23,7 @@
         "busboy": "^0.3.1",
         "d3-queue": "^3.0.7",
         "express": "^4.17.1",
-        "express-json-validator-middleware": "^2.1.1",
         "express-minify": "^1.0.0",
-        "json-schema-ref-parser": "^9.0.7",
         "jsonwebtoken": "^8.5.1",
         "knex": "^0.95.4",
         "mailgen": "^2.0.14",
