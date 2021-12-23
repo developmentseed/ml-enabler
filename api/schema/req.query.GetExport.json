@@ -13,14 +13,16 @@
             "type": "string",
             "default": "geojsonld",
             "enum": [
+                "csv",
+                "geojson",
                 "geojsonld"
             ]
         },
-        "validation": {
+        "validity": {
             "type": "string",
             "default": "all",
             "enum": [
-                "all",
+                "both",
                 "validated",
                 "unvalidated"
             ]

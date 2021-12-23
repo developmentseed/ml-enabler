@@ -169,6 +169,7 @@ export default {
             url.searchParams.set('format', this.params.format);
             url.searchParams.set('inferences', this.params.inferences);
             url.searchParams.set('submission', this.params.submission);
+            url.searchParams.set('token', localStorage.token);
 
             if (this.params.inferences !== 'all') {
                 url.searchParams.set('threshold', this.params.threshold / 100);
