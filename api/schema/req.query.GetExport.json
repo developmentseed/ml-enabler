@@ -20,7 +20,7 @@
         },
         "validity": {
             "type": "string",
-            "default": "all",
+            "default": "both",
             "enum": [
                 "both",
                 "validated",
@@ -32,7 +32,7 @@
         },
         "threshold": {
             "type": "number",
-            "default": "50"
+            "default": 50
         },
         "submission": {
             "type": "number"

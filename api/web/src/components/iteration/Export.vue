@@ -168,8 +168,11 @@ export default {
 
             url.searchParams.set('format', this.params.format);
             url.searchParams.set('inferences', this.params.inferences);
-            url.searchParams.set('submission', this.params.submission);
             url.searchParams.set('token', localStorage.token);
+
+            if (this.params.submission !== 'all') {
+                url.searchParams.set('submission', this.params.submission);
+            }
 
             if (this.params.inferences !== 'all') {
                 url.searchParams.set('threshold', this.params.threshold / 100);
@@ -188,7 +191,9 @@ export default {
         getSubmissions: async function() {
             try {
                 const res = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/submission`);
-                this.submissions = res.submissions;
+                this.submissions = res.submissions.filter((s) => {
+                    return s.storage;
+                });
             } catch (err) {
                 this.$emit('err', err);
             }
