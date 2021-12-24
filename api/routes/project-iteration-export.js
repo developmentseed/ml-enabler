@@ -43,11 +43,10 @@ async function router(schema, config) {
 
             for (const s of list) {
                 if (!s.storage) continue;
-
                 await s3read(res, `project/${req.params.pid}/iteration/${req.params.iterationid}/submission-${s.id}.geojson`);
             }
 
-            res.json(true);
+            res.end();
         } catch (err) {
             return Err.respond(err, res);
         }
