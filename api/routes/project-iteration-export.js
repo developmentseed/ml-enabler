@@ -55,13 +55,13 @@ async function router(schema, config) {
             if (req.query.format === 'geojson') {
                 res.write('{ "type": "FeatureCollection", "features": [\n');
             } else if (req.query.format === 'csv') {
-                req.query.csv = csvStringifier = createCsvStringifier({
+                req.query.csv = createCsvStringifier({
                     header: [{
-                            id: 'submission_id',
-                            title: 'Submission ID'
-                        },{
-                            id: 'geometry',
-                            title: 'Geometry'
+                        id: 'submission_id',
+                        title: 'Submission ID'
+                    },{
+                        id: 'geometry',
+                        title: 'Geometry'
                     }].concat(req.query.iterations.map((m) => {
                         return {
                             id: m,
@@ -106,7 +106,7 @@ async function s3read(out, key, query) {
                     const feat = JSON.parse(line);
 
                     if (feat.properties[query.inferences] < query.threshold) return;
-                } catch (Err) {
+                } catch (err) {
                     return reject(err);
                 }
             }
@@ -122,7 +122,7 @@ async function s3read(out, key, query) {
                 }
             } else if (query.format === 'csv') {
                 try {
-                    let feat = JSON.parse(line);
+                    const feat = JSON.parse(line);
                     feat.properties.geometry = JSON.stringify(feat.geometry);
                     feat.properties.submission_id = feat.submission_id;
                     rl.output.write(query.csv.stringifyRecords([feat.properties]));
