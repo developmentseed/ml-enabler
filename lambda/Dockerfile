@@ -15,7 +15,8 @@ ENV \
 
 ADD requirements.txt requirements.txt
 
-RUN pip3 install -r requirements.txt --no-binary rasterio,shapely,numpy -t $PACKAGE_PREFIX -U
+RUN pip3 install --upgrade pip
+RUN pip3 install -r requirements.txt --no-binary rasterio==1.2.0,shapely,numpy -t $PACKAGE_PREFIX -U
 
 COPY download_and_predict download_and_predict
 
