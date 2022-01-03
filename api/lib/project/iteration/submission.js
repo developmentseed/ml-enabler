@@ -67,6 +67,7 @@ class Submission extends Generic {
 
     static async from(pool, id, pid) {
         const sub = await super.from(pool, id);
+
         sub.storage = await S3.exists(`project/${pid}/iteration/${sub.iter_id}/submission-${sub.id}.geojson`);
 
         return sub;

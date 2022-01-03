@@ -140,6 +140,8 @@ async function router(schema, config) {
                 'Content-Encoding': 'gzip',
                 'cache-control': 'no-transform'
             });
+
+            res.end(tile);
         } catch (err) {
             return Err.respond(err, res);
         }

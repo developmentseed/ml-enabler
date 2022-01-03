@@ -1,0 +1,41 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "token"
+    ],
+    "properties": {
+        "token": {
+            "type": "string",
+            "description": "Auth Token"
+        },
+        "format": {
+            "type": "string",
+            "default": "geojsonld",
+            "enum": [
+                "csv",
+                "geojson",
+                "geojsonld"
+            ]
+        },
+        "validity": {
+            "type": "string",
+            "default": "both",
+            "enum": [
+                "both",
+                "validated",
+                "unvalidated"
+            ]
+        },
+        "inferences": {
+            "type": "string",
+            "default": "all"
+        },
+        "threshold": {
+            "type": "number"
+        },
+        "submission": {
+            "type": "number"
+        }
+    }
+}

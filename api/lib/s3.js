@@ -28,7 +28,7 @@ class S3 {
         try {
             if (!process.env.ASSET_BUCKET) throw new Err(400, null, 'ASSET_BUCKET not set');
 
-            const res = await s3.headObject({
+            await s3.headObject({
                 Bucket: process.env.ASSET_BUCKET,
                 Key: key
             }).promise();
