@@ -44,7 +44,6 @@ async function router(schema, config) {
             const iter = await Iteration.from(config.pool, req.params.iterationid);
             req.query.iterations = iter.inf_list.split(',');
 
-            console.error(req.query.inferneces);
             if (req.query.inferences !== 'all' && !req.query.iterations.includes(req.query.inferences)) {
                 throw new Err(400, null, `inferences must be one of ${iter.inf_list}`);
             }
@@ -101,6 +100,16 @@ async function s3read(out, key, query) {
             output: out
         }).on('line', (line) => {
             if (!line.trim()) return;
+
+            if (query.threshold) {
+                try {
+                    const feat = JSON.parse(line);
+
+                    if (feat.properties[query.inferences] < query.threshold) return;
+                } catch (Err) {
+                    return reject(err);
+                }
+            }
 
             if (query.format === 'geojsonld') {
                 rl.output.write(line + '\n');
