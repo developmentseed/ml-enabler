@@ -30,6 +30,8 @@ async function router(schema, config) {
             req.auth = req.token;
             await user.is_auth(req);
 
+            if (req.query.threshold && req.query.inferences === 'all') throw new Err(400, null, 'Threshold can only set if inferences is not "all"');
+
             let list = [];
             if (req.query.submission) {
                 list.push(await Submission.from(config.pool, req.query.submission, req.params.pid));
@@ -41,6 +43,11 @@ async function router(schema, config) {
 
             const iter = await Iteration.from(config.pool, req.params.iterationid);
             req.query.iterations = iter.inf_list.split(',');
+
+            console.error(req.query.inferneces);
+            if (req.query.inferences !== 'all' && !req.query.iterations.includes(req.query.inferences)) {
+                throw new Err(400, null, `inferences must be one of ${iter.inf_list}`);
+            }
 
             res.writeHead(200, {
                 'Content-Disposition': `attachment; filename="ml-enabler-project-${req.params.pid}-iteration-${req.params.iterationid}.${req.query.format}"`

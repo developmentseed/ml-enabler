@@ -28,11 +28,11 @@
             ]
         },
         "inferences": {
-            "type": "string"
+            "type": "string",
+            "default": "all"
         },
         "threshold": {
-            "type": "number",
-            "default": 50
+            "type": "number"
         },
         "submission": {
             "type": "number"
