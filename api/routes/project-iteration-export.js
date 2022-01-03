@@ -29,8 +29,8 @@ async function router(schema, config) {
             await user.is_auth(req);
 
             let list = [];
-            if (req.params.submission) {
-                list.push(req.params.submission);
+            if (req.query.submission) {
+                list.push(await Submission.from(config.pool, req.query.submission, req.params.pid));
             } else {
                 list = (await Submission.list(config.pool, req.params.iterationid)).submissions.filter((s) => {
                     return s.storage;
@@ -59,8 +59,6 @@ async function s3read(out, key) {
             Bucket: process.env.ASSET_BUCKET,
             Key: key
         }).createReadStream().on('data', (data) => {
-            console.error(data);
-
             out.write(data);
         }).on('close', () => {
             return resolve();

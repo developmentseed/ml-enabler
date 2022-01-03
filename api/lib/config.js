@@ -103,7 +103,7 @@ class Config {
             }
         } while (!cnf.pool);
 
-        if (cnf.is_aws()) {
+        if (cnf.Environment === 'aws') {
             try {
                 const account = await STS.getCallerIdentity().promise();
                 cnf.account = account.Account;
@@ -123,7 +123,7 @@ class Config {
     }
 
     async confirm_sns() {
-        if (!this.is_aws()) return;
+        if (this.Environment !== 'aws') return;
 
         try {
             for (const type of ['vectorize', 'delete']) {
