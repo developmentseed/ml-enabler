@@ -38,7 +38,7 @@ async function router(schema, config) {
             }
 
             res.writeHead(200, {
-                'Content-Disposition': `inline; filename="ml-enabler-project-${req.params.pid}-iteration-${req.params.iterationid}.${req.query.format}"`
+                'Content-Disposition': `attachment; filename="ml-enabler-project-${req.params.pid}-iteration-${req.params.iterationid}.${req.query.format}"`
             });
 
             for (const s of list) {
