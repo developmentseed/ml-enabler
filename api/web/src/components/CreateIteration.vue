@@ -88,10 +88,10 @@
                     <label><span v-text='type'/> Zoom Level</label>
                     <label class='switch-container px6 fr'>
                         <span class='mr6'>Supertile</span>
-                        <input :disabled='iter.inf_type == "detection"' v-model='iter.inf_supertile' type='checkbox' />
+                        <input v-model='iter.inf_supertile' type='checkbox' />
                         <div class='switch'></div>
                     </label>
-                    <input v-model='iter.tile_zoom' class='input' placeholder='18'/>
+                    <input type='number' v-model='iter.tile_zoom' class='input' placeholder='18'/>
                 </div>
 
                 <div class='col col--12 py12'>
