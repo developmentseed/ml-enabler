@@ -8,7 +8,12 @@
                 <button @click='$emit("refresh")' class='mx3 btn btn--stroke color-gray color-blue-on-hover round'><svg class='icon fl'><use href='#icon-refresh'/></svg></button>
             </div>
         </div>
-        <template v-if='!submissions.length'>
+        <template v-if='loading'>
+            <div class='flex-parent flex-parent--center-main w-full py24'>
+                <div class='flex-child loading py24'></div>
+            </div>
+        </template>
+        <template v-else-if='!submissions.length'>
             <div class='col col--12 py6'>
                 <div class='flex-parent flex-parent--center-main pt36'>
                     <svg class='flex-child icon w60 h60 color-gray'><use href='#icon-info'/></svg>
@@ -171,7 +176,7 @@ export default {
     props: ['meta', 'iteration'],
     data: function() {
         return {
-            mode: 'visualize',
+            loading: true,
             integration: false,
             clickListener: false,
             popup: false,
@@ -234,6 +239,7 @@ export default {
         await this.getAOIs();
         await this.getSubmissions();
         await this.getImagery();
+        this.loading = false;
 
         this.inferences = this.iteration.inf_list.split(',');
         this.inf = this.inferences[0];
@@ -367,23 +373,6 @@ export default {
                     }
                 }]
             };
-
-            for (const aoi of this.aois) {
-                const bounds = aoi.bounds.bounds;
-                const aoipolyouter = buffer(bboxPolygon(bounds), 0.3);
-                const aoipolyinner = buffer(bboxPolygon(bounds), 0.1);
-                poly.features.push({
-                    type: 'Feature',
-                    properties: {},
-                    geometry: {
-                        type: 'Polygon',
-                        coordinates: [
-                            aoipolyouter.geometry.coordinates[0],
-                            aoipolyinner.geometry.coordinates[0]
-                        ]
-                    }
-                });
-            }
 
             if (!this.map.getSource('tiles')) {
                 this.map.addSource('tiles', {
