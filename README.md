@@ -86,12 +86,3 @@ TODO: Update
     cd api && npm run dev
     cd web && npm run dev
   ```
-
-TODO: Update
-### Tests
-
-1. Create a database for your tests:
-  * `createdb ml_enabler_test`
-  * Enabler postgis `echo 'CREATE EXTENSION postgis' | psql -d ml_enabler_test`
-2. Run tests with `python3 -m unittest discover ml_enabler/tests/`
-
