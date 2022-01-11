@@ -49,28 +49,40 @@ See [API.md](/API.md)
 
 ## Development Setup
 
+TODO: Update
 ### Using Docker
 1. Copy `example.env` to `ml_enabler.env`
 1. Run `docker-compose build`
 2. Run `docker-compose up`
 
 ### Manual
-1. Create a virtualenv - `python3 -m venv venv`
-3. Enable the virtualenv `./venv/bin/activate`
-4. Install dependencies `pip install -r requirements.txt`
-5. Setup the database:
-  * Setup database. If you're on a Mac use Postgres.app, or use docker
-  * Copy `example.env` to `ml_enabler.env` and add database configuration
-  * Initialize tables `flask db upgrade`
-6. Start the app
-  * `export FLASK_APP="ml_enabler"`
-  * `export FLASK_ENV="development"`
-  * `flask run`
 
-### Tests
+1. Prerequisite
+  - Install @openaddresses/deploy & yarn. This will make `deploy` & `yarn` command available globally
+    ```npm install -g @openaddresses/deploy yarn```
+  - [Install aws-cli](https://aws.amazon.com/cli/) & create user-access keys
+  - Add `$(MAPBOX_TOKEN)` environment variable from your [mapbox account](https://account.mapbox.com/)
+  - Install `jq` from [here](https://stedolan.github.io/jq/download/)
 
-1. Create a database for your tests:
-  * `createdb ml_enabler_test`
-  * Enabler postgis `echo 'CREATE EXTENSION postgis' | psql -d ml_enabler_test`
-2. Run tests with `python3 -m unittest discover ml_enabler/tests/`
-
+2. Clone ml-enabler & install node-modules (*TODO: Replace these with scripts in the future*)  
+  ```
+    gh repo clone developmentseed/ml-enabler
+    cd ml-enabler/api && npm install && npx knex migrate:latest
+    cd web && yarn install
+    cd ../..
+  ```
+3. Clone a stacks database into local database for development
+  ```
+    ./clone prod
+  ```
+4. Authenticate the `deploy` cli to make any changes to the underlying AWS Infrastructure
+  > Note: `profile name` should match with the AWS credentials file located at ~/.aws/credentials
+  ```
+    deploy init
+    $(deploy env)
+  ```
+5. Run the API & web UI
+  ```
+    cd api && npm run dev
+    cd web && npm run dev
+  ```
