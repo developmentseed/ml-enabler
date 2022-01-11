@@ -1,5 +1,5 @@
 boto3==1.20.15
-numpy==1.20.2
+numpy==1.21.0
 rasterio==1.1.5
 mercantile==1.1.5
 requests==2.25.0
