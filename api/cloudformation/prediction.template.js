@@ -149,7 +149,6 @@ module.exports = {
             Type: 'AWS::Lambda::Function',
             DependsOn: ['PredLambdaLogs'],
             Properties: {
-                Layers: [ 'arn:aws:lambda:us-east-1:552188055668:layer:geolambda:2' ],
                 Code: {
                     S3Bucket: 'devseed-artifacts',
                     S3Key: cf.join(['ml-enabler/lambda-', cf.ref('GitSha'), '.zip' ])
