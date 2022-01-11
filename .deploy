@@ -11,14 +11,5 @@
         "lambda": [
             "devseed-artifacts/ml-enabler/lambda-{{gitsha}}.zip"
         ]
-    },
-    "substacks": {
-        "*-project-*-iteration-*": {
-            "artifacts": {
-                "lambda": [
-                    "devseed-artifacts/ml-enabler/lambda-{{gitsha}}.zip"
-                ]
-            }
-        }
     }
 }
