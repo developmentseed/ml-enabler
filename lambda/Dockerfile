@@ -4,7 +4,6 @@ ARG PACKAGE_PREFIX=/var/task
 WORKDIR $PACKAGE_PREFIX
 
 ADD requirements.txt requirements.txt
-COPY download_and_predict ${PACKAGE_PREFIX}/download_and_predict
 
 RUN pip install -r requirements.txt --no-binary :all: -t ${PACKAGE_PREFIX}/
 
@@ -23,6 +22,8 @@ RUN rm -rdf \
     ${PACKAGE_PREFIX}/bin \
     ${PACKAGE_PREFIX}/geos_license \
     ${PACKAGE_PREFIX}/Misc
+
+COPY download_and_predict ${PACKAGE_PREFIX}/download_and_predict
 
 # Create package.zip
 RUN cd $PACKAGE_PREFIX && zip -r9q /tmp/package.zip *
