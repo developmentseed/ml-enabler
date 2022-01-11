@@ -177,10 +177,10 @@ async function server(args, config, cb) {
 
     config.confirm_sns();
 
-    const srv = app.listen(2001, (err) => {
+    const srv = app.listen(2000, (err) => {
         if (err) return err;
 
-        if (!config.silent) console.log('ok - http://localhost:2001');
+        if (!config.silent) console.log('ok - http://localhost:2000');
 
         if (cb) return cb(srv, config);
     });

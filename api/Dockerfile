@@ -8,7 +8,7 @@ COPY ./ $HOME/api
 WORKDIR $HOME/api
 
 RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y nginx curl
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y git nginx curl
 
 RUN export NODEV='16.9.0' \
     && curl "https://nodejs.org/dist/v${NODEV}/node-v${NODEV}-linux-x64.tar.gz" | tar -xzv \
@@ -19,8 +19,8 @@ RUN npm install \
     && npm run doc \
     && cd web \
     && npm install -g yarn \
-    && yarn install \
-    && yarn prod
+    && yarn install
+    # && yarn prod
 
 RUN cp ./nginx.conf /etc/nginx/sites-enabled/default
 
