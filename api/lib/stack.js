@@ -1,3 +1,4 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const AWS = require('aws-sdk');
 const cf = new AWS.CloudFormation({

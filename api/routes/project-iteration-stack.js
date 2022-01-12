@@ -1,3 +1,4 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const Iteration = require('../lib/project/iteration');
 const Stack = require('../lib/stack');

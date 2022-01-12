@@ -1,3 +1,4 @@
+'use strict';
 const Mailgen = require('mailgen');
 const { Err } = require('@openaddresses/batch-schema');
 const AWS = require('aws-sdk');
