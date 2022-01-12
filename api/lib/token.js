@@ -1,11 +1,11 @@
-
+'use strict';
 
 const { Err } = require('@openaddresses/batch-schema');
+const Generic = require('@openaddresses/batch-generic');
 const crypto = require('crypto');
 const { promisify } = require('util');
 const randomBytes = promisify(crypto.randomBytes);
 const { sql } = require('slonik');
-const Generic = require('./generic');
 
 /**
  * @class

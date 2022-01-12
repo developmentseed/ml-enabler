@@ -1,3 +1,4 @@
+'use strict';
 const AWS = require('aws-sdk');
 const { Err } = require('@openaddresses/batch-schema');
 const sqs = new AWS.SQS({
