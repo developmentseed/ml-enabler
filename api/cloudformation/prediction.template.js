@@ -157,7 +157,7 @@ module.exports = {
                 Role: cf.importValue(cf.join([cf.ref('StackName'), '-lambda-role'])),
                 Handler: 'download_and_predict.handler.handler',
                 MemorySize: 512,
-                Runtime: 'python3.7',
+                Runtime: 'python3.8',
                 ReservedConcurrentExecutions: cf.ref('MaxConcurrency'),
                 Timeout: 240,
                 Environment: {
