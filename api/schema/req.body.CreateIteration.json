@@ -14,7 +14,7 @@
     "additionalProperties": false,
     "properties": {
         "model_type": {
-            "type": "integer",
+            "type": "string",
             "enum": [
                 "tensorflow"
             ]
