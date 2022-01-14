@@ -28,3 +28,17 @@ jobs:
             - name: Docker Push Base
               run: docker push ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/ml-enabler:${GITHUB_SHA}
 
+            - name: Docker Compose Build Postgis & Migration
+              run: docker-compose up --build -d migration
+
+            - name: Docker API Lint
+              run: docker run base sh -c "npm run lint"
+
+            - name: Docker API Test
+              run: docker run
+                -e "POSTGRES=postgres://docker:docker@postgis:5432/gis"
+                -e "MAPBOX_TOKEN=${{ secrets.MAPBOX_TOKEN }}"
+                base sh -c "npm run test"
+
+            - name: Docker Compose Down
+              run: docker-compose down -v

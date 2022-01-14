@@ -16,11 +16,14 @@ RUN export NODEV='16.9.0' \
     && ./node-v${NODEV}-linux-x64/bin/npm install -g npm@7
 
 RUN npm install \
+    && npm uninstall bcrypt && npm install bcrypt \
     && npm run doc \
     && cd web \
     && npm install -g yarn \
     && yarn install
     # && yarn prod
+
+RUN npm rebuild
 
 RUN cp ./nginx.conf /etc/nginx/sites-enabled/default
 

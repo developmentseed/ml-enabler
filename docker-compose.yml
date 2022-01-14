@@ -15,12 +15,15 @@ services:
             - "2000:2000"
         environment:
             - PORT=2000
-            - Postgres=postgres://docker:docker@postgis:5432/gis
+            - POSTGRES=postgres://docker:docker@postgis:5432/gis
             - MAPBOX_TOKEN
+        volumes:
+            - /home/mle/api/node_modules
 
     migration:
         platform: linux/amd64
         build: ./api/
+        container_name: ml-enabler-migration
         command: sh -c "sleep 20; npx knex migrate:latest"
         links:
             - postgis
@@ -30,7 +33,7 @@ services:
             - postgis
         environment:
             - PORT=2001
-            - Postgres=postgres://docker:docker@postgis:5432/gis
+            - POSTGRES=postgres://docker:docker@postgis:5432/gis
 
     postgis:
         platform: linux/amd64
@@ -38,7 +41,7 @@ services:
         container_name: ml-enabler-postgis
         restart: 'always'
         ports:
-            - 5433:5432
+            - 5432:5432
         environment:
             - ALLOW_IP_RANGE=0.0.0.0/0
             - POSTGRES_DB=gis
