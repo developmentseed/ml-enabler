@@ -33,6 +33,7 @@ jobs:
 
             - name: Docker API Lint
               run: docker run base sh -c "npm run lint"
+              continue-on-error: true
 
             - name: Docker API Test
               run: docker run
