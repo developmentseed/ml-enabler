@@ -41,7 +41,7 @@ jobs:
               run: docker run
                 -e "POSTGRES=postgres://docker:docker@postgis:5432/gis"
                 -e "MAPBOX_TOKEN=${{ secrets.MAPBOX_TOKEN }}"
-                base sh -c "npm run test"
+                base sh -c "sleep 10; npm run test"
 
             - name: Docker Compose Down
               run: docker-compose down -v
