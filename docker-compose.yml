@@ -1,50 +1,68 @@
 version: '3'
 
 services:
-    api:
-        platform: linux/amd64
-        build: ./api/
-        command: sh -c "sleep 5; npm run dev"
-        container_name: ml-enabler-api
-        restart: always
-        links:
-            - postgis
-        depends_on:
-            - migration
-        ports:
-            - "2000:2000"
-        environment:
-            - PORT=2000
-            - POSTGRES=postgres://docker:docker@postgis:5432/gis
-            - MAPBOX_TOKEN
-        volumes:
-            - /home/mle/api/node_modules
+  base: &base
+    platform: linux/amd64
+    build: ./api/
+    image: mlenabler/base
+    command: sh -c "echo I am base!"
+    container_name: ml-enabler-base
+    restart: always
+    links:
+      - postgis
+    depends_on:
+      - postgis
+    environment:
+      - PORT=2001
+      - POSTGRES=postgres://docker:docker@postgis:5432/gis
+      - MAPBOX_TOKEN
+    volumes:
+      - /home/mle/api/node_modules
 
-    migration:
-        platform: linux/amd64
-        build: ./api/
-        container_name: ml-enabler-migration
-        command: sh -c "sleep 20; npx knex migrate:latest"
-        links:
-            - postgis
-        ports:
-            - "2001:2001"
-        depends_on:
-            - postgis
-        environment:
-            - PORT=2001
-            - POSTGRES=postgres://docker:docker@postgis:5432/gis
+  api:
+    <<: *base
+    container_name: ml-enabler-api
+    command: sh -c "sleep 5; npm run dev"
+    ports:
+      - "2001:2001"
+    links:
+      - migration
+    depends_on:
+      - migration
 
-    postgis:
-        platform: linux/amd64
-        image: kartoza/postgis:14-3.1
-        container_name: ml-enabler-postgis
-        restart: 'always'
-        ports:
-            - 5432:5432
-        environment:
-            - ALLOW_IP_RANGE=0.0.0.0/0
-            - POSTGRES_DB=gis
-            - POSTGRES_USER=docker
-            - POSTGRES_PASS=docker
-            - POSTGRES_MULTIPLE_EXTENSIONS="postgis","uuid-ossp"
+  lint:
+    <<: *base
+    container_name: ml-enabler-lint
+    command: sh -c "sleep 5; npm run lint"
+    links:
+      - migration
+    depends_on:
+      - migration
+
+  test:
+    <<: *base
+    container_name: ml-enabler-test
+    command: sh -c "sleep 5; npm run test"
+    links:
+      - migration
+    depends_on:
+      - migration
+
+  migration:
+    <<: *base
+    container_name: ml-enabler-migration
+    command: sh -c "sleep 20; npx knex migrate:latest"
+
+  postgis:
+    platform: linux/amd64
+    image: kartoza/postgis:14-3.1
+    container_name: ml-enabler-postgis
+    restart: 'always'
+    ports:
+      - 5432:5432
+    environment:
+      - ALLOW_IP_RANGE=0.0.0.0/0
+      - POSTGRES_DB=gis
+      - POSTGRES_USER=docker
+      - POSTGRES_PASS=docker
+      - POSTGRES_MULTIPLE_EXTENSIONS="postgis","uuid-ossp"
