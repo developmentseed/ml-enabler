@@ -34,15 +34,11 @@ jobs:
               run: docker-compose up --build -d migration
 
             - name: Docker API Lint
-              run: |
-                docker-compose --log-level ERROR up --build -d lint
-                docker logs ml-enabler-lint
+              run: docker-compose --log-level ERROR up --build lint
               continue-on-error: true
 
             - name: Docker API Test
-              run: |
-                docker-compose --log-level ERROR up --build -d test
-                docker logs ml-enabler-test
+              run: docker-compose --log-level ERROR up --build test
               continue-on-error: true
 
             - name: Docker Compose Down
