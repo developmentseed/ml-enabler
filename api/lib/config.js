@@ -26,7 +26,7 @@ class Config {
         //     process.env.GitSha = String(CP.execSync('git rev-parse HEAD'));
         // }
 
-        cnf.postgres = args.postgres || process.env.POSTGRES || 'postgres://postgres@localhost:5432/gis';
+        cnf.postgres = args.postgres || process.env.POSTGRES || 'postgres://postgres@localhost:5432/mlenabler';
         cnf.Environment = process.env.ENVIRONMENT || 'docker';
         cnf.region = process.env.AWS_DEFAULT_REGION || 'us-east-1';
 
