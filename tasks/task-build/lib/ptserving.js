@@ -44,3 +44,5 @@ async function docker(tmp, model, tagged_model) {
 
     return tag;
 }
+
+module.exports = docker;
