@@ -31,7 +31,11 @@ async function router(schema, config) {
 
             return res.json({
                 total: list.length,
-                stacks: list
+                stacks: list.map((l) => {
+                    l.project = l.StackName.match(/project-(\d+)/)[1]
+                    l.iteration = l.StackName.match(/iteration-(\d+)/)[1]
+                    return l;
+                })
             });
         } catch (err) {
             return Err.respond(err, res);

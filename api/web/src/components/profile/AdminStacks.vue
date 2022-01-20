@@ -45,29 +45,19 @@
             <div class='w-full align-center txt-bold'>No Stacks Found</div>
         </template>
         <template v-else>
-            <div :key='stack.id' v-for='stack in stacks' class='col col--12 grid'>
-                <div @click='stack._open = !stack._open' class='grid col col--12 bg-gray-light-on-hover cursor-pointer px12 py12 round'>
-                    <div class='col col--3'>
-                        <span v-text='stack.StackName'/>
-                    </div>
-                    <div class='col col--6'>
-                        <span v-text='stack.StackName'/>
-                    </div>
-                    <div class='col col--3'>
-                        <span class='fr bg-blue-faint color-blue round inline-block px6 py3 txt-xs txt-bold' v-text='stack.StackName'></span>
-                    </div>
-                </div>
-
-                <div v-if='stack._open' class='col col-12 border border--gray-light round px12 py12 my6 grid'>
-                    <h3 class='pb6 w-full'>User Flags</h3>
-
-                </div>
-            </div>
+            <Table
+                headers='_id,_project,_iteration,Stack Name,Status,Runtime (Hrs)'
+                :data='stacks'
+                @click='stackNav($event)'
+            />
         </template>
     </div>
 </template>
 
 <script>
+import Table from '../util/Table.vue';
+import moment from 'moment';
+
 export default {
     name: 'AdminStacks',
     props: [ ],
@@ -91,6 +81,9 @@ export default {
         refresh: function() {
             this.getStacks();
         },
+        stackNav: function(e) {
+            this.$router.push(`/project/${e[1]}/iteration/${e[2]}/stack`);
+        },
         getStacks: async function() {
             this.loading = true;
 
@@ -98,18 +91,28 @@ export default {
             url.searchParams.append('filter', this.filter);
 
             try {
-                const res = await window.std(url);
+                const list = await window.std(url);
 
-                this.loading = false;
-
-                this.stacks = res.stacks.map((stack) => {
-                    stack._open = false;
-                    return stack;
+                let id = 0;
+                this.stacks = list.stacks.map((s) => {
+                    return [
+                        ++id,
+                        s.project,
+                        s.iteration,
+                        s.StackName,
+                        s.StackStatus,
+                        Math.round(Number(moment().diff(s.CreationTime, 'hours', true)) * 100) / 100
+                    ]
                 });
             } catch (err) {
                 this.$emit('err', err);
             }
+
+            this.loading = false;
         }
+    },
+    components: {
+        Table
     }
 }
 </script>
