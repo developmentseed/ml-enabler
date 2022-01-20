@@ -1,6 +1,7 @@
 'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const Iteration = require('../lib/project/iteration');
+const Stack = require('../lib/stack');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
@@ -27,7 +28,28 @@ async function router(schema, config) {
             await user.is_auth(req);
 
             req.query.pid = req.params.pid;
-            res.json(await Iteration.list(config.pool, req.params.pid, req.query));
+            const list = await Iteration.list(config.pool, req.params.pid, req.query);
+
+            let stacks = [];
+            if (config.Environment) {
+                stacks = (await Stack.list(config.StackName)).map((s) => {
+                    return s.StackName;
+                });
+            }
+
+            list.iterations = list.iterations.map((i) => {
+                i.stack = false;
+
+                for (const s of stacks) {
+                    if (s.includes(config.StackName + '-project-' + req.params.pid + '-iteration-' + i.id)) {
+                        i.stack = true;
+                    }
+                }
+
+                return i;
+            });
+
+            return res.json(list);
         } catch (err) {
             return Err.respond(err, res);
         }

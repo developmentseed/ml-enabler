@@ -24,7 +24,8 @@
                     "model_link",
                     "checkpoint_link",
                     "tfrecord_link",
-                    "save_link"
+                    "save_link",
+                    "stack"
                 ],
                 "additionalProperties": false,
                 "properties": {
@@ -61,6 +62,10 @@
                     },
                     "save_link": {
                         "type": "string"
+                    },
+                    "stack": {
+                        "type": "boolean",
+                        "description": "Is there is an inference stack running"
                     }
                 }
             }
