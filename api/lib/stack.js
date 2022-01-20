@@ -53,7 +53,7 @@ class Stack {
 
             return stacks.filter((s) => {
                 return s.StackName.includes(prefix);
-            });;
+            });
         } catch (err) {
             throw new Err(500, err, 'Cannot list stacks');
         }

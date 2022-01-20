@@ -32,7 +32,7 @@ async function router(schema, config) {
 
             let stacks = [];
             if (config.Environment) {
-                stacks = (await Stack.list(config.StackName)).map((s) => {
+                stacks = (await Stack.list(config.StackName + '-')).map((s) => {
                     return s.StackName;
                 });
             }

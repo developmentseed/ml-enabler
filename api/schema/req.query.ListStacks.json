@@ -1,0 +1,11 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "filter": {
+            "type": "string",
+            "default": "",
+            "description": "Filter a complete or partial stack name"
+        }
+    }
+}
