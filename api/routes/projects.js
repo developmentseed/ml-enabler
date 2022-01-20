@@ -2,6 +2,7 @@
 const { Err } = require('@openaddresses/batch-schema');
 const Project = require('../lib/project');
 const ProjectAccess = require('../lib/project/access');
+const Stack = require('../lib/stack');
 
 async function router(schema, config) {
     const user = new (require('../lib/user'))(config);
@@ -27,7 +28,29 @@ async function router(schema, config) {
             await user.is_auth(req);
 
             req.query.uid = req.auth.uid;
-            res.json(await Project.list(config.pool, req.query));
+
+            const list = await Project.list(config.pool, req.query);
+
+            let stacks = [];
+            if (config.Environment) {
+                stacks = (await Stack.list(config.StackName)).map((s) => {
+                    return s.StackName;
+                });
+            }
+
+            list.projects = list.projects.map((p) => {
+                p.stacks = [];
+
+                for (const s of stacks) {
+                    if (s.includes(config.StackName + '-project-' + p.id)) {
+                        p.stacks.push(s);
+                    }
+                }
+
+                return p;
+            });
+
+            return res.json(list);
         } catch (err) {
             return Err.respond(err, res);
         }

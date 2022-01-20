@@ -11,7 +11,7 @@ const template = require('../cloudformation/prediction.template.js');
  * @class
  */
 class Stack {
-    static async list() {
+    static async list(prefix) {
         let stacks = [];
 
         let partial = false;
@@ -41,17 +41,19 @@ class Stack {
                 ]
             }).promise();
 
-            stacks = stacks.concat(partial);
+            stacks = stacks.concat(partial.StackSummaries);
 
             while (partial.NextToken) {
                 partial = await cf.listStacks({
                     NextToken: partial.NextToken
                 }).promise();
 
-                stacks = stacks.concat(partial);
+                stacks = stacks.concat(partial.StackSummaries);
             }
 
-            return stacks;
+            return stacks.filter((s) => {
+                return s.StackName.includes(prefix);
+            });;
         } catch (err) {
             throw new Err(500, err, 'Cannot list stacks');
         }

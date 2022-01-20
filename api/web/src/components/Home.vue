@@ -69,7 +69,7 @@
                                     Project Page
                                 </div>
 
-                                <div v-if='false' class='fr bg-green-faint bg-green-on-hover color-white-on-hover color-green inline-block px6 py3 round txt-xs txt-bold mr3'>
+                                <div v-if='project.stacks.length' class='fr bg-green-faint bg-green-on-hover color-white-on-hover color-green inline-block px6 py3 round txt-xs txt-bold mr3'>
                                     Active Stack
                                 </div>
                                 <div v-if='project.archived' class='fr bg-gray-faint bg-gray-on-hover color-white-on-hover color-gray inline-block px6 py3 round txt-xs txt-bold mr3'>
