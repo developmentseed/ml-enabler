@@ -29,6 +29,10 @@
             <ProfileAdminUser
                 @err='$emit("err", $event)'
             />
+
+            <AdminStacks
+                @err='$emit("err", $event)'
+            />
         </template>
     </div>
 </template>
@@ -36,6 +40,7 @@
 <script>
 import ProfileTokens from './profile/ProfileTokens.vue'
 import ProfileAdminUser from './profile/ProfileAdminUser.vue'
+import AdminStacks from './profile/AdminStacks.vue'
 
 export default {
     name: 'Profile',
@@ -47,7 +52,8 @@ export default {
     },
     components: {
         ProfileTokens,
-        ProfileAdminUser
+        ProfileAdminUser,
+        AdminStacks
     }
 }
 </script>

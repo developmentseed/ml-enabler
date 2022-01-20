@@ -1,0 +1,25 @@
+{
+    "type": "object",
+    "required": [
+        "total",
+        "stacks"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "total": {
+            "type": "integer",
+            "description": "Total number of items"
+        },
+        "stacks": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                ],
+                "additionalProperties": false,
+                "properties": {
+                }
+            }
+        }
+    }
+}
