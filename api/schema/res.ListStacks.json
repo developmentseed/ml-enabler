@@ -15,9 +15,37 @@
             "items": {
                 "type": "object",
                 "required": [
+                    "StackId",
+                    "StackName",
+                    "CreationTime",
+                    "StackStatus",
+                    "DriftInformation",
+                    "project",
+                    "iteration"
                 ],
                 "additionalProperties": false,
                 "properties": {
+                    "StackId": {
+                        "type": "string"
+                    },
+                    "StackName": {
+                        "type": "string"
+                    },
+                    "CreationTime": {
+                        "type": "string"
+                    },
+                    "StackStatus": {
+                        "type": "string"
+                    },
+                    "DriftInformation": {
+                        "type": "object"
+                    },
+                    "project": {
+                        "type": "integer"
+                    },
+                    "iteration": {
+                        "type": "integer"
+                    }
                 }
             }
         }

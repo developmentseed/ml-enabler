@@ -32,8 +32,8 @@ async function router(schema, config) {
             return res.json({
                 total: list.length,
                 stacks: list.map((l) => {
-                    l.project = l.StackName.match(/project-(\d+)/)[1]
-                    l.iteration = l.StackName.match(/iteration-(\d+)/)[1]
+                    l.project = parseInt(l.StackName.match(/project-(\d+)/)[1]);
+                    l.iteration = parseInt(l.StackName.match(/iteration-(\d+)/)[1]);
                     return l;
                 })
             });
