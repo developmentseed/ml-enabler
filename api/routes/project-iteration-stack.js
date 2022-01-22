@@ -69,7 +69,8 @@ async function router(schema, config) {
                     iteration_id: req.params.iterationid,
                     imagery_id: iter.imagery_id,
                     inf_list: iter.inf_list,
-                    inf_supertile: iter.inf_supertile
+                    inf_supertile: iter.inf_supertile,
+                    model_type: iter.model_type
                 }
             );
 

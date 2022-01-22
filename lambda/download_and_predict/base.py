@@ -34,9 +34,15 @@ from download_and_predict.custom_types import SQSEvent
 
 firehose = boto3.client('firehose')
 
-class ModelType(Enum):
-    OBJECT_DETECT = 1
-    CLASSIFICATION = 2
+class ModelMeta:
+    def __init__(self, meta):
+        inputs = self.meta["metadata"]["signature_def"]["signature_def"]["serving_default"]["inputs"]
+        outputs self.meta["metadata"]["signature_def"]["signature_def"]["serving_default"]["outputs"]
+
+        # As far as I know there can be only a single named i/o key
+        self.raw = meta
+        self.input_name = inputs.keys()[0]
+        self.output_name = outputs.keys()[0]
 
 class DownloadAndPredict(object):
     """
@@ -49,23 +55,13 @@ class DownloadAndPredict(object):
 
         self.mlenabler_endpoint = mlenabler_endpoint
         self.prediction_endpoint = prediction_endpoint
-        self.meta = {}
+        self.meta = False
 
-    def get_meta(self) -> ModelType:
+    def get_meta(self):
         r = requests.get(self.prediction_endpoint + "/metadata")
         r.raise_for_status()
 
-        self.meta = r.json()
-
-        inputs = self.meta["metadata"]["signature_def"]["signature_def"]["serving_default"]["inputs"]
-
-        # Object Detection Model
-        if inputs.get("inputs") is not None:
-            return ModelType.OBJECT_DETECT
-
-        # Chip Classification Model
-        else:
-            return ModelType.CLASSIFICATION
+        self.meta = ModelMeta(r.json())
 
     @staticmethod
     def get_chips(event: SQSEvent) -> List[str]:
@@ -92,7 +88,7 @@ class DownloadAndPredict(object):
             r = requests.get(chip.get('url'))
             yield (chip, r.content)
 
-    def get_prediction_payload(self, chips: List[dict], model_type: ModelType) -> Tuple[List[dict], Dict[str, Any]]:
+    def get_prediction_payload(self, chips: List[dict]) -> Tuple[List[dict], Dict[str, Any]]:
         """
         chps: list image tilesk
         imagery: str an imagery API endpoint with three variables {z}/{x}/{y} to replace
@@ -104,11 +100,10 @@ class DownloadAndPredict(object):
 
         tiles_and_images = self.get_images(chips)
         tile_indices, images = zip(*tiles_and_images)
-        instances = []
-        if model_type == ModelType.CLASSIFICATION:
-            instances = [dict(image_bytes=dict(b64=self.b64encode_image(img))) for img in images]
-        else:
-            instances = [dict(inputs=dict(b64=self.b64encode_image(img))) for img in images]
+
+        instances = [{
+            self.meta.input_name: dict(b64=self.b64encode_image(img))
+        } for img in images]
 
         payload = {
             "instances": instances

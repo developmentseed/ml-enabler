@@ -2,7 +2,7 @@
 
 import os
 from typing import Dict, Any
-from download_and_predict.base import DownloadAndPredict, ModelType, SuperTileDownloader
+from download_and_predict.base import DownloadAndPredict, SuperTileDownloader
 from download_and_predict.custom_types import SQSEvent
 
 def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
@@ -12,8 +12,10 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
     stream = os.getenv('StackName')
 
     super_tile = os.getenv('INF_SUPERTILE')
+    model_type = os.getenv('MODEL_TYPE')
 
     assert(stream)
+    assert(model_type)
     assert(prediction_endpoint)
     assert(mlenabler_endpoint)
 
@@ -33,9 +35,9 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
 
     if super_tile == 'True':
         dap = SuperTileDownloader(mlenabler_endpoint=mlenabler_endpoint, prediction_endpoint=prediction_endpoint)
-        payload = dap.get_prediction_payload(chips, model_type)
+        payload = dap.get_prediction_payload(chips)
     else:
-        payload = dap.get_prediction_payload(chips, model_type)
+        payload = dap.get_prediction_payload(chips)
 
     if model_type == ModelType.OBJECT_DETECT:
         print("TYPE: Object Detection")
