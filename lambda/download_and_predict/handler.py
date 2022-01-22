@@ -66,6 +66,12 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
         dap.save_prediction(preds, stream)
     elif inf_type == "segmentation":
         print("TYPE: Segmentation")
+
+        # send prediction request
+        preds = dap.seg_post_prediction(payload, chips)
+
+        # Save the prediction to ML-Enabler
+        dap.save_prediction(preds, stream)
     else:
         print("Unknown Model")
 
