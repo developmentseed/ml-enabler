@@ -45,7 +45,7 @@ module.exports = {
             Type: 'String',
             Description: 'Model was trained and should inference on supertiles'
         },
-        ModelType: {
+        InfType: {
             Type: 'String',
             Description: 'What type of model is being inferenced'
         },
@@ -170,7 +170,7 @@ module.exports = {
                         PROJ_LIB: '/opt/share/proj',
                         StackName: cf.stackName,
                         INFERENCES: cf.ref('Inferences'),
-                        MODEL_TYPE: cf.ref('ModelType'),
+                        INF_TYPE: cf.ref('InfType'),
                         INF_SUPERTILE: cf.ref('InfSupertile'),
                         IMAGERY_ID: cf.ref('ImageryId'),
                         PREDICTION_ENDPOINT: cf.join([
