@@ -44,7 +44,7 @@ class ModelMeta:
         # As far as I know there can be only a single named i/o key
         self.inf_type = inf_type
 
-        print('inputs', intputs)
+        print('inputs', inputs)
         print('outputs', outputs)
         self.input_name = inputs.keys()[0]
         self.output_name = outputs.keys()[0]
