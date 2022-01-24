@@ -94,7 +94,6 @@ class DownloadAndPredict(object):
         except ValueError:
             img = img.reshape((256, 256, 4))
         img = img[:, :, :3]
-        img = np.rollaxis(img, 2, 0)
 
         # Custom
         img = img * (1/255)
