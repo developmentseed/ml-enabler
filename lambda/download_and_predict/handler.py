@@ -44,14 +44,6 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
 
         # send prediction request
         preds = dap.od_post_prediction(payload, chips)
-
-        if len(preds["predictions"]) == 0:
-            print('RESULT: No Predictions')
-        else:
-            print('RESULT: ' + str(len(preds["predictions"])) + ' Predictions')
-
-            # Save the prediction to ML-Enabler
-            dap.save_prediction(preds, stream)
     elif inf_type == "classification":
         print("TYPE: Classification")
 
@@ -61,19 +53,16 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
 
         # send prediction request
         preds = dap.cl_post_prediction(payload, chips, inferences)
-
-        # Save the prediction to ML-Enabler
-        dap.save_prediction(preds, stream)
     elif inf_type == "segmentation":
         print("TYPE: Segmentation")
 
         # send prediction request
         preds = dap.seg_post_prediction(payload, chips)
-
-        # Save the prediction to ML-Enabler
-        dap.save_prediction(preds, stream)
     else:
         print("Unknown Model")
+
+    print('Saving:', len(preds), ' predictions')
+    dap.save_prediction(preds, stream)
 
     return True
 
