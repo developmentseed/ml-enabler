@@ -169,7 +169,7 @@ class DownloadAndPredict(object):
         except requests.exceptions.HTTPError as e:
             print (e.response.text)
 
-    def seg_post_prediction(self, payload: Dict[str, Any], chips: List[dict], inferences: List[str]) -> Dict[str, Any]:
+    def seg_post_prediction(self, payload: Dict[str, Any], chips: List[dict]) -> Dict[str, Any]:
         try:
             r = requests.post(self.prediction_endpoint + ":predict", data=json.dumps(payload))
             r.raise_for_status()
