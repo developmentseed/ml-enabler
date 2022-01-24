@@ -36,11 +36,12 @@ firehose = boto3.client('firehose')
 
 class ModelMeta:
     def __init__(self, meta, inf_type):
-        inputs = self.meta["metadata"]["signature_def"]["signature_def"]["serving_default"]["inputs"]
-        outputs = self.meta["metadata"]["signature_def"]["signature_def"]["serving_default"]["outputs"]
+        self.raw = meta
+
+        inputs = self.raw["metadata"]["signature_def"]["signature_def"]["serving_default"]["inputs"]
+        outputs = self.raw["metadata"]["signature_def"]["signature_def"]["serving_default"]["outputs"]
 
         # As far as I know there can be only a single named i/o key
-        self.raw = meta
         self.inf_type = inf_type
         self.input_name = inputs.keys()[0]
         self.output_name = outputs.keys()[0]
