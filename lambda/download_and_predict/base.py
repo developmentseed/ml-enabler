@@ -126,11 +126,7 @@ class DownloadAndPredict(object):
             for img in images:
                 img_l.append(self.listencode_image(img))
 
-            instances = [{
-                self.meta.input_name: np.stack(img_l, axis=0)
-            } for img in images]
-
-            instances = instances.tolist()
+            instances = np.stack(img_l, axis=0).tolist()
         else:
             instances = [{
                 self.meta.input_name: dict(b64=self.b64encode_image(img))
