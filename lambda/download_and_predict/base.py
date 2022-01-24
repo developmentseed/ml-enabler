@@ -87,24 +87,19 @@ class DownloadAndPredict(object):
 
     @staticmethod
     def listencode_image(image):
-        with MemoryFile() as memfile:
-            with memfile.open(driver='jpeg', height=512, width=512, count=3, dtype=rasterio.uint8) as dataset:
-                img = np.array(Image.open(io.BytesIO(image)), dtype=np.uint8)
+        img = np.array(Image.open(io.BytesIO(image)), dtype=np.uint8)
 
-                try:
-                    img = img.reshape((256, 256, 3))
-                except ValueError:
-                    img = img.reshape((256, 256, 4))
-                img = img[:, :, :3]
-                img = np.rollaxis(img, 2, 0)
+        try:
+            img = img.reshape((256, 256, 3))
+        except ValueError:
+            img = img.reshape((256, 256, 4))
+        img = img[:, :, :3]
+        img = np.rollaxis(img, 2, 0)
 
-                # Custom
-                img = img * (1/255)
+        # Custom
+        img = img * (1/255)
 
-                dataset.write(img)
-            dataset_b = memfile.read()
-
-        return dataset_b
+        return img
 
     def get_images(self, chips: List[dict]) -> Iterator[Tuple[dict, bytes]]:
         for chip in chips:
@@ -134,6 +129,8 @@ class DownloadAndPredict(object):
             instances = [{
                 self.meta.input_name: np.stack(img_l, axis=0)
             } for img in images]
+
+            instances = instances.tolist()
         else:
             instances = [{
                 self.meta.input_name: dict(b64=self.b64encode_image(img))
