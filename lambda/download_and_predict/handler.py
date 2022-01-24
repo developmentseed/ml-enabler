@@ -29,7 +29,7 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
     chips = dap.get_chips(event)
 
     # Get meta about model to determine model type (Classification vs Object Detection)
-    dap.get_meta()
+    dap.get_meta(inf_type)
 
     # construct a payload for our prediction endpoint
 

@@ -35,12 +35,13 @@ from download_and_predict.custom_types import SQSEvent
 firehose = boto3.client('firehose')
 
 class ModelMeta:
-    def __init__(self, meta):
+    def __init__(self, meta, inf_type):
         inputs = self.meta["metadata"]["signature_def"]["signature_def"]["serving_default"]["inputs"]
-        outputs self.meta["metadata"]["signature_def"]["signature_def"]["serving_default"]["outputs"]
+        outputs = self.meta["metadata"]["signature_def"]["signature_def"]["serving_default"]["outputs"]
 
         # As far as I know there can be only a single named i/o key
         self.raw = meta
+        self.inf_type = inf_type
         self.input_name = inputs.keys()[0]
         self.output_name = outputs.keys()[0]
 
@@ -57,11 +58,11 @@ class DownloadAndPredict(object):
         self.prediction_endpoint = prediction_endpoint
         self.meta = False
 
-    def get_meta(self):
+    def get_meta(self, inf_type: str):
         r = requests.get(self.prediction_endpoint + "/metadata")
         r.raise_for_status()
 
-        self.meta = ModelMeta(r.json())
+        self.meta = ModelMeta(r.json(), inf_type)
 
     @staticmethod
     def get_chips(event: SQSEvent) -> List[str]:
@@ -82,6 +83,27 @@ class DownloadAndPredict(object):
     def b64encode_image(image_binary:bytes) -> str:
         return b64encode(image_binary).decode('utf-8')
 
+    @staticmethod
+    def listencode_image(image):
+        with MemoryFile() as memfile:
+            with memfile.open(driver='jpeg', height=512, width=512, count=3, dtype=rasterio.uint8) as dataset:
+                img = np.array(Image.open(io.BytesIO(image)), dtype=np.uint8)
+
+                try:
+                    img = img.reshape((256, 256, 3))
+                except ValueError:
+                    img = img.reshape((256, 256, 4))
+                img = img[:, :, :3]
+                img = np.rollaxis(img, 2, 0)
+
+                # Custom
+                img = img * (1/255)
+
+                dataset.write(img)
+            dataset_b = memfile.read()
+
+        return dataset_b
+
     def get_images(self, chips: List[dict]) -> Iterator[Tuple[dict, bytes]]:
         for chip in chips:
             print("IMAGE: " + chip.get('url'))
@@ -101,9 +123,19 @@ class DownloadAndPredict(object):
         tiles_and_images = self.get_images(chips)
         tile_indices, images = zip(*tiles_and_images)
 
-        instances = [{
-            self.meta.input_name: dict(b64=self.b64encode_image(img))
-        } for img in images]
+        if self.meta.inf_type == "segmentation":
+            # Hack submit as list for seg - b64 for others - eventually detemine & support both for any inf
+            img_l = [];
+            for img in images:
+                img_l.append(self.listencode_image(img))
+
+            instances = [{
+                self.meta.input_name: np.stack(img_l, axis=0)
+            } for img in images]
+        else:
+            instances = [{
+                self.meta.input_name: dict(b64=self.b64encode_image(img))
+            } for img in images]
 
         payload = {
             "instances": instances
@@ -113,8 +145,7 @@ class DownloadAndPredict(object):
 
     def cl_post_prediction(self, payload: Dict[str, Any], chips: List[dict], inferences: List[str]) -> Dict[str, Any]:
         try:
-            payload = json.dumps(payload)
-            r = requests.post(self.prediction_endpoint + ":predict", data=payload)
+            r = requests.post(self.prediction_endpoint + ":predict", data=json.dumps(payload))
             r.raise_for_status()
 
             preds = r.json()["predictions"]
@@ -145,8 +176,7 @@ class DownloadAndPredict(object):
 
     def seg_post_prediction(self, payload: Dict[str, Any], chips: List[dict], inferences: List[str]) -> Dict[str, Any]:
         try:
-            payload = json.dumps(payload)
-            r = requests.post(self.prediction_endpoint + ":predict", data=payload)
+            r = requests.post(self.prediction_endpoint + ":predict", data=json.dumps(payload))
             r.raise_for_status()
 
             preds = r.json()
