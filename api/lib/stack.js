@@ -120,7 +120,7 @@ class Stack {
                     { ParameterKey: 'MaxSize',          ParameterValue: String(options.max_size) },
                     { ParameterKey: 'MaxConcurrency',   ParameterValue: String(options.max_concurrency) },
                     { ParameterKey: 'InfSupertile',     ParameterValue: options.inf_supertile ? 'True' : 'False' },
-                    { ParameterKey: 'ModelType',     ParameterValue: options.model_type }
+                    { ParameterKey: 'InfType',     ParameterValue: options.inf_type }
                 ],
                 Capabilities: ['CAPABILITY_NAMED_IAM'],
                 OnFailure: 'ROLLBACK'
