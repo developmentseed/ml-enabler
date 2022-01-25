@@ -163,7 +163,7 @@ module.exports = {
                 MemorySize: 512,
                 Runtime: 'python3.8',
                 ReservedConcurrentExecutions: cf.ref('MaxConcurrency'),
-                Timeout: 240,
+                Timeout: 900,
                 Environment: {
                     Variables: {
                         GDAL_DATA: '/opt/share/gdal',
