@@ -125,7 +125,6 @@ class DownloadAndPredict(object):
             for img in images:
                 img_l.append(self.listencode_image(img))
 
-            print('PRE', np.stack(img_l, axis=0).shape)
             instances = np.stack(img_l, axis=0).tolist()
         else:
             instances = [{
@@ -175,21 +174,11 @@ class DownloadAndPredict(object):
             r.raise_for_status()
 
             res = [];
-            print('FULL:', np.argmax(np.array(r.json()['predictions']), axis=-1).shape)
-            for pred in np.argmax(np.array(r.json()['predictions']), axis=-1):
-                img[:,:,0] = pred
-                img[:,:,1] = pred
-                img[:,:,2] = pred
-
-                print('SHAPE:', img.shape)
-                data = Image.fromarray((img * 255).astype(np.uint8))
-
+            for pred in np.argmax(np.array(r.json()['predictions']), axis=-1).astype('uint8'):
                 img_bytes = BytesIO()
-                data.save(img_bytes, 'JPEG')
-
+                Image.fromarray(img).save(img_bytes, 'PNG')
                 res.append(self.b64encode_image(img_bytes))
 
-            print('RES:', res);
             return res
 
         except requests.exceptions.HTTPError as e:
