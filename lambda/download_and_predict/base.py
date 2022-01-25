@@ -176,7 +176,7 @@ class DownloadAndPredict(object):
             res = [];
             for pred in np.argmax(np.array(r.json()['predictions']), axis=-1).astype('uint8'):
                 img_bytes = BytesIO()
-                Image.fromarray(img).save(img_bytes, 'PNG')
+                Image.fromarray(pred).save(img_bytes, 'PNG')
                 res.append(self.b64encode_image(img_bytes))
 
             return res
