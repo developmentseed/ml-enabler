@@ -45,6 +45,15 @@ module.exports = {
             Type: 'String',
             Description: 'Model was trained and should inference on supertiles'
         },
+        InfType: {
+            Type: 'String',
+            Description: 'What type of model is being inferenced'
+        },
+        MemorySize: {
+            Type: 'Number',
+            Default: 512,
+            Description: 'Lambda Memory Limits'
+        },
     },
     Resources: {
         PredSQSAlarn: {
@@ -156,16 +165,17 @@ module.exports = {
                 FunctionName: cf.join([ cf.stackName, '-queue']),
                 Role: cf.importValue(cf.join([cf.ref('StackName'), '-lambda-role'])),
                 Handler: 'download_and_predict.handler.handler',
-                MemorySize: 512,
+                MemorySize: cf.ref('MemorySize'),
                 Runtime: 'python3.8',
                 ReservedConcurrentExecutions: cf.ref('MaxConcurrency'),
-                Timeout: 240,
+                Timeout: 900,
                 Environment: {
                     Variables: {
                         GDAL_DATA: '/opt/share/gdal',
                         PROJ_LIB: '/opt/share/proj',
                         StackName: cf.stackName,
                         INFERENCES: cf.ref('Inferences'),
+                        INF_TYPE: cf.ref('InfType'),
                         INF_SUPERTILE: cf.ref('InfSupertile'),
                         IMAGERY_ID: cf.ref('ImageryId'),
                         PREDICTION_ENDPOINT: cf.join([

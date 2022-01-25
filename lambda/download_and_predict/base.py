@@ -34,9 +34,18 @@ from download_and_predict.custom_types import SQSEvent
 
 firehose = boto3.client('firehose')
 
-class ModelType(Enum):
-    OBJECT_DETECT = 1
-    CLASSIFICATION = 2
+class ModelMeta:
+    def __init__(self, meta, inf_type):
+        self.raw = meta
+
+        inputs = self.raw["metadata"]["signature_def"]["signature_def"]["serving_default"]["inputs"]
+        outputs = self.raw["metadata"]["signature_def"]["signature_def"]["serving_default"]["outputs"]
+
+        # As far as I know there can be only a single named i/o key
+        self.inf_type = inf_type
+
+        self.input_name = list(inputs.keys())[0]
+        self.output_name = list(outputs.keys())[0]
 
 class DownloadAndPredict(object):
     """
@@ -49,23 +58,13 @@ class DownloadAndPredict(object):
 
         self.mlenabler_endpoint = mlenabler_endpoint
         self.prediction_endpoint = prediction_endpoint
-        self.meta = {}
+        self.meta = False
 
-    def get_meta(self) -> ModelType:
+    def get_meta(self, inf_type: str):
         r = requests.get(self.prediction_endpoint + "/metadata")
         r.raise_for_status()
 
-        self.meta = r.json()
-
-        inputs = self.meta["metadata"]["signature_def"]["signature_def"]["serving_default"]["inputs"]
-
-        # Object Detection Model
-        if inputs.get("inputs") is not None:
-            return ModelType.OBJECT_DETECT
-
-        # Chip Classification Model
-        else:
-            return ModelType.CLASSIFICATION
+        self.meta = ModelMeta(r.json(), inf_type)
 
     @staticmethod
     def get_chips(event: SQSEvent) -> List[str]:
@@ -86,13 +85,28 @@ class DownloadAndPredict(object):
     def b64encode_image(image_binary:bytes) -> str:
         return b64encode(image_binary).decode('utf-8')
 
+    @staticmethod
+    def listencode_image(image):
+        img = np.array(Image.open(io.BytesIO(image)), dtype=np.uint8)
+
+        try:
+            img = img.reshape((256, 256, 3))
+        except ValueError:
+            img = img.reshape((256, 256, 4))
+        img = img[:, :, :3]
+
+        # Custom
+        img = img * (1/255)
+
+        return img
+
     def get_images(self, chips: List[dict]) -> Iterator[Tuple[dict, bytes]]:
         for chip in chips:
             print("IMAGE: " + chip.get('url'))
             r = requests.get(chip.get('url'))
             yield (chip, r.content)
 
-    def get_prediction_payload(self, chips: List[dict], model_type: ModelType) -> Tuple[List[dict], Dict[str, Any]]:
+    def get_prediction_payload(self, chips: List[dict]) -> Tuple[List[dict], Dict[str, Any]]:
         """
         chps: list image tilesk
         imagery: str an imagery API endpoint with three variables {z}/{x}/{y} to replace
@@ -104,11 +118,18 @@ class DownloadAndPredict(object):
 
         tiles_and_images = self.get_images(chips)
         tile_indices, images = zip(*tiles_and_images)
-        instances = []
-        if model_type == ModelType.CLASSIFICATION:
-            instances = [dict(image_bytes=dict(b64=self.b64encode_image(img))) for img in images]
+
+        if self.meta.inf_type == "segmentation":
+            # Hack submit as list for seg - b64 for others - eventually detemine & support both for any inf
+            img_l = [];
+            for img in images:
+                img_l.append(self.listencode_image(img))
+
+            instances = np.stack(img_l, axis=0).tolist()
         else:
-            instances = [dict(inputs=dict(b64=self.b64encode_image(img))) for img in images]
+            instances = [{
+                self.meta.input_name: dict(b64=self.b64encode_image(img))
+            } for img in images]
 
         payload = {
             "instances": instances
@@ -118,8 +139,7 @@ class DownloadAndPredict(object):
 
     def cl_post_prediction(self, payload: Dict[str, Any], chips: List[dict], inferences: List[str]) -> Dict[str, Any]:
         try:
-            payload = json.dumps(payload)
-            r = requests.post(self.prediction_endpoint + ":predict", data=payload)
+            r = requests.post(self.prediction_endpoint + ":predict", data=json.dumps(payload))
             r.raise_for_status()
 
             preds = r.json()["predictions"]
@@ -145,6 +165,28 @@ class DownloadAndPredict(object):
                 pred_list.append(body)
 
             return pred_list
+        except requests.exceptions.HTTPError as e:
+            print (e.response.text)
+
+    def seg_post_prediction(self, payload: Dict[str, Any], chips: List[dict]) -> Dict[str, Any]:
+        try:
+            r = requests.post(self.prediction_endpoint + ":predict", data=json.dumps(payload))
+            r.raise_for_status()
+
+            res = [];
+            preds = np.argmax(np.array(r.json()['predictions']), axis=-1).astype('uint8')
+
+            for i in range(len(preds)):
+                img_bytes = BytesIO()
+                Image.fromarray(preds[i]).save(img_bytes, 'PNG')
+                res.append({
+                    "type": "Image",
+                    "submission_id": chips[i].get('submission'),
+                    "image": self.b64encode_image(img_bytes.getvalue())
+                })
+
+            return res
+
         except requests.exceptions.HTTPError as e:
             print (e.response.text)
 

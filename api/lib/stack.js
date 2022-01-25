@@ -105,6 +105,11 @@ class Stack {
             const image = `project-${pid}-iteration-${iterationid}`;
             const stack_name = `${process.env.StackName}-${image}`;
 
+            let memory_size = 512;
+            if (inf_type === 'segmentation') {
+                memory_size = 1024;
+            }
+
             await cf.createStack({
                 StackName: stack_name,
                 TemplateBody: JSON.stringify(template),
@@ -119,7 +124,9 @@ class Stack {
                     { ParameterKey: 'ImageryId',        ParameterValue: String(options.imagery_id) },
                     { ParameterKey: 'MaxSize',          ParameterValue: String(options.max_size) },
                     { ParameterKey: 'MaxConcurrency',   ParameterValue: String(options.max_concurrency) },
-                    { ParameterKey: 'InfSupertile',     ParameterValue: options.inf_supertile ? 'True' : 'False' }
+                    { ParameterKey: 'InfSupertile',     ParameterValue: options.inf_supertile ? 'True' : 'False' },
+                    { ParameterKey: 'InfType',          ParameterValue: options.inf_type },
+                    { ParameterKey: 'MemorySize',       ParameterValue: memory_size }
                 ],
                 Capabilities: ['CAPABILITY_NAMED_IAM'],
                 OnFailure: 'ROLLBACK'
