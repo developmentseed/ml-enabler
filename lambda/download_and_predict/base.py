@@ -125,6 +125,7 @@ class DownloadAndPredict(object):
             for img in images:
                 img_l.append(self.listencode_image(img))
 
+            print('PRE', np.stack(img_l, axis=0).shape)
             instances = np.stack(img_l, axis=0).tolist()
         else:
             instances = [{
