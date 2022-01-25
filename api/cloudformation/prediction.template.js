@@ -49,6 +49,11 @@ module.exports = {
             Type: 'String',
             Description: 'What type of model is being inferenced'
         },
+        MemorySize: {
+            Type: 'Number',
+            Default: 512,
+            Description: 'Lambda Memory Limits'
+        },
     },
     Resources: {
         PredSQSAlarn: {
@@ -160,7 +165,7 @@ module.exports = {
                 FunctionName: cf.join([ cf.stackName, '-queue']),
                 Role: cf.importValue(cf.join([cf.ref('StackName'), '-lambda-role'])),
                 Handler: 'download_and_predict.handler.handler',
-                MemorySize: 512,
+                MemorySize: cf.ref('MemorySize'),
                 Runtime: 'python3.8',
                 ReservedConcurrentExecutions: cf.ref('MaxConcurrency'),
                 Timeout: 900,
