@@ -174,9 +174,11 @@ class DownloadAndPredict(object):
             r.raise_for_status()
 
             res = [];
+
+            print('FULL:', np.argmax(np.array(r.json()['predictions']), axis=-1).shape)
             for pred in np.argmax(np.array(r.json()['predictions']), axis=-1):
                 print('SHAPE:', pred.shape)
-                data = Image.fromarray(pred)
+                data = Image.fromarray((pred * 255).astype(np.uint8))
 
                 img_bytes = BytesIO()
                 data.save(img_bytes, 'JPEG')
