@@ -174,10 +174,16 @@ class DownloadAndPredict(object):
             r.raise_for_status()
 
             res = [];
-            for pred in np.argmax(np.array(r.json()['predictions']), axis=-1).astype('uint8'):
+            preds = np.argmax(np.array(r.json()['predictions']), axis=-1).astype('uint8')
+
+            for i in range(len(preds)):
                 img_bytes = BytesIO()
-                Image.fromarray(pred).save(img_bytes, 'PNG')
-                res.append(self.b64encode_image(img_bytes.getvalue()))
+                Image.fromarray(preds[i]).save(img_bytes, 'PNG')
+                res.append({
+                    "type": "Image",
+                    "submission_id": chips[i].get('submission'),
+                    "image": self.b64encode_image(img_bytes.getvalue())
+                })
 
             return res
 
