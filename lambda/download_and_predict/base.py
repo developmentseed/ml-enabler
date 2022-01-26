@@ -181,6 +181,9 @@ class DownloadAndPredict(object):
                 Image.fromarray(preds[i]).save(img_bytes, 'PNG')
                 res.append({
                     "type": "Image",
+                    "x": chips[i].get("x"),
+                    "y": chips[i].get("y"),
+                    "z": chips[i].get("z"),
                     "submission_id": chips[i].get('submission'),
                     "image": self.b64encode_image(img_bytes.getvalue())
                 })
