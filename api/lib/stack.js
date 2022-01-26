@@ -106,7 +106,7 @@ class Stack {
             const stack_name = `${process.env.StackName}-${image}`;
 
             let memory_size = 512;
-            if (inf_type === 'segmentation') {
+            if (options.inf_type === 'segmentation') {
                 memory_size = 1024;
             }
 
@@ -126,7 +126,7 @@ class Stack {
                     { ParameterKey: 'MaxConcurrency',   ParameterValue: String(options.max_concurrency) },
                     { ParameterKey: 'InfSupertile',     ParameterValue: options.inf_supertile ? 'True' : 'False' },
                     { ParameterKey: 'InfType',          ParameterValue: options.inf_type },
-                    { ParameterKey: 'MemorySize',       ParameterValue: memory_size }
+                    { ParameterKey: 'MemorySize',       ParameterValue: String(memory_size) }
                 ],
                 Capabilities: ['CAPABILITY_NAMED_IAM'],
                 OnFailure: 'ROLLBACK'
