@@ -106,7 +106,7 @@ class Stack {
             const stack_name = `${process.env.StackName}-${image}`;
 
             let memory_size = 512;
-            if (inf_type === 'segmentation') {
+            if (options.inf_type === 'segmentation') {
                 memory_size = 1024;
             }
 
