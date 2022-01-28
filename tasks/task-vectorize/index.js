@@ -74,6 +74,14 @@ class Task {
             }).promise();
         }
     }
+
+    /**
+     * Sniff the first line of a line delimited GeoJSON file and determine
+     * if it contains B64 encoded images or Features
+     */
+    static async determine() {
+
+    }
 }
 
 if (require.main === module) {
