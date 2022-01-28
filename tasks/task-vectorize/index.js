@@ -33,28 +33,16 @@ class Task {
             throw new Error('If opts.bucket is set, opts.<project, iteration, submission> must be also');
         }
 
-        if (!opts.silent) console.error(`ok - writing to: ${opts.tmp}`);
+        const type = await Task.#sniff(input);
 
-        await tippecanoe.tile(
-            fs.createReadStream(input),
-            path.resolve(opts.tmp, 'fabric.mbtiles'),
-            {
-                layer: 'data',
-                std: !!opts.silent,
-                force: true,
-                name: `Project ${opts.project} - Iteration ${opts.iteration} - Submission ${opts.submission}`,
-                attribution: `Project ${opts.project} - Iteration ${opts.iteration} - Submission ${opts.submission}`,
-                description: `Project ${opts.project} - Iteration ${opts.iteration} - Submission ${opts.submission}`,
-                limit: {
-                    features: false,
-                    size: false
-                },
-                zoom: {
-                    max: 15,
-                    min: 10
-                }
-            }
-        );
+        if (type === 'Feature') {
+            await Task.#feature(input, opts);
+        } else {
+            throw new Error('Unsupported File Type');
+        }
+
+
+        if (!opts.silent) console.error(`ok - writing to: ${opts.tmp}`);
 
         await TileBase.to_tb(
             path.resolve(opts.tmp, 'fabric.mbtiles'),
@@ -75,12 +63,35 @@ class Task {
         }
     }
 
+    static async #feature(input, opts) {
+        await tippecanoe.tile(
+            fs.createReadStream(input),
+            path.resolve(opts.tmp, 'fabric.mbtiles'),
+            {
+                layer: 'data',
+                std: !!opts.silent,
+                force: true,
+                name: `Project ${opts.project} - Iteration ${opts.iteration} - Submission ${opts.submission}`,
+                attribution: `Project ${opts.project} - Iteration ${opts.iteration} - Submission ${opts.submission}`,
+                description: `Project ${opts.project} - Iteration ${opts.iteration} - Submission ${opts.submission}`,
+                limit: {
+                    features: false,
+                    size: false
+                },
+                zoom: {
+                    max: 15,
+                    min: 10
+                }
+            }
+        );
+    }
+
     /**
      * Sniff the first line of a line delimited GeoJSON file and determine
      * if it contains B64 encoded images or Features
      */
-    static async determine() {
-
+    static async #sniff() {
+        return 'Feature';
     }
 }
 

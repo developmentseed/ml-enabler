@@ -5,7 +5,7 @@ const os = require('os');
 const Task = require('..');
 const AWS = require('@mapbox/mock-aws-sdk-js');
 
-test('vector', async (t) => {
+test('Feature', async (t) => {
     AWS.stub('S3', 'putObject', function(params) {
         t.equals(params.Bucket, 's3-bucket');
         t.equals(params.ContentType, 'application/octet-stream');
