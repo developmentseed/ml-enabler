@@ -85,17 +85,12 @@ class Task {
 }
 
 if (require.main === module) {
-    const PROJECT = process.env.PROJECT_ID;
-    const ITERATION = process.env.ITERATION_ID;
-    const SUBMISSION = process.env.SUBMISSION_ID;
-    const ASSET_BUCKET = process.env.ASSET_BUCKET;
-
     Task.vectorize(path.resolve(__dirname, './data/input.geojson'), {
         silent: false,
-        bucket: ASSET_BUCKET,
-        project: PROJECT,
-        iteration: ITERATION,
-        submission: SUBMISSION
+        bucket: process.env.ASSET_BUCKET,
+        project: process.env.PROJECT_ID,
+        iteration: process.env.ITERATION_ID,
+        submission: process.env.SUBMISSION_ID
     });
 }
 
