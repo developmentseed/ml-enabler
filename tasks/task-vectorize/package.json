@@ -12,6 +12,7 @@
     "license": "ISC",
     "dependencies": {
         "aws-sdk": "^2.1039.0",
+        "randomcolor": "^0.6.2",
         "tilebase": "^1.5.0"
     },
     "devDependencies": {
