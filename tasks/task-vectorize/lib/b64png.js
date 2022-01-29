@@ -1,7 +1,7 @@
 const fs = require('fs');
-const fsp = require('fs/promises');
 const path = require('path');
 const RL = require('readline');
+const MBTiles = require('./mbtiles');
 
 /**
  * @class
@@ -11,6 +11,8 @@ class B64PNG {
         const rl = RL.createInterface({
             input: fs.createReadStream(input)
         });
+
+        const mbtiles = await MBTiles.create(path.resolve(opts.tmp, `fabric.mbtiles`));
 
         for await (let line of rl) {
             try {
@@ -22,8 +24,6 @@ class B64PNG {
 
             const png = new Buffer.from(line.image, 'base64');
 
-            console.error(line);
-            await fsp.writeFile(path.resolve(opts.tmp, `${line.z}-${line.x}-${line.y}.png`), png);
         }
     }
 }
