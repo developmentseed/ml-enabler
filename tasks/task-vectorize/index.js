@@ -4,8 +4,8 @@ const path = require('path');
 const fs = require('fs');
 const TileBase = require('tilebase');
 const Tippecanoe = require('./lib/tippecanoe');
-
-const tippecanoe = new Tippecanoe();
+const B64PNG = require('./lib/b64png.js');
+const RL = require('readline');
 
 /**
  * @class
@@ -37,6 +37,8 @@ class Task {
 
         if (type === 'Feature') {
             await Task.#feature(input, opts);
+        } else if (type === 'Image') {
+            await Task.#image(input, opts);
         } else {
             throw new Error('Unsupported File Type');
         }
@@ -63,7 +65,13 @@ class Task {
         }
     }
 
+    static async #image(input, opts) {
+        await B64PNG.convert(input);
+    }
+
     static async #feature(input, opts) {
+        const tippecanoe = new Tippecanoe();
+
         await tippecanoe.tile(
             fs.createReadStream(input),
             path.resolve(opts.tmp, 'fabric.mbtiles'),
@@ -90,8 +98,29 @@ class Task {
      * Sniff the first line of a line delimited GeoJSON file and determine
      * if it contains B64 encoded images or Features
      */
-    static async #sniff() {
-        return 'Feature';
+    static #sniff(input) {
+        return new Promise((resolve, reject) => {
+            let type = false;
+
+            const rl = RL.createInterface({
+                input: fs.createReadStream(input)
+            }).on('line', (line) => {
+                try {
+                    line = JSON.parse(line);
+                } catch (err) {
+                    type = false;
+                }
+                if (['Image', 'Feature'].includes(line.type)) {
+                    type = line.type;
+                }
+
+                rl.close();
+
+                return resolve(type);
+            }).on('error', (err) => {
+                return reject(err);
+            });
+        });
     }
 }
 
