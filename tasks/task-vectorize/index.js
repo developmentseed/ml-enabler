@@ -66,7 +66,7 @@ class Task {
     }
 
     static async #image(input, opts) {
-        await B64PNG.convert(input);
+        await B64PNG.convert(input, opts);
     }
 
     static async #feature(input, opts) {
