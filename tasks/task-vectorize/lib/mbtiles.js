@@ -7,7 +7,7 @@ class MBTiles {
 
     static create(input) {
         return new Promise((resolve, reject) => {
-            new MBTiles(`${input}?mode=rwc`, (err, mbtiles) => {
+            new MBT(input, (err, mbtiles) => {
                 if (err) return reject(err);
                 return resolve(new MBTiles(mbtiles));
             });
@@ -18,7 +18,7 @@ class MBTiles {
         return new Promise((resolve, reject) => {
             this.mbtiles.putInfo(data, (err) => {
                 if (err) return reject(err);
-                return resolve();
+                return resolve(true);
             });
         });
     }
@@ -27,7 +27,7 @@ class MBTiles {
         return new Promise((resolve, reject) => {
             this.mbtiles.putTile(z, x, y, buffer, (err) => {
                 if (err) return reject(err);
-                return resolve();
+                return resolve(true);
             });
         });
     }
@@ -36,7 +36,7 @@ class MBTiles {
         return new Promise((resolve, reject) => {
             this.mbtiles.startWriting((err) => {
                 if (err) return reject(err);
-                return resolve();
+                return resolve(true);
             });
         });
     }
@@ -45,7 +45,7 @@ class MBTiles {
         return new Promise((resolve, reject) => {
             this.mbtiles.stopWriting((err) => {
                 if (err) return reject(err);
-                return resolve();
+                return resolve(true);
             });
         });
     }
