@@ -17,7 +17,7 @@ class BBox {
     constructor(opts = {}) {
 
         this.zoom = opts.zoom || null;
-        this.bbox = [null, null, null, null];
+        this.bbox = null; // [w, s, e, n]
         this.tiles = 0;
 
         this.minzoom = null;
@@ -37,10 +37,14 @@ class BBox {
         if (isNaN(parseInt(y))) throw new Error('y param must be integer');
         if (this.zoom && z !== this.zoom) throw new Error(`Zoom is not the enforced z${this.zoom}`);
 
-        if (z < this.minzoom) this.minzoom = z;
-        if (z > this.maxzoom) this.maxzoom = z;
+        if (this.minzoom === null || z < this.minzoom) this.minzoom = z;
+        if (this.maxzoom === null || z > this.maxzoom) this.maxzoom = z;
 
         this.tiles++;
+
+        if (this.bbox === null) {
+            this.bbox = sm.bbox(x, y, z);
+        }
     }
 }
 
