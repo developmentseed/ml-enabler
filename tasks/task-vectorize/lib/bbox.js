@@ -53,11 +53,11 @@ class BBox {
 
         const n = sm.bbox(x, y, z);
 
-        if (n[0] < this.bbox[0]) this.bbox[0] = n[0]
-        if (n[2] > this.bbox[2]) this.bbox[2] = n[2]
+        if (n[0] < this.bbox[0]) this.bbox[0] = n[0];
+        if (n[2] > this.bbox[2]) this.bbox[2] = n[2];
 
-        if (n[1] < this.bbox[1]) this.bbox[1] = n[1]
-        if (n[3] > this.bbox[3]) this.bbox[3] = n[3]
+        if (n[1] < this.bbox[1]) this.bbox[1] = n[1];
+        if (n[3] > this.bbox[3]) this.bbox[3] = n[3];
 
         return this.bbox;
     }
