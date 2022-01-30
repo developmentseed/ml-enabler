@@ -1,5 +1,6 @@
+'use strict';
 const SM = require('@mapbox/sphericalmercator');
-const sm = new SphericalMercator({
+const sm = new SM({
     size: 256,
     antimeridian: true
 });
@@ -16,7 +17,7 @@ class BBox {
     constructor(opts = {}) {
 
         this.zoom = opts.zoom || null;
-        this.bbox = [null, null, null, null]
+        this.bbox = [null, null, null, null];
         this.tiles = 0;
 
         this.minzoom = null;
@@ -25,6 +26,10 @@ class BBox {
 
     /**
      * Add a tile to the bbox, adjusting the bbox as necessaryt
+     *
+     * @param {number}  z   Z Tile Coordinate
+     * @param {number}  x   X Tile Coordinate
+     * @param {number}  y   Y Tile Coordinate
      */
     tile(z, x, y) {
         if (isNaN(parseInt(z))) throw new Error('z param must be integer');
@@ -38,3 +43,5 @@ class BBox {
         this.tiles++;
     }
 }
+
+module.exports = BBox;

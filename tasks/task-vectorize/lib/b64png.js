@@ -1,3 +1,4 @@
+'use strict';
 const fs = require('fs');
 const path = require('path');
 const RL = require('readline');
@@ -9,9 +10,9 @@ const BBox = require('./bbox');
  */
 class B64PNG {
     static async convert(input, opts) {
-        const bbox = new BBOX();
+        const bbox = new BBox();
 
-        const mbtiles = await MBTiles.create(path.resolve(opts.tmp, `fabric.mbtiles`));
+        const mbtiles = await MBTiles.create(path.resolve(opts.tmp, 'fabric.mbtiles'));
         await mbtiles.startWriting();
 
         const rl = RL.createInterface({
@@ -28,7 +29,7 @@ class B64PNG {
 
             const png = new Buffer.from(line.image, 'base64');
 
-            bbox.tile(line.z, line.x, liny.y);
+            bbox.tile(line.z, line.x, line.y);
 
             await mbtiles.putTile(line.z, line.x, line.y, png);
         }

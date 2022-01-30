@@ -97,6 +97,9 @@ class Task {
     /**
      * Sniff the first line of a line delimited GeoJSON file and determine
      * if it contains B64 encoded images or Features
+     *
+     * @param {string}  input   Input Path
+     * @return {string}         "Image" / "Feature"
      */
     static #sniff(input) {
         return new Promise((resolve, reject) => {

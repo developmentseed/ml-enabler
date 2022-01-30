@@ -5,11 +5,14 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "lint": "eslint index.js 'test/**/*.js'",
+        "lint": "eslint index.js 'test/**/*.js' 'lib/**/*.js'",
         "test": "tape test/**.test.js"
     },
     "author": "Nick Ingalls <nick@ingalls.ca>",
     "license": "ISC",
+    "engines": {
+        "node": ">= 16.0.0"
+    },
     "dependencies": {
         "@mapbox/mbtiles": "^0.12.1",
         "@mapbox/sphericalmercator": "^1.2.0",
