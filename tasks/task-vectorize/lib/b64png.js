@@ -5,6 +5,8 @@ const RL = require('readline');
 const MBTiles = require('./mbtiles');
 const BBox = require('./bbox');
 const PNG = require('fast-png');
+const colour = require('randomcolor');
+const { Image } = require('image-js');
 
 /**
  * @class
@@ -28,11 +30,20 @@ class B64PNG {
                 continue;
             }
 
-            const png = PNG.decode(new Buffer.from(line.image, 'base64'));
-
             bbox.tile(line.z, line.x, line.y);
 
-            await mbtiles.putTile(line.z, line.x, line.y, Buffer.from(PNG.encode(png)));
+
+            let png = PNG.decode(new Buffer.from(line.image, 'base64'));
+            png.palette = new Array(256).fill(
+                colour({ format: 'rgb' })
+                    .replace(/(rgb\(|\)|\s)/g, '')
+                    .split(',')
+                    .map(e => parseInt(e))
+            );
+
+            png = exportPNG(loadPNGFromPalette(png));
+
+            await mbtiles.putTile(line.z, line.x, line.y, Buffer.from(png));
         }
 
         await mbtiles.putInfo({
@@ -49,5 +60,62 @@ class B64PNG {
         await mbtiles.stopWriting();
     }
 }
+
+// Internal Export FN
+// https://github.com/image-js/image-js/blob/675bafe1ec5f78d2d5d36df67e14e254d27a1f2d/src/image/core/export.js#L25-L41
+// Can't find a way to export to Buffer
+function exportPNG(image, options = {}) {
+    const data = {
+        width: image.width,
+        height: image.height,
+        channels: image.channels,
+        depth: image.bitDepth,
+        data: image.data,
+    };
+
+    if (data.depth === 1 || data.depth === 32) {
+        data.depth = 8;
+        data.channels = 4;
+        data.data = image.getRGBAData();
+    }
+
+    return PNG.encode(data, options);
+}
+
+function loadPNGFromPalette(png) {
+    const pixels = png.width * png.height;
+    const channels = png.palette[0].length;
+    const data = new Uint8Array(pixels * channels);
+    const pixelsPerByte = 8 / png.depth;
+    const factor = png.depth < 8 ? pixelsPerByte : 1;
+    const mask = parseInt('1'.repeat(png.depth), 2);
+    const hasAlpha = channels === 4;
+    let dataIndex = 0;
+
+    for (let i = 0; i < pixels; i++) {
+        const index = Math.floor(i / factor);
+        let value = png.data[index];
+        if (png.depth < 8) {
+            value =
+                (value >>> (png.depth * (pixelsPerByte - 1 - (i % pixelsPerByte)))) &
+                mask;
+        }
+        const paletteValue = png.palette[value];
+        data[dataIndex++] = paletteValue[0];
+        data[dataIndex++] = paletteValue[1];
+        data[dataIndex++] = paletteValue[2];
+
+        if (hasAlpha) {
+            data[dataIndex++] = paletteValue[3];
+        }
+    }
+
+    return new Image(png.width, png.height, data, {
+        components: 3,
+        alpha: hasAlpha,
+        bitDepth: 8,
+    });
+}
+
 
 module.exports = B64PNG;

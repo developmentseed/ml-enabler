@@ -20,6 +20,7 @@
         "@turf/centroid": "^6.5.0",
         "aws-sdk": "^2.1039.0",
         "fast-png": "^6.1.0",
+        "image-js": "^0.33.1",
         "randomcolor": "^0.6.2",
         "tilebase": "^1.5.0"
     },
