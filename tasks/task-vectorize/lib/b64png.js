@@ -10,9 +10,24 @@ const { Image } = require('image-js');
 
 /**
  * @class
+ *
+ * @param {Array} Palette
  */
 class B64PNG {
-    static async convert(input, opts) {
+    constructor(palette) {
+        if (palette) {
+            this.palette = palette;
+        } else {
+            this.palette = new Array(256).fill(
+                colour({ format: 'rgb' })
+                    .replace(/(rgb\(|\)|\s)/g, '')
+                    .split(',')
+                    .map(e => parseInt(e))
+            );
+        }
+    }
+
+    async convert(input, opts) {
         const bbox = new BBox();
 
         const mbtiles = await MBTiles.create(path.resolve(opts.tmp, 'fabric.mbtiles'));
@@ -34,12 +49,7 @@ class B64PNG {
 
 
             let png = PNG.decode(new Buffer.from(line.image, 'base64'));
-            png.palette = new Array(256).fill(
-                colour({ format: 'rgb' })
-                    .replace(/(rgb\(|\)|\s)/g, '')
-                    .split(',')
-                    .map(e => parseInt(e))
-            );
+            png.palette = this.palette;
 
             png = exportPNG(loadPNGFromPalette(png));
 
