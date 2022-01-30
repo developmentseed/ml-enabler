@@ -4,6 +4,7 @@ const path = require('path');
 const RL = require('readline');
 const MBTiles = require('./mbtiles');
 const BBox = require('./bbox');
+const PNG = require('fast-png');
 
 /**
  * @class
@@ -27,11 +28,11 @@ class B64PNG {
                 continue;
             }
 
-            const png = new Buffer.from(line.image, 'base64');
+            const png = PNG.decode(new Buffer.from(line.image, 'base64'));
 
             bbox.tile(line.z, line.x, line.y);
 
-            await mbtiles.putTile(line.z, line.x, line.y, png);
+            await mbtiles.putTile(line.z, line.x, line.y, Buffer.from(PNG.encode(png)));
         }
 
         await mbtiles.putInfo({
