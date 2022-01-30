@@ -1,5 +1,7 @@
 'use strict';
 const SM = require('@mapbox/sphericalmercator');
+const bboxPolygon = require('@turf/bbox-polygon').default;
+const centroid = require('@turf/centroid').default;
 const sm = new SM({
     size: 256,
     antimeridian: true
@@ -30,6 +32,8 @@ class BBox {
      * @param {number}  z   Z Tile Coordinate
      * @param {number}  x   X Tile Coordinate
      * @param {number}  y   Y Tile Coordinate
+     *
+     * @returns {Number[]}  Current BBox
      */
     tile(z, x, y) {
         if (isNaN(parseInt(z))) throw new Error('z param must be integer');
@@ -44,7 +48,24 @@ class BBox {
 
         if (this.bbox === null) {
             this.bbox = sm.bbox(x, y, z);
+            return this.bbox;
         }
+
+        const n = sm.bbox(x, y, z);
+
+        if (n[0] < this.bbox[0]) this.bbox[0] = n[0]
+        if (n[2] > this.bbox[2]) this.bbox[2] = n[2]
+
+        if (n[1] < this.bbox[1]) this.bbox[1] = n[1]
+        if (n[3] > this.bbox[3]) this.bbox[3] = n[3]
+
+        return this.bbox;
+    }
+
+    center() {
+        if (this.bbox === null) throw new Error('Tiles have not been added to bbox, bbox is null');
+
+        return centroid(bboxPolygon(this.bbox));
     }
 }
 
