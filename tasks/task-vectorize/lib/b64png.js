@@ -41,7 +41,8 @@ class B64PNG {
             version: 2,
             minzoom: bbox.minzoom,
             maxzoom: bbox.maxzoom,
-            center: bbox.center()
+            bounds: bbox.bbox.join(','),
+            center: bbox.center().concat([bbox.maxzoom]).join(',')
         });
 
         await mbtiles.stopWriting();

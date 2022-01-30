@@ -65,7 +65,7 @@ class BBox {
     center() {
         if (this.bbox === null) throw new Error('Tiles have not been added to bbox, bbox is null');
 
-        return centroid(bboxPolygon(this.bbox));
+        return centroid(bboxPolygon(this.bbox)).geometry.coordinates;
     }
 }
 
