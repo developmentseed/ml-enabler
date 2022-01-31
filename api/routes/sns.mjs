@@ -1,11 +1,10 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const AWS = require('aws-sdk');
-const express = require('express');
-const Task = require('../lib/project/iteration/task');
-const Stack = require('../lib/stack');
-const Submission = require('../lib/project/iteration/submission');
-const MessageValidator = require('sns-validator');
+import { Err } from '@openaddresses/batch-schema';
+import AWS from 'aws-sdk';
+import express from 'express';
+import Task from '../lib/project/iteration/task.js';
+import Stack from '../lib/stack.js';
+import Submission from '../lib/project/iteration/submission.js';
+import MessageValidator from 'sns-validator';
 
 const SNS = new AWS.SNS({
     region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
@@ -124,4 +123,4 @@ async function router(schema, config) {
     });
 }
 
-module.exports = router;
+export default router;
