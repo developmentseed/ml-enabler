@@ -1,11 +1,13 @@
 'use strict';
-const AWS = require('aws-sdk');
-const path = require('path');
-const fs = require('fs');
-const TileBase = require('tilebase');
-const Tippecanoe = require('./lib/tippecanoe');
-const B64PNG = require('./lib/b64png.js');
-const RL = require('readline');
+import { fileURLToPath } from 'url';
+import process from 'process';
+import AWS from 'aws-sdk';
+import path from 'path';
+import fs from 'fs';
+import TileBase from 'tilebase';
+import Tippecanoe from './lib/tippecanoe.js';
+import B64PNG from './lib/b64png.js';
+import RL from 'readline';
 
 /**
  * @class
@@ -25,7 +27,7 @@ class Task {
      * @param {boolean} [opts.silent=false] Should output be squelched
      */
     static async vectorize(input, opts = {}) {
-        if (!opts.tmp) opts.tmp = path.resolve(__dirname, './data/');
+        if (!opts.tmp) opts.tmp = new URL('./data/', import.meta.url).pathname;
         if (!opts.silent) opts.silent = false;
         if (!opts.bucket) {
             opts.bucket = false;
@@ -128,8 +130,8 @@ class Task {
     }
 }
 
-if (require.main === module) {
-    Task.vectorize(path.resolve(__dirname, './data/input.geojson'), {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+    Task.vectorize(new URL('./data/input.geojson', import.meta.url).pathname, {
         silent: false,
         bucket: process.env.ASSET_BUCKET,
         project: process.env.PROJECT_ID,
@@ -138,4 +140,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = Task;
+export default Task;

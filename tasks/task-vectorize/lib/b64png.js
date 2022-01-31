@@ -1,12 +1,12 @@
 'use strict';
-const fs = require('fs');
-const path = require('path');
-const RL = require('readline');
-const MBTiles = require('./mbtiles');
-const BBox = require('./bbox');
-const PNG = require('fast-png');
-const colour = require('randomcolor');
-const { Image } = require('image-js');
+import fs from 'fs';
+import path from 'path';
+import RL from 'readline';
+import MBTiles from './mbtiles.js';
+import BBox from './bbox.js';
+import PNG from 'fast-png';
+import colour from 'randomcolor';
+import { Image } from 'image-js';
 
 /**
  * @class
@@ -18,12 +18,12 @@ class B64PNG {
         if (palette) {
             this.palette = palette;
         } else {
-            this.palette = new Array(256).fill(
-                colour({ format: 'rgb' })
+            this.palette = new Array(256).fill().map(() => {
+                return colour({ format: 'rgb' })
                     .replace(/(rgb\(|\)|\s)/g, '')
                     .split(',')
-                    .map(e => parseInt(e))
-            );
+                    .map((e) => parseInt(e))
+            });
         }
     }
 
@@ -80,7 +80,7 @@ function exportPNG(image, options = {}) {
         height: image.height,
         channels: image.channels,
         depth: image.bitDepth,
-        data: image.data,
+        data: image.data
     };
 
     if (data.depth === 1 || data.depth === 32) {
@@ -123,9 +123,9 @@ function loadPNGFromPalette(png) {
     return new Image(png.width, png.height, data, {
         components: 3,
         alpha: hasAlpha,
-        bitDepth: 8,
+        bitDepth: 8
     });
 }
 
 
-module.exports = B64PNG;
+export default B64PNG;

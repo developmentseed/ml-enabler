@@ -1,9 +1,8 @@
 'use strict';
-const test = require('tape');
-const path = require('path');
-const os = require('os');
-const Task = require('..');
-const AWS = require('@mapbox/mock-aws-sdk-js');
+import test from 'tape';
+import os from 'os';
+import Task from '../index.js';
+import AWS from '@mapbox/mock-aws-sdk-js';
 
 test('Feature', async (t) => {
     AWS.stub('S3', 'putObject', function(params) {
@@ -16,7 +15,7 @@ test('Feature', async (t) => {
     });
 
     try {
-        await Task.vectorize(path.resolve(__dirname, './fixtures/feature.json'), {
+        await Task.vectorize(new URL('./fixtures/feature.json', import.meta.url).pathname, {
             tmp: os.tmpdir(),
             bucket: 's3-bucket',
             project: 1,
@@ -27,5 +26,6 @@ test('Feature', async (t) => {
         t.error(err);
     }
 
+    AWS.S3.restore();
     t.end();
 });

@@ -1,5 +1,5 @@
 'use strict';
-const MBT = require('@mapbox/mbtiles');
+import MBT from '@mapbox/mbtiles';
 
 class MBTiles {
     constructor(mbtiles) {
@@ -52,4 +52,4 @@ class MBTiles {
     }
 }
 
-module.exports = MBTiles;
+export default MBTiles;
