@@ -104,7 +104,7 @@ async function router(schema, config) {
     });
 
     /**
-     * @api {get} /api/project/:pid/iteration/:iterationid/submission/:subid/tiles/:z/:x/:y.mvt Vector Tile
+     * @api {get} /api/project/:pid/iteration/:iterationid/submission/:subid/tiles/:z/:x/:y.:format Tile
      * @apiVersion 1.0.0
      * @apiName VectorTileSubmission
      * @apiGroup Submissions
@@ -119,15 +119,22 @@ async function router(schema, config) {
         ':subid': 'integer',
         ':z': 'integer',
         ':x': 'integer',
-        ':y': 'integer'
+        ':y': 'integer',
+        ':format': 'string'
     }, async (req, res) => {
         try {
             req.auth = req.token;
 
             await user.is_auth(req);
 
-            const encodings = req.headers['accept-encoding'].split(',').map((e) => e.trim());
-            if (!encodings.includes('gzip')) throw new Err(400, null, 'Accept-Encoding must include gzip');
+            if (!['mvt', 'png'].includes(req.params.format)) {
+                throw new Err(400, null, '.mvt and .png are supported');
+            }
+
+            if (req.params.format === 'mvt') {
+                const encodings = req.headers['accept-encoding'].split(',').map((e) => e.trim());
+                if (!encodings.includes('gzip')) throw new Err(400, null, 'Accept-Encoding must include gzip');
+            }
 
             const sub = await Submission.from(config.pool, req.params.subid, req.params.pid);
             if (!sub.storage) throw new Err(404, null, 'Submission has no TileSet');
@@ -137,11 +144,18 @@ async function router(schema, config) {
 
             const tile = await tb.tile(req.params.z, req.params.x, req.params.y);
 
-            res.writeHead(200, {
-                'Content-Type': 'application/vnd.mapbox-vector-tile',
-                'Content-Encoding': 'gzip',
-                'cache-control': 'no-transform'
-            });
+            if (req.params.format === 'mvt') {
+                res.writeHead(200, {
+                    'Content-Type': 'application/vnd.mapbox-vector-tile',
+                    'Content-Encoding': 'gzip',
+                    'cache-control': 'no-transform'
+                });
+            } else if (req.params.format === 'png') {
+                res.writeHead(200, {
+                    'Content-Type': 'image/png',
+                    'cache-control': 'no-transform'
+                });
+            }
 
             res.end(tile);
         } catch (err) {
