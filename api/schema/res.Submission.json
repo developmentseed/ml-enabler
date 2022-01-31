@@ -6,7 +6,8 @@
         "aoi_id",
         "created",
         "iter_id",
-        "storage"
+        "storage",
+        "tiles"
     ],
     "properties": {
         "id": {
@@ -22,6 +23,9 @@
             "type": "integer"
         },
         "storage": {
+            "type": "boolean"
+        },
+        "tiles": {
             "type": "boolean"
         }
     }
