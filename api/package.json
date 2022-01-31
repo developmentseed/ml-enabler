@@ -36,7 +36,7 @@
         "pg": "^8.6.0",
         "slonik": "^27.0.0",
         "sns-validator": "^0.3.4",
-        "tilebase": "^2.0.0",
+        "tilebase": "^3.0.0",
         "wkx": "^0.5.0"
     },
     "devDependencies": {
