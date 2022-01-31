@@ -95,7 +95,7 @@ async function router(schema, config) {
             const tj = tb.tilejson();
             tj.token = config.Mapbox;
 
-            tj.tiles.push(`/api/project/${req.params.pid}/iteration/${req.params.iterationid}/submission/${req.params.subid}/tiles/{z}/{x}/{y}.mvt`);
+            tj.tiles.push(`/api/project/${req.params.pid}/iteration/${req.params.iterationid}/submission/${req.params.subid}/tiles/{z}/{x}/{y}.${tb.format()}`);
 
             return res.json(tj);
         } catch (err) {
