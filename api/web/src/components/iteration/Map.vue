@@ -212,9 +212,12 @@ export default {
         },
         submission: async function() {
             await this.getSubmissionTileJSON();
+
+            if (!this.map) await this.init();
+            this.styles();
         },
         bg: function() {
-            this.layers();
+            this.background();
         },
         opacity: function() {
             for (const inf of this.inferences) {
@@ -242,20 +245,29 @@ export default {
         this.inferences = this.iteration.inf_list.split(',');
         this.inf = this.inferences[0];
 
+        this.loading = false;
         if (this.submissions.length) {
             this.submission = this.submissions[0].id;
-            await this.getSubmissionTileJSON();
-
-            this.loading = false;
-
-            this.$nextTick(() => {
-                this.init();
-            });
-        } else {
-            this.loading = false;
         }
     },
     methods: {
+        init: function() {
+            return new Promise((resolve) => {
+                this.$nextTick(() => {
+                    mapboxgl.accessToken = this.tilejson.token;
+
+                    this.map = new mapboxgl.Map({
+                        container: 'map',
+                        bounds: this.tilejson.bounds,
+                        style: 'mapbox://styles/mapbox/satellite-streets-v11'
+                    });
+
+                    this.map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+
+                    this.map.on('load', resolve);
+                });
+            });
+        },
         infValidity: async function(id, valid) {
             this.popup.remove();
 
@@ -298,22 +310,7 @@ export default {
 
             this.map.setLayoutProperty(`inf-${this.inf}`, 'visibility', 'visible');
         },
-        init: function() {
-            mapboxgl.accessToken = this.tilejson.token;
-
-            this.map = new mapboxgl.Map({
-                container: 'map',
-                bounds: this.tilejson.bounds,
-                style: 'mapbox://styles/mapbox/satellite-streets-v11'
-            });
-
-            this.map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
-
-            this.map.on('load', () => {
-                this.styles();
-            });
-        },
-        layers: function() {
+        background: function() {
             this.map.once('styledata', () => {
                 this.styles();
             });
@@ -414,30 +411,31 @@ export default {
 
 
             if (this.tilejson.tiles[0].match(/\.png$/)) {
-                if (!this.map.getSource('tiles')) {
-                    this.map.addSource('tiles', {
-                        type: 'raster',
-                        tileSize: 256,
-                        tiles: [ window.location.origin + this.tilejson.tiles[0] + `?token=${encodeURIComponent(localStorage.token)}` ],
-                    });
+                if (this.map.getSource('tiles')) {
+                    this.map.removeLayer('raster-tiles');
+                    this.map.removeSource('tiles');
+                }
 
-                    this.map.addLayer({
-                        id: `raster-tiles`,
-                        type: 'raster',
-                        source: 'tiles',
-                        minzoom: this.tilejson.minzoom,
-                        maxzoom: this.tilejson.maxzoom
-                    });
-                }
+                this.map.addSource('tiles', {
+                    type: 'raster',
+                    tileSize: 256,
+                    tiles: [ window.location.origin + this.tilejson.tiles[0] + `?token=${encodeURIComponent(localStorage.token)}` ],
+                });
+
+                this.map.addLayer({
+                    id: `raster-tiles`,
+                    type: 'raster',
+                    source: 'tiles',
+                    minzoom: this.tilejson.minzoom,
+                    maxzoom: this.tilejson.maxzoom
+                });
             } else {
-                if (!this.map.getSource('tiles')) {
-                    this.map.addSource('tiles', {
-                        type: 'vector',
-                        tiles: [ window.location.origin + this.tilejson.tiles[0] + `?token=${encodeURIComponent(localStorage.token)}` ],
-                        minzoom: this.tilejson.minzoom,
-                        maxzoom: this.tilejson.maxzoom
-                    });
-                }
+                this.map.addSource('tiles', {
+                    type: 'vector',
+                    tiles: [ window.location.origin + this.tilejson.tiles[0] + `?token=${encodeURIComponent(localStorage.token)}` ],
+                    minzoom: this.tilejson.minzoom,
+                    maxzoom: this.tilejson.maxzoom
+                });
 
                 for (const inf of this.inferences) {
                     this.map.addLayer({
