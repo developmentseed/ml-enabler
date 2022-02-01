@@ -521,7 +521,7 @@ export default {
             try {
                 const res = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/submission`);
                 this.submissions = res.submissions.filter((s) => {
-                    return s.storage;
+                    return s.tiles;
                 });
             } catch (err) {
                 this.$emit('err', err);

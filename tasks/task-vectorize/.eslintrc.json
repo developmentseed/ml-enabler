@@ -6,9 +6,12 @@
     },
     "globals": {
         "Map": true,
-        "Promise": true
+        "Promise": true,
+        "Uint8Array": true,
+        "BigInt": true
     },
     "parserOptions": {
+        "sourceType": "module",
         "ecmaVersion": 13
     },
     "plugins": [ "node" ],
@@ -39,7 +42,6 @@
         "keyword-spacing": [ "error", { "before": true, "after": true } ],
         "template-curly-spacing": [ "error", "never" ],
         "semi-spacing": "error",
-        "strict": "error",
         "node/no-missing-require": "error",
         "valid-jsdoc": ["error", {
             "requireParamDescription": false,

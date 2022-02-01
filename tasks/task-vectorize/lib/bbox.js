@@ -1,7 +1,7 @@
 'use strict';
-const SM = require('@mapbox/sphericalmercator');
-const bboxPolygon = require('@turf/bbox-polygon').default;
-const centroid = require('@turf/centroid').default;
+import SM from '@mapbox/sphericalmercator';
+import bboxPolygon from '@turf/bbox-polygon';
+import centroid from '@turf/centroid';
 const sm = new SM({
     size: 256,
     antimeridian: true
@@ -69,4 +69,4 @@ class BBox {
     }
 }
 
-module.exports = BBox;
+export default BBox;

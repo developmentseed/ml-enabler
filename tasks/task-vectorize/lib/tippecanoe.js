@@ -1,6 +1,6 @@
 'use strict';
-const CP = require('child_process');
-const stream = require('stream');
+import CP from 'child_process';
+import stream from 'stream';
 
 /**
  * Create a new Tippecanoe instance
@@ -121,4 +121,4 @@ class Tippecanoe {
     }
 }
 
-module.exports = Tippecanoe;
+export default Tippecanoe;
