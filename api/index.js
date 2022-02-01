@@ -170,7 +170,7 @@ async function server(args, config, cb) {
         if (ext === '.js') {
             await require('./routes/' + r)(schema, config);
         } else if (ext === '.mjs') {
-            await import('./routes/' + r);
+            (await import('./routes/' + r)).default(schema, config);
         }
     }
 
