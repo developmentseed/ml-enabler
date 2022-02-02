@@ -113,7 +113,7 @@ async function router(schema, config) {
      * @apiDescription
      *     Return a vector tile for the given submission
      */
-    await schema.get('/project/:pid/iteration/:iterationid/submission/:subid/tiles/:z/:x/:y.mvt', {
+    await schema.get('/project/:pid/iteration/:iterationid/submission/:subid/tiles/:z/:x/:y.:format', {
         ':pid': 'integer',
         ':iterationid': 'integer',
         ':subid': 'integer',

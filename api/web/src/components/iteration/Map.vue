@@ -8,7 +8,10 @@
                 <button @click='$emit("refresh")' class='mx3 btn btn--stroke color-gray color-blue-on-hover round'><svg class='icon fl'><use href='#icon-refresh'/></svg></button>
             </div>
         </div>
-        <template v-if='!submissions.length'>
+        <template v-if='loading'>
+            <Loading/>
+        </template>
+        <template v-else-if='!submissions.length'>
             <div class='col col--12 py6'>
                 <div class='flex-parent flex-parent--center-main pt36'>
                     <svg class='flex-child icon w60 h60 color-gray'><use href='#icon-info'/></svg>
@@ -160,6 +163,7 @@
 </template>
 
 <script>
+import Loading from '../util/Loading.vue';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import buffer from '@turf/buffer';
@@ -171,7 +175,7 @@ export default {
     props: ['meta', 'iteration'],
     data: function() {
         return {
-            mode: 'visualize',
+            loading: true,
             integration: false,
             clickListener: false,
             popup: false,
@@ -208,9 +212,12 @@ export default {
         },
         submission: async function() {
             await this.getSubmissionTileJSON();
+
+            if (!this.map) await this.init();
+            this.styles();
         },
         bg: function() {
-            this.layers();
+            this.background();
         },
         opacity: function() {
             for (const inf of this.inferences) {
@@ -238,16 +245,29 @@ export default {
         this.inferences = this.iteration.inf_list.split(',');
         this.inf = this.inferences[0];
 
+        this.loading = false;
         if (this.submissions.length) {
             this.submission = this.submissions[0].id;
-            await this.getSubmissionTileJSON();
-
-            this.$nextTick(() => {
-                this.init();
-            });
         }
     },
     methods: {
+        init: function() {
+            return new Promise((resolve) => {
+                this.$nextTick(() => {
+                    mapboxgl.accessToken = this.tilejson.token;
+
+                    this.map = new mapboxgl.Map({
+                        container: 'map',
+                        bounds: this.tilejson.bounds,
+                        style: 'mapbox://styles/mapbox/satellite-streets-v11'
+                    });
+
+                    this.map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+
+                    this.map.on('load', resolve);
+                });
+            });
+        },
         infValidity: async function(id, valid) {
             this.popup.remove();
 
@@ -290,22 +310,7 @@ export default {
 
             this.map.setLayoutProperty(`inf-${this.inf}`, 'visibility', 'visible');
         },
-        init: function() {
-            mapboxgl.accessToken = this.tilejson.token;
-
-            this.map = new mapboxgl.Map({
-                container: 'map',
-                bounds: this.tilejson.bounds,
-                style: 'mapbox://styles/mapbox/satellite-streets-v11'
-            });
-
-            this.map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
-
-            this.map.on('load', () => {
-                this.styles();
-            });
-        },
-        layers: function() {
+        background: function() {
             this.map.once('styledata', () => {
                 this.styles();
             });
@@ -385,15 +390,6 @@ export default {
                 });
             }
 
-            if (!this.map.getSource('tiles')) {
-                this.map.addSource('tiles', {
-                    type: 'vector',
-                    tiles: [ window.location.origin + this.tilejson.tiles[0] + `?token=${encodeURIComponent(localStorage.token)}` ],
-                    minzoom: this.tilejson.minzoom,
-                    maxzoom: this.tilejson.maxzoom
-                });
-            }
-
             if (!this.map.getSource('bbox')) {
                 this.map.addSource('bbox', {
                     type: 'geojson',
@@ -413,84 +409,115 @@ export default {
                 });
             }
 
-            for (const inf of this.inferences) {
-                this.map.addLayer({
-                    id: `inf-${inf}`,
-                    type: 'fill',
-                    source: 'tiles',
-                    'source-layer': 'data',
-                    paint: {
-                        'fill-color': [
-                            'case',
-                            ['==', ["feature-state", `v_${inf}`], false], '#ec747e',
-                            ['==', ["feature-state", `v_${inf}`], true], '#00b6b0',
-                            ['==', ['get', `v_${inf}`], false], '#ec747e',
-                            ['==', ['get', `v_${inf}`], true], '#00b6b0',
-                            '#ffffff'
-                        ],
-                        'fill-opacity': [
-                            'number',
-                            [ '*', ['get', inf], (this.opacity / 100) ]
-                        ]
-                    }
+
+            if (this.tilejson.tiles[0].match(/\.png$/)) {
+                if (this.map.getSource('tiles')) {
+                    this.map.removeLayer('tiles');
+                    this.map.removeSource('tiles');
+                }
+
+                this.map.addSource('tiles', {
+                    type: 'raster',
+                    scheme: 'xyz',
+                    tileSize: 256,
+                    bounds: this.tilejson.bounds,
+                    tiles: [ window.location.origin + this.tilejson.tiles[0] + `?token=${encodeURIComponent(localStorage.token)}` ],
+                    minzoom: this.tilejson.minzoom,
+                    maxzoom: this.tilejson.maxzoom
                 });
 
-                this.filter(inf);
+                this.map.addLayer({
+                    id: `tiles`,
+                    type: 'raster',
+                    source: 'tiles',
+                });
+            } else {
+                this.map.addSource('tiles', {
+                    type: 'vector',
+                    tiles: [ window.location.origin + this.tilejson.tiles[0] + `?token=${encodeURIComponent(localStorage.token)}` ],
+                    minzoom: this.tilejson.minzoom,
+                    maxzoom: this.tilejson.maxzoom
+                });
 
-                if (!this.clickListener) {
-                    this.map.on('click', `inf-${inf}`, (e) => {
-                        if (
-                            e.features.length === 0
-                            || !e.features[0].properties[this.inf]
-                            || e.features[0].properties[this.inf] === 0
-                        ) return;
+                for (const inf of this.inferences) {
+                    this.map.addLayer({
+                        id: `inf-${inf}`,
+                        type: 'fill',
+                        source: 'tiles',
+                        'source-layer': 'data',
+                        paint: {
+                            'fill-color': [
+                                'case',
+                                ['==', ["feature-state", `v_${inf}`], false], '#ec747e',
+                                ['==', ["feature-state", `v_${inf}`], true], '#00b6b0',
+                                ['==', ['get', `v_${inf}`], false], '#ec747e',
+                                ['==', ['get', `v_${inf}`], true], '#00b6b0',
+                                '#ffffff'
+                            ],
+                            'fill-opacity': [
+                                'number',
+                                [ '*', ['get', inf], (this.opacity / 100) ]
+                            ]
+                        }
+                    });
 
-                        this.popupid = e.features[0].id;
+                    this.filter(inf);
 
-                        this.popup = new mapboxgl.Popup({
-                            className: 'infpop'
-                        })
-                            .setLngLat(e.lngLat)
-                            .setHTML(`
-                                <div class='col col--12'>
-                                    <h1 class="txt-h5 mb3 align-center">Inf Geom</h1>
-                                    <button id="${inf}-valid" class="w-full round btn btn--gray color-green-on-hover btn--s btn--stroke mb6">Valid</button>
-                                    <button id="${inf}-invalid" class="w-full round btn btn--gray color-red-on-hover btn--s btn--stroke">Invalid</button>
-                                </div>
-                            `)
-                            .setMaxWidth("200px")
-                            .addTo(this.map);
+                    if (!this.clickListener) {
+                        this.map.on('click', `inf-${inf}`, (e) => {
+                            if (
+                                e.features.length === 0
+                                || !e.features[0].properties[this.inf]
+                                || e.features[0].properties[this.inf] === 0
+                            ) return;
 
-                        this.$nextTick(() => {
-                            document.querySelector(`#${inf}-valid`).addEventListener('click', () => {
-                                this.infValidity(this.popupid, true)
-                            });
-                            document.querySelector(`#${inf}-invalid`).addEventListener('click', () => {
-                                this.infValidity(this.popupid, false)
+                            this.popupid = e.features[0].id;
+
+                            this.popup = new mapboxgl.Popup({
+                                className: 'infpop'
+                            })
+                                .setLngLat(e.lngLat)
+                                .setHTML(`
+                                    <div class='col col--12'>
+                                        <h1 class="txt-h5 mb3 align-center">Inf Geom</h1>
+                                        <button id="${inf}-valid" class="w-full round btn btn--gray color-green-on-hover btn--s btn--stroke mb6">Valid</button>
+                                        <button id="${inf}-invalid" class="w-full round btn btn--gray color-red-on-hover btn--s btn--stroke">Invalid</button>
+                                    </div>
+                                `)
+                                .setMaxWidth("200px")
+                                .addTo(this.map);
+
+                            this.$nextTick(() => {
+                                document.querySelector(`#${inf}-valid`).addEventListener('click', () => {
+                                    this.infValidity(this.popupid, true)
+                                });
+                                document.querySelector(`#${inf}-invalid`).addEventListener('click', () => {
+                                    this.infValidity(this.popupid, false)
+                                });
                             });
                         });
-                    });
 
-                    this.map.on('mousemove', `inf-${inf}`, (e) => {
-                        if (
-                            e.features.length === 0
-                            || !e.features[0].properties[this.inf]
-                            || e.features[0].properties[this.inf] === 0
-                        ) {
-                            this.map.getCanvas().style.cursor = '';
-                            this.inspect = false;
-                            return;
-                        }
+                        this.map.on('mousemove', `inf-${inf}`, (e) => {
+                            if (
+                                e.features.length === 0
+                                || !e.features[0].properties[this.inf]
+                                || e.features[0].properties[this.inf] === 0
+                            ) {
+                                this.map.getCanvas().style.cursor = '';
+                                this.inspect = false;
+                                return;
+                            }
 
-                        this.map.getCanvas().style.cursor = 'pointer';
+                            this.map.getCanvas().style.cursor = 'pointer';
 
-                        this.inspect = e.features[0].properties[this.inf];
-                    });
+                            this.inspect = e.features[0].properties[this.inf];
+                        });
+                    }
                 }
-            }
-            this.clickListener = true;
+                this.clickListener = true;
 
-            this.hide();
+                this.hide();
+            }
         },
         fullscreen: function() {
             const container = document.querySelector('#map-container');
@@ -537,6 +564,7 @@ export default {
         },
     },
     components: {
+        Loading,
         IterationHeader
     }
 }
