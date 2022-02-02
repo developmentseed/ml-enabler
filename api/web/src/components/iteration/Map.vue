@@ -420,10 +420,7 @@ export default {
                     type: 'raster',
                     scheme: 'xyz',
                     tileSize: 256,
-                    bounds: this.tilejson.bounds,
                     tiles: [ window.location.origin + this.tilejson.tiles[0] + `?token=${encodeURIComponent(localStorage.token)}` ],
-                    minzoom: this.tilejson.minzoom,
-                    maxzoom: this.tilejson.maxzoom
                 });
 
                 this.map.addLayer({
