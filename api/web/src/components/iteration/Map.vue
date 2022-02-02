@@ -412,7 +412,7 @@ export default {
 
             if (this.tilejson.tiles[0].match(/\.png$/)) {
                 if (this.map.getSource('tiles')) {
-                    this.map.removeLayer('raster-tiles');
+                    this.map.removeLayer('tiles');
                     this.map.removeSource('tiles');
                 }
 
