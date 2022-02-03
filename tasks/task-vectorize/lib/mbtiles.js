@@ -15,11 +15,29 @@ class MBTiles {
         });
     }
 
+    getInfo() {
+        return new Promise((resolve, reject) => {
+            this.mbtiles.getInfo((err, info) => {
+                if (err) return reject(err);
+                return resolve(info);
+            });
+        });
+    }
+
     putInfo(data) {
         return new Promise((resolve, reject) => {
             this.mbtiles.putInfo(data, (err) => {
                 if (err) return reject(err);
                 return resolve(true);
+            });
+        });
+    }
+
+    getTile(z, x, y) {
+        return new Promise((resolve, reject) => {
+            this.mbtiles.getTile(z, x, y, (err, tile) => {
+                if (err) return reject(err);
+                return resolve(tile);
             });
         });
     }
