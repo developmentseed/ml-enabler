@@ -57,26 +57,43 @@ class B64PNG {
 
             bbox.tile(line.z, line.x, line.y);
 
-            console.error('input', line.z, line.x, line.y);
             await mbtiles.putTile(line.z, line.x, line.y, new Buffer.from(line.image, 'base64'));
         }
         await mbtiles.stopWriting();
 
         const stack = bbox.gen_stack();
 
-        await mbtiles.getTile(18, 37406, 83510); //178633
-
         // Generate Underzoom Tiles
         if (opts.minzoom < bbox.minzoom) {
             const stack = bbox.gen_stack();
 
-            opts.minzoom = 17; // TODO REMOVE
             for (let z = bbox.minzoom - 1; z >= opts.minzoom; z--) {
+                await mbtiles.startWriting();
+
                 for (let x = stack[z].minx; x <= stack[z].maxx; x++) {
                     for (let y = stack[z].miny; y <= stack[z].maxy; y++) {
-                        this.overzoom(mbtiles, x, y, z);
+                        mbtiles.putTile(z, x, y, await this.overzoom(mbtiles, x, y, z));
                     }
                 }
+
+                await mbtiles.stopWriting();
+            }
+        }
+
+        // Colourize Tiles
+        if (opts.minzoom < bbox.minzoom) {
+            const stack = bbox.gen_stack();
+
+            for (let z = bbox.minzoom - 1; z >= opts.minzoom; z--) {
+                await mbtiles.startWriting();
+
+                for (let x = stack[z].minx; x <= stack[z].maxx; x++) {
+                    for (let y = stack[z].miny; y <= stack[z].maxy; y++) {
+                        await mbtiles.putTile(x, y, z, this.color(await mbtiles.getTile(x, y, z)));
+                    }
+                }
+
+                await mbtiles.stopWriting();
             }
         }
 
@@ -98,28 +115,28 @@ class B64PNG {
      * Given a XYZ coordinate, generate a PNG Class tile from it's children
      */
     async overzoom(mbtiles, x, y, z) {
-        const children = tb.getChildren([x, y, z]).map(async (child) => {
+        let children = [];
+        for (const child of tb.getChildren([x, y, z])) {
             const x = child[0];
             const y = child[1];
             const z = child[2];
 
             let image;
             try {
-                console.error(z, x, y);
-                image = Image.load(await mbtiles.getTile(z, x, y));
-                console.error('HERE');
+                image = await image.load(await mbtiles.getTile(z, x, y));
             } catch (err) {
                 image = new Image(256, 256, [], {
                     kind: 'RGB'
                 })
             }
 
-            //console.error(image, x, y, z);
-
-            return {
+            children.push({
                 x, y, z, image
-            }
-        });
+            });
+        }
+
+        // TODO Obviously wrong
+        return exportPNG(children[0].image);
     }
 
     /**
