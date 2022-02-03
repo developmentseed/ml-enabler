@@ -72,7 +72,7 @@ class B64PNG {
 
                 for (let x = stack[z].minx; x <= stack[z].maxx; x++) {
                     for (let y = stack[z].miny; y <= stack[z].maxy; y++) {
-                        mbtiles.putTile(z, x, y, await this.overzoom(mbtiles, x, y, z));
+                        mbtiles.putTile(z, x, y, Buffer.from(await this.overzoom(mbtiles, x, y, z)));
                     }
                 }
 
@@ -89,7 +89,7 @@ class B64PNG {
 
                 for (let x = stack[z].minx; x <= stack[z].maxx; x++) {
                     for (let y = stack[z].miny; y <= stack[z].maxy; y++) {
-                        await mbtiles.putTile(x, y, z, this.color(await mbtiles.getTile(x, y, z)));
+                        await mbtiles.putTile(z, x, y, Buffer.from(this.color(await mbtiles.getTile(z, x, y))));
                     }
                 }
 
@@ -149,6 +149,8 @@ class B64PNG {
         let png = PNG.decode(buff);
         png.palette = this.palette;
         png = exportPNG(loadPNGFromPalette(png));
+
+        return png;
     }
 }
 
