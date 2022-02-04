@@ -118,6 +118,10 @@ class B64PNG {
      * @param {Number}  z           Z Coordinate
      */
     async overzoom(mbtiles, x, y, z) {
+        const parent = new Image(256, 256, [], {
+            kind: 'RGB'
+        });
+
         const children = [];
         for (const child of tb.getChildren([x, y, z])) {
             const x = child[0];
@@ -138,8 +142,19 @@ class B64PNG {
             });
         }
 
-        // TODO Obviously wrong
-        return exportPNG(children[0].image);
+        for (let i = 0; i < 256 * 256; i++) {
+            const values = [];
+
+            for (const child of children) {
+                values.push(child.image.data.slice(i * child.image.channels, i * child.image.channels + child.image.channels))
+            }
+
+            const value = this.rgb_mean(values);
+
+            parent.data.set(value, i * parent.channels);
+        }
+
+        return exportPNG(parent);
     }
 
     /**
@@ -154,6 +169,26 @@ class B64PNG {
         png = exportPNG(loadPNGFromPalette(png));
 
         return png;
+    }
+
+    rgb_mean(values) {
+        values = values.map((value) => {
+            return value.reduce((prev, curr) => {
+                // Hash values in to fixed length string by prepending 0s
+                return prev + String(curr).padStart(3, '0');
+            }, '');
+        });
+
+        const value = values.sort((a,b) => {
+            values.filter(v => v === a).length - values.filter(v => v === b).length
+        }).pop();
+
+        return [
+            parseInt(value.slice(0, 3)),
+            parseInt(value.slice(3, 3 + 3)),
+            parseInt(value.slice(6, 6 + 3)),
+            parseInt(value.slice(9, 9 + 3))
+        ]
     }
 }
 
@@ -212,6 +247,5 @@ function loadPNGFromPalette(png) {
         bitDepth: 8
     });
 }
-
 
 export default B64PNG;
