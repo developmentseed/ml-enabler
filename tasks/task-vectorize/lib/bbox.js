@@ -55,7 +55,7 @@ class BBox {
                 miny: y,
                 maxx: x,
                 maxy: y
-            }
+            };
         }
 
         if (x < this.stack[z].minx) this.stack[z].minx = x;

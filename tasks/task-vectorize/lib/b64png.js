@@ -65,8 +65,6 @@ class B64PNG {
 
         // Generate Underzoom Tiles
         if (opts.minzoom < bbox.minzoom) {
-            const stack = bbox.gen_stack();
-
             for (let z = bbox.minzoom - 1; z >= opts.minzoom; z--) {
                 await mbtiles.startWriting();
 
@@ -113,9 +111,14 @@ class B64PNG {
 
     /**
      * Given a XYZ coordinate, generate a PNG Class tile from it's children
+     *
+     * @param {MBTiles} mbtiles     MBTiles instance
+     * @param {Number}  x           X Coordinate
+     * @param {Number}  y           Y Coordinate
+     * @param {Number}  z           Z Coordinate
      */
     async overzoom(mbtiles, x, y, z) {
-        let children = [];
+        const children = [];
         for (const child of tb.getChildren([x, y, z])) {
             const x = child[0];
             const y = child[1];
@@ -127,7 +130,7 @@ class B64PNG {
             } catch (err) {
                 image = new Image(256, 256, [], {
                     kind: 'RGB'
-                })
+                });
             }
 
             children.push({
