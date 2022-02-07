@@ -131,6 +131,12 @@ class Task {
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
+    console.log('ok - starting Task.vectorize');
+    console.log(`ASSET_BUCKET: ${process.env.ASSET_BUCKET}`);
+    console.log(`project: ${process.env.PROJECT_ID}`);
+    console.log(`iteration: ${process.env.ITERATION_ID}`);
+    console.log(`submission: ${process.env.SUBMISSION_ID}`);
+
     Task.vectorize(new URL('./data/input.geojson', import.meta.url).pathname, {
         silent: false,
         bucket: process.env.ASSET_BUCKET,
