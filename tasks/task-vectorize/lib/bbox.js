@@ -2,6 +2,8 @@
 import SM from '@mapbox/sphericalmercator';
 import bboxPolygon from '@turf/bbox-polygon';
 import centroid from '@turf/centroid';
+import tb from '@mapbox/tilebelt';
+
 const sm = new SM({
     size: 256,
     antimeridian: true
@@ -22,6 +24,7 @@ class BBox {
         this.bbox = null; // [w, s, e, n]
         this.tiles = 0;
 
+        this.stack = {};
         this.minzoom = null;
         this.maxzoom = null;
     }
@@ -46,6 +49,20 @@ class BBox {
 
         this.tiles++;
 
+        if (!this.stack[z]) {
+            this.stack[z] = {
+                minx: x,
+                miny: y,
+                maxx: x,
+                maxy: y
+            };
+        }
+
+        if (x < this.stack[z].minx) this.stack[z].minx = x;
+        if (x > this.stack[z].maxx) this.stack[z].maxx = x;
+        if (y < this.stack[z].miny) this.stack[z].miny = y;
+        if (y > this.stack[z].maxy) this.stack[z].maxy = y;
+
         if (this.bbox === null) {
             this.bbox = sm.bbox(x, y, z);
             return this.bbox;
@@ -62,7 +79,40 @@ class BBox {
         return this.bbox;
     }
 
-    center() {
+    /**
+     * Return a fully quantified stack of zoom xyz ranges
+     * Generates stack from highest zoom => 0
+     *
+     * @returns {Object}
+     */
+    gen_stack() {
+        if (!this.minzoom) throw new Error('Cannot populate stack until minzoom is established');
+
+        const stack = JSON.parse(JSON.stringify(this.stack));
+
+        for (let z = this.minzoom; z > 0; z--) {
+            if (stack[z - 1]) continue; // Only start populating where the data cuts out
+
+            const min = tb.getParent([stack[z].minx, stack[z].miny, z]);
+            const max = tb.getParent([stack[z].maxx, stack[z].maxy, z]);
+
+            stack[z - 1] = {
+                minx: min[0],
+                miny: min[1],
+                maxx: max[0],
+                maxy: max[1]
+            };
+        }
+
+        return stack;
+    }
+
+    /**
+     * Calculate centre coordinates for the bbox
+     *
+     * @returns {Number[]}
+     */
+    centre() {
         if (this.bbox === null) throw new Error('Tiles have not been added to bbox, bbox is null');
 
         return centroid(bboxPolygon(this.bbox)).geometry.coordinates;

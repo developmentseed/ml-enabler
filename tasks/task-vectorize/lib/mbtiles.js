@@ -1,5 +1,6 @@
 'use strict';
 import MBT from '@mapbox/mbtiles';
+import fs from 'fs';
 
 class MBTiles {
     constructor(mbtiles) {
@@ -8,9 +9,20 @@ class MBTiles {
 
     static create(input) {
         return new Promise((resolve, reject) => {
-            new MBT(input, (err, mbtiles) => {
+            fs.unlink(input, () => {
+                new MBT(input, (err, mbtiles) => {
+                    if (err) return reject(err);
+                    return resolve(new MBTiles(mbtiles));
+                });
+            });
+        });
+    }
+
+    getInfo() {
+        return new Promise((resolve, reject) => {
+            this.mbtiles.getInfo((err, info) => {
                 if (err) return reject(err);
-                return resolve(new MBTiles(mbtiles));
+                return resolve(info);
             });
         });
     }
@@ -20,6 +32,15 @@ class MBTiles {
             this.mbtiles.putInfo(data, (err) => {
                 if (err) return reject(err);
                 return resolve(true);
+            });
+        });
+    }
+
+    getTile(z, x, y) {
+        return new Promise((resolve, reject) => {
+            this.mbtiles.getTile(z, x, y, (err, tile) => {
+                if (err) return reject(err);
+                return resolve(tile);
             });
         });
     }
