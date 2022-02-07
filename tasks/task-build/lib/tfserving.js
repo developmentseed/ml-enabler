@@ -8,7 +8,7 @@ function docker(tmp, model, tagged_model) {
     console.error('ok - pulling tensorflow/serving docker image');
 
     CP.execSync(`
-        docker pull tensorflow/serving:2.1.0-gpu
+        docker pull tensorflow/serving:2.7.0-gpu
     `);
 
     // Ignore errors, these are to ensure the next commands don't err
