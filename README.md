@@ -31,7 +31,7 @@ MLE can then convert these validated predictions back into labelled training dat
 
 ### Infrastructure
 
-MLE uses AWS CloudFormation and is tightly integrated with AWS infrastructure at the moment. We can add support for other cloud providers or private infrastructure based on request.
+MLE uses AWS CloudFormation and is tightly integrated with AWS infrastructure at the moment. MLE currenlty doesn't support any other public or private cloud.
 
 ### Framework
 
