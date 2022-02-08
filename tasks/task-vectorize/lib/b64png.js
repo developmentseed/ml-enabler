@@ -89,7 +89,11 @@ class B64PNG {
 
             for (let x = stack[z].minx; x <= stack[z].maxx; x++) {
                 for (let y = stack[z].miny; y <= stack[z].maxy; y++) {
-                    await mbtiles.putTile(z, x, y, Buffer.from(this.color(await mbtiles.getTile(z, x, y))));
+                    try {
+                        await mbtiles.putTile(z, x, y, Buffer.from(this.color(await mbtiles.getTile(z, x, y))));
+                    } catch (err) {
+                        console.error(err);
+                    }
                 }
             }
 
