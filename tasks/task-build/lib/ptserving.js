@@ -1,10 +1,8 @@
 'use strict';
 
-const CP = require('child_process');
-const path = require('path');
-const fs = require('fs');
+import CP from 'child_process';
 
-async function docker(tmp, model, tagged_model) {
+async function docker(tmp) {
     console.error('ok - pulling tensorflow/serving docker image');
 
     CP.execSync(`
@@ -45,4 +43,4 @@ async function docker(tmp, model, tagged_model) {
     return tag;
 }
 
-module.exports = docker;
+export default docker;
