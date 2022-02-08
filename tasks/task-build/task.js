@@ -169,7 +169,7 @@ function h5_convert(tmp) {
             if (files.length === 0) return resolve();
 
             CP.execSync(`
-                python3 ./lib/convert.py ${files[0]}
+                python3 ./lib/convert.py ${files[0]} ${path.resolve(tmp, '/src')}
             `);
         });
     });
