@@ -14,9 +14,7 @@
     </div>
     <div class='col col--12 border border--gray-light grid round'>
         <template v-if='loading'>
-            <div class='flex-parent flex-parent--center-main w-full py24'>
-                <div class='flex-child loading py24'></div>
-            </div>
+            <Loading desc='Loading Queues'/>
         </template>
         <template v-else>
             <div class='col col--4'>
@@ -65,6 +63,7 @@
 
 <script>
 import moment from 'moment';
+import Loading from '../../util/Loading.vue';
 
 export default {
     name: 'StackQueue',
@@ -142,6 +141,9 @@ export default {
                 this.$emit('err', err);
             }
         },
+    },
+    components: {
+        Loading
     }
 }
 </script>

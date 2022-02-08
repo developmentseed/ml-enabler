@@ -1,9 +1,7 @@
 <template>
     <div class="col col--12">
         <template v-if='loading.project'>
-            <div class='flex-parent flex-parent--center-main w-full py24'>
-                <div class='flex-child loading py24'></div>
-            </div>
+            <Loading desc='Loading Projects'/>
         </template>
         <template v-else-if='$route.name === "project"'>
             <div class='col col--12 clearfix py6'>
@@ -54,9 +52,7 @@
 
                 <div v-if='!folding.iterations' class='grid grid--gut12'>
                     <template v-if='loading.iters'>
-                        <div class='flex-parent flex-parent--center-main w-full py24'>
-                            <div class='flex-child loading py24'></div>
-                        </div>
+                        <Loading desc='Loading Iterations'/>
                     </template>
                     <template v-else-if='iterations.length === 0'>
                         <div class='col col--12 py6'>
@@ -192,6 +188,7 @@
 <script>
 import vSort from 'semver-sort';
 import Integrations from './Integrations.vue';
+import Loading from './util/Loading.vue';
 
 export default {
     name: 'Project',
@@ -220,6 +217,7 @@ export default {
         }
     },
     components: {
+        Loading,
         Integrations,
     },
     mounted: function() {

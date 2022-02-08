@@ -1,9 +1,7 @@
 <template>
     <div class='col col--12 grid pt12'>
         <template v-if='loading'>
-            <div class='flex-parent flex-parent--center-main w-full'>
-                <div class='flex-child loading py24'></div>
-            </div>
+            <Loading/>
         </template>
         <template v-else>
             <div class='col col--12 flex-parent flex-parent--center-main'>
@@ -31,6 +29,8 @@
 </template>
 
 <script>
+import Loading from './util/Loading.vue';
+
 export default {
     name: 'Login',
     props: ['meta'],
@@ -75,6 +75,9 @@ export default {
                 this.$emit('err', err);
             }
         }
+    },
+    components: {
+        Loading
     }
 }
 </script>

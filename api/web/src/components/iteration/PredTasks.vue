@@ -6,9 +6,7 @@
             />
         </div>
         <template v-if='!iteration'>
-            <div class='flex-parent flex-parent--center-main w-full py24'>
-                <div class='flex-child loading py24'></div>
-            </div>
+            <Loading/>
         </template>
         <template v-else-if='meta.environment !== "aws"'>
             <div class='flex-parent flex-parent--center-main pt36'>
@@ -166,6 +164,7 @@ import IterationHeader from './IterationHeader.vue';
 import UploadPrediction from './UploadPrediction.vue';
 
 import TaskVectorize from './tasks/Vectorize.vue';
+import Loading from './../util/Loading.vue';
 
 export default {
     name: 'PredTasks',

@@ -1,18 +1,7 @@
 <template>
     <div class="col col--12">
         <div class='col col--12'>
-            <FilePond
-                name='file'
-                ref='pond'
-                :label-idle='label'
-                v-bind:allow-multiple='false'
-                v-on:processfile='uploaded'
-                :accepted-file-types='filetype'
-                :fileValidateTypeDetectType='detect'
-                allowRevert='false'
-                :server='server'
-                v-bind:files='files'
-            />
+            <Upload/>
         </div>
 
         <div v-if='done' class='col col--12 py12'>
@@ -22,17 +11,11 @@
 </template>
 
 <script>
-import vueFilePond from 'vue-filepond';
-import 'filepond/dist/filepond.min.css';
-import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
-const FilePond = vueFilePond(FilePondPluginFileValidateType);
+import Upload from '../util/Upload.vue';
 
 export default {
     name: 'UploadPrediction',
     props: ['prediction', 'type'],
-    components: {
-        FilePond
-    },
     data: function() {
         return {
             done: false,
@@ -80,6 +63,9 @@ export default {
         close: function() {
             this.$emit('close');
         }
+    },
+    components: {
+       Upload
     }
 }
 </script>

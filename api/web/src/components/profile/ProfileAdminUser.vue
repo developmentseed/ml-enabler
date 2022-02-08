@@ -85,9 +85,7 @@
         </template>
 
         <template v-if='loading'>
-            <div class='flex-parent flex-parent--center-main w-full'>
-                <div class='flex-child loading py24'></div>
-            </div>
+            <Loading/>
         </template>
         <template v-else-if='!users.length'>
             <div class='flex-parent flex-parent--center-main w-full'>
@@ -124,6 +122,7 @@
 
 <script>
 import Pager from '../util/Pager.vue';
+import Loading from '../util/Loading.vue';
 
 export default {
     name: 'ProfileAdminUser',
@@ -208,6 +207,7 @@ export default {
         }
     },
     components: {
+        Loading,
         Pager
     }
 }

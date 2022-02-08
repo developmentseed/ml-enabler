@@ -55,9 +55,7 @@
                 <label>Imagery Source:</label>
                 <div class='border border--gray-light round'>
                     <template v-if='loading.imagery'>
-                        <div class='flex-parent flex-parent--center-main w-full py24'>
-                            <div class='flex-child loading py24'></div>
-                        </div>
+                        <Loading/>
                     </template>
                     <template v-else>
                         <div :key='img.id' v-for='img in imagery' class='col col--12 bg-darken10-on-hover'>
@@ -87,6 +85,7 @@
 
 <script>
 import IterationHeader from './IterationHeader.vue';
+import Loading from './../util/Loading.vue';
 
 export default {
     name: 'Config',

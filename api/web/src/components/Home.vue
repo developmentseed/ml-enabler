@@ -33,12 +33,7 @@
                 </div>
             </template>
             <template v-if='loading.projects'>
-                <div class='flex-parent flex-parent--center-main w-full'>
-                    <div class='flex-child loading py24'></div>
-                </div>
-                <div class='flex-parent flex-parent--center-main w-full'>
-                    <div class='flex-child py24'>Loading Projects</div>
-                </div>
+                <Loading desc='Loading Projects'/>
             </template>
             <template v-else-if='projects.length === 0'>
                 <div class='flex-parent flex-parent--center-main pt36'>
@@ -92,6 +87,7 @@
 
 <script>
 import Pager from './util/Pager.vue';
+import Loading from './util/Loading.vue';
 
 export default {
     name: 'Home',
@@ -164,6 +160,7 @@ export default {
         }
     },
     components: {
+        Loading,
         Pager
     }
 }

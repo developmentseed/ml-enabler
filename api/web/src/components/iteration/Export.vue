@@ -7,9 +7,7 @@
         </div>
 
         <template v-if='loading'>
-            <div class='flex-parent flex-parent--center-main w-full py24'>
-                <div class='flex-child loading py24'></div>
-            </div>
+            <Loading/>
         </template>
         <template v-else-if='submissions.length'>
             <div class='col col--12 grid grid--gut12'>
@@ -127,6 +125,7 @@
 
 <script>
 import IterationHeader from './IterationHeader.vue';
+import Loading from './../util/Loading.vue';
 
 export default {
     name: 'Export',

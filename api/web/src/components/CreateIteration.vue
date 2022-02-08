@@ -55,9 +55,7 @@
                     <label>Imagery Source:</label>
                     <div class='border border--gray-light round'>
                         <template v-if='loading.imagery'>
-                            <div class='flex-parent flex-parent--center-main w-full py24'>
-                                <div class='flex-child loading py24'></div>
-                            </div>
+                            <Loading desc='Loading Imagery'/>
                         </template>
                         <template v-else-if='imagery.length === 0'>
                             <div class='flex-parent flex-parent--center-main pt36'>
@@ -104,6 +102,8 @@
 </template>
 
 <script>
+import Loading from './util/Loading.vue';
+
 export default {
     name: 'CreateIteration',
     data: function() {

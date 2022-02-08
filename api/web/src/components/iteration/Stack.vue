@@ -26,9 +26,7 @@
             </div>
         </template>
         <template v-else-if='!iteration || loading.stack'>
-            <div class='flex-parent flex-parent--center-main w-full py24'>
-                <div class='flex-child loading py24'></div>
-            </div>
+            <Loading/>
         </template>
         <template v-else-if='!iteration.model_link'>
             <div class='col col--12 py6'>
@@ -166,12 +164,7 @@
             </div>
         </template>
         <template v-else-if='stack.status !== "None"'>
-            <div class='flex-parent flex-parent--center-main w-full py24'>
-                <div class='flex-child loading py24'></div>
-            </div>
-            <div class='flex-parent flex-parent--center-main w-full'>
-                <div class='flex-child py24'><span v-text='stack.status'/></div>
-            </div>
+            <Loading :desc='stack.status'/>
         </template>
     </div>
 </template>
@@ -184,6 +177,7 @@ import StackQueueXYZ from './stack/QueueXYZ.vue';
 import StackQueueAOI from './stack/QueueAOI.vue';
 
 import StackQueue from './stack/Queue.vue';
+import Loading from '../util/Loading.vue';
 
 export default {
     name: 'Stack',
@@ -401,6 +395,7 @@ export default {
         }
     },
     components: {
+        Loading,
         IterationHeader,
         StackQueueList,
         StackQueueXYZ,
