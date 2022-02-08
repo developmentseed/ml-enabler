@@ -1,20 +1,18 @@
 #!/usr/bin/env node
-'use strict';
+import unzipper from 'unzipper';
+import find from 'find';
+import request from 'request';
+import mkdir from 'mkdirp';
+import { pipeline } from 'stream';
+import fs from 'fs';
+import fse from 'fs-extra';
+import os from 'os';
+import CP from 'child_process';
+import path from 'path';
+import AWS from 'aws-sdk';
 
-const unzipper = require('unzipper');
-const find = require('find');
-const request = require('request');
-const mkdir = require('mkdirp').sync;
-const pipeline = require('stream').pipeline;
-const fs = require('fs');
-const fse = require('fs-extra');
-const os = require('os');
-const CP = require('child_process');
-const path = require('path');
-const AWS = require('aws-sdk');
-
-const TFServing = require('./lib/tfserving');
-// const PyTorchServing = require('./lib/ptserving');
+import TFServing from './lib/tfserving.js';
+// import PTServing from './lib/ptserving.js';
 
 const batch = new AWS.Batch({ region: process.env.AWS_REGION || 'us-east-1' });
 const s3 = new AWS.S3({ region: process.env.AWS_REGION || 'us-east-1' });
@@ -56,6 +54,8 @@ async function main() {
         const dd = await dockerd();
 
         await get_zip(tmp, model);
+
+        await h5_convert(tmp);
 
         await std_model(tmp);
 
@@ -163,6 +163,18 @@ function set_link(project, iteration, patch) {
     });
 }
 
+function h5_convert(tmp) {
+    return new Promise((resolve) => {
+        find.file(/\.h5$/, path.resolve(tmp, '/src'), (files) => {
+            if (files.length === 0) return resolve();
+
+            CP.execSync(`
+                python3 ./lib/convert.py ${files[0]} ${path.resolve(tmp, '/src')}
+            `);
+        });
+    });
+}
+
 function std_model(tmp) {
     return new Promise((resolve, reject) => {
         find.file('saved_model.pb', path.resolve(tmp, '/src'), (files) => {
@@ -171,7 +183,7 @@ function std_model(tmp) {
 
             path.parse(files[0]).dir;
 
-            mkdir(tmp + '/MODEL/001');
+            mkdir.sync(tmp + '/MODEL/001');
 
             fse.move(path.parse(files[0]).dir, tmp + '/MODEL/001/', {
                 overwrite: true
@@ -232,7 +244,7 @@ function dockerd() {
 async function docker(tmp, model) {
     const tagged_model = model.split('/').splice(1).join('-').replace(/-model\.zip/, '');
 
-    const tag = TFServing(tmp, model, tagged_model);
+    const tag = TFServing(tmp);
 
     const push = `${process.env.AWS_ACCOUNT_ID}.dkr.ecr.${process.env.AWS_REGION}.amazonaws.com/${process.env.BATCH_ECR}:${tagged_model}`;
     CP.execSync(`
