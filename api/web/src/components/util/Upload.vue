@@ -92,6 +92,9 @@ export default {
             formData.append('file', file)
             xhr.send(formData)
         }
+    },
+    components: {
+        Loading
     }
 }
 

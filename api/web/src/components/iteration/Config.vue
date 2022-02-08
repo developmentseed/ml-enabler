@@ -109,6 +109,7 @@ export default {
         this.inf_binary = this.iteration.inf_binary;
     },
     components: {
+        Loading,
         IterationHeader,
     },
     methods: {

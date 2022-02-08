@@ -189,6 +189,7 @@ export default {
     components: {
         Tasks,
         TaskVectorize,
+        Loading,
         UploadPrediction,
         IterationHeader
     },

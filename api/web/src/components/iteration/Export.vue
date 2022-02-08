@@ -203,6 +203,7 @@ export default {
         },
     },
     components: {
+        Loading,
         IterationHeader
     }
 }
