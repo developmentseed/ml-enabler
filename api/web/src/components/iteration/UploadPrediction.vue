@@ -1,12 +1,17 @@
 <template>
     <div class="col col--12">
         <div class='col col--12'>
-            <Upload/>
+            <Upload
+                :label='label'
+                :url='url'
+                :headers='headers'
+                :mimetype='filetype'
+                single=true
+                err='error($event)'
+                @ok='close'
+            />
         </div>
 
-        <div v-if='done' class='col col--12 py12'>
-            <button @click='close' class='btn btn--stroke round fr color-blue-light color-blue-on-hover'>Done</button>
-        </div>
     </div>
 </template>
 
@@ -18,19 +23,12 @@ export default {
     props: ['prediction', 'type'],
     data: function() {
         return {
-            done: false,
-            files: [],
             label: '',
-            server: {
-                url: this.type === 'inferences'
-                    ? `/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/import`
-                    : `/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/asset?type=${this.type}`,
-                process: {
-                    onerror: this.error,
-                    headers: {
-                        Authorization: `Bearer ${localStorage.token}`
-                    }
-                }
+            url: this.type === 'inferences'
+                ? new URL(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/import`, window.location.origin)
+                : new URL(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/asset?type=${this.type}`, window.location.origin),
+            headers: {
+                Authorization: `Bearer ${localStorage.token}`
             },
             filetype: ''
         };
@@ -54,11 +52,6 @@ export default {
         },
         error: function(res) {
             this.$emit('err', new Error(JSON.parse(res).message));
-        },
-        uploaded: function(err) {
-            if (err) return;
-
-            this.done = true;
         },
         close: function() {
             this.$emit('close');

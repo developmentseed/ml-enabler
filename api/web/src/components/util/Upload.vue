@@ -3,12 +3,20 @@
         <div id='dragndrop' class='col col--12'>
 
             <div class='col col--12' :class='{ "none": progress !== 0 }'>
-                <div class='pb6'>Select a file to upload</div>
+                <div class='pb12 flex flex--center-main' v-text='label'></div>
                 <div class='flex flex--center-main'>
                     <button @click='$refs.fileInput.click()' class='btn btn--stroke round color-gray color-green-on-hover'>Upload File</button>
                 </div>
                 <form>
-                    <input ref='fileInput' class='none' type='file' id='file' name='file' accept='*' @change='upload' />
+                    <input
+                        ref='fileInput'
+                        class='none'
+                        type='file'
+                        id='file'
+                        name='file'
+                        :accept='mimetype'
+                        @change='upload'
+                    />
                 </form>
             </div>
 
@@ -46,19 +54,37 @@ import Loading from './Loading.vue';
 
 export default {
     name: 'UploadFile',
-    props: ['single'],
+    props: {
+        single: {
+            type: Boolean,
+            default: false
+        },
+        url: URL,
+        headers: {
+            type: Object,
+            default: function() {
+                return {};
+            }
+        },
+        label: {
+            type: String,
+            default: 'Select a file to upload'
+        },
+        mimetype: {
+            type: String,
+            default: '*'
+        }
+    },
     data: function() {
         return {
             name: '',
             progress: 0,
-            url: []
         }
     },
     methods: {
         refresh: function() {
             this.name = '';
             this.progress = 0;
-            this.url = [];
             const input = this.$refs.fileInput;
             input.type = 'text';
             input.type = 'file';
@@ -70,9 +96,13 @@ export default {
             const xhr = new XMLHttpRequest()
             const formData = new FormData()
 
-            xhr.open('POST', new URL(`${window.location.origin}/api/asset`), true)
+            xhr.open('POST', this.url, true)
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-            xhr.setRequestHeader('Authorization', `Bearer ${localStorage.token}`);
+
+            for (const header of Object.keys(this.headers)) {
+                xhr.setRequestHeader(header, this.headers[header]);
+            }
+
             xhr.upload.addEventListener('progress', (e) => {
                 this.progress = (e.loaded * 100.0 / e.total) || 100
             });
