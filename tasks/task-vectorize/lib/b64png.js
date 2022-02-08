@@ -91,7 +91,7 @@ class B64PNG {
                     try {
                         await mbtiles.putTile(z, x, y, Buffer.from(this.color(await mbtiles.getTile(z, x, y))));
                     } catch (err) {
-                        console.error(err);
+                        console.error(z, x, y, err);
                     }
                 }
             }
@@ -127,8 +127,8 @@ class B64PNG {
      * @param {Number}  z           Z Coordinate
      */
     async underzoom(mbtiles, x, y, z) {
-        const parent = new Image(256, 256, [], {
-            kind: 'RGBA'
+        const parent = new Image(256, 256, new Uint8Array(256 * 256), {
+            kind: 'GREY'
         });
 
         const children = [];
@@ -139,10 +139,10 @@ class B64PNG {
 
             let image;
             try {
-                image = await image.load(await mbtiles.getTile(z, x, y));
+                image = await Image.load(await mbtiles.getTile(z, x, y));
             } catch (err) {
-                image = new Image(256, 256, [], {
-                    kind: 'RGBA'
+                image = new Image(256, 256, new Uint8Array(256 * 256), {
+                    kind: 'GREY'
                 });
             }
 
@@ -158,7 +158,7 @@ class B64PNG {
                 values.push(child.image.data.slice(i * child.image.channels, i * child.image.channels + child.image.channels))
             }
 
-            const value = this.rgb_mean(values);
+            const value = this.class_mean(values);
 
             parent.data.set(value, i * parent.channels);
         }
@@ -180,24 +180,12 @@ class B64PNG {
         return png;
     }
 
-    rgb_mean(values) {
-        values = values.map((value) => {
-            return value.reduce((prev, curr) => {
-                // Hash values in to fixed length string by prepending 0s
-                return prev + String(curr).padStart(3, '0');
-            }, '');
-        });
-
+    class_mean(values) {
         const value = values.sort((a,b) => {
             values.filter(v => v === a).length - values.filter(v => v === b).length
         }).pop();
 
-        return [
-            parseInt(value.slice(0, 3)),
-            parseInt(value.slice(3, 3 + 3)),
-            parseInt(value.slice(6, 6 + 3)),
-            parseInt(value.slice(9, 9 + 3))
-        ]
+        return value;
     }
 }
 
