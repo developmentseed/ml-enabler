@@ -55,6 +55,8 @@ async function main() {
 
         await get_zip(tmp, model);
 
+        await h5_convert(tmp);
+
         await std_model(tmp);
 
         const finalLinks = await docker(tmp, model);
@@ -157,6 +159,18 @@ function set_link(project, iteration, patch) {
             } else {
                 return reject(res.statusCode + ':' + typeof res.body === 'object' ? JSON.stringify(res.body) : res.body);
             }
+        });
+    });
+}
+
+function h5_convert(tmp) {
+    return new Promise((resolve) => {
+        find.file(/\.h5$/, path.resolve(tmp, '/src'), (files) => {
+            if (files.length === 0) return resolve();
+
+            CP.execSync(`
+                python3 ./lib/convert.py ${files[0]}
+            `);
         });
     });
 }

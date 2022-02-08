@@ -13,7 +13,7 @@ RUN apk -v --update add \
         mailcap \
     && python3 -m ensurepip \
     && pip3 install --upgrade pip \
-    && pip3 install --upgrade awscli==1.14.5 s3cmd==2.0.1 python-magic
+    && pip3 install --upgrade awscli==1.14.5 s3cmd==2.0.1 python-magic tensorflow==2.7.0
 
 WORKDIR /usr/local/src/batch
 ADD . /usr/local/src/batch
