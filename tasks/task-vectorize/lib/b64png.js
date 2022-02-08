@@ -127,10 +127,6 @@ class B64PNG {
      * @param {Number}  z           Z Coordinate
      */
     async underzoom(mbtiles, x, y, z) {
-        const parent = new Image(256, 256, new Uint8Array(256 * 256), {
-            kind: 'GREY'
-        });
-
         const children = [];
         for (const child of tb.getChildren([x, y, z])) {
             const x = child[0];
@@ -151,19 +147,30 @@ class B64PNG {
             });
         }
 
-        for (let i = 0; i < 256 * 256; i++) {
-            const values = [];
+        // Sort so 0,0, 1,0, 0,1, 1,1
+        children.sort((a, b) => {
+            if (a.y < b.y) return -1;
+            if (a.y > b.y) return 1;
+            if (a.x < b.x) return -1;
+            if (a.x > b.x) return 1;
+            return 0;
+        });
 
-            for (const child of children) {
-                values.push(child.image.data.slice(i * child.image.channels, i * child.image.channels + child.image.channels))
-            }
+        const full = new Image(512, 512, new Uint8Array(512 * 512 * 4), {
+            kind: 'RGBA'
+        });
 
-            const value = this.class_mean(values);
+        full.insert(children[0].image.rgba8(), { x: 0,    y: 0,       inPlace: true });
+        full.insert(children[1].image.rgba8(), { x: 256,  y: 0,       inPlace: true });
+        full.insert(children[2].image.rgba8(), { x: 0,    y: 256,     inPlace: true });
+        full.insert(children[3].image.rgba8(), { x: 256,  y: 256,     inPlace: true });
 
-            parent.data.set(value, i * parent.channels);
-        }
-
-        return exportPNG(parent);
+        return exportPNG(full.grey({
+            keepAlpha: false
+        }).resize({
+            width: 256,
+            height: 256
+        }));
     }
 
     /**
