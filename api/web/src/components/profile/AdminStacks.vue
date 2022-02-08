@@ -32,12 +32,10 @@
         </template>
 
         <template v-if='loading'>
-            <div class='flex-parent flex-parent--center-main w-full'>
-                <div class='flex-child loading py24'></div>
-            </div>
+            <Loading/>
         </template>
         <template v-else-if='!stacks.length'>
-            <div class='flex-parent flex-parent--center-main w-full'>
+            <div class='flex flex--center-main w-full'>
                 <div class='flex-child py24'>
                     <svg class='icon h60 w60 color-gray'><use href='#icon-info'/></svg>
                 </div>
@@ -57,6 +55,7 @@
 <script>
 import Table from '../util/Table.vue';
 import moment from 'moment';
+import Loading from '../util/Loading.vue';
 
 export default {
     name: 'AdminStacks',
@@ -112,6 +111,7 @@ export default {
         }
     },
     components: {
+        Loading,
         Table
     }
 }

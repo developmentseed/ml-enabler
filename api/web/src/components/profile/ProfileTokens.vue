@@ -16,13 +16,11 @@
         </div>
 
         <template v-if='loading'>
-            <div class='flex-parent flex-parent--center-main w-full'>
-                <div class='flex-child loading py24'></div>
-            </div>
+            <Loading/>
         </template>
         <template v-else-if='!tokens.length && !newToken.show'>
             <div class='col col--12'>
-                <div class='flex-parent flex-parent--center-main'>
+                <div class='flex flex--center-main'>
                     <div class='flex-child py24'>
                         <svg class='icon h60 w60 color-gray'><use href='#icon-info'/></svg>
                     </div>
@@ -84,6 +82,8 @@
 </template>
 
 <script>
+import Loading from '../util/Loading.vue';
+
 export default {
     name: 'ProfileToken',
     props: [ ],
@@ -155,6 +155,9 @@ export default {
 
             this.getTokens();
         }
+    },
+    components: {
+        Loading
     }
 }
 </script>

@@ -13,12 +13,7 @@
             </div>
 
             <template v-if='loading.logs'>
-                <div class='flex-parent flex-parent--center-main w-full pt24'>
-                    <div class='flex-child loading py24'></div>
-                </div>
-                <div class='flex-parent flex-parent--center-main w-full pb24'>
-                    <div class='flex-child py24'>Loading Logs</div>
-                </div>
+                <Loading desc='Loading Logs'/>
             </template>
             <template v-else>
                 <div v-for='line in logs' :key='line.id' v-text='line.message' class='cursor-pointer bg-darken10-on-hover'></div>
@@ -52,20 +47,15 @@
                 </div>
             </div>
             <template v-if='loading.init'>
-                <div class='flex-parent flex-parent--center-main w-full pt24'>
-                    <div class='flex-child loading py24'></div>
-                </div>
-                <div class='flex-parent flex-parent--center-main w-full pb24'>
-                    <div class='flex-child py24'>Loading Tasks</div>
-                </div>
+                <Loading desc='Loading Tasks'/>
             </template>
             <template v-else-if='tasks.length === 0'>
                 <div class='col col--12 py6'>
-                    <div class='flex-parent flex-parent--center-main pt36'>
+                    <div class='flex flex--center-main pt36'>
                         <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-info'/></svg>
                     </div>
 
-                    <div class='flex-parent flex-parent--center-main pt12 pb36'>
+                    <div class='flex flex--center-main pt12 pb36'>
                         <h1 class='flex-child txt-h4 cursor-default'>No Tasks Yet</h1>
                     </div>
                 </div>
@@ -96,6 +86,8 @@
 </template>
 
 <script>
+import Loading from '../util/Loading.vue';
+
 export default {
     name: 'Tasks',
     props: ['iteration'],
@@ -204,6 +196,9 @@ export default {
                 this.$emit('err', err);
             }
         },
+    },
+    components: {
+        Loading
     }
 }
 </script>

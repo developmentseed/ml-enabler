@@ -13,11 +13,11 @@
         </template>
         <template v-else-if='!submissions.length'>
             <div class='col col--12 py6'>
-                <div class='flex-parent flex-parent--center-main pt36'>
+                <div class='flex flex--center-main pt36'>
                     <svg class='flex-child icon w60 h60 color-gray'><use href='#icon-info'/></svg>
                 </div>
 
-                <div class='flex-parent flex-parent--center-main pt12 pb36'>
+                <div class='flex flex--center-main pt12 pb36'>
                     <h1 class='flex-child txt-h4 cursor-default'>No Inferences Uploaded</h1>
                 </div>
             </div>
@@ -110,24 +110,24 @@
 
                     <div class='absolute z5 w180 bg-white round px12 py12' style='bottom: 40px; left: 12px;'>
                         <template v-if='inspect'>
-                            <div class='flex-parent flex-parent--center-main'>
+                            <div class='flex flex--center-main'>
                                 <div class='flex-child'>
                                     <svg class='icon w30 h30'><use xlink:href='#icon-info'/></svg>
                                 </div>
                             </div>
-                            <div class='flex-parent flex-parent--center-main'>
+                            <div class='flex flex--center-main'>
                                 <div class='flex-child'>
                                     <span v-text='inf'></span>: <span v-text='(inspect * 100).toFixed(1)'></span>%
                                 </div>
                             </div>
                         </template>
                         <template v-else>
-                            <div class='flex-parent flex-parent--center-main'>
+                            <div class='flex flex--center-main'>
                                 <div class='flex-child'>
                                     <svg class='icon w30 h30'><use xlink:href='#icon-cursor'/></svg>
                                 </div>
                             </div>
-                            <div class='flex-parent flex-parent--center-main'>
+                            <div class='flex flex--center-main'>
                                 <div class='flex-child'>
                                     <div align=center>Hover for Details</div>
                                 </div>
@@ -138,9 +138,9 @@
                     <div id="map" class='w-full h-full'></div>
                 </div>
             </div>
-            <div class='flex-parent flex-parent--center-main my18'>
+            <div class='flex flex--center-main my18'>
                 <div class='w240 round shadow-darken10 px12 py12 txt-s'>
-                    <div class='flex-parent flex-parent--center-main flex-parent--center-cross align-center'>
+                    <div class='flex flex--center-main flex--center-cross align-center'>
                         <div class='flex-child flex-child--grow wmin24'>
                             <span class='inline-block w12 h12 round-full bg-gray-light'></span>
                         </div>

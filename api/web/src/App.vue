@@ -1,5 +1,5 @@
 <template>
-    <div id="app" class='flex-parent flex-parent--center-main relative'>
+    <div id="app" class='flex flex--center-main relative'>
         <div class='flex-child wmax600 col col--12'>
             <div class='py36 col col--12 grid'>
                 <div class='col col--3'></div>
@@ -26,22 +26,17 @@
                 </div>
             </div>
             <template v-if='loading.meta || loading.user'>
-                <div class='flex-parent flex-parent--center-main w-full'>
-                    <div class='flex-child loading py24'></div>
-                </div>
-                <div class='flex-parent flex-parent--center-main w-full'>
-                    <div class='flex-child py24'>Loading MLEnabler</div>
-                </div>
+                <Loading desc='Loading ML-Enabler'/>
             </template>
             <template v-else-if='meta.security === "authenticated" && !user.username && $route.path !== "/login"'>
-                <div class='flex-parent flex-parent--center-main pt36'>
+                <div class='flex flex--center-main pt36'>
                     <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-alert'/></svg>
                 </div>
 
-                <div class='flex-parent flex-parent--center-main pt12 pb6'>
+                <div class='flex flex--center-main pt12 pb6'>
                     <h1 class='flex-child txt-h4 cursor-default align-center'>Access Denied</h1>
                 </div>
-                <div class='flex-parent flex-parent--center-main'>
+                <div class='flex flex--center-main'>
                     <h2 class='flex-child txt-h5 cursor-default align-center'>Please Login To Access</h2>
                 </div>
             </template>
@@ -65,6 +60,7 @@
 
 <script>
 import Err from './components/Err.vue';
+import Loading from './components/util/Loading.vue';
 
 export default {
     name: 'MLEnabler',
@@ -127,12 +123,42 @@ export default {
         }
     },
     components: {
+        Loading,
         Err
     }
 }
 </script>
 
-<style>
+<style lang="scss">
+
+.col--1 { width: 8.3333% !important; }
+.col--2 { width: 16.6666% !important; }
+.col--3 { width: 25% !important; }
+.col--4 { width: 33.3333% !important; }
+.col--5 { width: 41.6666% !important; }
+.col--6 { width: 50% !important; }
+.col--7 { width: 58.3333% !important; }
+.col--8 { width: 66.6666% !important; }
+.col--9 { width: 75% !important; }
+.col--10 { width: 83.3333% !important; }
+.col--11 { width: 91.6666% !important; }
+.col--12 { width: 100% !important; }
+
+@media screen and (min-width: 640px) {
+    .col--1-mm { width: 8.3333% !important; }
+    .col--2-mm { width: 16.6666% !important; }
+    .col--3-mm { width: 25% !important; }
+    .col--4-mm { width: 33.3333% !important; }
+    .col--5-mm { width: 41.6666% !important; }
+    .col--6-mm { width: 50% !important; }
+    .col--7-mm { width: 58.3333% !important; }
+    .col--8-mm { width: 66.6666% !important; }
+    .col--9-mm { width: 75% !important; }
+    .col--10-mm { width: 83.3333% !important; }
+    .col--11-mm { width: 91.6666% !important; }
+    .col--12-mm { width: 100% !important; }
+}
+
 .dropdown {
     position: relative;
     display: inline-block;

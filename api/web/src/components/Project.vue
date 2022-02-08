@@ -1,9 +1,7 @@
 <template>
     <div class="col col--12">
         <template v-if='loading.project'>
-            <div class='flex-parent flex-parent--center-main w-full py24'>
-                <div class='flex-child loading py24'></div>
-            </div>
+            <Loading desc='Loading Projects'/>
         </template>
         <template v-else-if='$route.name === "project"'>
             <div class='col col--12 clearfix py6'>
@@ -54,17 +52,15 @@
 
                 <div v-if='!folding.iterations' class='grid grid--gut12'>
                     <template v-if='loading.iters'>
-                        <div class='flex-parent flex-parent--center-main w-full py24'>
-                            <div class='flex-child loading py24'></div>
-                        </div>
+                        <Loading desc='Loading Iterations'/>
                     </template>
                     <template v-else-if='iterations.length === 0'>
                         <div class='col col--12 py6'>
-                            <div class='flex-parent flex-parent--center-main pt36'>
+                            <div class='flex flex--center-main pt36'>
                                 <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-info'/></svg>
                             </div>
 
-                            <div class='flex-parent flex-parent--center-main pt12 pb36'>
+                            <div class='flex flex--center-main pt12 pb36'>
                                 <h1 class='flex-child txt-h4 cursor-default'>No Iterations Yet</h1>
                             </div>
                         </div>
@@ -122,11 +118,11 @@
                 <div v-if='!folding.imagery' class='grid grid--gut12'>
                     <template v-if='imagery.length === 0'>
                         <div class='col col--12 py6'>
-                            <div class='flex-parent flex-parent--center-main pt36'>
+                            <div class='flex flex--center-main pt36'>
                                 <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-info'/></svg>
                             </div>
 
-                            <div class='flex-parent flex-parent--center-main pt12 pb36'>
+                            <div class='flex flex--center-main pt12 pb36'>
                                 <h1 class='flex-child txt-h4 cursor-default'>No Imagery Yet</h1>
                             </div>
                         </div>
@@ -192,6 +188,7 @@
 <script>
 import vSort from 'semver-sort';
 import Integrations from './Integrations.vue';
+import Loading from './util/Loading.vue';
 
 export default {
     name: 'Project',
@@ -220,6 +217,7 @@ export default {
         }
     },
     components: {
+        Loading,
         Integrations,
     },
     mounted: function() {

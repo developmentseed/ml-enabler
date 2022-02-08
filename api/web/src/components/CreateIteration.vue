@@ -55,19 +55,17 @@
                     <label>Imagery Source:</label>
                     <div class='border border--gray-light round'>
                         <template v-if='loading.imagery'>
-                            <div class='flex-parent flex-parent--center-main w-full py24'>
-                                <div class='flex-child loading py24'></div>
-                            </div>
+                            <Loading desc='Loading Imagery'/>
                         </template>
                         <template v-else-if='imagery.length === 0'>
-                            <div class='flex-parent flex-parent--center-main pt36'>
+                            <div class='flex flex--center-main pt36'>
                                 <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-info'/></svg>
                             </div>
 
-                            <div class='flex-parent flex-parent--center-main pt12 pb36'>
+                            <div class='flex flex--center-main pt12 pb36'>
                                 <h1 class='flex-child txt-h4 cursor-default'>An Imagery Source Must Be Created</h1>
                             </div>
-                            <div class='flex-parent flex-parent--center-main pt12 pb36'>
+                            <div class='flex flex--center-main pt12 pb36'>
                                 <button @click='$router.push({ path: `/project/${$route.params.projectid}/imagery` })' class='btn btn--stroke round fr color-green-light color-green-on-hover'>Create Imagery</button>
                             </div>
                         </template>
@@ -104,6 +102,8 @@
 </template>
 
 <script>
+import Loading from './util/Loading.vue';
+
 export default {
     name: 'CreateIteration',
     data: function() {
@@ -200,6 +200,9 @@ export default {
                 return this.$emit('err', err);
             }
         }
+    },
+    components: {
+        Loading
     }
 }
 </script>

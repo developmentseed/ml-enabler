@@ -15,9 +15,7 @@
         </div>
         <div class='border border--gray-light round col col--12 px12 py12 clearfix'>
             <template v-if='loading.iteration'>
-                <div class='flex-parent flex-parent--center-main w-full py24'>
-                    <div class='flex-child loading py24'></div>
-                </div>
+                <Loading/>
             </template>
             <template v-else>
                 <router-view
@@ -33,6 +31,8 @@
 </template>
 
 <script>
+import Loading from './util/Loading.vue';
+
 export default {
     name: 'Iteration',
     props: ['meta', 'project'],
@@ -73,6 +73,9 @@ export default {
             }
             this.loading.iteration = false;
         }
+    },
+    components: {
+        Loading
     }
 }
 </script>
