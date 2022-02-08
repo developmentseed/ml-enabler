@@ -8,6 +8,7 @@ import TileBase from 'tilebase';
 import Tippecanoe from './lib/tippecanoe.js';
 import B64PNG from './lib/b64png.js';
 import RL from 'readline';
+import minimist from 'minimist';
 
 /**
  * @class
@@ -38,15 +39,16 @@ class Task {
         const type = await Task.#sniff(input);
 
         if (type === 'Feature') {
+            if (!opts.silent) console.log('ok - detected Feature input');
             await Task.#feature(input, opts);
         } else if (type === 'Image') {
+            if (!opts.silent) console.log('ok - detected Image input');
             await Task.#image(input, opts);
         } else {
             throw new Error('Unsupported File Type');
         }
 
-
-        if (!opts.silent) console.error(`ok - writing to: ${opts.tmp}`);
+        if (!opts.silent) console.log(`ok - writing to: ${opts.tmp}`);
 
         await TileBase.to_tb(
             path.resolve(opts.tmp, 'fabric.mbtiles'),
@@ -131,18 +133,34 @@ class Task {
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-    console.log('ok - starting Task.vectorize');
-    console.log(`ASSET_BUCKET: ${process.env.ASSET_BUCKET}`);
-    console.log(`project: ${process.env.PROJECT_ID}`);
-    console.log(`iteration: ${process.env.ITERATION_ID}`);
-    console.log(`submission: ${process.env.SUBMISSION_ID}`);
+    const args = minimist(process.argv, {
+        string: ['bucket', 'input', 'tmp'],
+        boolean: ['silent'],
+        default: {
+            silent: false,
+            bucket: process.env.ASSET_BUCKET,
+            project: process.env.PROJECT_ID,
+            iteration: process.env.ITERATION_ID,
+            submission: process.env.SUBMISSION_ID,
+            input: new URL('./data/input.geojson', import.meta.url).pathname,
+            tmp: new URL('./data/', import.meta.url).pathname
+        }
+    });
 
-    Task.vectorize(new URL('./data/input.geojson', import.meta.url).pathname, {
-        silent: false,
-        bucket: process.env.ASSET_BUCKET,
-        project: process.env.PROJECT_ID,
-        iteration: process.env.ITERATION_ID,
-        submission: process.env.SUBMISSION_ID
+
+    console.log('ok - starting Task.vectorize');
+    console.log(`ok - bucket: ${args.bucket}`);
+    console.log(`ok - project: ${args.project}`);
+    console.log(`ok - iteration: ${args.iteration}`);
+    console.log(`ok - submission: ${args.submission}`);
+
+    Task.vectorize(args.input, {
+        tmp: args.tmp,
+        silent: args.silent,
+        bucket: args.bucket,
+        project: args.project,
+        iteration: args.iteration,
+        submission: args.submission
     });
 }
 

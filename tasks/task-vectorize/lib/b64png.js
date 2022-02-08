@@ -51,7 +51,7 @@ class B64PNG {
             try {
                 line = JSON.parse(line);
             } catch (err) {
-                console.error(err);
+                console.error(err, line);
                 continue;
             }
 
@@ -59,6 +59,9 @@ class B64PNG {
 
             await mbtiles.putTile(line.z, line.x, line.y, new Buffer.from(line.image, 'base64'));
         }
+
+        if (!opts.silent) console.log('ok - finished writing base tiles');
+
         await mbtiles.stopWriting();
 
         const stack = bbox.gen_stack();
@@ -78,6 +81,8 @@ class B64PNG {
             }
         }
 
+        if (!opts.silent) console.log('ok - starting colourize, finished underzoom');
+
         // Colourize Tiles
         if (opts.minzoom < bbox.minzoom) {
             const stack = bbox.gen_stack();
@@ -95,6 +100,8 @@ class B64PNG {
             }
         }
 
+        if (!opts.silent) console.log('ok - writing info - finished colourize');
+
         await mbtiles.startWriting();
         await mbtiles.putInfo({
             name: 'Fabric',
@@ -106,7 +113,10 @@ class B64PNG {
             bounds: bbox.bbox.join(','),
             center: bbox.centre().concat([bbox.maxzoom]).join(',')
         });
+
         await mbtiles.stopWriting();
+
+        if (!opts.silent) console.log('ok - finished writing MBTiles');
     }
 
     /**
