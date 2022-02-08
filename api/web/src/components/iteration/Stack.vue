@@ -17,11 +17,11 @@
         </div>
 
         <template v-if='meta.environment !== "aws"'>
-            <div class='flex-parent flex-parent--center-main pt36'>
+            <div class='flex flex--center-main pt36'>
                 <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-info'/></svg>
             </div>
 
-            <div class='flex-parent flex-parent--center-main pt12 pb36'>
+            <div class='flex flex--center-main pt12 pb36'>
                 <h1 class='flex-child txt-h4 cursor-default align-center'>Stacks can only be created when MLEnabler is running in an "aws" environment</h1>
             </div>
         </template>
@@ -30,11 +30,11 @@
         </template>
         <template v-else-if='!iteration.model_link'>
             <div class='col col--12 py6'>
-                <div class='flex-parent flex-parent--center-main pt36'>
+                <div class='flex flex--center-main pt36'>
                     <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-info'/></svg>
                 </div>
 
-                <div class='flex-parent flex-parent--center-main pt12 pb36'>
+                <div class='flex flex--center-main pt12 pb36'>
                     <h1 class='flex-child txt-h4 cursor-default'>A Model must be uploaded before a stack is created</h1>
                 </div>
             </div>
@@ -90,10 +90,10 @@
             </div>
         </template>
         <template v-else-if='submit'>
-            <div class='flex-parent flex-parent--center-main w-full'>
+            <div class='flex flex--center-main w-full'>
                 <div class='flex-child py24'>Inferences Submitted</div>
             </div>
-            <div class='flex-parent flex-parent--center-main w-full'>
+            <div class='flex flex--center-main w-full'>
                 <button @click='submit = false' class='flex-child btn btn--stroke color-gray color-blue-on-hover round'>Close</button>
             </div>
         </template>
@@ -156,7 +156,7 @@
                         />
                     </template>
                     <template v-else>
-                        <div class='flex-parent flex-parent--center-main w-full py24'>
+                        <div class='flex flex--center-main w-full py24'>
                             <div class='flex-child py24'>Imagery Type Not Supported</div>
                         </div>
                     </template>

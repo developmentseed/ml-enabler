@@ -25,7 +25,7 @@
             <template v-if='showSearch'>
                 <div class='col col--12 px24 py6'>
                     <div class='relative'>
-                        <div class='absolute flex-parent flex-parent--center-cross flex-parent--center-main w36 h36'>
+                        <div class='absolute flex flex--center-cross flex--center-main w36 h36'>
                             <svg class='icon'><use xlink:href='#icon-search'></use></svg>
                         </div>
                         <input ref='search' v-model='search' class='input pl36' placeholder='Model Name'>
@@ -36,11 +36,11 @@
                 <Loading desc='Loading Projects'/>
             </template>
             <template v-else-if='projects.length === 0'>
-                <div class='flex-parent flex-parent--center-main pt36'>
+                <div class='flex flex--center-main pt36'>
                     <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-info'/></svg>
                 </div>
 
-                <div class='flex-parent flex-parent--center-main pt12 pb36'>
+                <div class='flex flex--center-main pt12 pb36'>
                     <h1 class='flex-child txt-h4 cursor-default'>No Projects Found</h1>
                 </div>
             </template>

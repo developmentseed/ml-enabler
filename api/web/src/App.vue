@@ -1,5 +1,5 @@
 <template>
-    <div id="app" class='flex-parent flex-parent--center-main relative'>
+    <div id="app" class='flex flex--center-main relative'>
         <div class='flex-child wmax600 col col--12'>
             <div class='py36 col col--12 grid'>
                 <div class='col col--3'></div>
@@ -29,14 +29,14 @@
                 <Loading desc='Loading ML-Enabler'/>
             </template>
             <template v-else-if='meta.security === "authenticated" && !user.username && $route.path !== "/login"'>
-                <div class='flex-parent flex-parent--center-main pt36'>
+                <div class='flex flex--center-main pt36'>
                     <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-alert'/></svg>
                 </div>
 
-                <div class='flex-parent flex-parent--center-main pt12 pb6'>
+                <div class='flex flex--center-main pt12 pb6'>
                     <h1 class='flex-child txt-h4 cursor-default align-center'>Access Denied</h1>
                 </div>
-                <div class='flex-parent flex-parent--center-main'>
+                <div class='flex flex--center-main'>
                     <h2 class='flex-child txt-h5 cursor-default align-center'>Please Login To Access</h2>
                 </div>
             </template>

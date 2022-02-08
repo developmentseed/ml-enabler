@@ -5,7 +5,7 @@
     </div>
 
     <template v-if='desc && desc.length'>
-        <div class='flex-parent flex-parent--center-main w-full'>
+        <div class='flex flex--center-main w-full'>
             <div class='flex-child py24' v-text='desc'></div>
         </div>
     </template>

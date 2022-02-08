@@ -15,7 +15,7 @@
                     <h2 class='txt-h4 py12'>Export Inferences</h2>
                 </div>
                 <div class='col col--6'>
-                    <div class="flex-parent-inline fr py12">
+                    <div class="flex-inline fr py12">
                         <button @click='mode = "download"' :class='{
                             "btn--stroke": mode !== "download"
                         }' class="btn btn--pill btn--pill-stroke btn--s btn--pill-hl round">Download</button>
@@ -95,11 +95,11 @@
                 </template>
                 <template v-else-if='mode === "complete"'>
                     <div class='col col--12 py6'>
-                        <div class='flex-parent flex-parent--center-main pt36'>
+                        <div class='flex flex--center-main pt36'>
                             <svg class='flex-child icon w60 h60 color-gray'><use href='#icon-info'/></svg>
                         </div>
 
-                        <div class='flex-parent flex-parent--center-main pt12 pb36'>
+                        <div class='flex flex--center-main pt12 pb36'>
                             <h1 class='flex-child txt-h4 cursor-default'>Integration Successful</h1>
                         </div>
                     </div>
@@ -111,11 +111,11 @@
         </template>
         <template v-else>
             <div class='col col--12 py6'>
-                <div class='flex-parent flex-parent--center-main pt36'>
+                <div class='flex flex--center-main pt36'>
                     <svg class='flex-child icon w60 h60 color-gray'><use href='#icon-info'/></svg>
                 </div>
 
-                <div class='flex-parent flex-parent--center-main pt12 pb36'>
+                <div class='flex flex--center-main pt12 pb36'>
                     <h1 class='flex-child txt-h4 cursor-default'>No Inferences Uploaded</h1>
                 </div>
             </div>

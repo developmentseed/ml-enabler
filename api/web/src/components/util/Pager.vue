@@ -1,5 +1,5 @@
 <template>
-    <div class='col col--12 flex-parent flex-parent--center-main my12'>
+    <div class='col col--12 flex flex--center-main my12'>
         <div class='flex-child'>
             <template v-if='parseInt(total) <= parseInt(perpage)'>
                 <button

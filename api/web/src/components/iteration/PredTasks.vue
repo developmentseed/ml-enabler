@@ -9,11 +9,11 @@
             <Loading/>
         </template>
         <template v-else-if='meta.environment !== "aws"'>
-            <div class='flex-parent flex-parent--center-main pt36'>
+            <div class='flex flex--center-main pt36'>
                 <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-info'/></svg>
             </div>
 
-            <div class='flex-parent flex-parent--center-main pt12 pb36'>
+            <div class='flex flex--center-main pt12 pb36'>
                 <h1 class='flex-child txt-h4 cursor-default align-center'>
                     Task creation can only occur when MLEnabler is running in an "aws" environment
                 </h1>
@@ -30,11 +30,11 @@
                 <svg class='icon'><use href='#icon-close'/></svg>
             </button>
 
-            <div class='flex-parent flex-parent--center-main pt36'>
+            <div class='flex flex--center-main pt36'>
                 <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-info'/></svg>
             </div>
 
-            <div class='flex-parent flex-parent--center-main pt12 pb36'>
+            <div class='flex flex--center-main pt12 pb36'>
                 <h1 class='flex-child txt-h4 cursor-default align-center'>
                     A TFRecords file must be created before retraining occurs
                 </h1>
@@ -45,16 +45,16 @@
                 <svg class='icon'><use href='#icon-close'/></svg>
             </button>
 
-            <div class='flex-parent flex-parent--center-main pt36'>
+            <div class='flex flex--center-main pt36'>
                 <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-info'/></svg>
             </div>
 
-            <div class='flex-parent flex-parent--center-main pt12 pb36'>
+            <div class='flex flex--center-main pt12 pb36'>
                 <h1 class='flex-child txt-h4 cursor-default align-center'>
                     A model must be uploaded before retraining occurs
                 </h1>
             </div>
-            <div class='flex-parent flex-parent--center-main pt12 pb36'>
+            <div class='flex flex--center-main pt12 pb36'>
                 <button @click='$router.push({ name: "assets" })' class='flex-child btn btn--stroke round'>
                     Upload Model
                 </button>
@@ -68,22 +68,22 @@
                 <svg class='icon'><use href='#icon-close'/></svg>
             </button>
 
-            <div class='flex-parent flex-parent--center-main pt36'>
+            <div class='flex flex--center-main pt36'>
                 <svg class='flex-child icon w60 h60 color-gray'><use href='#icon-info'/></svg>
             </div>
 
-            <div class='flex-parent flex-parent--center-main pt12 pb36'>
+            <div class='flex flex--center-main pt12 pb36'>
                 <h1 class='flex-child txt-h4 cursor-default'>No Inferences Uploaded</h1>
             </div>
 
-            <div class='flex-parent flex-parent--center-main pt12 pb36'>
+            <div class='flex flex--center-main pt12 pb36'>
                 <button @click='$router.push({ name: "stack" })' class='flex-child btn btn--stroke round'>
                     Create Inference Stack
                 </button>
             </div>
         </template>
         <template v-else-if='create === "retrain" && !iteration.checkpoint_link'>
-            <div class='flex-parent flex-parent--center-main pt12 pb36'>
+            <div class='flex flex--center-main pt12 pb36'>
                 <h1 class='flex-child txt-h4 cursor-default align-center'>
                     Checkpoint Upload
                 </h1>
