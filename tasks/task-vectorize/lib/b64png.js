@@ -84,20 +84,16 @@ class B64PNG {
         if (!opts.silent) console.log('ok - starting colourize, finished underzoom');
 
         // Colourize Tiles
-        if (opts.minzoom < bbox.minzoom) {
-            const stack = bbox.gen_stack();
+        for (let z = bbox.minzoom; z >= opts.minzoom; z--) {
+            await mbtiles.startWriting();
 
-            for (let z = bbox.minzoom - 1; z >= opts.minzoom; z--) {
-                await mbtiles.startWriting();
-
-                for (let x = stack[z].minx; x <= stack[z].maxx; x++) {
-                    for (let y = stack[z].miny; y <= stack[z].maxy; y++) {
-                        await mbtiles.putTile(z, x, y, Buffer.from(this.color(await mbtiles.getTile(z, x, y))));
-                    }
+            for (let x = stack[z].minx; x <= stack[z].maxx; x++) {
+                for (let y = stack[z].miny; y <= stack[z].maxy; y++) {
+                    await mbtiles.putTile(z, x, y, Buffer.from(this.color(await mbtiles.getTile(z, x, y))));
                 }
-
-                await mbtiles.stopWriting();
             }
+
+            await mbtiles.stopWriting();
         }
 
         if (!opts.silent) console.log('ok - writing info - finished colourize');
