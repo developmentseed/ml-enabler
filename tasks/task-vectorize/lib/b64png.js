@@ -10,7 +10,6 @@ import tb from '@mapbox/tilebelt';
 
 /**
  * @class
- *
  * @param {Array} Palette
  */
 class B64PNG {
@@ -73,7 +72,7 @@ class B64PNG {
 
                 for (let x = stack[z].minx; x <= stack[z].maxx; x++) {
                     for (let y = stack[z].miny; y <= stack[z].maxy; y++) {
-                        mbtiles.putTile(z, x, y, Buffer.from(await this.overzoom(mbtiles, x, y, z)));
+                        mbtiles.putTile(z, x, y, Buffer.from(await this.underzoom(mbtiles, x, y, z)));
                     }
                 }
 
@@ -127,9 +126,9 @@ class B64PNG {
      * @param {Number}  y           Y Coordinate
      * @param {Number}  z           Z Coordinate
      */
-    async overzoom(mbtiles, x, y, z) {
+    async underzoom(mbtiles, x, y, z) {
         const parent = new Image(256, 256, [], {
-            kind: 'RGB'
+            kind: 'RGBA'
         });
 
         const children = [];
@@ -143,7 +142,7 @@ class B64PNG {
                 image = await image.load(await mbtiles.getTile(z, x, y));
             } catch (err) {
                 image = new Image(256, 256, [], {
-                    kind: 'RGB'
+                    kind: 'RGBA'
                 });
             }
 
