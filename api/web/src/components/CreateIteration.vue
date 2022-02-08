@@ -200,6 +200,9 @@ export default {
                 return this.$emit('err', err);
             }
         }
+    },
+    components: {
+        Loading
     }
 }
 </script>
