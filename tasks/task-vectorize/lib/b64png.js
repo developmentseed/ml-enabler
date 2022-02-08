@@ -189,7 +189,7 @@ class B64PNG {
 
     class_mean(values) {
         const value = values.sort((a,b) => {
-            values.filter(v => v === a).length - values.filter(v => v === b).length
+            values.filter((v) => v === a).length - values.filter((v) => v === b).length;
         }).pop();
 
         return value;
