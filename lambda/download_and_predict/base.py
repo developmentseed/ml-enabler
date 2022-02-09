@@ -44,8 +44,8 @@ class ModelMeta:
         self.inf_type = inf_type
 
         # As far as I know there can be only a single named i/o key
-        self.input_name = list(inputs.keys())[0]
-        self.output_name = list(outputs.keys())[0]
+        self.input_name = list(self.inputs.keys())[0]
+        self.output_name = list(self.outputs.keys())[0]
 
         # We assume B64 encoded images are 256,256 as we have no other way of determining their inputs
         if self.inputs[self.input_name].get('dtype') == 'DT_FLOAT':
