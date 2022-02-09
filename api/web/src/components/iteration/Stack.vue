@@ -6,11 +6,11 @@
             />
 
             <div v-if='iteration.model_link' class='fr'>
-                <button @click='refresh' class='btn fr round btn--stroke btn--gray'>
+                <button @click='refresh' v-tooltip='"Refresh Stack"' class='btn fr round btn--stroke btn--gray'>
                     <svg class='icon'><use href='#icon-refresh'/></svg>
                 </button>
 
-                <button v-if='complete.includes(stack.status)' @click='deleteStack' class='mr12 btn fr round btn--stroke color-gray color-red-on-hover'>
+                <button v-if='complete.includes(stack.status)' @click='deleteStack' v-tooltip='"Delete Stack"' class='mr12 btn fr round btn--stroke color-gray color-red-on-hover'>
                     <svg class='icon'><use href='#icon-trash'/></svg>
                 </button>
             </div>

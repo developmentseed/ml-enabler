@@ -6,10 +6,10 @@
         <div class='fr'>
             <div v-if='loading.mini' class='fl mr6 mt3 loading loading--s'></div>
 
-            <button @click='purgeQueue' class='btn mx3 round btn--stroke btn--gray btn--red-on-hover'>
+            <button @click='purgeQueue' v-tooltip='"Purge Queue"' class='btn mx3 round btn--stroke btn--gray btn--red-on-hover'>
                 <svg class='icon'><use href='#icon-trash'/></svg>
             </button>
-            <button @click='refresh' class='btn mx3 round btn--stroke btn--gray'>
+            <button @click='refresh' v-tooltip='"Refresh Queue"' class='btn mx3 round btn--stroke btn--gray'>
                 <svg class='icon'><use href='#icon-refresh'/></svg>
             </button>
         </div>
