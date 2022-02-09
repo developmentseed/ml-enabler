@@ -25,9 +25,17 @@
             <div class='col col--12 grid border-b border--gray-light'>
                 <div class='col col--2'>Type</div>
                 <div class='col col--2'>Status</div>
-                <div class='col col--5'>Note</div>
-                <div class='col col--3 clearfix pr6'>
+                <div class='col col--3'>Note</div>
+                <div class='col col--5 clearfix pr6'>
                     <button class='dropdown btn fr h24 mb6 round btn--stroke btn--s color-gray color-green-on-hover'>
+                        <svg class='icon fl'><use href='#icon-menu'/></svg>
+                        <svg class='icon fl'><use href='#icon-chevron-down'/></svg>
+
+                        <div class='round dropdown-content color-black' style='top: 24px;'>
+                            <div @click='clearTasks' class='round bg-gray-faint-on-hover'>Clear</div>
+                        </div>
+                    </button>
+                    <button class='dropdown btn fr h24 mr6 mb6 round btn--stroke btn--s color-gray color-green-on-hover'>
                         <svg class='icon fl'><use href='#icon-plus'/></svg>
                         <svg class='icon fl'><use href='#icon-chevron-down'/></svg>
 
@@ -46,6 +54,9 @@
             </div>
             <template v-if='loading.init'>
                 <Loading desc='Loading Tasks'/>
+            </template>
+            <template v-else-if='loading.clear'>
+                <Loading desc='Cleaning Up Tasks'/>
             </template>
             <template v-else-if='tasks.length === 0'>
                 <div class='col col--12 py6'>
@@ -77,7 +88,6 @@
                         <div v-if='task.logs' class='fr bg-gray-faint color-gray inline-block px6 py3 round txt-xs txt-bold mr6'>
                             Logs
                         </div>
-
                     </div>
                 </div>
             </template>
@@ -103,6 +113,7 @@ export default {
             looping: false,
             loading: {
                 init: true,
+                clear: false,
                 tasks: true,
                 logs: false
             }
@@ -110,16 +121,29 @@ export default {
     },
     mounted: function() {
         this.refresh();
+
+        this.looping = setInterval(() => {
+            this.getTasks(true);
+        }, 10 * 1000);
+    },
+    destroyed: function() {
+        if (this.looping) clearInterval(this.looping);
     },
     methods: {
+        clearTasks: function() {
+            this.loading.clear = true;
+
+            for (const task of this.tasks) {
+                this.deleteTask(task.id, false);
+            }
+
+            this.getTasks();
+
+            this.loading.clear = false;
+        },
         closelogs: function() {
             this.logs = [];
             this.log = false;
-        },
-        loop: function() {
-            setTimeout(() => {
-                this.getTasks(true);
-            }, 10000);
         },
         refresh: function() {
             this.getTasks();
@@ -143,7 +167,7 @@ export default {
 
             this.loading.logs = false;
         },
-        getTasks: async function(loop) {
+        getTasks: async function() {
             if (this.init) {
                 this.init = false;
                 this.loading.init = true;
@@ -159,8 +183,6 @@ export default {
                     return task;
                 });
                 this.tasks.forEach(task => this.getTask(task.id));
-
-                if (loop) this.loop();
             } catch (err) {
                 this.$emit('err', err);
             }
@@ -184,7 +206,7 @@ export default {
                 this.$emit('err', err);
             }
         },
-        deleteTask: async function(task_id) {
+        deleteTask: async function(task_id, refresh=true) {
             try {
                 await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/task/${task_id}`, {
                     method: 'DELETE'
