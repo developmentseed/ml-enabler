@@ -120,7 +120,7 @@ export default {
         }
     },
     mounted: function() {
-        this.refresh();
+        this.getTasks();
 
         this.looping = setInterval(() => {
             this.getTasks(true);
@@ -144,9 +144,6 @@ export default {
         closelogs: function() {
             this.logs = [];
             this.log = false;
-        },
-        refresh: function() {
-            this.getTasks();
         },
         external: function(url) {
             if (!url) return;
@@ -212,7 +209,7 @@ export default {
                     method: 'DELETE'
                 });
 
-                this.getTasks()
+                if (refresh) this.getTasks()
             } catch (err) {
                 console.error(err)
                 this.$emit('err', err);
