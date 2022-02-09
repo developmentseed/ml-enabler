@@ -58,9 +58,9 @@ class ModelMeta:
 
             cmn = max(set(dimlist), key=dimlist.count)
 
-            self.meta.size = { 'x': cmn, 'y': cmn }
+            self.size = { 'x': cmn, 'y': cmn }
         else:
-            self.meta.size = { 'x': 256, 'y': 256 }
+            self.size = { 'x': 256, 'y': 256 }
 
 
 class DownloadAndPredict(object):
