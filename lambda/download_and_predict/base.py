@@ -97,12 +97,10 @@ class DownloadAndPredict(object):
 
         return chips
 
-    @staticmethod
-    def b64encode_image(image_binary:bytes) -> str:
+    def b64encode_image(self, image_binary: bytes) -> str:
         return b64encode(image_binary).decode('utf-8')
 
-    @staticmethod
-    def listencode_image(image):
+    def listencode_image(self, image: bytes):
         img = Image.open(io.BytesIO(image))
 
         # Resize input to be happy with model expectations
