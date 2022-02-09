@@ -38,14 +38,30 @@ class ModelMeta:
     def __init__(self, meta, inf_type):
         self.raw = meta
 
-        inputs = self.raw["metadata"]["signature_def"]["signature_def"]["serving_default"]["inputs"]
-        outputs = self.raw["metadata"]["signature_def"]["signature_def"]["serving_default"]["outputs"]
+        self.inputs = self.raw["metadata"]["signature_def"]["signature_def"]["serving_default"]["inputs"]
+        self.outputs = self.raw["metadata"]["signature_def"]["signature_def"]["serving_default"]["outputs"]
 
-        # As far as I know there can be only a single named i/o key
         self.inf_type = inf_type
 
+        # As far as I know there can be only a single named i/o key
         self.input_name = list(inputs.keys())[0]
         self.output_name = list(outputs.keys())[0]
+
+        # We assume B64 encoded images are 256,256 as we have no other way of determining their inputs
+        if self.inputs[self.input_name].get('dtype') == 'DT_FLOAT':
+            dims = self.inputs[self.input_name]['tensor_shape']['dim']
+
+            # For now pick the dimension that is duplicated twice as most models use square inputs
+            dimlist = []
+            for dim in dims:
+                dimlist.append(int(dim.get('size')))
+
+            cmn = max(set(dimlist), key=dimlist.count)
+
+            self.size = { 'x': cmn, 'y': cmn }
+        else:
+            self.size = { 'x': 256, 'y': 256 }
+
 
 class DownloadAndPredict(object):
     """
@@ -87,12 +103,21 @@ class DownloadAndPredict(object):
 
     @staticmethod
     def listencode_image(image):
-        img = np.array(Image.open(io.BytesIO(image)), dtype=np.uint8)
+        img = Image.open(io.BytesIO(image))
+
+        # Resize input to be happy with model expectations
+        # TODO don't assume input image size starts at 256^2
+        if self.size['x'] != 256 or self.size['y'] != 256:
+            img.resize((self.size['x'], self.size['y']))
+
+        img = np.array(img), dtype=np.uint8)
 
         try:
-            img = img.reshape((256, 256, 3))
+            img = img.reshape((self.size['x'], self.size['y'], 3))
         except ValueError:
-            img = img.reshape((256, 256, 4))
+            img = img.reshape((self.size['x'], self.size['y'], 4))
+
+        # TODO: Eventually check channel size from model metadata
         img = img[:, :, :3]
 
         # Custom
@@ -178,7 +203,11 @@ class DownloadAndPredict(object):
 
             for i in range(len(preds)):
                 img_bytes = BytesIO()
-                Image.fromarray(preds[i]).save(img_bytes, 'PNG')
+                # TODO don't assume input image size starts at 256^2 - and that the desired end state is 256^2
+                Image.fromarray(preds[i])
+                    .resize((256, 256))
+                    .save(img_bytes, 'PNG')
+
                 res.append({
                     "type": "Image",
                     "name": chips[i].get("name"),
