@@ -110,7 +110,7 @@ class DownloadAndPredict(object):
         if self.size['x'] != 256 or self.size['y'] != 256:
             img.resize((self.size['x'], self.size['y']))
 
-        img = np.array(img), dtype=np.uint8)
+        img = np.array(img, dtype=np.uint8)
 
         try:
             img = img.reshape((self.size['x'], self.size['y'], 3))
@@ -204,9 +204,7 @@ class DownloadAndPredict(object):
             for i in range(len(preds)):
                 img_bytes = BytesIO()
                 # TODO don't assume input image size starts at 256^2 - and that the desired end state is 256^2
-                Image.fromarray(preds[i])
-                    .resize((256, 256))
-                    .save(img_bytes, 'PNG')
+                Image.fromarray(preds[i]).resize((256, 256)).save(img_bytes, 'PNG')
 
                 res.append({
                     "type": "Image",
