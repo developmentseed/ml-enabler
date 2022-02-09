@@ -41,9 +41,7 @@
                         <svg class='icon'><use href='#icon-refresh'/></svg>
                     </button>
 
-                    <div v-if='loading.tasks' class='clearfix w24 pr12'>
-                        <div class='loading loading--s'></div>
-                    </div>
+                    <div v-if='loading.tasks' class='fl mr6 mt3 loading loading--s'></div>
                 </div>
             </div>
             <template v-if='loading.init'>
@@ -64,7 +62,9 @@
                 <div @click='getLogs(task.id)' :key='task.id' v-for='task in tasks' :class='{ "cursor-pointer": task.logs }' class='col col--12 grid py6 bg-gray-light-on-hover round'>
                     <div class='col col--2 px6' v-text='task.type'></div>
                     <template v-if='task._loading'>
-                        <div class='col col--8 loading loading--s h24'></div>
+                        <div class='col col--8 h24'>
+                            <div class='loading loading--s'></div>
+                        </div>
                     </template>
                     <template v-else>
                         <div class='col col--2 px6' v-text='task.status'></div>
