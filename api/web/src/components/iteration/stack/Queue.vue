@@ -105,7 +105,7 @@ export default {
                 + ':' + ('0' + date.getSeconds()).substr(-2);
         },
         refresh: async function(showLoading=true) {
-            if (this.showLoading) {
+            if (showLoading) {
                 this.loading.main = true;
             } else {
                 this.loading.mini = true;
