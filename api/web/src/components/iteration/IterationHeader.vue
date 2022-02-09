@@ -1,5 +1,5 @@
 <template>
-    <div class="flex-inline py3">
+    <div class='inline-block mb6'>
         <button @click='mode !== "config" && $router.push({ name: "config" })' :class='{
             "btn--stroke": mode !== "config"
         }' class="btn btn--pill btn--pill-stroke btn--s btn--pill-hl round">Config</button>
