@@ -13,7 +13,7 @@
         </div>
     </div>
     <div class='col col--12 border border--gray-light grid round'>
-        <template v-if='loading'>
+        <template v-if='loading.main'>
             <Loading desc='Loading Queues'/>
         </template>
         <template v-else>
@@ -40,7 +40,7 @@
             </div>
         </template>
 
-        <template v-if='tasks.length > 0 && !loading'>
+        <template v-if='tasks.length > 0 && !loading.main'>
             <div class='col col--12 px12'>
                 <div class='align-center w-full'>Recent Queue Population Tasks</div>
 
@@ -69,7 +69,10 @@ export default {
     name: 'StackQueue',
     data: function() {
         return {
-            loading: true,
+            loading: {
+                main: true,
+                mini: false
+            },
             tasks: [],
             queue: {
                 queued: 0,
@@ -80,7 +83,15 @@ export default {
         };
     },
     mounted: function() {
+        this.looping = setInterval(() => {
+            this.refresh(false);
+        }, 5 * 1000);
+
         this.refresh();
+    },
+    destroyed: function() {
+        if (this.looping) clearInterval(this.looping);
+        this.looping = false;
     },
     methods: {
         datefmt: function(dt) {
@@ -93,13 +104,18 @@ export default {
                 + ':' + ('0' + date.getMinutes()).substr(-2)
                 + ':' + ('0' + date.getSeconds()).substr(-2);
         },
-        refresh: async function() {
-            this.loading = true;
+        refresh: async function(showLoading=true) {
+            if (this.showLoading) {
+                this.loading.main = true;
+            } else {
+                this.loading.mini = true;
+            }
 
             await this.getQueue();
             await this.getTasks();
 
-            this.loading = false;
+            this.loading.main = false;
+            this.loading.mini = false;
         },
         getTasks: async function() {
             try {

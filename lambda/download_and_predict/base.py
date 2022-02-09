@@ -58,9 +58,9 @@ class ModelMeta:
 
             cmn = max(set(dimlist), key=dimlist.count)
 
-            self.size = { 'x': cmn, 'y': cmn }
+            self.meta.size = { 'x': cmn, 'y': cmn }
         else:
-            self.size = { 'x': 256, 'y': 256 }
+            self.meta.size = { 'x': 256, 'y': 256 }
 
 
 class DownloadAndPredict(object):
@@ -105,15 +105,15 @@ class DownloadAndPredict(object):
 
         # Resize input to be happy with model expectations
         # TODO don't assume input image size starts at 256^2
-        if self.size['x'] != 256 or self.size['y'] != 256:
-            img.resize((self.size['x'], self.size['y']))
+        if self.meta.size['x'] != 256 or self.meta.size['y'] != 256:
+            img.resize((self.meta.size['x'], self.meta.size['y']))
 
         img = np.array(img, dtype=np.uint8)
 
         try:
-            img = img.reshape((self.size['x'], self.size['y'], 3))
+            img = img.reshape((self.meta.size['x'], self.meta.size['y'], 3))
         except ValueError:
-            img = img.reshape((self.size['x'], self.size['y'], 4))
+            img = img.reshape((self.meta.size['x'], self.meta.size['y'], 4))
 
         # TODO: Eventually check channel size from model metadata
         img = img[:, :, :3]
