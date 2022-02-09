@@ -106,7 +106,7 @@ class DownloadAndPredict(object):
         # Resize input to be happy with model expectations
         # TODO don't assume input image size starts at 256^2
         if self.meta.size['x'] != 256 or self.meta.size['y'] != 256:
-            img.resize((self.meta.size['x'], self.meta.size['y']))
+            img = img.resize((self.meta.size['x'], self.meta.size['y']))
 
         img = np.array(img, dtype=np.uint8)
 
