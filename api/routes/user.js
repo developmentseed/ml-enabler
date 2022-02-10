@@ -24,7 +24,7 @@ async function router(schema, config) {
         try {
             await User.is_auth(req);
 
-            res.json(await user.list(req.query));
+            res.json(await User.list(config.pool, req.query));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -101,7 +101,11 @@ async function router(schema, config) {
                 delete req.body.validated;
             }
 
-            res.json(await user.patch(req.params.uid, req.body));
+            const user = await User.from(config.pool, req.params.uid);
+            user.patch(req.body);
+            await user.commit(config.pool);
+
+            res.json(user.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }

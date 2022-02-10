@@ -25,35 +25,17 @@
             @err='$emit("err", $event)'
         />
 
-        <template v-if='user.access === "admin"'>
-            <ProfileAdminUser
-                @err='$emit("err", $event)'
-            />
-
-            <AdminStacks
-                @err='$emit("err", $event)'
-            />
-        </template>
     </div>
 </template>
 
 <script>
 import ProfileTokens from './profile/ProfileTokens.vue'
-import ProfileAdminUser from './profile/ProfileAdminUser.vue'
-import AdminStacks from './profile/AdminStacks.vue'
 
 export default {
     name: 'Profile',
     props: ['user'],
-    data: function() {
-        return { };
-    },
-    methods: {
-    },
     components: {
-        ProfileTokens,
-        ProfileAdminUser,
-        AdminStacks
+        ProfileTokens
     }
 }
 </script>

@@ -13,6 +13,7 @@ import Home from './components/Home.vue';
 import Login from './components/Login.vue';
 import Project from './components/Project.vue';
 import Profile from './components/Profile.vue';
+import Admin from './components/Admin.vue';
 import CreateProject from './components/CreateProject.vue';
 import EditProject from './components/EditProject.vue';
 import Iteration from './components/Iteration.vue';
@@ -37,6 +38,8 @@ const router = new VueRouter({
         { path: '/', name: 'home', component: Home },
         { path: '/login', name: 'login', component: Login },
         { path: '/profile', name: 'profile', component: Profile },
+
+        { path: '/admin', name: 'admin', component: Admin },
 
         { path: '/project/new', name: 'newproject', component: CreateProject },
 

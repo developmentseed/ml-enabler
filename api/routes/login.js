@@ -23,14 +23,7 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             await User.is_auth(req);
-
-            res.json({
-                uid: req.user.id,
-                username: req.user.username,
-                email: req.user.email,
-                access: req.user.access,
-                validated: req.user.validated
-            });
+            res.json(req.user.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
