@@ -56,7 +56,7 @@
                         </div>
                         <div class='col col--4'>
                             <div class='select-container fr'>
-                                <select v-model='user.access' class='select'>
+                                <select v-model='user.access' class='select select--stroke'>
                                     <option>read</option>
                                     <option>write</option>
                                     <option>admin</option>

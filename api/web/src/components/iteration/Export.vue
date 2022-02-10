@@ -29,7 +29,7 @@
                     <div class='col col--2'>
                         <label>Submission</label>
                         <div class='select-container w-full'>
-                            <select v-model='params.submission' class='select'>
+                            <select v-model='params.submission' class='select select--stroke'>
                                 <option value='all'>All</option>
                                 <option :key='s.id' v-for='s in submissions' :value='s.id'><span v-text='s.id'/></option>
                             </select>
@@ -39,7 +39,7 @@
                     <div class='col col--5'>
                         <label>Format</label>
                         <div class='select-container w-full'>
-                            <select v-model='params.format' class='select'>
+                            <select v-model='params.format' class='select select--stroke'>
                                 <option value='geojson'>GeoJSON</option>
                                 <option value='geojsonld'>GeoJSON LD</option>
                                 <option value='csv'>CSV</option>
@@ -50,7 +50,7 @@
                     <div class='col col--5'>
                         <label>Inferences</label>
                         <div class='select-container w-full'>
-                            <select v-model='params.inferences' class='select'>
+                            <select v-model='params.inferences' class='select select--stroke'>
                                 <option value='all'>All</option>
                                 <option :key='inf' v-for='inf in iteration.inf_list.split(",")' :value='inf'><span v-text='inf'/></option>
                             </select>

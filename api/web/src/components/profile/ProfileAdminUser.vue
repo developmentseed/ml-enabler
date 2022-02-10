@@ -57,7 +57,7 @@
                     <div class='col col--4'>
                         <label>Access</label>
                         <div class='select-container w-full'>
-                            <select :disabled='newUser.password' v-model='newUser.access' class='select'>
+                            <select :disabled='newUser.password' v-model='newUser.access' class='select select--stroke'>
                                 <option>user</option>
                                 <option>admin</option>
                             </select>

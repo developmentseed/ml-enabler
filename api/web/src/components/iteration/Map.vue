@@ -29,7 +29,7 @@
                         <div class='col col--12'>
                             <label>Submission #</label>
                             <div class='select-container w-full'>
-                                <select v-model='submission' class='select select--s'>
+                                <select v-model='submission' class='select select--stroke select--s'>
                                     <template v-for='s in submissions'>
                                         <option v-bind:key='s.id' v-text='s.id'></option>
                                     </template>
@@ -37,7 +37,7 @@
                                 <div class='select-arrow'></div>
                             </div>
                         </div>
-                        <div class='col col--12'>
+                        <div v-if='iteration.inf_type !== "segmentation"' class='col col--12'>
                             <label>Inference Type</label>
                             <div class='select-container w-full'>
                                 <select v-model='inf' class='select select--s'>
@@ -50,7 +50,7 @@
                         </div>
                         <div class='col col--12 clearfix pt6'>
                             <div class='select-container mr6' style='width: 100px;'>
-                                <select v-model='aoi' class='select select--s'>
+                                <select v-model='aoi' class='select select--stroke select--s'>
                                     <option default value='aoi'>AOI</option>
                                     <template v-for='aoi in aois'>
                                         <template v-if='aoi.name.trim().length'>
@@ -82,7 +82,7 @@
                                     <input v-on:input='opacity = parseInt($event.target.value)' type='range' min=0 max=100 />
                                 </div>
                             </div>
-                            <div class='col col--12'>
+                            <div v-if='iteration.inf_type !== "segmentation"' class='col col--12'>
                                 <label>Threshold (<span v-text='threshold'/>%)</label>
                                 <div class='range range--s color-gray'>
                                     <input v-on:input='threshold = parseInt($event.target.value)' type='range' min=0 max=100 />
@@ -92,7 +92,7 @@
                             <div class='col col--12'>
                                 <label>Imagery</label>
                                 <div class='select-container w-full'>
-                                    <select v-model='bg' class='select select--s'>
+                                    <select v-model='bg' class='select select--stroke select--s'>
                                         <option value='default'>Default</option>
                                         <option v-for='img in imagery' v-bind:key='img.id' :value='img.id' v-text='img.name'></option>
                                     </select>
@@ -108,7 +108,7 @@
                         </button>
                     </div>
 
-                    <div class='absolute z5 w180 bg-white round px12 py12' style='bottom: 40px; left: 12px;'>
+                    <div v-if='iteration.inf_type !== "segmentation"' class='absolute z5 w180 bg-white round px12 py12' style='bottom: 40px; left: 12px;'>
                         <template v-if='inspect'>
                             <div class='flex flex--center-main'>
                                 <div class='flex-child'>
@@ -220,12 +220,20 @@ export default {
             this.background();
         },
         opacity: function() {
-            for (const inf of this.inferences) {
+            if (this.iteration.inf_type === 'segmentation') {
                 this.map.setPaintProperty(
-                    `inf-${inf}`,
-                    'fill-opacity',
-                    [ 'number', [ '*', ['get', inf], (this.opacity / 100) ] ]
+                    `tiles`,
+                    'raster-opacity',
+                    this.opacity / 100
                 );
+            } else {
+                for (const inf of this.inferences) {
+                    this.map.setPaintProperty(
+                        `inf-${inf}`,
+                        'fill-opacity',
+                        [ 'number', [ '*', ['get', inf], (this.opacity / 100) ] ]
+                    );
+                }
             }
         },
         threshold: function() {
@@ -355,61 +363,6 @@ export default {
             this.map.setFilter(`inf-${inf}`, ['>=', inf, this.threshold / 100]);
         },
         styles: function() {
-            const polyouter = buffer(bboxPolygon(this.tilejson.bounds), 0.3);
-            const polyinner = buffer(bboxPolygon(this.tilejson.bounds), 0.1);
-
-            const poly = {
-                type: 'FeatureCollection',
-                features: [{
-                    type: 'Feature',
-                    properties: {},
-                    geometry: {
-                        type: 'Polygon',
-                        coordinates: [
-                            polyouter.geometry.coordinates[0],
-                            polyinner.geometry.coordinates[0]
-                        ]
-                    }
-                }]
-            };
-
-            for (const aoi of this.aois) {
-                const bounds = aoi.bounds.bounds;
-                const aoipolyouter = buffer(bboxPolygon(bounds), 0.3);
-                const aoipolyinner = buffer(bboxPolygon(bounds), 0.1);
-                poly.features.push({
-                    type: 'Feature',
-                    properties: {},
-                    geometry: {
-                        type: 'Polygon',
-                        coordinates: [
-                            aoipolyouter.geometry.coordinates[0],
-                            aoipolyinner.geometry.coordinates[0]
-                        ]
-                    }
-                });
-            }
-
-            if (!this.map.getSource('bbox')) {
-                this.map.addSource('bbox', {
-                    type: 'geojson',
-                    data: poly
-                });
-            }
-
-            if (!this.map.getLayer('bbox-layer')) {
-                this.map.addLayer({
-                    'id': `bbox-layer`,
-                    'type': 'fill',
-                    'source': 'bbox',
-                    'paint': {
-                        'fill-color': '#ffffff',
-                        'fill-opacity': 1
-                    }
-                });
-            }
-
-
             if (this.tilejson.tiles[0].match(/\.png$/)) {
                 if (this.map.getSource('tiles')) {
                     this.map.removeLayer('tiles');
@@ -427,6 +380,9 @@ export default {
                     id: `tiles`,
                     type: 'raster',
                     source: 'tiles',
+                    paint: {
+                        'raster-opacity': this.opacity / 100
+                    }
                 });
             } else {
                 this.map.addSource('tiles', {
@@ -515,6 +471,61 @@ export default {
 
                 this.hide();
             }
+
+            const polyouter = buffer(bboxPolygon(this.tilejson.bounds), 0.3);
+            const polyinner = buffer(bboxPolygon(this.tilejson.bounds), 0.1);
+
+            const poly = {
+                type: 'FeatureCollection',
+                features: [{
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [
+                            polyouter.geometry.coordinates[0],
+                            polyinner.geometry.coordinates[0]
+                        ]
+                    }
+                }]
+            };
+
+            for (const aoi of this.aois) {
+                const bounds = aoi.bounds.bounds;
+                const aoipolyouter = buffer(bboxPolygon(bounds), 0.3);
+                const aoipolyinner = buffer(bboxPolygon(bounds), 0.1);
+                poly.features.push({
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [
+                            aoipolyouter.geometry.coordinates[0],
+                            aoipolyinner.geometry.coordinates[0]
+                        ]
+                    }
+                });
+            }
+
+            if (!this.map.getSource('bbox')) {
+                this.map.addSource('bbox', {
+                    type: 'geojson',
+                    data: poly
+                });
+            }
+
+            if (!this.map.getLayer('bbox-layer')) {
+                this.map.addLayer({
+                    'id': `bbox-layer`,
+                    'type': 'fill',
+                    'source': 'bbox',
+                    'paint': {
+                        'fill-color': '#ffffff',
+                        'fill-opacity': 1
+                    }
+                });
+            }
+
         },
         fullscreen: function() {
             const container = document.querySelector('#map-container');
