@@ -29,7 +29,7 @@
                         <div class='col col--12'>
                             <label>Submission #</label>
                             <div class='select-container w-full'>
-                                <select v-model='submission' class='select select--s'>
+                                <select v-model='submission' class='select select--stroke select--s'>
                                     <template v-for='s in submissions'>
                                         <option v-bind:key='s.id' v-text='s.id'></option>
                                     </template>
@@ -37,7 +37,7 @@
                                 <div class='select-arrow'></div>
                             </div>
                         </div>
-                        <div class='col col--12'>
+                        <div v-if='iteration.inf_type !== "segmentation"' class='col col--12'>
                             <label>Inference Type</label>
                             <div class='select-container w-full'>
                                 <select v-model='inf' class='select select--s'>
@@ -50,7 +50,7 @@
                         </div>
                         <div class='col col--12 clearfix pt6'>
                             <div class='select-container mr6' style='width: 100px;'>
-                                <select v-model='aoi' class='select select--s'>
+                                <select v-model='aoi' class='select select--stroke select--s'>
                                     <option default value='aoi'>AOI</option>
                                     <template v-for='aoi in aois'>
                                         <template v-if='aoi.name.trim().length'>
@@ -82,7 +82,7 @@
                                     <input v-on:input='opacity = parseInt($event.target.value)' type='range' min=0 max=100 />
                                 </div>
                             </div>
-                            <div class='col col--12'>
+                            <div v-if='iteration.inf_type !== "segmentation"' class='col col--12'>
                                 <label>Threshold (<span v-text='threshold'/>%)</label>
                                 <div class='range range--s color-gray'>
                                     <input v-on:input='threshold = parseInt($event.target.value)' type='range' min=0 max=100 />
@@ -92,7 +92,7 @@
                             <div class='col col--12'>
                                 <label>Imagery</label>
                                 <div class='select-container w-full'>
-                                    <select v-model='bg' class='select select--s'>
+                                    <select v-model='bg' class='select select--stroke select--s'>
                                         <option value='default'>Default</option>
                                         <option v-for='img in imagery' v-bind:key='img.id' :value='img.id' v-text='img.name'></option>
                                     </select>

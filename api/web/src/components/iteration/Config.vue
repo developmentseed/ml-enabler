@@ -17,7 +17,7 @@
             <div class='col col--4 py6'>
                 <label>Model Type:</label>
                 <div class='select-container w-full'>
-                    <select disabled v-model='model_type' class='select'>
+                    <select disabled v-model='model_type' class='select select--stroke'>
                         <option value='tensorflow'>Tensorflow</option>
                     </select>
                     <div class='select-arrow'></div>
@@ -27,7 +27,7 @@
             <div class='col col--4 py6'>
                 <label>Model Type:</label>
                 <div class='select-container w-full'>
-                    <select disabled :value='iteration.inf_type' class='select'>
+                    <select disabled :value='iteration.inf_type' class='select select--stroke'>
                         <option value='classification'>Classification</option>
                         <option value='detection'>Object Detection</option>
                         <option value='segmentation'>Segmentation</option>

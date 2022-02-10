@@ -24,7 +24,7 @@
                 <div class='col col--4 py6'>
                     <label>Imagery Format</label>
                     <div class='select-container w-full'>
-                        <select v-model='imagery.fmt' class='select'>
+                        <select v-model='imagery.fmt' class='select select--stroke'>
                             <option value='wms'>WMS</option>
                             <option value='list'>Chip List</option>
                         </select>
