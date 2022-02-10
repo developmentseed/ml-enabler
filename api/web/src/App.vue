@@ -7,10 +7,6 @@
                     <h1 @click='$router.push({ path: "/" })' class='align-center txt-h3 cursor-default txt-underline-on-hover cursor-pointer'>ML Enabler</h1>
                 </div>
                 <div v-if='!loading.user && $route.path !== "/login"' class='col col--3'>
-                    <button @click='external("/docs/")' class='btn btn--stroke round color-gray' style='height: 33px;'>
-                        <svg class='icon'><use href='#icon-book'/></svg>
-                    </button>
-
                     <button v-if='user.username' @click='$router.push({ path: "/profile" })' class='dropdown btn fr mr6 mb6 pb3 round btn--stroke color-gray color-blue-on-hover'>
                         <svg class='icon inline'><use href='#icon-chevron-down'/></svg>
                         <span v-text='user.username'/>
@@ -21,8 +17,13 @@
                             <div @click.stop='getLogout' class='round bg-gray-faint-on-hover'>Logout</div>
                         </div>
                     </button>
+                    <button v-else @click='$router.push({ path: "/login" })' class='btn fr mr6 mb6 pb3 round btn--stroke color-gray color-green-on-hover'>
+                        Login
+                    </button>
 
-                    <button v-else @click='$router.push({ path: "/login" })' class='fr btn btn--stroke btn--s round color-gray-light color-gray-on-hover'>Login</button>
+                    <button @click='external("/docs/")' class='btn btn--stroke round color-gray fr mr12' style='height: 33px;'>
+                        <svg class='icon'><use href='#icon-book'/></svg>
+                    </button>
 
                 </div>
             </div>
