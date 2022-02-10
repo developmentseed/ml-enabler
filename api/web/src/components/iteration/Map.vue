@@ -363,61 +363,6 @@ export default {
             this.map.setFilter(`inf-${inf}`, ['>=', inf, this.threshold / 100]);
         },
         styles: function() {
-            const polyouter = buffer(bboxPolygon(this.tilejson.bounds), 0.3);
-            const polyinner = buffer(bboxPolygon(this.tilejson.bounds), 0.1);
-
-            const poly = {
-                type: 'FeatureCollection',
-                features: [{
-                    type: 'Feature',
-                    properties: {},
-                    geometry: {
-                        type: 'Polygon',
-                        coordinates: [
-                            polyouter.geometry.coordinates[0],
-                            polyinner.geometry.coordinates[0]
-                        ]
-                    }
-                }]
-            };
-
-            for (const aoi of this.aois) {
-                const bounds = aoi.bounds.bounds;
-                const aoipolyouter = buffer(bboxPolygon(bounds), 0.3);
-                const aoipolyinner = buffer(bboxPolygon(bounds), 0.1);
-                poly.features.push({
-                    type: 'Feature',
-                    properties: {},
-                    geometry: {
-                        type: 'Polygon',
-                        coordinates: [
-                            aoipolyouter.geometry.coordinates[0],
-                            aoipolyinner.geometry.coordinates[0]
-                        ]
-                    }
-                });
-            }
-
-            if (!this.map.getSource('bbox')) {
-                this.map.addSource('bbox', {
-                    type: 'geojson',
-                    data: poly
-                });
-            }
-
-            if (!this.map.getLayer('bbox-layer')) {
-                this.map.addLayer({
-                    'id': `bbox-layer`,
-                    'type': 'fill',
-                    'source': 'bbox',
-                    'paint': {
-                        'fill-color': '#ffffff',
-                        'fill-opacity': 1
-                    }
-                });
-            }
-
-
             if (this.tilejson.tiles[0].match(/\.png$/)) {
                 if (this.map.getSource('tiles')) {
                     this.map.removeLayer('tiles');
@@ -526,6 +471,61 @@ export default {
 
                 this.hide();
             }
+
+            const polyouter = buffer(bboxPolygon(this.tilejson.bounds), 0.3);
+            const polyinner = buffer(bboxPolygon(this.tilejson.bounds), 0.1);
+
+            const poly = {
+                type: 'FeatureCollection',
+                features: [{
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [
+                            polyouter.geometry.coordinates[0],
+                            polyinner.geometry.coordinates[0]
+                        ]
+                    }
+                }]
+            };
+
+            for (const aoi of this.aois) {
+                const bounds = aoi.bounds.bounds;
+                const aoipolyouter = buffer(bboxPolygon(bounds), 0.3);
+                const aoipolyinner = buffer(bboxPolygon(bounds), 0.1);
+                poly.features.push({
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [
+                            aoipolyouter.geometry.coordinates[0],
+                            aoipolyinner.geometry.coordinates[0]
+                        ]
+                    }
+                });
+            }
+
+            if (!this.map.getSource('bbox')) {
+                this.map.addSource('bbox', {
+                    type: 'geojson',
+                    data: poly
+                });
+            }
+
+            if (!this.map.getLayer('bbox-layer')) {
+                this.map.addLayer({
+                    'id': `bbox-layer`,
+                    'type': 'fill',
+                    'source': 'bbox',
+                    'paint': {
+                        'fill-color': '#ffffff',
+                        'fill-opacity': 1
+                    }
+                });
+            }
+
         },
         fullscreen: function() {
             const container = document.querySelector('#map-container');
