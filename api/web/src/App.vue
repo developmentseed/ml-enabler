@@ -17,6 +17,7 @@
 
                         <div class='round dropdown-content color-black' style='top: 24px;'>
                             <div @click.stop='$router.push({ path: "/profile" })' class='round bg-gray-faint-on-hover'>Profile</div>
+                            <div v-if='user.access === "admin"' @click.stop='$router.push({ path: "/admin" })' class='round bg-gray-faint-on-hover'>Admin</div>
                             <div @click.stop='getLogout' class='round bg-gray-faint-on-hover'>Logout</div>
                         </div>
                     </button>
@@ -68,7 +69,8 @@ export default {
         return {
             err: false,
             user: {
-                name: false
+                name: false,
+                access: false
             },
             meta: {
                 version: 1,

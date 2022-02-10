@@ -1,8 +1,9 @@
 'use strict';
 const { Err } = require('@openaddresses/batch-schema');
+const Login = require('../lib/login');
+const User = require('../lib/user');
 
 async function router(schema, config) {
-    const user = new (require('../lib/user'))(config);
     const email = new (require('../lib/email'))(config);
 
     /**
@@ -21,14 +22,14 @@ async function router(schema, config) {
         res: 'res.Login.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             res.json({
-                uid: req.auth.uid,
-                username: req.auth.username,
-                email: req.auth.email,
-                access: req.auth.access,
-                validated: req.auth.validated
+                uid: req.user.id,
+                username: req.user.username,
+                email: req.user.email,
+                access: req.user.access,
+                validated: req.user.validated
             });
         } catch (err) {
             return Err.respond(err, res);
@@ -53,17 +54,17 @@ async function router(schema, config) {
         res: 'res.Login.json'
     }, async (req, res) => {
         try {
-            req.auth = await user.login({
+            req.user = await Login.attempt({
                 username: req.body.username,
                 password: req.body.password
             });
 
             return res.json({
-                uid: req.auth.uid,
-                username: req.auth.username,
-                email: req.auth.email,
-                access: req.auth.access,
-                token: req.auth.token
+                uid: req.user.id,
+                username: req.user.username,
+                email: req.user.email,
+                access: req.user.access,
+                token: req.user.token
             });
         } catch (err) {
             return Err.respond(err, res);

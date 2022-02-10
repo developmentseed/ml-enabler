@@ -5,10 +5,9 @@ const Busboy = require('busboy');
 const Iteration = require('../lib/project/iteration');
 const path = require('path');
 const Task = require('../lib/project/iteration/task');
+const User = new (require('../lib/user'))(config);
 
 async function router(schema, config) {
-    const user = new (require('../lib/user'))(config);
-
     /**
      * @api {post} /api/project/:pid/iteration/:iterationid/asset Upload
      * @apiVersion 1.0.0
@@ -29,7 +28,7 @@ async function router(schema, config) {
         res: 'res.Iteration.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             config.is_aws();
         } catch (err) {
@@ -102,8 +101,8 @@ async function router(schema, config) {
         query: 'req.query.DownloadIterationAsset.json'
     }, async (req, res) => {
         try {
-            req.auth = req.token;
-            await user.is_auth(req);
+            req.user = req.token;
+            await User.is_auth(req);
 
             config.is_aws();
 

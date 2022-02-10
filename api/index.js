@@ -14,6 +14,7 @@ const args = require('minimist')(process.argv, {
 });
 
 const Config = require('./lib/config');
+const User = new require('./lib/user');
 const UserToken = new require('./lib/token');
 
 if (require.main === module) {
@@ -43,8 +44,6 @@ function configure(args, cb) {
  */
 
 async function server(args, config, cb) {
-    const user = new (require('./lib/user'))(config);
-
     const app = express();
 
     const schema = new Schema(express.Router(), {
@@ -123,7 +122,7 @@ async function server(args, config, cb) {
 
             if (authorization[1].split('.')[0] === 'mle') {
                 try {
-                    req.auth = await UserToken.validate(config.pool, authorization[1]);
+                    req.user = await UserToken.validate(config.pool, authorization[1]);
                 } catch (err) {
                     return Err.respond(err, res);
                 }
@@ -133,9 +132,9 @@ async function server(args, config, cb) {
 
                     // Internal Machine Token
                     if (decoded.t === 'i') {
-                        req.auth = 'internal';
+                        req.user = 'internal';
                     } else {
-                        req.auth = await user.user(decoded.u);
+                        req.user = await User.from(config.pool, decoded.u);
                     }
                 } catch (err) {
                     return Err.respond(new Err(401, err, 'Invalid Token'), res);
@@ -145,15 +144,15 @@ async function server(args, config, cb) {
             try {
                 const decoded = jwt.verify(req.query.token, config.SigningSecret);
                 if (decoded.t === 'i') {
-                    req.auth = 'internal';
+                    req.user = 'internal';
                 } else {
-                    req.token = await user.user(decoded.u);
+                    req.token = await User.from(config.pool, decoded.u);
                 }
             } catch (err) {
                 return Err.respond(new Err(401, err, 'Invalid Token'), res);
             }
         } else {
-            req.auth = false;
+            req.user = false;
         }
 
         return next();

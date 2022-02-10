@@ -91,7 +91,7 @@ class Token extends Generic {
         try {
             pgres = await pool.query(sql`
                 SELECT
-                    users.id AS uid,
+                    users.id,
                     users.username,
                     users.access,
                     users.email
@@ -112,7 +112,7 @@ class Token extends Generic {
         }
 
         return {
-            uid: parseInt(pgres.rows[0].uid),
+            id: pgres.rows[0].id,
             username: pgres.rows[0].username,
             access: pgres.rows[0].access,
             email: pgres.rows[0].email

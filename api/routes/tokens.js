@@ -1,9 +1,9 @@
 'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const UserToken = new require('../lib/token');
+const User = require('../lib/user');
 
 async function router(schema, config) {
-    const user = new (require('../lib/user'))(config);
 
     /**
      * @api {get} /api/token List Tokens
@@ -23,9 +23,9 @@ async function router(schema, config) {
         res: 'res.ListTokens.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
-            req.query.uid = req.auth.uid;
+            req.query.uid = req.user.id;
             return res.json(await UserToken.list(config.pool, req.query));
         } catch (err) {
             return Err.respond(err, res);
@@ -50,9 +50,9 @@ async function router(schema, config) {
         res: 'res.CreateToken.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
-            req.body.uid = req.auth.uid;
+            req.body.uid = req.user.id;
             return res.json((await UserToken.generate(config.pool, req.body)).serialize(true));
         } catch (err) {
             return Err.respond(err, res);
@@ -76,10 +76,10 @@ async function router(schema, config) {
         res: 'res.Token.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             let token = await UserToken.from(config.pool, req.params.token_id);
-            if (token.uid !== req.auth.uid) throw new Err(401, null, 'Cannot get a token you did not create');
+            if (token.uid !== req.user.id) throw new Err(401, null, 'Cannot get a token you did not create');
 
             token = token.serialize();
             delete token.token;
@@ -106,10 +106,10 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             const token = await UserToken.from(config.pool, req.params.token_id);
-            if (token.uid !== req.auth.uid) throw new Err(401, null, 'Cannot delete a token you did not create');
+            if (token.uid !== req.user.id) throw new Err(401, null, 'Cannot delete a token you did not create');
 
             await token.delete(config.pool);
 

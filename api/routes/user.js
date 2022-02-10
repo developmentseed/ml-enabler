@@ -1,8 +1,8 @@
 'use strict';
 const { Err } = require('@openaddresses/batch-schema');
+const User = require('../lib/user');
 
 async function router(schema, config) {
-    const user = new (require('../lib/user'))(config);
     const email = new (require('../lib/email'))(config);
 
     /**
@@ -22,7 +22,7 @@ async function router(schema, config) {
         res: 'res.ListUsers.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             res.json(await user.list(req.query));
         } catch (err) {
@@ -89,14 +89,14 @@ async function router(schema, config) {
         res: 'res.User.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
-            if (req.auth.access !== 'admin' && req.auth.uid !== req.params.uid) {
+            if (req.user.access !== 'admin' && req.user.id !== req.params.uid) {
                 throw new Err(401, null, 'You can only edit your own user account');
             }
 
             // Only admins can change access or set validated
-            if (req.auth.access !== 'admin') {
+            if (req.user.access !== 'admin') {
                 delete req.body.access;
                 delete req.body.validated;
             }
