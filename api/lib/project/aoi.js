@@ -54,6 +54,7 @@ class ProjectAOI extends Generic {
                     aois
                 WHERE
                     aois.name ~ ${query.filter}
+                    AND pid = ${pid}
                 ORDER BY
                     ${sql.identifier(['aois', query.sort])} ${query.order}
                 LIMIT
