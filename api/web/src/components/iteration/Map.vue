@@ -220,12 +220,20 @@ export default {
             this.background();
         },
         opacity: function() {
-            for (const inf of this.inferences) {
+            if (this.iteration.inf_type === 'segmentation') {
                 this.map.setPaintProperty(
-                    `inf-${inf}`,
-                    'fill-opacity',
-                    [ 'number', [ '*', ['get', inf], (this.opacity / 100) ] ]
+                    `tiles`,
+                    'raster-opacity',
+                    this.opacity / 100
                 );
+            } else {
+                for (const inf of this.inferences) {
+                    this.map.setPaintProperty(
+                        `inf-${inf}`,
+                        'fill-opacity',
+                        [ 'number', [ '*', ['get', inf], (this.opacity / 100) ] ]
+                    );
+                }
             }
         },
         threshold: function() {
@@ -427,6 +435,9 @@ export default {
                     id: `tiles`,
                     type: 'raster',
                     source: 'tiles',
+                    paint: {
+                        'raster-opacity': this.opacity / 100
+                    }
                 });
             } else {
                 this.map.addSource('tiles', {
