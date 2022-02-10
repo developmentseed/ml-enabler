@@ -1,5 +1,9 @@
 import Vue from 'vue'
 import VueRouter from  'vue-router'
+
+import 'floating-vue/dist/style.css'
+import FloatingVue from 'floating-vue'
+
 import App from './App.vue'
 
 import std from './std.js';
@@ -24,6 +28,7 @@ import Stack from './components/iteration/Stack.vue';
 import PredTasks from './components/iteration/PredTasks.vue';
 
 Vue.use(VueRouter);
+Vue.use(FloatingVue);
 Vue.config.productionTip = false
 
 const router = new VueRouter({
