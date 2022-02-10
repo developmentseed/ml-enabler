@@ -30,7 +30,7 @@
             <template v-if='loading.meta || loading.user'>
                 <Loading desc='Loading ML-Enabler'/>
             </template>
-            <template v-else-if='meta.security === "authenticated" && !user.username && $route.path !== "/login"'>
+            <template v-else-if='meta.security === "authenticated" && !user.username && !["/login", "/forgot"].includes($route.path)'>
                 <div class='flex flex--center-main pt36'>
                     <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-alert'/></svg>
                 </div>

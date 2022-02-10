@@ -5,25 +5,17 @@
         </template>
         <template v-else>
             <div class='col col--12 flex flex--center-main'>
-                <h3 class='flex-child txt-h4 py6'>Login</h3>
+                <h3 class='flex-child txt-h4 py6'>Forgot Password</h3>
             </div>
 
             <div class='col col--12 flex flex--center-main'>
                 <div class='w240 col col--12 grid grid--gut12'>
-                    <label class='mt12'>Username:</label>
+                    <label class='mt12'>Username/Email:</label>
                     <input v-on:keyup.enter='login' :class='{
                          "input--border-red": attempted && !username
                     }' v-model='username' type='text' class='input'/>
 
-                    <label class='mt12 col col--12'>
-                        Password:
-                        <span @click='$router.push("/forgot")' class='txt-underline-on-hover fr cursor-pointer'>Forgot Password?</span>
-                    </label>
-                    <input v-on:keyup.enter='login' :class='{
-                         "input--border-red": attempted && !password
-                   } ' v-model='password' type='password' class='input'/>
-
-                    <button @click='login' class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'>Login</button>
+                    <button @click='reset' class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'>Reset Password</button>
                 </div>
             </div>
         </template>
@@ -34,40 +26,31 @@
 import Loading from './util/Loading.vue';
 
 export default {
-    name: 'Login',
+    name: 'Forgot',
     props: ['meta'],
     data: function() {
         return {
             loading: false,
             attempted: false,
             username: '',
-            password: ''
         }
     },
     methods: {
-        external: function(url) {
-            if (!url) return;
-
-            window.open(url, "_blank")
-        },
-        login: async function() {
+        reset: async function() {
             this.attempted = true;
 
             if (!this.username.length) return;
-            if (!this.password.length) return;
             this.loading = true;
 
             try {
-                const body = await window.std('/api/login', {
+                await window.std('/api/login/reset', {
                     method: 'POST',
                     body: {
-                        username: this.username,
-                        password: this.password
+                        username: this.username
                     }
                 }, false);
 
-                this.$emit('auth', body.token);
-                this.$router.push('/')
+                //this.$router.push('/')
             } catch (err) {
                 this.$emit('err', err);
             }

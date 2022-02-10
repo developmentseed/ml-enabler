@@ -11,6 +11,7 @@ std();
 
 import Home from './components/Home.vue';
 import Login from './components/Login.vue';
+import Forgot from './components/Forgot.vue';
 import Project from './components/Project.vue';
 import Profile from './components/Profile.vue';
 import Admin from './components/Admin.vue';
@@ -37,6 +38,7 @@ const router = new VueRouter({
     routes: [
         { path: '/', name: 'home', component: Home },
         { path: '/login', name: 'login', component: Login },
+        { path: '/forgot', name: 'login', component: Forgot },
         { path: '/profile', name: 'profile', component: Profile },
 
         { path: '/admin', name: 'admin', component: Admin },
