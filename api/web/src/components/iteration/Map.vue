@@ -108,7 +108,7 @@
                         </button>
                     </div>
 
-                    <div class='absolute z5 w180 bg-white round px12 py12' style='bottom: 40px; left: 12px;'>
+                    <div v-if='iteration.inf_type !== "segmentation"' class='absolute z5 w180 bg-white round px12 py12' style='bottom: 40px; left: 12px;'>
                         <template v-if='inspect'>
                             <div class='flex flex--center-main'>
                                 <div class='flex-child'>
