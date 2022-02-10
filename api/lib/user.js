@@ -27,7 +27,7 @@ class User extends Generic {
      * @param {String} [query.sort=created] Field to sort by
      * @param {String} [query.order=asc] Sort Order (asc/desc)
      */
-    async list(query) {
+    async list(pool, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
@@ -44,7 +44,7 @@ class User extends Generic {
 
         let pgres;
         try {
-            pgres = await this.config.pool.query(sql`
+            pgres = await pool.query(sql`
                 SELECT
                     count(*) OVER() AS count,
                     users.id,
