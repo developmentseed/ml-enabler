@@ -31,6 +31,8 @@ class Config {
         cnf.Environment = process.env.ENVIRONMENT || 'docker';
         cnf.region = process.env.AWS_DEFAULT_REGION || 'us-east-1';
 
+        cnf.domain = process.env.EMAIL_DOMAIN || 'ds.io';
+
         if (cnf.Environment === 'aws') {
             cnf.StackName = process.env.StackName;
             cnf.Stack = process.env.StackName;

@@ -6,18 +6,24 @@ const { promisify } = require('util');
 const randomBytes = promisify(crypto.randomBytes);
 const jwt = require('jsonwebtoken');
 const { sql } = require('slonik');
-const USer = require('./user');
+const User = require('./user');
 
 /**
  * @class
  */
 class Login {
-    async verify(token) {
+    /**
+     * Verify a password reset token
+     *
+     * @param {Pool}    pool            Instantiated Postgres Pool
+     * @param {String}  token           Password reset token
+     */
+    static async verify(pool, token) {
         if (!token) throw new Err(400, null, 'token required');
 
         let pgres;
         try {
-            pgres = await this.config.pool.query(sql`
+            pgres = await pool.query(sql`
                 SELECT
                     uid
                 FROM
@@ -56,7 +62,7 @@ class Login {
         }
     }
 
-    async reset(user) {
+    static async reset(user) {
         if (!user.token) throw new Err(400, null, 'token required');
         if (!user.password) throw new Err(400, null, 'password required');
 
@@ -112,16 +118,16 @@ class Login {
     /**
      * Given a username or email, generate a password reset or validation email
      *
-     * @param {string} user username or email to reset
-     * @param {string} [action=reset] 'reset' or 'verify'
+     * @param {Pool}    pool            Instantiated Postgres Pool
+     * @param {string}  username        username or email to reset
+     * @param {string}  [action=reset]  'reset' or 'verify'
      */
-    async forgot(user, action) {
-        if (!user || !user.length) throw new Err(400, null, 'user must not be empty');
-        if (!action) action = 'reset';
+    static async forgot(pool, username, action='reset') {
+        if (!username || !username.length) throw new Err(400, null, 'user must not be empty');
 
         let pgres;
         try {
-            pgres = await this.config.pool.query(sql`
+            pgres = await pool.query(sql`
                 SELECT
                     id,
                     username,
@@ -129,8 +135,8 @@ class Login {
                 FROM
                     users
                 WHERE
-                    username = ${user}
-                    OR email = ${user}
+                    username = ${username}
+                    OR email = ${username}
             `);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
@@ -141,7 +147,7 @@ class Login {
         u.id = parseInt(u.id);
 
         try {
-            await this.config.pool.query(sql`
+            await pool.query(sql`
                 DELETE FROM
                     users_reset
                 WHERE
@@ -155,7 +161,7 @@ class Login {
         try {
             const buffer = await randomBytes(40);
 
-            await this.config.pool.query(sql`
+            await pool.query(sql`
                 INSERT INTO
                     users_reset (uid, expires, token, action)
                 VALUES (

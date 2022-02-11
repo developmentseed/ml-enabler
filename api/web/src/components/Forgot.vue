@@ -43,7 +43,7 @@ export default {
             this.loading = true;
 
             try {
-                await window.std('/api/login/reset', {
+                await window.std('/api/login/forgot', {
                     method: 'POST',
                     body: {
                         username: this.username

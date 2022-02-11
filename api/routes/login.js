@@ -1,7 +1,7 @@
 'use strict';
 const { Err } = require('@openaddresses/batch-schema');
-const Login = require('../lib/login');
 const User = require('../lib/user');
+const Login = require('../lib/login');
 
 async function router(schema, config) {
     const email = new (require('../lib/email'))(config);
@@ -82,7 +82,7 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            res.json(await user.verify(req.query.token));
+            res.json(await Login.verify(req.query.token));
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -106,14 +106,17 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            const reset = await user.forgot(req.body.user); // Username or email
+            const reset = await Login.forgot(config.pool, req.body.username); // Username or email
 
             if (config.args.email) {
                 await email.forgot(reset);
             }
 
             // To avoid email scraping - this will always return true, regardless of success
-            return res.json({ status: 200, message: 'Password Email Sent' });
+            return res.json({
+                status: 200,
+                message: 'Password Email Sent'
+            });
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -138,7 +141,7 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            return res.json(await user.reset({
+            return res.json(await Login.reset({
                 token: req.body.token,
                 password: req.body.password
             }));
