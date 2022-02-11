@@ -39,7 +39,7 @@ export default {
             this.loading = true;
 
             try {
-                const body = await window.std('/api/login', {
+                await window.std('/api/login', {
                     method: 'POST',
                     body: {
                         username: this.username,

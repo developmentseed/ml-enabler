@@ -41,7 +41,7 @@ export default {
             this.loading = true;
 
             try {
-                const body = await window.std('/api/login/reset', {
+                await window.std('/api/login/reset', {
                     method: 'POST',
                     body: {
                         token: this.token,

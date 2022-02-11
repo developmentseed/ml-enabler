@@ -183,7 +183,7 @@ class Login {
         }
     }
 
-    async attempt(pool, body, secret) {
+    static async attempt(pool, body, secret) {
         if (!body.username) throw new Err(400, null, 'username required');
         if (!body.password) throw new Err(400, null, 'password required');
 

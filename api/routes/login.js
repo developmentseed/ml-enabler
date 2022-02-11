@@ -47,10 +47,10 @@ async function router(schema, config) {
         res: 'res.Login.json'
     }, async (req, res) => {
         try {
-            req.user = await Login.attempt({
+            req.user = await Login.attempt(config.pool, {
                 username: req.body.username,
                 password: req.body.password
-            });
+            }, config.SigningSecret);
 
             return res.json({
                 uid: req.user.id,
