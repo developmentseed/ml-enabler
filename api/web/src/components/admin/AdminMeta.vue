@@ -45,7 +45,7 @@
         </template>
         <template v-else-if='editMeta'>
             <Metadata
-                existing=editMeta
+                :existing=editMeta
                 @err='$emit("err", $event)'
                 @close='getMetas'
             />
