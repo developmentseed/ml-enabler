@@ -1,12 +1,9 @@
 'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const bcrypt = require('bcrypt');
-const crypto = require('crypto');
-const { promisify } = require('util');
-const randomBytes = promisify(crypto.randomBytes);
 const jwt = require('jsonwebtoken');
-const { sql } = require('slonik');
 const User = require('./user');
+const UserReset = require('./user_reset');
 
 /**
  * @class
@@ -21,98 +18,23 @@ class Login {
     static async verify(pool, token) {
         if (!token) throw new Err(400, null, 'token required');
 
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                SELECT
-                    uid
-                FROM
-                    users_reset
-                WHERE
-                    expires > NOW()
-                    AND token = ${token}
-                    AND action = 'verify'
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'User Verify Error');
-        }
+        const reset = await UserReset.from(pool, token, 'verify');
+        await UserReset.delete_all(pool, reset.uid);
 
-        if (pgres.rows.length !== 1) {
-            throw new Err(401, null, 'Invalid or Expired Verify Token');
-        }
-
-        try {
-            await pool.query(sql`
-                DELETE FROM users_reset
-                    WHERE uid = ${pgres.rows[0].uid}
-            `);
-
-            await pool.query(sql`
-                UPDATE users
-                    SET validated = True
-                    WHERE id = ${pgres.rows[0].uid}
-            `);
-
-            return {
-                status: 200,
-                message: 'User Verified'
-            };
-        } catch (err) {
-            throw new Err(500, err, 'Failed to verify user');
-        }
+        const user = User.from(pool. reset.uid);
+        user.validated = true;
+        await user.commit(pool);
     }
 
-    static async reset(pool, user) {
-        if (!user.token) throw new Err(400, null, 'token required');
-        if (!user.password) throw new Err(400, null, 'password required');
+    static async reset(pool, body) {
+        if (!body.token) throw new Err(400, null, 'token required');
+        if (!body.password) throw new Err(400, null, 'password required');
 
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                SELECT
-                    uid
-                FROM
-                    users_reset
-                WHERE
-                    expires > NOW()
-                    AND token = ${user.token}
-                    AND action = 'reset'
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'User Reset Error');
-        }
+        const reset = await UserReset.from(pool, body.token, 'verify');
+        await UserReset.delete_all(pool, reset.uid);
 
-        if (pgres.rows.length !== 1) {
-            throw new Err(401, null, 'Invalid or Expired Reset Token');
-        }
-
-        const uid = pgres.rows[0].uid;
-
-        try {
-            const userhash = await bcrypt.hash(user.password, 10);
-
-            await pool.query(sql`
-                UPDATE users
-                    SET
-                        password = ${userhash},
-                        validated = True
-
-                    WHERE
-                        id = ${uid}
-            `);
-
-            await pool.query(sql`
-                DELETE FROM users_reset
-                    WHERE uid = ${uid}
-            `);
-
-            return {
-                status: 200,
-                message: 'User Reset'
-            };
-        } catch (err) {
-            throw new Err(500, err, 'Failed to reset user\'s password');
-        }
+        const user = User.from(pool. reset.uid);
+        await user.password(pool, body.password);
     }
 
     /**
@@ -122,46 +44,20 @@ class Login {
      * @param {string}  username        username or email to reset
      * @param {string}  [action=reset]  'reset' or 'verify'
      */
-    static async forgot(pool, username, action='reset') {
+    static async forgot(pool, username, action = 'reset') {
         if (!username || !username.length) throw new Err(400, null, 'username must not be empty');
 
         const u = await User.from_username(pool, username);
+        await UserReset.delete_all(pool, u.id);
 
-        try {
-            await pool.query(sql`
-                DELETE FROM
-                    users_reset
-                WHERE
-                    uid = ${u.id}
-                    AND action = ${action}
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'Internal User Error');
-        }
+        const reset = await UserReset.generate(pool, u.id, action);
 
-        try {
-            const buffer = await randomBytes(40);
-
-            await pool.query(sql`
-                INSERT INTO
-                    users_reset (uid, expires, token, action)
-                VALUES (
-                    ${u.id},
-                    NOW() + interval '1 hour',
-                    ${buffer.toString('hex')},
-                    ${action}
-                )
-            `);
-
-            return {
-                uid: u.id,
-                username: u.username,
-                email: u.email,
-                token: buffer.toString('hex')
-            };
-        } catch (err) {
-            throw new Err(500, err, 'Internal User Error');
-        }
+        return {
+            uid: u.id,
+            username: u.username,
+            email: u.email,
+            token: reset.token
+        };
     }
 
     static async attempt(pool, body, secret) {

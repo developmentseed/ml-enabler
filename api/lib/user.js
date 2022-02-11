@@ -1,10 +1,6 @@
 'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const bcrypt = require('bcrypt');
-const crypto = require('crypto');
-const { promisify } = require('util');
-const randomBytes = promisify(crypto.randomBytes);
-const jwt = require('jsonwebtoken');
 const { sql } = require('slonik');
 const Generic = require('@openaddresses/batch-generic');
 
@@ -19,6 +15,7 @@ class User extends Generic {
     /**
      * Return a list of users
      *
+     * @param {Pool}   pool  - Instantiated Postgres Pool
      * @param {Object} query - Query Object
      * @param {Number} [query.limit=100] - Max number of results to return
      * @param {Number} [query.page=0] - Page of users to return
@@ -74,7 +71,7 @@ class User extends Generic {
     }
 
     static async from_username(pool, username) {
-       let pgres;
+        let pgres;
         try {
             pgres = await pool.query(sql`
                 SELECT
@@ -124,19 +121,38 @@ class User extends Generic {
     }
 
     async commit(pool) {
-        let pgres;
         try {
-            pgres = await this.config.pool.query(sql`
+            await pool.query(sql`
                 UPDATE users
                     SET
-                        access = ${user.access},
-                        validated = ${user.validated}
+                        access = ${this.access},
+                        validated = ${this.validated}
                     WHERE
-                        id = ${uid}
+                        id = ${this.id}
                     RETURNING *
             `);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
+        }
+
+        return this;
+    }
+
+    async password(pool, password) {
+        const userhash = await bcrypt.hash(password, 10);
+
+        try {
+            await pool.query(sql`
+                UPDATE users
+                    SET
+                        password = ${userhash},
+                        validated = True
+                    WHERE
+                        id = ${this.id}
+                    RETURNING *
+            `);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to update User Password');
         }
 
         return this;

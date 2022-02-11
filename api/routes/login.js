@@ -82,7 +82,12 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            res.json(await Login.verify(config.pool, req.body.token));
+            await Login.verify(config.pool, req.body.token);
+
+            return res.json({
+                status: 200,
+                message: 'User Verified'
+            });
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -141,10 +146,15 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            return res.json(await Login.reset(config.pool, {
+            await Login.reset(config.pool, {
                 token: req.body.token,
                 password: req.body.password
-            }));
+            });
+
+            return res.json({
+                status: 200,
+                message: 'User Reset'
+            });
 
         } catch (err) {
             return Err.respond(err, res);

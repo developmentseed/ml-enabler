@@ -5,7 +5,7 @@ const Busboy = require('busboy');
 const Iteration = require('../lib/project/iteration');
 const path = require('path');
 const Task = require('../lib/project/iteration/task');
-const User = require('../lib/user')
+const User = require('../lib/user');
 
 async function router(schema, config) {
     /**
