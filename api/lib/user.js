@@ -180,6 +180,9 @@ class User extends Generic {
 
             return this.deserialize(pgres.rows[0]);
         } catch (err) {
+            if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
+                throw new Err(500, err, 'User already exists');
+            }
             throw new Err(500, err, 'Failed to register user');
         }
     }
