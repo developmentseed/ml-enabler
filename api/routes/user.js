@@ -60,18 +60,24 @@ async function router(schema, config) {
             if (req.body.password) {
                 const forgot = await Login.forgot(config.pool, usr.username, 'verify');
                 token = forgot.token
-            } else {
-                const forgot = await Login.forgot(config.pool, usr.username, 'reset');
-                token = forgot.token
-            }
 
-            if (config.args.email) {
                 await email.verify({
                     username: usr.username,
                     email: usr.email,
                     token
                 });
-            } else if (!config.args.validate) {
+            } else {
+                const forgot = await Login.forgot(config.pool, usr.username, 'reset');
+                token = forgot.token
+
+                await email.forgot({
+                    username: usr.username,
+                    email: usr.email,
+                    token
+                });
+            }
+
+            if (!config.args.validate) {
                 await User.verify(config.pool, token);
             }
 
