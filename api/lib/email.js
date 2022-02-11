@@ -51,7 +51,7 @@ class Email {
         };
 
         try {
-            return await this.send(user.email, 'BRI Email Verification', this.mailGenerator.generate(email));
+            return await this.send(user.email, 'ML-Enabler Email Verification', this.mailGenerator.generate(email));
         } catch (err) {
             throw new Err(500, err, 'Internal User Confirmation Error');
         }
