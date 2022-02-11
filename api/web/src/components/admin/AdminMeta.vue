@@ -37,7 +37,7 @@
         </template>
 
         <template v-if='newMeta'>
-            <CreateMetadata
+            <Metadata
                 @err='$emit("err", $event)'
                 @close='getMetas'
             />
@@ -73,7 +73,7 @@
 <script>
 import Pager from '../util/Pager.vue';
 import Loading from '../util/Loading.vue';
-import CreateMetadata from './CreateMetadata.vue';
+import Metadata from './Metadata.vue';
 
 export default {
     name: 'ProfileAdminUser',
@@ -131,7 +131,7 @@ export default {
         }
     },
     components: {
-        CreateMetadata,
+        Metadata,
         Loading,
         Pager
     }
