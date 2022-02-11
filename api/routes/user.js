@@ -49,18 +49,30 @@ async function router(schema, config) {
         res: 'res.User.json'
     }, async (req, res) => {
         try {
-            const usr = await User.generate(config.pool, req.body);
+            const usr = await User.generate(config.pool, {
+                ...req.body,
+                // Generate a temporary random password - can't actually be used as the user still has
+                // to verify email (unless the server is in auto-validate mode)
+                password: Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8)
+            });
 
-            const forgot = await Login.forgot(config.pool, usr.username, 'verify');
+            let token;
+            if (req.body.password) {
+                const forgot = await Login.forgot(config.pool, usr.username, 'verify');
+                token = forgot.token
+            } else {
+                const forgot = await Login.forgot(config.pool, usr.username, 'reset');
+                token = forgot.token
+            }
 
             if (config.args.email) {
                 await email.verify({
                     username: usr.username,
                     email: usr.email,
-                    token: forgot.token
+                    token
                 });
             } else if (!config.args.validate) {
-                await user.verify(forgot.token);
+                await User.verify(config.pool, token);
             }
 
             return res.json(usr);

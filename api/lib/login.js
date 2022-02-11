@@ -68,7 +68,6 @@ class Login {
 
         let pgres;
         try {
-            console.error(user.token);
             pgres = await pool.query(sql`
                 SELECT
                     uid
@@ -124,7 +123,7 @@ class Login {
      * @param {string}  [action=reset]  'reset' or 'verify'
      */
     static async forgot(pool, username, action='reset') {
-        if (!username || !username.length) throw new Err(400, null, 'user must not be empty');
+        if (!username || !username.length) throw new Err(400, null, 'username must not be empty');
 
         const u = await User.from_username(pool, username);
 
