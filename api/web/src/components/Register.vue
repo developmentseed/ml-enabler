@@ -5,7 +5,7 @@
         </div>
 
         <template v-if='loading'>
-            <Loading/>
+            <Loading desc='Creating User Account'/>
         </template>
         <template v-else-if='!success'>
             <div class='col col--12 flex flex--center-main'>

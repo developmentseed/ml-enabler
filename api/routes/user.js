@@ -78,7 +78,8 @@ async function router(schema, config) {
             }
 
             if (!config.args.validate) {
-                await User.verify(config.pool, token);
+                usr.validated = true;
+                await usr.commit(config.pool);
             }
 
             return res.json(usr);
