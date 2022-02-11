@@ -17,7 +17,7 @@
 
                     <label class='mt12 col col--12'>
                         Password:
-                        <span @click='$router.push("/forgot")' class='txt-underline-on-hover fr cursor-pointer'>Forgot Password?</span>
+                        <span @click='$router.push("/login/forgot")' class='txt-underline-on-hover fr cursor-pointer'>Forgot Password?</span>
                     </label>
                     <input v-on:keyup.enter='login' :class='{
                          "input--border-red": attempted && !password

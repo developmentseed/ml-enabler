@@ -11,7 +11,10 @@ std();
 
 import Home from './components/Home.vue';
 import Login from './components/Login.vue';
+import Lost from './components/Lost.vue';
 import Forgot from './components/Forgot.vue';
+import Verify from './components/Verify.vue';
+import Reset from './components/Reset.vue';
 import Project from './components/Project.vue';
 import Profile from './components/Profile.vue';
 import Admin from './components/Admin.vue';
@@ -37,8 +40,13 @@ const router = new VueRouter({
     mode: 'hash',
     routes: [
         { path: '/', name: 'home', component: Home },
+
         { path: '/login', name: 'login', component: Login },
-        { path: '/forgot', name: 'login', component: Forgot },
+        { path: '/login/forgot', name: 'forgot', component: Forgot },
+        { path: '/login/verify', name: 'verify', component: Verify },
+        { path: '/login/reset', name: 'reset', component: Reset },
+
+
         { path: '/profile', name: 'profile', component: Profile },
 
         { path: '/admin', name: 'admin', component: Admin },
@@ -108,7 +116,9 @@ const router = new VueRouter({
                     component: Export
                 }]
             }]
-        }
+        },
+
+        { path: '*', name: 'lost', component: Lost }
     ]
 });
 

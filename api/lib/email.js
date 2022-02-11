@@ -43,7 +43,7 @@ class Email {
                     button: {
                         color: 'green',
                         text: 'Verify Email',
-                        link: `${this.config.url}/login/verify?token=${user.token}`
+                        link: `${this.config.url}/#/login/verify?token=${user.token}`
                     }
                 },
                 outro: ''
@@ -67,7 +67,7 @@ class Email {
                     button: {
                         color: 'green',
                         text: 'Password Reset',
-                        link: `${this.config.url}/login/reset?token=${user.token}`
+                        link: `${this.config.url}/#/login/reset?token=${user.token}`
                     }
                 },
                 outro: ''
