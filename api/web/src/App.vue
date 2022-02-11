@@ -2,11 +2,11 @@
     <div id="app" class='flex flex--center-main relative'>
         <div class='flex-child wmax600 col col--12'>
             <div class='py36 col col--12 grid'>
-                <div class='col col--3'></div>
-                <div class='col col--6'>
+                <div class='col col--4'></div>
+                <div class='col col--4'>
                     <h1 @click='$router.push({ path: "/" })' class='align-center txt-h3 cursor-default txt-underline-on-hover cursor-pointer'>ML Enabler</h1>
                 </div>
-                <div v-if='!loading.user && $route.path !== "/login"' class='col col--3'>
+                <div v-if='!loading.user && $route.path !== "/login"' class='col col--4'>
                     <button v-if='user.username' @click='$router.push({ path: "/profile" })' class='dropdown btn fr mr6 mb6 pb3 round btn--stroke color-gray color-blue-on-hover'>
                         <svg class='icon inline'><use href='#icon-chevron-down'/></svg>
                         <span v-text='user.username'/>
@@ -30,7 +30,7 @@
             <template v-if='loading.meta || loading.user'>
                 <Loading desc='Loading ML-Enabler'/>
             </template>
-            <template v-else-if='meta.security === "authenticated" && !user.username && !["/login", "/login/forgot", "/login/verify", "/login/reset"].includes($route.path)'>
+            <template v-else-if='meta.security === "authenticated" && !user.username && !$route.path.includes("/login")'>
                 <div class='flex flex--center-main pt36'>
                     <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-alert'/></svg>
                 </div>

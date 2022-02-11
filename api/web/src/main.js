@@ -14,6 +14,7 @@ import Login from './components/Login.vue';
 import Lost from './components/Lost.vue';
 import Forgot from './components/Forgot.vue';
 import Verify from './components/Verify.vue';
+import Register from './components/Register.vue';
 import Reset from './components/Reset.vue';
 import Project from './components/Project.vue';
 import Profile from './components/Profile.vue';
@@ -45,6 +46,7 @@ const router = new VueRouter({
         { path: '/login/forgot', name: 'forgot', component: Forgot },
         { path: '/login/verify', name: 'verify', component: Verify },
         { path: '/login/reset', name: 'reset', component: Reset },
+        { path: '/login/register', name: 'register', component: Register },
 
 
         { path: '/profile', name: 'profile', component: Profile },
