@@ -155,8 +155,8 @@ async function router(schema, config) {
                 status: 200,
                 message: 'User Reset'
             });
-
         } catch (err) {
+            console.error(err);
             return Err.respond(err, res);
         }
     });

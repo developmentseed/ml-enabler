@@ -30,11 +30,11 @@ class Login {
         if (!body.token) throw new Err(400, null, 'token required');
         if (!body.password) throw new Err(400, null, 'password required');
 
-        const reset = await UserReset.from(pool, body.token, 'verify');
+        const reset = await UserReset.from(pool, body.token, 'reset');
         await UserReset.delete_all(pool, reset.uid);
 
-        const user = User.from(pool. reset.uid);
-        await user.password(pool, body.password);
+        const user = await User.from(pool, reset.uid);
+        await user.set_password(pool, body.password);
     }
 
     /**

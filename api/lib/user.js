@@ -138,7 +138,7 @@ class User extends Generic {
         return this;
     }
 
-    async password(pool, password) {
+    async set_password(pool, password) {
         const userhash = await bcrypt.hash(password, 10);
 
         try {

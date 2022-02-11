@@ -5,7 +5,7 @@
         </div>
 
         <template v-if='loading'>
-            <Loading/>
+            <Loading desc='Sending Password Reset Email'/>
         </template>
         <template v-else-if='!submitted'>
             <div class='col col--12 flex flex--center-main'>

@@ -101,7 +101,7 @@ export default {
         getLogout: async function() {
             try {
                 delete localStorage.token;
-                if (this.$router.path !== '/') this.$router.push({ path: "/" })
+                if (this.$router.path !== '/') this.$router.push('/login')
             } catch (err) {
                 this.err = err;
             }
