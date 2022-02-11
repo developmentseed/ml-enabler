@@ -30,7 +30,7 @@
                 <div class='absolute triangle--u triangle color-gray' style='top: -12px; right: 75px;'></div>
 
                 <div class='col col--12 px6'>
-                    <label>Username/Email Filter</label>
+                    <label>Metadata Key Filter</label>
                     <input v-model='filter' class='input' placeholder='john-doe' />
                 </div>
             </div>
