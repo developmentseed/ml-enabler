@@ -7,7 +7,7 @@
         "doc": "apidoc -i ./ -f ./routes/ -e node_modules -e coverage -e web --private",
         "lint": "eslint index.js 'lib/**/*.js' 'routes/**/*.js' 'test/**/*.js'",
         "test": "tape test/*.test.js | tap-dot",
-        "start": "node index.js --email",
+        "start": "node index.js --email --validate",
         "dev": "nodemon index.js -i web/",
         "cov-html": "nyc tape 'test/**/*.js' && nyc report --reporter=html",
         "cov": "nyc tape 'test/**/*.js' && nyc report --reporter=text-lcov > coverage.lcov && codecov"
