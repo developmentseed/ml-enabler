@@ -11,7 +11,7 @@
             <div class='col col--12 flex flex--center-main'>
                 <div class='w240 col col--12 grid grid--gut12'>
                     <label class='mt12'>Username/Email:</label>
-                    <input v-on:keyup.enter='login' :class='{
+                    <input v-on:keyup.enter='reset' :class='{
                          "input--border-red": attempted && !username
                     }' v-model='username' type='text' class='input'/>
 
