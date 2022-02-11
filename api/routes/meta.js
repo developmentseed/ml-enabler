@@ -2,6 +2,7 @@
 const { Err } = require('@openaddresses/batch-schema');
 const User = require('../lib/user');
 const Meta = require('../lib/meta');
+const Settings = require('../lib/settings');
 
 async function router(schema, config) {
 
@@ -51,7 +52,7 @@ async function router(schema, config) {
         try {
             await User.is_admin(req);
 
-            const meta = await Meta.generate(config.pool, req.body);
+            const meta = await Settings.generate(config.pool, req.body);
 
             return res.json(meta.serialize());
         } catch (err) {
@@ -82,8 +83,8 @@ async function router(schema, config) {
         try {
             await User.is_admin(req);
 
-            const meta = await Meta.from(config.pool, req.params.key);
-            meta.patch(req.body);
+            const meta = await Settings.from(config.pool, req.params.key);
+            Settings.patch(meta, req.body);
             await meta.commit(config.pool);
 
             res.json(meta.serialize());
@@ -107,7 +108,7 @@ async function router(schema, config) {
      * @apiSchema (Body) {jsonschema=../schema/req.body.PatchMeta.json} apiParam
      * @apiSchema {jsonschema=../schema/res.Meta.json} apiSuccess
      */
-    await schema.patch('/meta/:key', {
+    await schema.delete('/meta/:key', {
         ':key': 'string',
         res: 'res.Standard.json'
     }, async (req, res) => {

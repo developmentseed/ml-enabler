@@ -32,6 +32,8 @@ class Meta extends Generic {
                 SELECT
                     count(*) OVER() AS count,
                     key,
+                    created,
+                    updated,
                     value
                 FROM
                     meta
@@ -61,7 +63,8 @@ class Meta extends Generic {
             await pool.query(sql`
                 UPDATE meta
                     SET
-                        value = ${JSON.stringify(this.value)}
+                        value = ${JSON.stringify(this.value)},
+                        updatd = NOW()
                     WHERE
                         key = ${this.key}
             `);
