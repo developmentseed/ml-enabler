@@ -1,0 +1,121 @@
+'use strict';
+
+const { Err } = require('@openaddresses/batch-schema');
+const Generic = require('@openaddresses/batch-generic');
+const { sql } = require('slonik');
+
+/**
+ * @class
+ */
+class Meta extends Generic {
+    static _table = 'meta';
+    static _patch = require('../schema/req.body.PatchMeta.json');
+    static _res = require('../schema/res.Meta.json');
+
+    /**
+     * List & Filter Meta
+     *
+     * @param {Pool} pool - Postgres Pool instance
+     * @param {Object} query - Query object
+     * @param {String} [query.filter=] - Filter tokens by name
+     * @param {Number} [query.limit=100] - Max number of results to return
+     * @param {Number} [query.page=0] - Page to return
+     */
+    static async list(pool, query) {
+        if (!query) query = {};
+        if (!query.filter) query.filter = '';
+        if (!query.limit) query.limit = 100;
+        if (!query.page) query.page = 0;
+
+        try {
+            const pgres = await pool.query(sql`
+                SELECT
+                    count(*) OVER() AS count,
+                    id,
+                    created,
+                    name
+                FROM
+                    meta
+                WHERE
+                    key ~ ${query.filter}
+                ORDER BY
+                    key DESC
+                LIMIT
+                    ${query.limit}
+                OFFSET
+                    ${query.limit * query.page}
+            `);
+
+            return this.deserialize(pgres.rows);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to list meta');
+        }
+    }
+
+    /**
+     * Commit a meta to the database
+     *
+     * @param {Pool} pool - Postgres Pool instance
+     */
+    async commit(pool) {
+        try {
+            await pool.query(sql`
+                UPDATE meta
+                    SET
+                        value = ${JSON.stringify(this.value)}
+                    WHERE
+                        key = ${this.key}
+            `);
+        } catch (err) {
+            throw new Err(500, err, 'failed to save meta');
+        }
+    }
+
+    /**
+     * Create a new Meta
+     *
+     * @param {Pool} pool - Postgres Pool instance
+     * @param {Object} params - Create Params
+     * @param {String} params.key - Key of Meta
+     * @param {Object} params.value - Value of Meta
+     *
+     * @returns {Meta}
+     */
+    static async generate(pool, params = {}) {
+        try {
+            const pgres = await pool.query(sql`
+                INSERT INTO meta (
+                    key,
+                    value,
+                ) VALUES (
+                    ${params.key},
+                    ${params.value}
+                ) RETURNING *
+            `);
+
+            return this.deserialize(pgres.rows[0]);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to generate meta');
+        }
+    }
+
+    /**
+     * Delete a meta
+     *
+     * @param {Pool} pool - Postgres Pool instance
+     *
+     * @returns {meta}
+     */
+    static async delete(pool) {
+        try {
+            const pgres = await pool.query(sql`
+                DELETE FROM meta
+                    WHERE key = ${this.key}
+            `);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to generate meta');
+        }
+    }
+}
+
+module.exports = Meta;

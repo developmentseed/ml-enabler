@@ -1,0 +1,33 @@
+{
+    "type": "object",
+    "required": [
+        "total",
+        "meta"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "total": {
+            "type": "integer",
+            "description": "Total number of items with the service"
+        },
+        "tokens": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "key",
+                    "value"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "key": {
+                        "type": "string"
+                    },
+                    "value": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    }
+}
