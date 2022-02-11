@@ -16,10 +16,6 @@
                 <label>Email:</label>
                 <input disabled :value='email' class='input' placeholder='Email'/>
             </div>
-            <div class='col col--12 clearfix pt12'>
-                <button @click='saveEmail' class='btn btn--stroke btn--gray btn--s round fr'>Update Email</button>
-                <button @click='savePassword' class='btn btn--stroke btn--gray btn--s round fr mr12'>Change Password</button>
-            </div>
         </div>
 
         <ProfileTokens
@@ -43,14 +39,6 @@ export default {
     },
     components: {
         ProfileTokens
-    },
-    methods: {
-        saveEmail: function() {
-
-        },
-        savePassword: function() {
-
-        }
     }
 }
 </script>
