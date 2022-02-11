@@ -141,7 +141,7 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            return res.json(await Login.reset({
+            return res.json(await Login.reset(config.pool, {
                 token: req.body.token,
                 password: req.body.password
             }));

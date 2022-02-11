@@ -7,6 +7,25 @@
         <template v-if='loading'>
             <Loading/>
         </template>
+        <template v-if='!success'>
+            <div class='col col--12 flex flex--center-main'>
+                <div class='w240 col col--12 grid grid--gut12'>
+                    <label class='mt12'>Reset Token:</label>
+                    <input v-on:keyup.enter='reset' :class='{
+                         "input--border-red": attempted && !token
+                    }' v-model='token' type='text' class='input'/>
+
+                    <label class='mt12 col col--12'>
+                        New Password:
+                    </label>
+                    <input v-on:keyup.enter='reset' :class='{
+                         "input--border-red": attempted && !password
+                   } ' v-model='password' type='password' class='input'/>
+
+                    <button @click='reset' class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'>Reset Password</button>
+                </div>
+            </div>
+        </template>
         <template v-else>
             <div class='col col--12 flex flex--center-main py24'>
                 <svg class='icon color-green w60 h60'><use href='#icon-check'/></svg>
@@ -29,15 +48,19 @@ export default {
     data: function() {
         return {
             loading: false,
-            token: '',
+            attempted: false,
+            success: false,
+            token: this.$route.query.token,
             password: ''
         }
     },
-    mounted: function() {
-        this.reset();
-    },
     methods: {
         reset: async function() {
+            this.attempted = true;
+
+            if (!this.token.length) return;
+            if (!this.password.length) return;
+
             this.loading = true;
 
             try {
@@ -48,6 +71,8 @@ export default {
                         password: this.password
                     }
                 }, false);
+
+                this.success = true;
             } catch (err) {
                 this.$emit('err', err);
             }

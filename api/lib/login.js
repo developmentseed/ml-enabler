@@ -62,13 +62,14 @@ class Login {
         }
     }
 
-    static async reset(user) {
+    static async reset(pool, user) {
         if (!user.token) throw new Err(400, null, 'token required');
         if (!user.password) throw new Err(400, null, 'password required');
 
         let pgres;
         try {
-            pgres = await this.config.pool.query(sql`
+            console.error(user.token);
+            pgres = await pool.query(sql`
                 SELECT
                     uid
                 FROM
@@ -91,7 +92,7 @@ class Login {
         try {
             const userhash = await bcrypt.hash(user.password, 10);
 
-            await this.config.pool.query(sql`
+            await pool.query(sql`
                 UPDATE users
                     SET
                         password = ${userhash},
@@ -101,7 +102,7 @@ class Login {
                         id = ${uid}
             `);
 
-            await this.config.pool.query(sql`
+            await pool.query(sql`
                 DELETE FROM users_reset
                     WHERE uid = ${uid}
             `);
@@ -125,26 +126,7 @@ class Login {
     static async forgot(pool, username, action='reset') {
         if (!username || !username.length) throw new Err(400, null, 'user must not be empty');
 
-        let pgres;
-        try {
-            pgres = await pool.query(sql`
-                SELECT
-                    id,
-                    username,
-                    email
-                FROM
-                    users
-                WHERE
-                    username = ${username}
-                    OR email = ${username}
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'Internal User Error');
-        }
-
-        if (pgres.rows.length !== 1) return;
-        const u = pgres.rows[0];
-        u.id = parseInt(u.id);
+        const u = await User.from_username(pool, username);
 
         try {
             await pool.query(sql`
@@ -187,7 +169,7 @@ class Login {
         if (!body.username) throw new Err(400, null, 'username required');
         if (!body.password) throw new Err(400, null, 'password required');
 
-        const user = await User.from_username(pool, body);
+        const user = await User.from_username(pool, body.username);
 
         if (!await bcrypt.compare(body.password, user.password)) {
             throw new Err(403, null, 'Invalid Username or Pass');

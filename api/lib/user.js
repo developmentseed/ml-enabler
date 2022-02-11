@@ -82,8 +82,8 @@ class User extends Generic {
                 FROM
                     users
                 WHERE
-                    username = ${user.username} OR
-                    email = ${user.username};
+                    username = ${username}
+                    OR email = ${username}
             `);
         } catch (err) {
             throw new Err(500, err, 'Internal Login Error');
