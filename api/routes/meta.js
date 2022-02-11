@@ -6,7 +6,7 @@ const Meta = require('../lib/meta');
 async function router(schema, config) {
 
     /**
-     * @api {get} /api/user List Meta
+     * @api {get} /api/meta List Meta
      * @apiVersion 1.0.0
      * @apiName ListMeta
      * @apiGroup Meta
@@ -44,7 +44,7 @@ async function router(schema, config) {
      * @apiSchema (Body) {jsonschema=../schema/req.body.CreateMeta.json} apiParam
      * @apiSchema {jsonschema=../schema/res.Meta.json} apiSuccess
      */
-    await schema.post('/user', {
+    await schema.post('/meta', {
         body: 'req.body.CreateMeta.json',
         res: 'res.Meta.json'
     }, async (req, res) => {

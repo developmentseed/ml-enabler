@@ -31,9 +31,8 @@ class Meta extends Generic {
             const pgres = await pool.query(sql`
                 SELECT
                     count(*) OVER() AS count,
-                    id,
-                    created,
-                    name
+                    key,
+                    value
                 FROM
                     meta
                 WHERE
@@ -86,10 +85,10 @@ class Meta extends Generic {
             const pgres = await pool.query(sql`
                 INSERT INTO meta (
                     key,
-                    value,
+                    value
                 ) VALUES (
                     ${params.key},
-                    ${params.value}
+                    ${JSON.stringify(params.value)}
                 ) RETURNING *
             `);
 

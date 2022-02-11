@@ -8,6 +8,10 @@
         </div>
 
         <template v-if='user.access === "admin"'>
+            <AdminMeta
+                @err='$emit("err", $event)'
+            />
+
             <AdminUser
                 @err='$emit("err", $event)'
             />
@@ -30,12 +34,14 @@
 <script>
 import AdminUser from './admin/AdminUser.vue'
 import AdminStacks from './admin/AdminStacks.vue'
+import AdminMeta from './admin/AdminMeta.vue'
 
 export default {
     name: 'Admin',
     props: ['user'],
     components: {
         AdminUser,
+        AdminMeta,
         AdminStacks
     }
 }

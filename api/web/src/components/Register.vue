@@ -43,7 +43,7 @@
                 <div>Email Confirmation Sent!</div>
             </div>
 
-            <button @click='$router.push("/home")' class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'>Home</button>
+            <button @click='$router.push("/")' class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'>Home</button>
         </template>
     </div>
 </template>
