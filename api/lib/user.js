@@ -141,7 +141,8 @@ class User extends Generic {
 
         return this;
     }
-    async generate(pool, user) {
+
+    static async generate(pool, user) {
         if (!user.username) throw new Err(400, null, 'username required');
         if (!user.email) throw new Err(400, null, 'email required');
         if (!user.password) throw new Err(400, null, 'password required');
@@ -161,7 +162,7 @@ class User extends Generic {
                 ) RETURNING *
             `);
 
-            this.deserialize(pgres.rows[0]);
+            return this.deserialize(pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Failed to register user');
         }

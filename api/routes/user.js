@@ -1,6 +1,7 @@
 'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const User = require('../lib/user');
+const Login = require('../lib/login');
 
 async function router(schema, config) {
     const email = new (require('../lib/email'))(config);
@@ -48,9 +49,9 @@ async function router(schema, config) {
         res: 'res.User.json'
     }, async (req, res) => {
         try {
-            const usr = await user.register(req.body);
+            const usr = await User.generate(config.pool, req.body);
 
-            const forgot = await user.forgot(usr.username, 'verify');
+            const forgot = await Login.forgot(config.pool, usr.username, 'verify');
 
             if (config.args.email) {
                 await email.verify({
