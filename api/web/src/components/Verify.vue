@@ -5,7 +5,7 @@
         </div>
 
         <template v-if='loading'>
-            <Loading/>
+            <Loading desc='Verifying Account'/>
         </template>
         <template v-else>
             <div class='col col--12 flex flex--center-main py24'>
@@ -32,25 +32,25 @@ export default {
         }
     },
     mounted: function() {
-        this.verify();
+        console.error(this.$route.query);
+        this.verify(this.$route.query.token);
     },
     methods: {
-        verify: async function() {
+        verify: async function(token) {
             this.loading = true;
 
             try {
-                await window.std('/api/login', {
+                await window.std('/api/login/verify', {
                     method: 'POST',
                     body: {
-                        username: this.username,
-                        password: this.password
+                        token
                     }
                 }, false);
+
+                this.loading = false;
             } catch (err) {
                 this.$emit('err', err);
             }
-
-            this.loading = false;
         }
     },
     components: {

@@ -65,7 +65,7 @@ async function router(schema, config) {
     });
 
     /**
-     * @api {get} /api/login/verify Verify User
+     * @api {post} /api/login/verify Verify User
      * @apiVersion 1.0.0
      * @apiName VerifyLogin
      * @apiGroup Login
@@ -77,12 +77,12 @@ async function router(schema, config) {
      * @apiSchema (Query) {jsonschema=../schema/req.query.VerifyLogin.json} apiParam
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
-    await schema.get('/login/verify', {
-        query: 'req.query.VerifyLogin.json',
+    await schema.post('/login/verify', {
+        body: 'req.body.VerifyLogin.json',
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            res.json(await Login.verify(req.query.token));
+            res.json(await Login.verify(config.pool, req.body.token));
         } catch (err) {
             return Err.respond(err, res);
         }

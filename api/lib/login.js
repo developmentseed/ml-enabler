@@ -42,12 +42,12 @@ class Login {
         }
 
         try {
-            await this.config.pool.query(sql`
+            await pool.query(sql`
                 DELETE FROM users_reset
                     WHERE uid = ${pgres.rows[0].uid}
             `);
 
-            await this.config.pool.query(sql`
+            await pool.query(sql`
                 UPDATE users
                     SET validated = True
                     WHERE id = ${pgres.rows[0].uid}
