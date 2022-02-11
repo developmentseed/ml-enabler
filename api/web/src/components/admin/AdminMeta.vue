@@ -38,6 +38,14 @@
 
         <template v-if='newMeta'>
             <Metadata
+                existing=false
+                @err='$emit("err", $event)'
+                @close='getMetas'
+            />
+        </template>
+        <template v-else-if='editMeta'>
+            <Metadata
+                existing=editMeta
                 @err='$emit("err", $event)'
                 @close='getMetas'
             />
@@ -61,7 +69,12 @@
                 </div>
 
                 <div v-if='meta._open' class='col col--12 border border--gray-light round px12 py12 my6 grid'>
-                    <div class='col col--12 pre' v-text='meta.value'/>
+                    <div class='col col--12 relative'>
+                        <button @click='editMeta = meta' class='btn btn--stroke round btn--gray absolute top right mr6 mt6'>
+                            <svg class='icon h16 w16 color-gray'><use href='#icon-pencil'/></svg>
+                        </button>
+                        <div class='pre' v-text='meta.value'></div>
+                    </div>
                 </div>
             </div>
         </template>
@@ -87,7 +100,8 @@ export default {
             perpage: 10,
             total: 100,
             metas: [],
-            newMeta: false
+            newMeta: false,
+            editMeta: false
         };
     },
     mounted: function() {
@@ -108,6 +122,7 @@ export default {
         },
         getMetas: async function() {
             this.newMeta = false;
+            this.editMeta = false;
             this.loading = true;
 
             const url = new URL(`${window.api}/api/meta`);
