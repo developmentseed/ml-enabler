@@ -8,7 +8,7 @@
                 </h2>
 
                 <div class='fr'>
-                    <button @click='newUser.show = true' class='btn round btn--stroke color-gray color-green-on-hover mr6'>
+                    <button @click='newUser = true' class='btn round btn--stroke color-gray color-green-on-hover mr6'>
                         <svg class='icon'><use xlink:href='#icon-plus'/></svg>
                     </button>
 
@@ -36,52 +36,11 @@
             </div>
         </template>
 
-        <template v-if='newUser.show'>
-            <div class='col col--12 border border--gray-light round my12'>
-                <div class='col col--12 grid grid--gut12 pl12 py6'>
-                    <div class='col col--12 pb6'>
-                        <h2 class='txt-bold fl'>Create New User</h2>
-                        <button @click='newUser.show = false' class='fr btn round btn--s btn--stroke btn--gray'>
-                            <svg class='icon'><use xlink:href='#icon-close'/></svg>
-                        </button>
-                    </div>
-
-                    <div class='col col--4'>
-                        <label>Username</label>
-                        <input :disabled='newUser.password' v-model='newUser.username' type='text' class='input' placeholder='Username'/>
-                    </div>
-                    <div class='col col--4'>
-                        <label>Email</label>
-                        <input :disabled='newUser.password' v-model='newUser.email' type='text' class='input' placeholder='Email'/>
-                    </div>
-                    <div class='col col--4'>
-                        <label>Access</label>
-                        <div class='select-container w-full'>
-                            <select :disabled='newUser.password' v-model='newUser.access' class='select select--stroke'>
-                                <option>user</option>
-                                <option>admin</option>
-                            </select>
-                            <div class='select-arrow'></div>
-                        </div>
-                    </div>
-
-                    <template v-if='newUser.password'>
-                        <div class='col col--12'>
-                            <label>Temporary Password</label>
-                            <pre class='pre' v-text='newUser.password'></pre>
-                        </div>
-                    </template>
-
-                    <div class='col col--12 mt12'>
-                        <button v-if='!newUser.password' @click='createUser' class='fr btn btn--stroke round color-gray color-green-on-hover'>
-                            <svg class='fl icon mt6'><use href='#icon-check'/></svg><span>Create</span>
-                        </button>
-                        <button v-else @click='clear' class='fr btn btn--stroke round color-gray color-green-on-hover'>
-                            <svg class='fl icon mt6'><use href='#icon-check'/></svg><span>Done</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
+        <template v-if='newUser'>
+            <CreateUser
+                @err='$emit("err", $event)'
+                @close='getUsers'
+            />
         </template>
 
         <template v-if='loading'>
@@ -109,9 +68,8 @@
                     </div>
                 </div>
 
-                <div v-if='user._open' class='col col-12 border border--gray-light round px12 py12 my6 grid'>
-                    <h3 class='pb6 w-full'>User Flags</h3>
-
+                <div v-if='user._open' class='col col--12 border border--gray-light round px12 py12 my6 grid'>
+                    <h3 class='pb6'>User Flags</h3>
                 </div>
             </div>
         </template>
@@ -123,6 +81,7 @@
 <script>
 import Pager from '../util/Pager.vue';
 import Loading from '../util/Loading.vue';
+import CreateUser from './CreateUser.vue';
 
 export default {
     name: 'ProfileAdminUser',
@@ -136,13 +95,7 @@ export default {
             perpage: 10,
             total: 100,
             users: [],
-            newUser: {
-                show: false,
-                username: '',
-                email: '',
-                access: 'user',
-                password: false
-            }
+            newUser: false
         };
     },
     mounted: function() {
@@ -161,15 +114,8 @@ export default {
         refresh: function() {
             this.getUsers();
         },
-        clear: function() {
-            this.newUser.show = false;
-            this.newUser.username = '';
-            this.newUser.email = '';
-            this.newUser.access = 'user';
-            this.newUser.password = false;
-            this.getUsers();
-        },
         getUsers: async function() {
+            this.newUser = false;
             this.loading = true;
 
             const url = new URL(`${window.api}/api/user`);
@@ -190,23 +136,10 @@ export default {
             } catch (err) {
                 this.$emit('err', err);
             }
-        },
-        createUser: async function() {
-            try  {
-                await window.std('/api/user', {
-                    method: 'POST',
-                    body: {
-                        username: this.newUser.username,
-                        email: this.newUser.email,
-                        access: this.newUser.access
-                    }
-                })
-            } catch (err) {
-                this.$emit('err', err);
-            }
         }
     },
     components: {
+        CreateUser,
         Loading,
         Pager
     }
