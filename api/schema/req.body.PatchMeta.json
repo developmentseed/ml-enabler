@@ -6,7 +6,7 @@
     "additionalProperties": false,
     "properties": {
         "value": {
-            "type": "object"
+            "$ref": "./util/any.json"
         }
     }
 }

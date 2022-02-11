@@ -99,6 +99,36 @@ class Meta extends Generic {
     }
 
     /**
+     * Get a meta
+     *
+     * @param {Pool} pool - Postgres Pool instance
+     * @param {String} key - Metadata key
+     *
+     * @returns {meta}
+     */
+    static async from(pool, key) {
+        let pgres;
+        try {
+            pgres = await pool.query(sql`
+                SELECT
+                    *
+                FROM
+                    meta
+                WHERE
+                    key = ${key}
+            `);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to obtain meta');
+        }
+
+        if (!pgres.rows.length) {
+            throw new Err(404, null, `Meta not found`);
+        }
+
+        return this.deserialize(pgres.rows[0])
+    }
+
+    /**
      * Delete a meta
      *
      * @param {Pool} pool - Postgres Pool instance

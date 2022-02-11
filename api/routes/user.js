@@ -2,6 +2,7 @@
 const { Err } = require('@openaddresses/batch-schema');
 const User = require('../lib/user');
 const Login = require('../lib/login');
+const Settings = require('../lib/settings');
 
 async function router(schema, config) {
     const email = new (require('../lib/email'))(config);
@@ -50,6 +51,10 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             const has_password = !!req.body.password;
+
+            if (!await Settings.from(config.pool, 'user::registration') && req.user.access !== 'admin') {
+                throw new Err(400, null, 'User Registration has been disabled');
+            }
 
             const usr = await User.generate(config.pool, {
                 ...req.body,

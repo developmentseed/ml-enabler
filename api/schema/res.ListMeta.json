@@ -24,7 +24,7 @@
                         "type": "string"
                     },
                     "value": {
-                        "type": "object"
+                        "$ref": "./util/any.json"
                     }
                 }
             }
