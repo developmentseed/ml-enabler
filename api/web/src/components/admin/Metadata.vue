@@ -89,13 +89,24 @@ export default {
                 this.invalidjson = false;
 
                 this.loading = true;
-                await window.std('/api/meta', {
-                    method: 'POST',
-                    body: {
-                        key: this.key,
-                        value: value,
-                    }
-                })
+                if (this.existing) {
+                    await window.std(`/api/meta/${this.key}`, {
+                        method: 'PATCH',
+                        body: {
+                            key: this.key,
+                            value: value,
+                        }
+                    })
+                } else {
+                    await window.std('/api/meta', {
+                        method: 'POST',
+                        body: {
+                            key: this.key,
+                            value: value,
+                        }
+                    })
+                }
+
 
                 this.success = 'Saved';
             } catch (err) {

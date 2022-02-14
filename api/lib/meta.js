@@ -64,7 +64,7 @@ class Meta extends Generic {
                 UPDATE meta
                     SET
                         value = ${JSON.stringify(this.value)},
-                        updatd = NOW()
+                        updated = NOW()
                     WHERE
                         key = ${this.key}
             `);

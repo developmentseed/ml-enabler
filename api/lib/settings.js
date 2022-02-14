@@ -1,4 +1,5 @@
 const Meta = require('./meta');
+const { Err } = require('@openaddresses/batch-schema');
 const Ajv = require('ajv');
 const ajv = new Ajv({
     allErrors: true
@@ -42,9 +43,9 @@ class Settings {
         return Defaults[key];
     }
 
-    static async patch(meta, key, patch) {
-        if (Defaults[key] !== undefined) {
-            let valid = Compiled[key](patch.value);
+    static async patch(meta, patch) {
+        if (Defaults[meta.key] !== undefined) {
+            let valid = Compiled[meta.key](patch.value);
             if (!valid) throw new Err(400, null, 'Setting does not conform to schema');
         }
 

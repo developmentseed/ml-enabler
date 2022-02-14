@@ -56,6 +56,17 @@ async function router(schema, config) {
                 throw new Err(400, null, 'User Registration has been disabled');
             }
 
+            const domains = (await Settings.from(config.pool, 'user::domains')).value;
+
+            if (domains.length) {
+                let matched = false;
+                for (const domain of domains) {
+                    if (req.body.email.endsWith(domain)) matched = true;
+                }
+
+                if (!matched) throw new Err(400, null, 'User Registration is restricted by email domain');
+            }
+
             const usr = await User.generate(config.pool, {
                 ...req.body,
                 // Generate a temporary random password - can't actually be used as the user still has
@@ -68,20 +79,24 @@ async function router(schema, config) {
                 const forgot = await Login.forgot(config.pool, usr.username, 'verify');
                 token = forgot.token;
 
-                await email.verify({
-                    username: usr.username,
-                    email: usr.email,
-                    token
-                });
+                if (config.args.email) {
+                    await email.verify({
+                        username: usr.username,
+                        email: usr.email,
+                        token
+                    });
+                }
             } else {
                 const forgot = await Login.forgot(config.pool, usr.username, 'reset');
                 token = forgot.token;
 
-                await email.forgot({
-                    username: usr.username,
-                    email: usr.email,
-                    token
-                });
+                if (config.args.email) {
+                    await email.forgot({
+                        username: usr.username,
+                        email: usr.email,
+                        token
+                    });
+                }
             }
 
             if (!config.args.validate) {
