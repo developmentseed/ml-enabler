@@ -25,7 +25,10 @@
                 }'/>
             </div>
 
-            <div class='col col--12 mt12'>
+            <div class='col col--12 mt12 clearfix'>
+                <button @click='deleteMeta' class='fl btn btn--stroke round color-gray color-red-on-hover'>
+                    <svg class='fl icon mt6'><use href='#icon-trash'/></svg><span>Delete</span>
+                </button>
                 <button @click='createMeta' class='fr btn btn--stroke round color-gray color-green-on-hover'>
                     <svg class='fl icon mt6'><use href='#icon-check'/></svg><span>Save</span>
                 </button>
@@ -36,7 +39,7 @@
                 <svg class='icon color-green w60 h60'><use href='#icon-check'/></svg>
             </div>
             <div class='col col--12 flex flex--center-main'>
-                <div>Metadata Saved</div>
+                <div>Metadata <span v-text='success'/></div>
             </div>
 
             <button @click='$emit("close")' class='mt12 w-full color-gray color-green-on-hover btn btn--stroke round'>OK</button>
@@ -65,7 +68,7 @@ export default {
     mounted: function() {
         if (this.existing) {
             this.key = this.existing.key;
-            this.value = this.existing.value;
+            this.value = JSON.stringify(this.existing.value, null, 4);
 
             this.edit_key = false;
         }
@@ -94,10 +97,25 @@ export default {
                     }
                 })
 
-                this.success = true;
+                this.success = 'Saved';
             } catch (err) {
                 this.$emit('err', err);
             }
+            this.loading = false;
+        },
+        deleteMeta: async function() {
+            this.loading = true;
+
+            try {
+                await window.std(`/api/meta/${this.key}`, {
+                    method: 'DELETE',
+                });
+
+                this.success = 'Deleted';
+            } catch (err) {
+                this.$emit('err', err);
+            }
+
             this.loading = false;
         }
     },

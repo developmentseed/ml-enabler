@@ -138,7 +138,7 @@ class Meta extends Generic {
      *
      * @returns {meta}
      */
-    static async delete(pool) {
+    async delete(pool) {
         try {
             const pgres = await pool.query(sql`
                 DELETE FROM meta
