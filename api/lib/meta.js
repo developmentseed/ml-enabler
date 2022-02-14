@@ -125,10 +125,10 @@ class Meta extends Generic {
         }
 
         if (!pgres.rows.length) {
-            throw new Err(404, null, `Meta not found`);
+            throw new Err(404, null, 'Meta not found');
         }
 
-        return this.deserialize(pgres.rows[0])
+        return this.deserialize(pgres.rows[0]);
     }
 
     /**
@@ -140,7 +140,7 @@ class Meta extends Generic {
      */
     async delete(pool) {
         try {
-            const pgres = await pool.query(sql`
+            await pool.query(sql`
                 DELETE FROM meta
                     WHERE key = ${this.key}
             `);

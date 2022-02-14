@@ -29,7 +29,7 @@ async function router(schema, config) {
                 return {
                     total: 0,
                     stacks: []
-                }
+                };
             }
 
             const list = (await Stack.list(config.StackName + '-')).filter((stack) => {

@@ -1,3 +1,4 @@
+'use strict';
 const Meta = require('./meta');
 const { Err } = require('@openaddresses/batch-schema');
 const Ajv = require('ajv');
@@ -32,7 +33,7 @@ for (const key in Defaults) {
 class Settings {
     static async generate(pool, params) {
         if (Defaults[params.key] !== undefined) {
-            let valid = Compiled[params.key](params.value);
+            const valid = Compiled[params.key](params.value);
             if (!valid) throw new Err(400, null, 'Setting does not conform to schema');
         }
 
@@ -45,7 +46,7 @@ class Settings {
 
     static async patch(meta, patch) {
         if (Defaults[meta.key] !== undefined) {
-            let valid = Compiled[meta.key](patch.value);
+            const valid = Compiled[meta.key](patch.value);
             if (!valid) throw new Err(400, null, 'Setting does not conform to schema');
         }
 
@@ -57,7 +58,7 @@ class Settings {
             return await Meta.from(pool, key);
         } catch (err) {
             if (err.status === 404 && Defaults[key] !== undefined) {
-                return Defaults[key].default
+                return Defaults[key].default;
             } else {
                 throw err;
             }
