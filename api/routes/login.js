@@ -74,7 +74,7 @@ async function router(schema, config) {
      * @apiDescription
      *     Email Verification of new user
      *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.VerifyLogin.json} apiParam
+     * @apiSchema (Body) {jsonschema=../schema/req.body.VerifyLogin.json} apiParam
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.post('/login/verify', {
