@@ -14,13 +14,13 @@
         <template v-else-if='!success'>
             <div class='col col--12'>
                 <label>Key</label>
-                <input v-model='key' :disabled='edit_key' type='text' class='input' placeholder='Key' :class='{
+                <input v-model='key' :disabled='existing' type='text' class='input' placeholder='Key' :class='{
                      "input--border-red": attempted && !key
                 }' />
             </div>
             <div class='col col--12'>
                 <label>Value</label>
-                <textarea row=10 v-model='value' type='text' class='input' placeholder='JSON Value' :class='{
+                <textarea rows=10 v-model='value' type='text' class='input' placeholder='JSON Value' :class='{
                      "input--border-red": attempted && (!key || invalidjson)
                 }'/>
             </div>
@@ -53,7 +53,12 @@ import Loading from '../util/Loading.vue';
 
 export default {
     name: 'Metadata',
-    props: [ 'existing' ],
+    props: {
+        existing: {
+            type: [Boolean, Object],
+            default: false
+        }
+    },
     data: function() {
         return {
             loading: false,
@@ -61,7 +66,6 @@ export default {
             attempted: false,
             invalidjsonp: false,
             key: '',
-            edit_key: true,
             value: ''
         };
     },
@@ -69,8 +73,6 @@ export default {
         if (this.existing) {
             this.key = this.existing.key;
             this.value = JSON.stringify(this.existing.value, null, 4);
-
-            this.edit_key = false;
         }
     },
     methods: {

@@ -75,6 +75,8 @@ async function router(schema, config) {
             await User.is_admin(req);
 
             const meta = await Settings.from(config.pool, req.params.key);
+            if (!meta instanceof Meta) throw new Err(400, null, 'Meta not found');
+
             Settings.patch(meta, req.body);
             await meta.commit(config.pool);
 

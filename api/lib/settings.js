@@ -58,7 +58,9 @@ class Settings {
             return await Meta.from(pool, key);
         } catch (err) {
             if (err.status === 404 && Defaults[key] !== undefined) {
-                return Defaults[key].default;
+                return {
+                    key,
+                    value: JSON.parse(JSON.stringify(Defaults[key].default))
             } else {
                 throw err;
             }
