@@ -10,46 +10,29 @@
         <div class='border border--gray-light round col col--12 px12 py12 clearfix'>
             <div class='grid grid--gut12'>
                 <div class='col col--4 py6'>
-                    <label><span v-text='type'/> Version</label>
-                    <input v-model='iter.version' class='input' placeholder='0.0.0'/>
+                    <InfVersion
+                        @version='iter.version = $event'
+                    />
                 </div>
 
                 <div class='col col--4 py6'>
-                    <label>Model Type:</label>
-                    <div class='select-container w-full'>
-                        <select v-model='iter.model_type' class='select select--stroke'>
-                            <option value='tensorflow'>Tensorflow</option>
-                        </select>
-                        <div class='select-arrow'></div>
-                    </div>
+                    <InfModel
+                        @model='iter.model_type = $event'
+                    />
                 </div>
 
                 <div class='col col--4 py6'>
-                    <label>Inference Type:</label>
-                    <div class='select-container w-full'>
-                        <select v-model='iter.inf_type' class='select select--stroke'>
-                            <option value='classification'>Classification</option>
-                            <option value='detection'>Object Detection</option>
-                            <option value='segmentation'>Segmentation</option>
-                        </select>
-                        <div class='select-arrow'></div>
-                    </div>
+                    <InfType
+                        @type='iter.inf_type = $event'
+                    />
                 </div>
 
-                <template v-if='iter.inf_type === "classification"'>
-                    <div class='col col--12 pr12 my12'>
-                        <label>Inferences List:</label>
-                        <label class='switch-container px6 fr'>
-                            <span class='mr6'>Binary Inference</span>
-                            <input :disabled='iter.inf_list.split(",").length !== 2' v-model='iter.inf_binary' type='checkbox' />
-                            <div class='switch'></div>
-                        </label>
-                        <input v-model='iter.inf_list' type='text' class='input' placeholder='buildings,schools,roads,...'/>
-                    </div>
-                    <div class='col col--8'>
-                    </div>
-                </template>
-                <div class='col col--8'></div>
+                <div v-if='iter.inf_type !== "detection"' class='col col--12 grid pr12 my12'>
+                    <InfList
+                        @binary='iter.inf_binary = $event'
+                        @list='iter.inf_list = $event'
+                    />
+                </div>
 
                 <div class='col col--12 pt6'>
                     <label>Imagery Source:</label>
@@ -103,6 +86,10 @@
 
 <script>
 import Loading from './util/Loading.vue';
+import InfType from './util/InfType.vue';
+import InfList from './util/InfList.vue';
+import InfVersion from './util/InfVersion.vue';
+import InfModel from './util/InfModel.vue';
 
 export default {
     name: 'CreateIteration',
@@ -117,7 +104,7 @@ export default {
                 imagery_id: false,
                 version: '',
                 tile_zoom: '18',
-                inf_list: '',
+                inf_list: [],
                 model_type: 'tensorflow',
                 inf_type: 'classification',
                 inf_binary: false,
@@ -202,7 +189,11 @@ export default {
         }
     },
     components: {
-        Loading
+        Loading,
+        InfType,
+        InfList,
+        InfVersion,
+        InfModel
     }
 }
 </script>

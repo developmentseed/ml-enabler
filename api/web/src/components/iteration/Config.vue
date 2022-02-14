@@ -10,30 +10,24 @@
 
         <div class='grid grid--gut12'>
             <div class='col col--4 py6'>
-                <label><span v-text='iteration.type'/> Version</label>
-                <input disabled :value='iteration.version' class='input' placeholder='0.0.0'/>
+                <InfVersion
+                    :disabled='true'
+                    :_version='iteration.version'
+                />
             </div>
 
             <div class='col col--4 py6'>
-                <label>Model Type:</label>
-                <div class='select-container w-full'>
-                    <select disabled v-model='model_type' class='select select--stroke'>
-                        <option value='tensorflow'>Tensorflow</option>
-                    </select>
-                    <div class='select-arrow'></div>
-                </div>
+                <InfModel
+                    :_model='model_type'
+                    :disabled='true'
+                />
             </div>
 
             <div class='col col--4 py6'>
-                <label>Model Type:</label>
-                <div class='select-container w-full'>
-                    <select disabled :value='iteration.inf_type' class='select select--stroke'>
-                        <option value='classification'>Classification</option>
-                        <option value='detection'>Object Detection</option>
-                        <option value='segmentation'>Segmentation</option>
-                    </select>
-                    <div class='select-arrow'></div>
-                </div>
+                <InfType
+                    :_type='iteration.inf_type'
+                    :disabled='true'
+                />
             </div>
 
             <template v-if='iteration.inf_type === "classification"'>
@@ -86,6 +80,9 @@
 <script>
 import IterationHeader from './IterationHeader.vue';
 import Loading from './../util/Loading.vue';
+import InfModel from './../util/InfModel.vue';
+import InfVersion from './../util/InfVersion.vue';
+import InfType from './../util/InfType.vue';
 
 export default {
     name: 'Config',
@@ -95,7 +92,7 @@ export default {
             loading: {
                 imagery: true
             },
-            model_type: false,
+            model_type: 'tensorflow',
             inf_supertile: false,
             inf_binary: false,
             imagery: []
@@ -110,6 +107,9 @@ export default {
     },
     components: {
         Loading,
+        InfModel,
+        InfVersion,
+        InfType,
         IterationHeader,
     },
     methods: {

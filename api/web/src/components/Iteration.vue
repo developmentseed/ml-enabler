@@ -15,7 +15,7 @@
         </div>
         <div class='border border--gray-light round col col--12 px12 py12 clearfix'>
             <template v-if='loading.iteration'>
-                <Loading/>
+                <Loading desc='Loading Iteration'/>
             </template>
             <template v-else>
                 <router-view
