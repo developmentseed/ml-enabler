@@ -6,10 +6,10 @@ const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
 const Submission = require('../lib/project/iteration/submission');
 const createCsvStringifier = require('csv-writer').createObjectCsvStringifier;
 const RL = require('readline');
+const User = require('../lib/user');
+
 
 async function router(schema, config) {
-    const user = new (require('../lib/user'))(config);
-
     /**
      * @api {get} /api/project/:pid/iteration/:iterationid/export
      * @apiVersion 1.0.0
@@ -28,8 +28,8 @@ async function router(schema, config) {
         query: 'req.query.GetExport.json'
     }, async (req, res) => {
         try {
-            req.auth = req.token;
-            await user.is_auth(req);
+            req.user = req.token;
+            await User.is_auth(req);
 
             if (req.query.threshold && req.query.inferences === 'all') throw new Err(400, null, 'Threshold can only set if inferences is not "all"');
 

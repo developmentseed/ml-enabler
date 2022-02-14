@@ -149,7 +149,7 @@ export default {
         this.getUsers();
 
         this.project.users.push({
-            uid: this.user.uid,
+            uid: this.user.id,
             username: this.user.username,
             access: 'admin'
         });

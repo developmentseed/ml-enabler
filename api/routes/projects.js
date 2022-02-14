@@ -3,9 +3,9 @@ const { Err } = require('@openaddresses/batch-schema');
 const Project = require('../lib/project');
 const ProjectAccess = require('../lib/project/access');
 const Stack = require('../lib/stack');
+const User = require('../lib/user');
 
 async function router(schema, config) {
-    const user = new (require('../lib/user'))(config);
 
     /**
      * @api {get} /api/project List Projects
@@ -25,9 +25,9 @@ async function router(schema, config) {
         res: 'res.ListProjects.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
-            req.query.uid = req.auth.uid;
+            req.query.uid = req.user.id;
 
             const list = await Project.list(config.pool, req.query);
 
@@ -74,7 +74,7 @@ async function router(schema, config) {
         res: 'res.Project.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             if (!req.body.users.length) throw new Err(400, null, 'Users list cannot be empty');
 
@@ -108,7 +108,7 @@ async function router(schema, config) {
         res: 'res.Project.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             const project = await Project.from(config.pool, req.params.pid);
 
@@ -137,7 +137,7 @@ async function router(schema, config) {
         res: 'res.Project.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             const project = await Project.from(config.pool, req.params.pid);
             project.patch(req.body);
@@ -166,7 +166,7 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             const project = await Project.from(config.pool, req.params.pid);
             await project.delete(config.pool);

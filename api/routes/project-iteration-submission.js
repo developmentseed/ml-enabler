@@ -1,11 +1,10 @@
 'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const Submission = require('../lib/project/iteration/submission');
+const User = require('../lib/user');
 
 async function router(schema, config) {
     const TileBase = (await import('tilebase')).default;
-
-    const user = new (require('../lib/user'))(config);
 
     /**
      * @api {get} /api/project/:pid/iteration/:iterationid/submission List Submission
@@ -27,7 +26,7 @@ async function router(schema, config) {
         res: 'res.ListSubmission.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             res.json(await Submission.list(config.pool, req.params.iterationid, req.query));
         } catch (err) {
@@ -54,7 +53,7 @@ async function router(schema, config) {
         res: 'res.Task.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             const sub = await Submission.from(config.pool, req.params.subid, req.params.pid);
 
@@ -83,7 +82,7 @@ async function router(schema, config) {
         res: 'res.TileJSON.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             const sub = await Submission.from(config.pool, req.params.subid, req.params.pid);
 
@@ -123,9 +122,9 @@ async function router(schema, config) {
         ':format': 'string'
     }, async (req, res) => {
         try {
-            req.auth = req.token;
+            req.user = req.token;
 
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             if (!['mvt', 'png'].includes(req.params.format)) {
                 throw new Err(400, null, '.mvt and .png are supported');

@@ -2,9 +2,7 @@
     "type": "object",
     "required": [
         "key",
-        "value",
-        "created",
-        "updated"
+        "value"
     ],
     "additionalProperties": false,
     "properties": {
@@ -13,12 +11,6 @@
         },
         "value": {
             "$ref": "./util/any.json"
-        },
-        "created": {
-            "type": "integer"            
-        },
-        "updated": {
-            "type": "integer"            
         }
     }
 }
