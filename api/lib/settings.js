@@ -61,6 +61,7 @@ class Settings {
                 return {
                     key,
                     value: JSON.parse(JSON.stringify(Defaults[key].default))
+                };
             } else {
                 throw err;
             }
