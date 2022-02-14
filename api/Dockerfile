@@ -26,5 +26,5 @@ RUN cp ./nginx.conf /etc/nginx/sites-enabled/default
 
 CMD service nginx restart \
     && ./node_modules/.bin/knex migrate:latest \
-    && npm run dev
+    && npm start
 
