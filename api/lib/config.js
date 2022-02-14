@@ -47,7 +47,7 @@ class Config {
             if (!cnf.bucket) throw new Error('ASSET_BUCKET Required');
         }
 
-        cnf.url = 'http://localhost:2001';
+        cnf.url = process.env.FRONTEND_URL || 'http://localhost:2001';
         cnf.SigningSecret = process.env.SigningSecret || '123';
 
         try {

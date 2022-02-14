@@ -291,6 +291,9 @@ const Resources = {
                     Name: 'ENVIRONMENT',
                     Value: 'aws'
                 },{
+                    Name: 'FRONTEND_URL',
+                    Value: cf.getAtt('MLEnablerELB', 'LoadBalancerFullName'),
+                },{
                     Name: 'SigningSecret',
                     Value: cf.ref('SigningSecret')
                 },{
