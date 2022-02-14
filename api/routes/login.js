@@ -1,8 +1,9 @@
 'use strict';
 const { Err } = require('@openaddresses/batch-schema');
+const User = require('../lib/user');
+const Login = require('../lib/login');
 
 async function router(schema, config) {
-    const user = new (require('../lib/user'))(config);
     const email = new (require('../lib/email'))(config);
 
     /**
@@ -21,15 +22,8 @@ async function router(schema, config) {
         res: 'res.Login.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
-
-            res.json({
-                uid: req.auth.uid,
-                username: req.auth.username,
-                email: req.auth.email,
-                access: req.auth.access,
-                validated: req.auth.validated
-            });
+            await User.is_auth(req);
+            res.json(req.user.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -53,17 +47,17 @@ async function router(schema, config) {
         res: 'res.Login.json'
     }, async (req, res) => {
         try {
-            req.auth = await user.login({
+            req.user = await Login.attempt(config.pool, {
                 username: req.body.username,
                 password: req.body.password
-            });
+            }, config.SigningSecret);
 
             return res.json({
-                uid: req.auth.uid,
-                username: req.auth.username,
-                email: req.auth.email,
-                access: req.auth.access,
-                token: req.auth.token
+                uid: req.user.id,
+                username: req.user.username,
+                email: req.user.email,
+                access: req.user.access,
+                token: req.user.token
             });
         } catch (err) {
             return Err.respond(err, res);
@@ -71,7 +65,7 @@ async function router(schema, config) {
     });
 
     /**
-     * @api {get} /api/login/verify Verify User
+     * @api {post} /api/login/verify Verify User
      * @apiVersion 1.0.0
      * @apiName VerifyLogin
      * @apiGroup Login
@@ -80,15 +74,20 @@ async function router(schema, config) {
      * @apiDescription
      *     Email Verification of new user
      *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.VerifyLogin.json} apiParam
+     * @apiSchema (Body) {jsonschema=../schema/req.body.VerifyLogin.json} apiParam
      * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
-    await schema.get('/login/verify', {
-        query: 'req.query.VerifyLogin.json',
+    await schema.post('/login/verify', {
+        body: 'req.body.VerifyLogin.json',
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            res.json(await user.verify(req.query.token));
+            await Login.verify(config.pool, req.body.token);
+
+            return res.json({
+                status: 200,
+                message: 'User Verified'
+            });
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -112,14 +111,17 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            const reset = await user.forgot(req.body.user); // Username or email
+            const reset = await Login.forgot(config.pool, req.body.username); // Username or email
 
             if (config.args.email) {
                 await email.forgot(reset);
             }
 
             // To avoid email scraping - this will always return true, regardless of success
-            return res.json({ status: 200, message: 'Password Email Sent' });
+            return res.json({
+                status: 200,
+                message: 'Password Email Sent'
+            });
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -144,12 +146,17 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            return res.json(await user.reset({
+            await Login.reset(config.pool, {
                 token: req.body.token,
                 password: req.body.password
-            }));
+            });
 
+            return res.json({
+                status: 200,
+                message: 'User Reset'
+            });
         } catch (err) {
+            console.error(err);
             return Err.respond(err, res);
         }
     });

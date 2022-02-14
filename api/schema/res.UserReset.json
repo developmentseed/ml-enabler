@@ -1,0 +1,20 @@
+{
+    "type": "object",
+    "required": [
+        "uid",
+        "expires",
+        "action"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "uid": {
+            "type": "integer"
+        },
+        "expires": {
+            "type": "string"
+        },
+        "action": {
+            "type": "string"
+        }
+    }
+}

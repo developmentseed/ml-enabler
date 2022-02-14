@@ -14,6 +14,10 @@ const Parameters = {
         Description: 'Secret to signing JWT Tokens',
         Type: 'String'
     },
+    EmailDomain: {
+        Description: 'SES Domain to send emails via',
+        Type: 'String'
+    },
     ContainerCpu: {
         Description: 'How much CPU to give to the container. 1024 is 1 cpu. See aws docs for acceptable cpu/mem combinations',
         Default: 1024,
@@ -295,6 +299,9 @@ const Resources = {
                 },{
                     Name: 'StackName',
                     Value: cf.stackName
+                },{
+                    Name: 'EMAIL_DOMAIN',
+                    Value: cf.ref('EmailDomain')
                 },{
                     Name: 'MAPBOX_TOKEN',
                     Value: cf.ref('MapboxAccessToken')

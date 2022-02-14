@@ -1,9 +1,9 @@
 'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const Stack = require('../lib/stack');
+const User = require('../lib/user');
 
 async function router(schema, config) {
-    const user = new (require('../lib/user'))(config);
 
     /**
      * @api {get} /api/stack List Stacks
@@ -23,7 +23,14 @@ async function router(schema, config) {
         res: 'res.ListStacks.json'
     }, async (req, res) => {
         try {
-            await user.is_admin(req);
+            await User.is_admin(req);
+
+            if (config.Environment !== 'aws') {
+                return {
+                    total: 0,
+                    stacks: []
+                };
+            }
 
             const list = (await Stack.list(config.StackName + '-')).filter((stack) => {
                 return stack.StackName.includes(req.query.filter);
