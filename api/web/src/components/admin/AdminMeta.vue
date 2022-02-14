@@ -89,7 +89,7 @@ import Loading from '../util/Loading.vue';
 import Metadata from './Metadata.vue';
 
 export default {
-    name: 'ProfileAdminUser',
+    name: 'AdminMeta',
     props: [ ],
     data: function() {
         return {
