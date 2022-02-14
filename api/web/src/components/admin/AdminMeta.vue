@@ -38,7 +38,7 @@
 
         <template v-if='newMeta'>
             <Metadata
-                existing=false
+                :existing='false'
                 @err='$emit("err", $event)'
                 @close='getMetas'
             />
