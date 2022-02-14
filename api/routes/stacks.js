@@ -25,6 +25,13 @@ async function router(schema, config) {
         try {
             await User.is_admin(req);
 
+            if (config.Environment !== 'aws') {
+                return {
+                    total: 0,
+                    stacks: []
+                }
+            }
+
             const list = (await Stack.list(config.StackName + '-')).filter((stack) => {
                 return stack.StackName.includes(req.query.filter);
             });
