@@ -292,7 +292,7 @@ const Resources = {
                     Value: 'aws'
                 },{
                     Name: 'FRONTEND_URL',
-                    Value: cf.getAtt('MLEnablerELB', 'LoadBalancerFullName'),
+                    Value: cf.getAtt('MLEnablerELB', 'DNSName')
                 },{
                     Name: 'SigningSecret',
                     Value: cf.ref('SigningSecret')
