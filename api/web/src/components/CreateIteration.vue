@@ -27,7 +27,7 @@
                     />
                 </div>
 
-                <div v-if='iter.inf_type !== "detection"' class='col col--12 grid pr12 my12'>
+                <div v-if='iter.inf_type !== "detection"' class='col col--12'>
                     <InfList
                         @binary='iter.inf_binary = $event'
                         @list='iter.inf_list = $event'

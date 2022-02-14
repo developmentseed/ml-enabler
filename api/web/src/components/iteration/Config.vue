@@ -30,20 +30,13 @@
                 />
             </div>
 
-            <template v-if='iteration.inf_type === "classification"'>
-                <div class='col col--12 pr12 my12'>
-                    <label>Inferences List:</label>
-                    <label class='switch-container px6 fr'>
-                        <span class='mr6'>Binary Inference</span>
-                        <input disabled v-model='inf_binary' type='checkbox' />
-                        <div class='switch'></div>
-                    </label>
-                    <input disabled :value='iteration.inf_list' type='text' class='input' placeholder='buildings,schools,roads,...'/>
-                </div>
-                <div class='col col--8'>
-                </div>
-            </template>
-            <div class='col col--8'></div>
+            <div v-if='iteration.inf_type !== "detection"' class='col col--12 pr12 my12'>
+                <InfList
+                    :_binary='iteration.inf_binary'
+                    :_list='iteration.inf_list'
+                    :disabled='true'
+                />
+            </div>
 
             <div class='col col--12 pt6'>
                 <label>Imagery Source:</label>
@@ -83,6 +76,7 @@ import Loading from './../util/Loading.vue';
 import InfModel from './../util/InfModel.vue';
 import InfVersion from './../util/InfVersion.vue';
 import InfType from './../util/InfType.vue';
+import InfList from './../util/InfList.vue';
 
 export default {
     name: 'Config',
@@ -110,6 +104,7 @@ export default {
         InfModel,
         InfVersion,
         InfType,
+        InfList,
         IterationHeader,
     },
     methods: {
