@@ -15,9 +15,6 @@ async function router(schema, config) {
      *
      * @apiDescription
      *     Return a list of metadata objects
-     *
-     * @apiSchema (Query) {jsonschema=../schema/req.query.ListMeta.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.ListMeta.json} apiSuccess
      */
     await schema.get('/meta', {
         query: 'req.query.ListMeta.json',
@@ -41,9 +38,6 @@ async function router(schema, config) {
      *
      * @apiDescription
      *     Create a new metadata object
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateMeta.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Meta.json} apiSuccess
      */
     await schema.post('/meta', {
         body: 'req.body.CreateMeta.json',
@@ -71,9 +65,6 @@ async function router(schema, config) {
      *     Update a metadata object
      *
      * @apiParam {String} :key Meta Key to update
-     *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchMeta.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Meta.json} apiSuccess
      */
     await schema.patch('/meta/:key', {
         ':key': 'string',
@@ -105,8 +96,7 @@ async function router(schema, config) {
      *
      * @apiParam {String} :key Meta key to delete
      *
-     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchMeta.json} apiParam
-     * @apiSchema {jsonschema=../schema/res.Meta.json} apiSuccess
+     * @apiSchema {jsonschema=../schema/res.Standard.json} apiSuccess
      */
     await schema.delete('/meta/:key', {
         ':key': 'string',
