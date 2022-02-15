@@ -52,7 +52,7 @@
                         <div class='select-container w-full'>
                             <select v-model='params.inferences' class='select select--stroke'>
                                 <option value='all'>All</option>
-                                <option :key='inf' v-for='inf in iteration.inf_list.split(",")' :value='inf'><span v-text='inf'/></option>
+                                <option :key='inf.name' v-for='inf in iteration.inf_list' :value='inf.name'><span v-text='inf.name'/></option>
                             </select>
                             <div class='select-arrow'></div>
                         </div>
