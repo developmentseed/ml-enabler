@@ -118,7 +118,7 @@ class Stack {
                     { ParameterKey: 'GitSha',           ParameterValue: process.env.GitSha },
                     { ParameterKey: 'StackName',        ParameterValue: process.env.StackName },
                     { ParameterKey: 'ImageTag',         ParameterValue: image },
-                    { ParameterKey: 'Inferences',       ParameterValue: options.inf_list },
+                    { ParameterKey: 'Inferences',       ParameterValue: options.inf_list.map((e) => e.name).join(',') },
                     { ParameterKey: 'ProjectId',        ParameterValue: String(options.project_id) },
                     { ParameterKey: 'IterationId',      ParameterValue: String(options.iteration_id) },
                     { ParameterKey: 'ImageryId',        ParameterValue: String(options.imagery_id) },
