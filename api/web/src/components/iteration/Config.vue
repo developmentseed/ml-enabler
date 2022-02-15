@@ -39,32 +39,12 @@
             </div>
 
             <div class='col col--12 pt6'>
-                <label>Imagery Source:</label>
-                <div class='border border--gray-light round'>
-                    <template v-if='loading.imagery'>
-                        <Loading/>
-                    </template>
-                    <template v-else>
-                        <div :key='img.id' v-for='img in imagery' class='col col--12 bg-darken10-on-hover'>
-                            <div class='w-full py6 px6' :class='{
-                                "bg-gray-light": iteration.imagery_id === img.id
-                            }'>
-                                <span class='txt-h4 round' v-text='img.name'/>
-                                <div v-text='img.fmt' class='fr mx3 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue px6 py3 round txt-xs txt-bold'></div>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-            </div>
-
-            <div v-if='isWMS' class='col col--12 py12'>
-                <label><span v-text='iteration.type'/> Zoom Level</label>
-                <label class='switch-container px6 fr'>
-                    <span class='mr6'>Supertile</span>
-                    <input disabled v-model='inf_supertile' type='checkbox' />
-                    <div class='switch'></div>
-                </label>
-                <input disabled :value='iteration.tile_zoom' class='input' placeholder='18'/>
+                <InfImagery
+                    :_zoom='iteration.tile_zoom'
+                    :_supertile='iteration.inf_supertile'
+                    :_imagery='iteration.imagery_id'
+                    :disabled='true'
+                />
             </div>
         </div>
     </div>
@@ -77,6 +57,7 @@ import InfModel from './../util/InfModel.vue';
 import InfVersion from './../util/InfVersion.vue';
 import InfType from './../util/InfType.vue';
 import InfList from './../util/InfList.vue';
+import InfImagery from './../util/InfImagery.vue';
 
 export default {
     name: 'Config',
@@ -105,6 +86,7 @@ export default {
         InfVersion,
         InfType,
         InfList,
+        InfImagery,
         IterationHeader,
     },
     methods: {

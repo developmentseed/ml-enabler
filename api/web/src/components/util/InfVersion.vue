@@ -1,6 +1,6 @@
 <template>
 <div class='col col--12'>
-    <label><span v-text='version'/> Version</label>
+    <label>Model Version</label>
     <input :disabled='disabled' v-model='version' class='input' placeholder='0.0.0'/>
 </div>
 </template>

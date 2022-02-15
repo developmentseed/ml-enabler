@@ -35,44 +35,12 @@
                 </div>
 
                 <div class='col col--12 pt6'>
-                    <label>Imagery Source:</label>
-                    <div class='border border--gray-light round'>
-                        <template v-if='loading.imagery'>
-                            <Loading desc='Loading Imagery'/>
-                        </template>
-                        <template v-else-if='imagery.length === 0'>
-                            <div class='flex flex--center-main pt36'>
-                                <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-info'/></svg>
-                            </div>
-
-                            <div class='flex flex--center-main pt12 pb36'>
-                                <h1 class='flex-child txt-h4 cursor-default'>An Imagery Source Must Be Created</h1>
-                            </div>
-                            <div class='flex flex--center-main pt12 pb36'>
-                                <button @click='$router.push({ path: `/project/${$route.params.projectid}/imagery` })' class='btn btn--stroke round fr color-green-light color-green-on-hover'>Create Imagery</button>
-                            </div>
-                        </template>
-                        <template v-else>
-                            <div @click='iter.imagery_id = img.id' :key='img.id' v-for='img in imagery' class='col col--12 cursor-pointer bg-darken10-on-hover'>
-                                <div class='w-full py6 px6' :class='{
-                                    "bg-gray-light": iter.imagery_id === img.id
-                                }'>
-                                    <span class='txt-h4 round' v-text='img.name'/>
-                                    <div v-text='img.fmt' class='fr mx3 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue px6 py3 round txt-xs txt-bold'></div>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-
-                <div v-if='isWMS' class='col col--12 py12'>
-                    <label><span v-text='type'/> Zoom Level</label>
-                    <label class='switch-container px6 fr'>
-                        <span class='mr6'>Supertile</span>
-                        <input v-model='iter.inf_supertile' type='checkbox' />
-                        <div class='switch'></div>
-                    </label>
-                    <input type='number' v-model='iter.tile_zoom' class='input' placeholder='18'/>
+                    <InfImagery
+                        @supertile='iter.inf_supertile = $event'
+                        @zoom='iter.tile_zoom = $event'
+                        @imagery='iter.imagery_id = $event'
+                        @err='$emit("err", $event)'
+                    />
                 </div>
 
                 <div class='col col--12 py12'>
@@ -85,11 +53,11 @@
 </template>
 
 <script>
-import Loading from './util/Loading.vue';
 import InfType from './util/InfType.vue';
 import InfList from './util/InfList.vue';
 import InfVersion from './util/InfVersion.vue';
 import InfModel from './util/InfModel.vue';
+import InfImagery from './util/InfImagery.vue';
 
 export default {
     name: 'CreateIteration',
@@ -112,22 +80,6 @@ export default {
             }
         };
     },
-    mounted: function() {
-        this.refresh();
-    },
-    computed: {
-        isWMS: function() {
-            if (!this.iter.imagery_id) return false;
-
-            for (const img of this.imagery) {
-                if (img.id === this.iter.imagery_id && img.fmt === 'wms') {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-    },
     watch: {
         'iter.inf_list': function() {
             if (this.iter.inf_list.split(",").length !== 2) {
@@ -136,26 +88,6 @@ export default {
         }
     },
     methods: {
-        refresh: function() {
-            this.getImagery();
-        },
-        getImagery: async function() {
-            this.loading.imagery = true;
-
-            try {
-                const imagery = await window.std(window.api + `/api/project/${this.$route.params.projectid}/imagery`);
-
-                this.imagery = imagery.imagery;
-
-                if (imagery.total === 1) {
-                    this.iter.imagery_id = this.imagery[0].id;
-                }
-            } catch (err) {
-                this.$emit('err', err);
-            }
-
-            this.loading.imagery = false;
-        },
         postIteration: async function() {
             if (!/^\d+\.\d+\.\d+$/.test(this.iter.version)) {
                 return this.$emit('err', new Error('Version must be valid semver'));
@@ -189,11 +121,11 @@ export default {
         }
     },
     components: {
-        Loading,
         InfType,
         InfList,
         InfVersion,
-        InfModel
+        InfModel,
+        InfImagery
     }
 }
 </script>
