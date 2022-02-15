@@ -10,7 +10,7 @@
     </div>
 
     <div class='col col--12 border border--gray-light py12 px12 round'>
-        <div :key='l.name' v-for='l in list' class='col col--12 grid grid--gut12 py6'>
+        <div :key='i' v-for='(l, i) in list' class='col col--12 grid grid--gut12 py6'>
             <div class='col col--10'>
                 <input :disabled='disabled' v-model='l.name' type='text' class='input w-full' placeholder='Class Name'/>
             </div>
@@ -61,6 +61,7 @@ export default {
             this.$emit('binary', this.binary);
         },
         list: function() {
+            if (this.list.length > 2) this.binary = false;
             this.$emit('list', this.list);
         }
     },
