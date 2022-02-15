@@ -23,6 +23,9 @@
             <button @click='add' class='btn btn--stroke round fr color-gray color-green-on-hover'>
                 Add Class
             </button>
+            <button @click='del' class='btn btn--stroke round fr color-gray color-red-on-hover mr12'>
+                Remove Class
+            </button>
         </div>
     </div>
 </div>
@@ -71,6 +74,9 @@ export default {
                 name: '',
                 color: ''
             });
+        },
+        del: function() {
+            this.list.pop();
         }
     }
 }
