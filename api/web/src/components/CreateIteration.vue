@@ -44,7 +44,7 @@
                 </div>
 
                 <div class='col col--12 py12'>
-                    <button @click='postIteration' class='btn btn--stroke round fr color-green-light color-green-on-hover'>Add <span v-text='type'/></button>
+                    <button @click='postIteration' class='btn btn--stroke round fr color-gray color-green-on-hover'>Add <span v-text='type'/></button>
                 </div>
             </div>
         </div>
