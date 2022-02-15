@@ -55,7 +55,7 @@ export default {
         } else {
             this.list.push({
                 name: '',
-                color: ''
+                color: '#ffffff'
             });
         }
     },
@@ -72,7 +72,7 @@ export default {
         add: function() {
             this.list.push({
                 name: '',
-                color: ''
+                color: '#ffffff'
             });
         },
         del: function() {

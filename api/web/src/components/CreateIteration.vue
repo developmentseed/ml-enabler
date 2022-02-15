@@ -80,19 +80,12 @@ export default {
             }
         };
     },
-    watch: {
-        'iter.inf_list': function() {
-            if (this.iter.inf_list.split(",").length !== 2) {
-                this.iter.inf_binary = false;
-            }
-        }
-    },
     methods: {
         postIteration: async function() {
             if (!/^\d+\.\d+\.\d+$/.test(this.iter.version)) {
                 return this.$emit('err', new Error('Version must be valid semver'));
-            } else if (this.iter.inf_type === 'classification' && this.iter.inf_list.trim().length === 0) {
-                return this.$emit('err', new Error('Classification model must have inference list'));
+            } else if (this.iter.inf_type !== 'detection' && this.iter.inf_list.length === 0) {
+                return this.$emit('err', new Error('Model must have inference list'));
             } else if (isNaN(parseInt(this.iter.tile_zoom))) {
                 return this.$emit('err', new Error('Tile Zoom must be an integer'));
             }

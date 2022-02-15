@@ -34,7 +34,7 @@
         </template>
 
         <div v-if='isWMS' class='col col--12 py12'>
-            <label><span v-text='type'/> Zoom Level</label>
+            <label>Zoom Level</label>
             <label class='switch-container px6 fr'>
                 <span class='mr6'>Supertile</span>
                 <input :disabled='disabled' v-model='supertile' type='checkbox' />
@@ -47,6 +47,8 @@
 </template>
 
 <script>
+import Loading from './Loading.vue';
+
 export default {
     name: 'InfImagery',
     props: {
@@ -116,6 +118,9 @@ export default {
 
             this.loading = false;
         },
+    },
+    components: {
+        Loading
     }
 }
 </script>
