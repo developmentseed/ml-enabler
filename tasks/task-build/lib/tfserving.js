@@ -4,11 +4,13 @@ const CP = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
+const TF_Version = '2.7.0';
+
 function docker(tmp, model, tagged_model) {
     console.error('ok - pulling tensorflow/serving docker image');
 
     CP.execSync(`
-        docker pull tensorflow/serving:2.7.0-gpu
+        docker pull tensorflow/serving:${TF_Version}-gpu
     `);
 
     // Ignore errors, these are to ensure the next commands don't err
@@ -29,7 +31,7 @@ function docker(tmp, model, tagged_model) {
     }
 
     CP.execSync(`
-        docker run -d --name serving_base tensorflow/serving:2.1.0-gpu
+        docker run -d --name serving_base tensorflow/serving:${TF_Version}-gpu
     `);
 
     CP.execSync(`
