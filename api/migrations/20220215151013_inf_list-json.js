@@ -26,7 +26,7 @@ exports.up = function(knex) {
             FROM
                 tmp
             WHERE
-                iterations.id = tmp.id
+                iterations.id = tmp.id;
 
         DROP TABLE tmp;
     `);
