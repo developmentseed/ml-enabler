@@ -41,8 +41,8 @@
                             <label>Inference Type</label>
                             <div class='select-container w-full'>
                                 <select v-model='inf' class='select select--s'>
-                                    <template v-for='inf in iteration.inf_list.split(",")'>
-                                        <option v-bind:key='inf' v-text='inf'></option>
+                                    <template v-for='inf in iteration.inf_list'>
+                                        <option :key='inf.name' v-text='inf.name'></option>
                                     </template>
                                 </select>
                                 <div class='select-arrow'></div>

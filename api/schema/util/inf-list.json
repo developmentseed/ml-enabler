@@ -1,0 +1,21 @@
+{
+    "type": "array",
+    "items": {
+        "type": "object",
+        "required": [
+            "name"
+        ],
+        "additionalProperties": false,
+        "properties": {
+            "name": {
+                "type": "string",
+                "description": "Class Name"
+            },
+            "color": {
+                "type": "string",
+                "description": "Color to use for class",
+                "pattern": "^#(?:[0-9a-fA-F]{3}){1,2}$"
+            }
+        }
+    }
+}
