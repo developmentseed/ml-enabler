@@ -400,7 +400,7 @@ module.exports = {
             Properties: {
                 Family: cf.ref('ImageTag'),
                 Cpu: 8192,
-                Memory: 61401,
+                Memory: 60000,
                 TaskRoleArn: cf.importValue(cf.join([
                     cf.ref('StackName'), '-task-role'
                 ])),
