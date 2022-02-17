@@ -492,7 +492,7 @@ module.exports = {
     Mappings: {
         AWSRegionToAMI: {
             DOCS: { LIST: 'http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html' },
-            'us-east-1': { AMIID: 'ami-07eb64b216d4d3522' }
+            'us-east-1': { AMIID: 'ami-0c8e4e021f2adfef0' }
         },
         AWSRegion2AZ: {
             'us-east-1': {
