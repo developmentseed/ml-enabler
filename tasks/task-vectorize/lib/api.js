@@ -13,7 +13,7 @@ class Iteration {
     }
 
     async from(id) {
-        const res = await fetch(new URL(this.url, `/api/iteration/${id}`));
+        const res = await fetch(new URL(`/api/iteration/${id}`, this.url));
         return await res.json();
     }
 }
