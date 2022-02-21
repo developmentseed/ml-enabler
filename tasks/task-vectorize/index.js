@@ -54,7 +54,7 @@ class Task {
             await Task.#feature(input, opts);
         } else if (type === 'Image') {
             if (!opts.silent) console.log('ok - detected Image input');
-            await Task.#image(input, opts);
+            await Task.#image(input, opts, iteration);
         } else {
             throw new Error('Unsupported File Type');
         }
@@ -80,8 +80,8 @@ class Task {
         }
     }
 
-    static async #image(input, opts) {
-        const b64png = new B64PNG();
+    static async #image(input, opts, iteration) {
+        const b64png = new B64PNG(iteration.inf_list.map(cls => cls.color));
         await b64png.convert(input, opts);
     }
 
@@ -154,7 +154,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
             iteration: process.env.ITERATION_ID,
             submission: process.env.SUBMISSION_ID,
             url: process.env.API_URL,
-            token: process.env.API_TOKEN,
+            token: process.env.TOKEN,
             input: new URL('./data/input.geojson', import.meta.url).pathname,
             tmp: new URL('./data/', import.meta.url).pathname
         }
