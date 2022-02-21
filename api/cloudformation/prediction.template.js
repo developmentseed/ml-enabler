@@ -400,7 +400,7 @@ module.exports = {
             Properties: {
                 Family: cf.ref('ImageTag'),
                 Cpu: 8192,
-                Memory: 61401,
+                Memory: 60000,
                 TaskRoleArn: cf.importValue(cf.join([
                     cf.ref('StackName'), '-task-role'
                 ])),
@@ -492,7 +492,7 @@ module.exports = {
     Mappings: {
         AWSRegionToAMI: {
             DOCS: { LIST: 'http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html' },
-            'us-east-1': { AMIID: 'ami-07eb64b216d4d3522' }
+            'us-east-1': { AMIID: 'ami-03ab174c20b61472c' }
         },
         AWSRegion2AZ: {
             'us-east-1': {

@@ -227,9 +227,9 @@ export default {
                     this.opacity / 100
                 );
             } else {
-                for (const inf of this.inferences) {
+                for (const inf of this.iteration.inf_list) {
                     this.map.setPaintProperty(
-                        `inf-${inf}`,
+                        `inf-${inf.name}`,
                         'fill-opacity',
                         [ 'number', [ '*', ['get', inf], (this.opacity / 100) ] ]
                     );
@@ -237,7 +237,7 @@ export default {
             }
         },
         threshold: function() {
-            for (const inf of this.inferences) {
+            for (const inf of this.iteration.inf_list) {
                 this.filter(inf);
             }
         },
@@ -250,8 +250,7 @@ export default {
         await this.getSubmissions();
         await this.getImagery();
 
-        this.inferences = this.iteration.inf_list.split(',');
-        this.inf = this.inferences[0];
+        this.inf = this.iteration.inf_list[0];
 
         this.loading = false;
         if (this.submissions.length) {
@@ -312,11 +311,11 @@ export default {
         hide: function() {
             if (!this.map) return;
 
-            for (const inf of this.inferences) {
-                this.map.setLayoutProperty(`inf-${inf}`, 'visibility', 'none');
+            for (const inf of this.iteration.inf_list) {
+                this.map.setLayoutProperty(`inf-${inf.name}`, 'visibility', 'none');
             }
 
-            this.map.setLayoutProperty(`inf-${this.inf}`, 'visibility', 'visible');
+            this.map.setLayoutProperty(`inf-${this.inf.name}`, 'visibility', 'visible');
         },
         background: function() {
             this.map.once('styledata', () => {
@@ -360,7 +359,7 @@ export default {
             ]);
         },
         filter: function(inf) {
-            this.map.setFilter(`inf-${inf}`, ['>=', inf, this.threshold / 100]);
+            this.map.setFilter(`inf-${inf.name}`, ['>=', inf, this.threshold / 100]);
         },
         styles: function() {
             if (this.tilejson.tiles[0].match(/\.png$/)) {
@@ -392,9 +391,9 @@ export default {
                     maxzoom: this.tilejson.maxzoom
                 });
 
-                for (const inf of this.inferences) {
+                for (const inf of this.iteration.inf_list) {
                     this.map.addLayer({
-                        id: `inf-${inf}`,
+                        id: `inf-${inf.name}`,
                         type: 'fill',
                         source: 'tiles',
                         'source-layer': 'data',
@@ -420,8 +419,8 @@ export default {
                         this.map.on('click', `inf-${inf}`, (e) => {
                             if (
                                 e.features.length === 0
-                                || !e.features[0].properties[this.inf]
-                                || e.features[0].properties[this.inf] === 0
+                                || !e.features[0].properties[this.inf.name]
+                                || e.features[0].properties[this.inf.name] === 0
                             ) return;
 
                             this.popupid = e.features[0].id;
@@ -453,8 +452,8 @@ export default {
                         this.map.on('mousemove', `inf-${inf}`, (e) => {
                             if (
                                 e.features.length === 0
-                                || !e.features[0].properties[this.inf]
-                                || e.features[0].properties[this.inf] === 0
+                                || !e.features[0].properties[this.inf.name]
+                                || e.features[0].properties[this.inf.name] === 0
                             ) {
                                 this.map.getCanvas().style.cursor = '';
                                 this.inspect = false;
@@ -463,7 +462,7 @@ export default {
 
                             this.map.getCanvas().style.cursor = 'pointer';
 
-                            this.inspect = e.features[0].properties[this.inf];
+                            this.inspect = e.features[0].properties[this.inf.name];
                         });
                     }
                 }
