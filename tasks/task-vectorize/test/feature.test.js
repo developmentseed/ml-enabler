@@ -3,6 +3,8 @@ import test from 'tape';
 import os from 'os';
 import Task from '../index.js';
 import AWS from '@mapbox/mock-aws-sdk-js';
+import { Iteration } from '../lib/api.js';
+import Sinon from 'sinon';
 
 test('Feature', async (t) => {
     AWS.stub('S3', 'putObject', function(params) {
@@ -14,9 +16,17 @@ test('Feature', async (t) => {
         return this.request.promise.returns(Promise.resolve({ }));
     });
 
+    Sinon.stub(Iteration.prototype, 'from').callsFake(() => {
+        return Promise.resolve({
+            id: 1,
+        });
+    });
+
     try {
         await Task.vectorize(new URL('./fixtures/feature.json', import.meta.url).pathname, {
             tmp: os.tmpdir(),
+            url: 'http://example.com',
+            token: '123',
             bucket: 's3-bucket',
             project: 1,
             iteration: 2,
@@ -26,6 +36,7 @@ test('Feature', async (t) => {
         t.error(err);
     }
 
+    Iteration.prototype.from.restore();
     AWS.S3.restore();
     t.end();
 });
