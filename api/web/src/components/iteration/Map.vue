@@ -250,7 +250,7 @@ export default {
         await this.getSubmissions();
         await this.getImagery();
 
-        this.inf = iteration.inf_list[0];
+        this.inf = this.iteration.inf_list[0];
 
         this.loading = false;
         if (this.submissions.length) {
