@@ -3,23 +3,6 @@ import fetch from 'node-fetch';
 /**
  * @class
  */
-class MLEnabler {
-    constructor(url, token) {
-        if (!url) throw new Error('MLEnabler Url not provided');
-        if (!token) throw new Error('MLEnabler Token not provided');
-
-        this.url = new URL(url);
-        this.token = token;
-
-        this.iteration = new Iteration(url, token);
-    }
-
-
-}
-
-/**
- * @class
- */
 class Iteration {
     constructor(url, token) {
         if (!url) throw new Error('MLEnabler Url not provided');
@@ -33,6 +16,23 @@ class Iteration {
         const res = await fetch(new URL(this.url, `/api/iteration/${id}`));
         return await res.json();
     }
+}
+
+/**
+ * @class
+ */
+class MLEnabler {
+    constructor(url, token) {
+        if (!url) throw new Error('MLEnabler Url not provided');
+        if (!token) throw new Error('MLEnabler Token not provided');
+
+        this.url = new URL(url);
+        this.token = token;
+
+        this.iteration = new Iteration(url, token);
+    }
+
+
 }
 
 export {

@@ -36,6 +36,7 @@ class B64PNG {
      * Convert Hex String to RGB Array
      *
      * @param {string} hex Hex Code to convert
+     * @returns {Number[]}
      */
     static hex2rgb(hex) {
         // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")

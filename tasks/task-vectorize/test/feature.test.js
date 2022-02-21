@@ -18,7 +18,7 @@ test('Feature', async (t) => {
 
     Sinon.stub(Iteration.prototype, 'from').callsFake(() => {
         return Promise.resolve({
-            id: 1,
+            id: 1
         });
     });
 

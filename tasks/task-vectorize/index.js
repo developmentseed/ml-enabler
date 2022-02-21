@@ -81,7 +81,7 @@ class Task {
     }
 
     static async #image(input, opts, iteration) {
-        const b64png = new B64PNG(iteration.inf_list.map(cls => cls.color));
+        const b64png = new B64PNG(iteration.inf_list.map((cls) => cls.color));
         await b64png.convert(input, opts);
     }
 
