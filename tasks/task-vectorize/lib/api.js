@@ -12,8 +12,8 @@ class Iteration {
         this.token = token;
     }
 
-    async from(id) {
-        const res = await fetch(new URL(`/api/iteration/${id}`, this.url), {
+    async from(pid, id) {
+        const res = await fetch(new URL(`/api/project/${pid}/iteration/${id}`, this.url), {
             method: 'GET',
             headers: {
                 Authorization: 'Bearer ' + this.token

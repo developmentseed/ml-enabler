@@ -39,13 +39,13 @@ class Task {
             throw new Error('If opts.bucket is set, opts.<project, iteration, submission> must be also');
         }
 
-        for (const opt of ['url', 'token']) {
+        for (const opt of ['url', 'token', 'project', 'iteration']) {
             if (!opts[opt]) throw new Error(`opts.${opt} must be set`);
         }
 
         const mlenabler = new MLEnabler(opts.url, opts.token);
 
-        const iteration = await mlenabler.iteration.from(opts.iteration);
+        const iteration = await mlenabler.iteration.from(opts.project, opts.iteration);
 
         const type = await Task.#sniff(input);
 
