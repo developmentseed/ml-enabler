@@ -1,5 +1,3 @@
-"""Example AWS Lambda function for chip-n-scale"""
-
 import os
 import boto3
 import requests
