@@ -101,6 +101,7 @@ const stack = {
                         { Name: 'AWS_ACCOUNT_ID', Value: cf.accountId },
                         { Name: 'AWS_REGION', Value: cf.region },
                         { Name: 'AWS_DEFAULT_REGION' , Value: cf.region },
+                        { Name: 'API_URL', Value: cf.join(['http://', cf.getAtt('MLEnablerELB', 'DNSName')]) }
                     ],
                     Memory: 512,
                     Privileged: true,

@@ -10,11 +10,11 @@ import tb from '@mapbox/tilebelt';
 
 /**
  * @class
- * @param {Array} Palette
+ * @param {String[]} palette Array of #RGB colour codes
  */
 class B64PNG {
     constructor(palette) {
-        if (palette) {
+        if (palette.length === 256) {
             this.palette = palette;
         } else {
             this.palette = new Array(256).fill().map(() => {
@@ -23,7 +23,34 @@ class B64PNG {
                     .split(',')
                     .map((e) => parseInt(e));
             });
+
+            if (palette) {
+                for (let i = 0; i < palette.length; i++) {
+                    this.palette[i] = B64PNG.hex2rgb(palette[i]);
+                }
+            }
         }
+    }
+
+    /**
+     * Convert Hex String to RGB Array
+     *
+     * @param {string} hex Hex Code to convert
+     * @returns {Number[]}
+     */
+    static hex2rgb(hex) {
+        // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+        const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        hex = hex.replace(shorthandRegex, (m, r, g, b) => {
+            return r + r + g + g + b + b;
+        });
+
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? [
+            parseInt(result[1], 16),
+            parseInt(result[2], 16),
+            parseInt(result[3], 16)
+        ] : null;
     }
 
     /**
