@@ -83,7 +83,7 @@ class B64PNG {
 
             bbox.tile(line.z, line.x, line.y);
 
-            await mbtiles.putTile(line.z, line.x, line.y, new Buffer.from(line.image, 'base64'));
+            await mbtiles.putTile(line.z, line.x, line.y, this.color(new Buffer.from(line.image, 'base64')));
         }
 
         if (!opts.silent) console.log('ok - finished writing base tiles');
@@ -106,27 +106,6 @@ class B64PNG {
                 await mbtiles.stopWriting();
             }
         }
-
-        if (!opts.silent) console.log('ok - starting colourize, finished underzoom');
-
-        // Colourize Tiles
-        for (let z = bbox.minzoom; z >= opts.minzoom; z--) {
-            await mbtiles.startWriting();
-
-            for (let x = stack[z].minx; x <= stack[z].maxx; x++) {
-                for (let y = stack[z].miny; y <= stack[z].maxy; y++) {
-                    try {
-                        await mbtiles.putTile(z, x, y, Buffer.from(this.color(await mbtiles.getTile(z, x, y))));
-                    } catch (err) {
-                        console.error(z, x, y, err);
-                    }
-                }
-            }
-
-            await mbtiles.stopWriting();
-        }
-
-        if (!opts.silent) console.log('ok - writing info - finished colourize');
 
         await mbtiles.startWriting();
         await mbtiles.putInfo({
@@ -164,9 +143,14 @@ class B64PNG {
             try {
                 image = await Image.load(await mbtiles.getTile(z, x, y));
             } catch (err) {
-                image = new Image(256, 256, new Uint8Array(256 * 256), {
-                    kind: 'GREY'
+                image = new Image(256, 256, new Uint8Array(256 * 256 * 4), {
+                    kind: 'RGBA'
                 });
+
+                // Add Transparency to Alpha channel
+                for (let i = 0; i < image.data.length / 4; i++) {
+                    image.data[i * 4 - 1] = 1;
+                }
             }
 
             children.push({
@@ -183,7 +167,7 @@ class B64PNG {
             return 0;
         });
 
-        const full = new Image(512, 512, new Uint8Array(512 * 512 * 4), {
+        let full = new Image(512, 512, new Uint8Array(512 * 512 * 4), {
             kind: 'RGBA'
         });
 
@@ -192,12 +176,16 @@ class B64PNG {
         full.insert(children[2].image.rgba8(), { x: 0,    y: 256,     inPlace: true });
         full.insert(children[3].image.rgba8(), { x: 256,  y: 256,     inPlace: true });
 
-        return exportPNG(full.grey({
-            keepAlpha: false
+        full = full.grey({
+            keepAlpha: true
         }).resize({
             width: 256,
             height: 256
-        }));
+        });
+
+        console.error(full.toBase64());
+
+        return exportPNG(full);
     }
 
     /**
@@ -211,7 +199,7 @@ class B64PNG {
         png.palette = this.palette;
         png = exportPNG(loadPNGFromPalette(png));
 
-        return png;
+        return Buffer.from(png);
     }
 
     class_mean(values) {
