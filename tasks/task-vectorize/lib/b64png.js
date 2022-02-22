@@ -171,19 +171,15 @@ class B64PNG {
             kind: 'RGBA'
         });
 
-        full.insert(children[0].image, { x: 0,    y: 0,       inPlace: true });
-        full.insert(children[1].image, { x: 256,  y: 0,       inPlace: true });
-        full.insert(children[2].image, { x: 0,    y: 256,     inPlace: true });
-        full.insert(children[3].image, { x: 256,  y: 256,     inPlace: true });
+        full.insert(children[0].image.rgba8(), { x: 0,    y: 0,       inPlace: true });
+        full.insert(children[1].image.rgba8(), { x: 256,  y: 0,       inPlace: true });
+        full.insert(children[2].image.rgba8(), { x: 0,    y: 256,     inPlace: true });
+        full.insert(children[3].image.rgba8(), { x: 256,  y: 256,     inPlace: true });
 
-        full = full.grey({
-            keepAlpha: true
-        }).resize({
+        full = full.resize({
             width: 256,
             height: 256
         });
-
-        console.error(full.toBase64());
 
         return exportPNG(full);
     }
