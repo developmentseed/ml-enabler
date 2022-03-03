@@ -15,6 +15,7 @@ const args = require('minimist')(process.argv, {
 
 const Config = require('./lib/config');
 const User = new require('./lib/user');
+const Project = new require('./lib/project');
 const UserToken = new require('./lib/token');
 
 if (require.main === module) {
@@ -159,6 +160,16 @@ async function server(args, config, cb) {
     });
 
     await schema.api();
+
+    schema.router.param('pid', async (req, res, next, pid) => {
+        try {
+            req.project = await Project.from(config.pool, pid, req.user.id);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+
+        return next();
+    });
 
     // Load dynamic routes directory
     for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {

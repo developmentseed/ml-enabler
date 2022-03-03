@@ -110,9 +110,7 @@ async function router(schema, config) {
         try {
             await User.is_auth(req);
 
-            const project = await Project.from(config.pool, req.params.pid);
-
-            return res.json(project.serialize());
+            return res.json(req.project.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -139,11 +137,10 @@ async function router(schema, config) {
         try {
             await User.is_auth(req);
 
-            const project = await Project.from(config.pool, req.params.pid);
-            project.patch(req.body);
-            await project.commit(config.pool);
+            req.project.patch(req.body);
+            await req.project.commit(config.pool);
 
-            return res.json(project.serialize());
+            return res.json(req.project.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -168,8 +165,7 @@ async function router(schema, config) {
         try {
             await User.is_auth(req);
 
-            const project = await Project.from(config.pool, req.params.pid);
-            await project.delete(config.pool);
+            await req.project.delete(config.pool);
 
             return res.json({
                 status: 200,
