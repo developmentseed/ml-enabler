@@ -47,6 +47,10 @@ test('GET: api/schema?method=FAKE', async (t) => {
             status: 400,
             message: 'validation error',
             messages: [{
+                keyword: 'enum',
+                dataPath: '.method',
+                schemaPath: '#/properties/method/enum',
+                params: { allowedValues: [ 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH' ] },
                 message: 'should be equal to one of the allowed values'
             }]
         });
@@ -112,27 +116,49 @@ test('GET: api/schema?method=POST&url=/login', async (t) => {
         t.deepEquals(res.body, {
             body: {
                 type: 'object',
-                required: ['username', 'password'],
+                required: [ 'username', 'password' ],
                 additionalProperties: false,
                 properties: {
-                    username: { type: 'string', description: 'username' },
-                    password: { type: 'string', description: 'password' }
+                    username: {
+                        type: 'string',
+                        description: 'username'
+                    },
+                    password: {
+                        type: 'string',
+                        description: 'password'
+                    }
                 }
             },
-            query: null,
             res: {
                 type: 'object',
-                required: ['uid', 'username', 'email', 'access'],
+                required: [ 'uid', 'username', 'email', 'access' ],
                 additionalProperties: false,
                 properties: {
-                    uid: { type: 'integer' },
-                    username: { type: 'string' },
-                    email: { type: 'string' },
-                    access: { type: 'string', enum: ['user' , 'disabled', 'admin'], description: 'The access level of a given user' },
-                    validated: { type: 'boolean', description: 'Has the user\'s email address been validated' },
-                    token: { type: 'string', description: 'JSON Web Token to use for subsequent auth' }
+                    uid: {
+                        type: 'integer'
+                    },
+                    username: {
+                        type: 'string'
+                    },
+                    email: {
+                        type: 'string'
+                    },
+                    access: {
+                        type: 'string',
+                        enum: [ 'user', 'read', 'disabled', 'admin' ],
+                        description: 'The access level of a given user'
+                    },
+                    validated: {
+                        type: 'boolean',
+                        description: 'Has the user\'s email address been validated'
+                    },
+                    token: {
+                        type: 'string',
+                        description: 'JSON Web Token to use for subsequent auth'
+                    }
                 }
-            }
+            },
+            query: null
         });
 
     } catch (err) {
@@ -158,13 +184,10 @@ test('POST: api/login', async (t) => {
         t.deepEquals(res.body, {
             status: 400,
             message: 'validation error',
-            messages: [{
-                message: 'should NOT have additional properties'
-            },{
-                message: 'should be string'
-            },{
-                message: 'should have required property \'password\''
-            }]
+            messages: [
+                { keyword: 'type', dataPath: '.username', schemaPath: '#/properties/username/type', params: { type: 'string' }, message: 'should be string' },
+                { keyword: 'required', dataPath: '', schemaPath: '#/required', params: { missingProperty: 'password' }, message: 'should have required property \'password\'' }
+            ]
         });
     } catch (err) {
         t.error(err, 'no error');
