@@ -29,4 +29,4 @@ jobs:
               run: docker push ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/ml-enabler:${GITHUB_SHA}
 
             - name: Docker Compose
-              run: dc up --abort-on-container-exit
+              run: docker-compose up --abort-on-container-exit
