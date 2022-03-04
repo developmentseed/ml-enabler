@@ -14,6 +14,7 @@ const args = require('minimist')(process.argv, {
 });
 
 const Config = require('./lib/config');
+const Settings = require('./lib/settings');
 const User = new require('./lib/user');
 const Project = new require('./lib/project');
 const UserToken = new require('./lib/token');
@@ -22,13 +23,24 @@ if (require.main === module) {
     configure(args);
 }
 
-function configure(args, cb) {
-    Config.env(args).then((config) => {
+async function configure(args, cb) {
+    try {
+        const config = await Config.env(args);
+
+        if (args.meta) {
+            for (const arg in args.meta) {
+                await Settings.generate(config.pool, {
+                    key: arg,
+                    value: args.meta[arg]
+                });
+            }
+        }
+
         return server(args, config, cb);
-    }).catch((err) => {
+    } catch (err) {
         console.error(err);
         process.exit(1);
-    });
+    }
 }
 
 /**
