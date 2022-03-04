@@ -10,6 +10,7 @@ services:
         ports:
             - "2000:2000"
         environment:
+            - GitSha=testing
             - POSTGRES=postgres://docker:docker@postgis:5432/gis
             - MAPBOX_TOKEN
 
@@ -26,5 +27,3 @@ services:
             - POSTGRES_PASS=docker
             - POSTGRES_MULTIPLE_EXTENSIONS="postgis","uuid-ossp"
             - DATADIR=/opt/postgres/data
-        volumes:
-            - ./postgis-data:/opt/postgres/data

@@ -8,7 +8,7 @@ COPY ./ $HOME/api
 WORKDIR $HOME/api
 
 RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y nginx curl
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y nginx curl git
 
 RUN export NODEV='16.14.0' \
     && curl "https://nodejs.org/dist/v${NODEV}/node-v${NODEV}-linux-x64.tar.gz" | tar -xzv \
