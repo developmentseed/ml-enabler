@@ -26,7 +26,9 @@ async function router(schema, config) {
         try {
             await User.is_auth(req);
 
-            res.json(await User.list(config.pool, req.query));
+            const list = await User.list(config.pool, req.query);
+
+            res.json(list);
         } catch (err) {
             return Err.respond(err, res);
         }

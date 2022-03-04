@@ -310,7 +310,7 @@ test('GET: api/user', async (t) => {
                 id: 1,
                 username: 'ingalls',
                 email: 'ingalls@example.com',
-                access: 'admin',
+                access: 'user',
                 validated: true
             }]
         });
@@ -360,31 +360,9 @@ test('GET: api/user?filter=ingalls', async (t) => {
                 id: 1,
                 username: 'ingalls',
                 email: 'ingalls@example.com',
-                access: 'admin',
+                access: 'user',
                 validated: true
             }]
-        });
-    } catch (err) {
-        t.error(err, 'no error');
-    }
-
-    t.end();
-});
-
-test('GET: api/user?filter=ingalls&access=user', async (t) => {
-    try {
-        const res = await flight.request({
-            url: '/api/user?filter=ingalls&access=user',
-            method: 'GET',
-            auth: {
-                bearer: token
-            },
-            json: true
-        }, t);
-
-        t.deepEquals(res.body, {
-            total: 0,
-            users: []
         });
     } catch (err) {
         t.error(err, 'no error');
@@ -405,12 +383,34 @@ test('GET: api/user?filter=ingalls&access=admin', async (t) => {
         }, t);
 
         t.deepEquals(res.body, {
+            total: 0,
+            users: []
+        });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
+test('GET: api/user?filter=ingalls&access=user', async (t) => {
+    try {
+        const res = await flight.request({
+            url: '/api/user?filter=ingalls&access=user',
+            method: 'GET',
+            auth: {
+                bearer: token
+            },
+            json: true
+        }, t);
+
+        t.deepEquals(res.body, {
             total: 1,
             users: [{
                 id: 1,
                 username: 'ingalls',
                 email: 'ingalls@example.com',
-                access: 'admin',
+                access: 'user',
                 validated: true
             }]
         });
@@ -464,7 +464,7 @@ test('GET: api/user?order=desc', async (t) => {
             users: [{
                 id: 2, username: 'ingalls-sub', validated: false, email: 'ingalls-sub@example.com', access: 'user'
             },{
-                id: 1, username: 'ingalls', validated: true, email: 'ingalls@example.com', access: 'admin'
+                id: 1, username: 'ingalls', validated: true, email: 'ingalls@example.com', access: 'user'
             }]
         });
     } catch (err) {
@@ -488,7 +488,7 @@ test('GET: api/user?order=asc', async (t) => {
         t.deepEquals(res.body, {
             total: 2,
             users: [{
-                id: 1, username: 'ingalls', validated: true, email: 'ingalls@example.com', access: 'admin'
+                id: 1, username: 'ingalls', validated: true, email: 'ingalls@example.com', access: 'user'
             },{
                 id: 2, username: 'ingalls-sub', validated: false, email: 'ingalls-sub@example.com', access: 'user'
             }]
@@ -516,7 +516,7 @@ test('GET: api/user?sort=username&order=desc', async (t) => {
             users: [{
                 id: 2, username: 'ingalls-sub', validated: false, email: 'ingalls-sub@example.com', access: 'user'
             },{
-                id: 1, username: 'ingalls', validated: true, email: 'ingalls@example.com', access: 'admin'
+                id: 1, username: 'ingalls', validated: true, email: 'ingalls@example.com', access: 'user'
             }]
         });
     } catch (err) {
@@ -526,7 +526,44 @@ test('GET: api/user?sort=username&order=desc', async (t) => {
     t.end();
 });
 
-test('PATCH: api/user/2', async (t) => {
+test('PATCH: api/user/2 - non-admin', async (t) => {
+    try {
+        const res = await flight.request({
+            url: '/api/user/2',
+            method: 'PATCH',
+            json: true,
+            auth: {
+                bearer: token
+            },
+            body: {
+                validated: true,
+                access: 'disabled'
+            }
+        }, false);
+
+        t.deepEquals(res.body, {
+            status: 401,
+            message: 'You can only edit your own user account',
+           messages: []
+        }, 'non-admin');
+
+        t.end();
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+});
+
+test('META: Admin User', async (t) => {
+    await flight.config.pool.query(sql`
+        UPDATE users
+            SET access = 'admin'
+            WHERE id = 1;
+    `);
+
+    t.end();
+});
+
+test('PATCH: api/user/2 - admin', async (t) => {
     try {
         const res = await flight.request({
             url: '/api/user/2',
