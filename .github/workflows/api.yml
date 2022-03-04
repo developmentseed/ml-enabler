@@ -6,7 +6,14 @@ jobs:
     build:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v1
+            - uses: actions/checkout@v2
+              with:
+                fetch-depth: 100
+
+            - uses: marceloprado/has-changed-path@v1
+              id: changed-pi
+              with:
+                paths: api
 
             - name: Docker Build Base
               run: docker build -t base api/
