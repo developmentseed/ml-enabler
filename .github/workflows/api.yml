@@ -7,13 +7,6 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
-              with:
-                fetch-depth: 100
-
-            - uses: marceloprado/has-changed-path@v1
-              id: changed-api
-              with:
-                paths: api
 
             - name: Docker Build Base
               run: docker build -t base api/
@@ -36,5 +29,4 @@ jobs:
               run: docker push ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/ml-enabler:${GITHUB_SHA}
 
             - name: Docker Compose
-              if: steps.changed-api.outputs.changed != 'true'
               run: docker-compose up --abort-on-container-exit
