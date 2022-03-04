@@ -293,40 +293,6 @@ test('GET: api/login', async (t) => {
     t.end();
 });
 
-test('GET: api/user - not admin', async (t) => {
-    try {
-        const res = await flight.request({
-            url: '/api/user',
-            method: 'GET',
-            auth: {
-                bearer: token
-            },
-            json: true
-        });
-
-        t.equals(res.statusCode, 401, 'http: 401');
-
-        t.deepEquals(res.body, {
-            status: 401,
-            message: 'Admin token required',
-            messages: []
-        });
-
-    } catch (err) {
-        t.error(err, 'no error');
-    }
-
-    t.end();
-});
-
-test('META: Admin User', async (t) => {
-    await flight.config.pool.query(sql`
-        UPDATE users SET access = 'admin';
-    `);
-
-    t.end();
-});
-
 test('GET: api/user', async (t) => {
     try {
         const res = await flight.request({
