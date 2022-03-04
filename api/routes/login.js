@@ -60,7 +60,7 @@ async function router(schema, config) {
             }, config.SigningSecret);
 
             return res.json({
-                uid: req.user.id,
+                id: req.user.id,
                 username: req.user.username,
                 email: req.user.email,
                 access: req.user.access,

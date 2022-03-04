@@ -124,7 +124,7 @@ test('POST: api/login (success: email)', async (t) => {
         delete res.body.token;
 
         t.deepEquals(res.body, {
-            uid: 1,
+            id: 1,
             username: 'ingalls',
             email: 'ingalls@example.com',
             access: 'user'
@@ -156,7 +156,7 @@ test('POST: api/login (success: username)', async (t) => {
         delete res.body.token;
 
         t.deepEquals(res.body, {
-            uid: 1,
+            id: 1,
             username: 'ingalls',
             email: 'ingalls@example.com',
             access: 'user'
@@ -279,7 +279,7 @@ test('GET: api/login', async (t) => {
         }, t);
 
         t.deepEquals(res.body, {
-            uid: 1,
+            id: 1,
             username: 'ingalls'    ,
             email: 'ingalls@example.com',
             validated: true,

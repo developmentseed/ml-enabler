@@ -83,7 +83,7 @@ class Login {
         }, secret);
 
         return {
-            uid: user.id,
+            id: user.id,
             username: user.username,
             access: user.access,
             email: user.email,

@@ -104,7 +104,7 @@ async function router(schema, config) {
                 await usr.commit(config.pool);
             }
 
-            return res.json(usr);
+            return res.json(usr.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
