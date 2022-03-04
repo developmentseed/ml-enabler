@@ -544,7 +544,7 @@ test('PATCH: api/user/2 - non-admin', async (t) => {
         t.deepEquals(res.body, {
             status: 401,
             message: 'You can only edit your own user account',
-           messages: []
+            messages: []
         }, 'non-admin');
 
         t.end();

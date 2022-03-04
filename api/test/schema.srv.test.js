@@ -50,7 +50,7 @@ test('GET: api/schema?method=FAKE', async (t) => {
                 keyword: 'enum',
                 dataPath: '.method',
                 schemaPath: '#/properties/method/enum',
-                params: { allowedValues: [ 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH' ] },
+                params: { allowedValues: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'] },
                 message: 'should be equal to one of the allowed values'
             }]
         });
@@ -116,7 +116,7 @@ test('GET: api/schema?method=POST&url=/login', async (t) => {
         t.deepEquals(res.body, {
             body: {
                 type: 'object',
-                required: [ 'username', 'password' ],
+                required: ['username', 'password'],
                 additionalProperties: false,
                 properties: {
                     username: {
@@ -131,7 +131,7 @@ test('GET: api/schema?method=POST&url=/login', async (t) => {
             },
             res: {
                 type: 'object',
-                required: [ 'id', 'username', 'email', 'access' ],
+                required: ['id', 'username', 'email', 'access'],
                 additionalProperties: false,
                 properties: {
                     id: {
@@ -145,7 +145,7 @@ test('GET: api/schema?method=POST&url=/login', async (t) => {
                     },
                     access: {
                         type: 'string',
-                        enum: [ 'user', 'read', 'disabled', 'admin' ],
+                        enum: ['user', 'read', 'disabled', 'admin'],
                         description: 'The access level of a given user'
                     },
                     validated: {
