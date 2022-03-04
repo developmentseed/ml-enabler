@@ -131,10 +131,10 @@ test('GET: api/schema?method=POST&url=/login', async (t) => {
             },
             res: {
                 type: 'object',
-                required: [ 'uid', 'username', 'email', 'access' ],
+                required: [ 'id', 'username', 'email', 'access' ],
                 additionalProperties: false,
                 properties: {
-                    uid: {
+                    id: {
                         type: 'integer'
                     },
                     username: {
