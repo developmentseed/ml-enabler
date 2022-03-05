@@ -28,7 +28,21 @@ jobs:
             - name: Docker Push Base
               run: docker push ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/ml-enabler:${GITHUB_SHA}
 
-            - name: Docker Compose
-              env:
-                MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
-              run: cd api && docker-compose up --exit-code-from api
+            - name: Lint
+              run: docker run base sh -c "npm run lint"
+
+            - name: Doc
+              run: docker run base sh -c "npm run doc"
+
+            - name: Docker Build
+              run: docker-compose up --build -d postgis
+
+            - name: Test
+              run: docker run --network ml-enabler_default
+                -e "Postgres=postgres://docker:docker@postgis:5432/gis"
+                -e "MAPBOX_TOKEN=${{ secrets.MAPBOX_TOKEN }}"
+                base npm test
+
+            - name: Docker Cleanup
+              run: docker-compose kill
+
