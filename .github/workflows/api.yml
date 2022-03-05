@@ -39,7 +39,7 @@ jobs:
               run: docker-compose up --build -d postgis
 
             - name: Test
-              run: docker run --network ml-enabler_default
+              run: docker run --network api_default
                 -e "Postgres=postgres://docker:docker@postgis:5432/gis"
                 -e "MAPBOX_TOKEN=${{ secrets.MAPBOX_TOKEN }}"
                 base npm test
