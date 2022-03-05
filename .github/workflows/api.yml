@@ -40,7 +40,7 @@ jobs:
 
             - name: Test
               run: docker run --network api_default
-                -e "Postgres=postgres://docker:docker@postgis:5432/gis"
+                -e "POSTGRES=postgres://docker:docker@postgis:5432/gis"
                 -e "MAPBOX_TOKEN=${{ secrets.MAPBOX_TOKEN }}"
                 -e "GitSha=testing"
                 base npm test
