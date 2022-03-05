@@ -35,6 +35,7 @@ jobs:
               run: docker run base sh -c "npm run doc"
 
             - name: Docker Build
+              working-directory: ./api
               run: docker-compose up --build -d postgis
 
             - name: Test
@@ -44,5 +45,6 @@ jobs:
                 base npm test
 
             - name: Docker Cleanup
+              working-directory: ./api
               run: docker-compose kill
 
