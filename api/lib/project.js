@@ -146,6 +146,7 @@ class Project extends Generic {
                     projects,
                     projects_access
                 WHERE
+                    projects.id = ${id}
                     AND (
                         projects.access = 'public'
                         OR (
@@ -153,6 +154,8 @@ class Project extends Generic {
                             AND projects_access.pid = projects.id
                         )
                     )
+                GROUP BY
+                    projects.id
             `);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
@@ -160,7 +163,7 @@ class Project extends Generic {
 
         if (!pgres.rows.length) throw new Err(404, null, 'Project does not exist or user does not have access');
 
-        return this.deserialize(pgres.rows);
+        return this.deserialize(pgres.rows[0]);
     }
 
     /**
