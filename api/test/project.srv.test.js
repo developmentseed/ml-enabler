@@ -98,6 +98,45 @@ test('POST: /project', async (t) => {
     t.end();
 });
 
+test('POST: /project - no duplicate projects', async (t) => {
+    try {
+        const res = await flight.request({
+            url: '/api/project',
+            method: 'POST',
+            json: true,
+            body: {
+                name: 'Test Project',
+                source: 'Development Seed',
+                project_url: 'example.com/test',
+                access: 'private',
+                notes: 'I am a note',
+                tags: [{
+                    Key: 'Billing',
+                    Value: 'Tags'
+                }],
+                users: [{
+                    uid: 1,
+                    access: 'admin'
+                }]
+            },
+            auth: {
+                bearer: flight.token.ingalls
+            }
+        }, false);
+
+        t.deepEquals(res.body, {
+            status: 400,
+            message: 'Project by that name already exists',
+            messages: []
+        });
+
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
 test('GET: /project/1', async (t) => {
     try {
         const res = await flight.request({
