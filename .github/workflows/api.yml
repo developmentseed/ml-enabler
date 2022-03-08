@@ -8,8 +8,19 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
+            - name: Docker Build
+              working-directory: ./api
+              run: docker-compose up --build -d postgis
+
             - name: Docker Build Base
               run: docker build -t base api/
+
+            - name: Test
+              run: docker run --network api_default
+                -e "POSTGRES=postgres://docker:docker@postgis:5432/gis"
+                -e "MAPBOX_TOKEN=${{ secrets.MAPBOX_TOKEN }}"
+                -e "GitSha=testing"
+                base npm test
 
             - name: Configure AWS Credentials
               uses: aws-actions/configure-aws-credentials@v1
@@ -33,17 +44,6 @@ jobs:
 
             - name: Doc
               run: docker run base sh -c "npm run doc"
-
-            - name: Docker Build
-              working-directory: ./api
-              run: docker-compose up --build -d postgis
-
-            - name: Test
-              run: docker run --network api_default
-                -e "POSTGRES=postgres://docker:docker@postgis:5432/gis"
-                -e "MAPBOX_TOKEN=${{ secrets.MAPBOX_TOKEN }}"
-                -e "GitSha=testing"
-                base npm test
 
             - name: Docker Cleanup
               working-directory: ./api
