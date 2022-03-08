@@ -2,7 +2,7 @@ services:
   api:
     platform: linux/amd64
     build: .
-    command: sh -c "npm run lint && npm run doc && npm test"
+    command: sh -c "./node_modules/.bin/knex migrate:latest && npm run lint && npm run doc && npm test"
     restart: always
     links:
       - postgis
