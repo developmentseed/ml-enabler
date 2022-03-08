@@ -87,7 +87,7 @@ test('POST: /project', async (t) => {
             source: 'Development Seed',
             project_url: 'example.com/test',
             archived: false,
-            tags: [ { Key: 'Billing', Value: 'Tags' } ],
+            tags: [{ Key: 'Billing', Value: 'Tags' }],
             access: 'private',
             notes: 'I am a note'
         });
@@ -120,7 +120,7 @@ test('GET: /project/1', async (t) => {
             source: 'Development Seed',
             project_url: 'example.com/test',
             archived: false,
-            tags: [ { Key: 'Billing', Value: 'Tags' } ],
+            tags: [{ Key: 'Billing', Value: 'Tags' }],
             access: 'private',
             notes: 'I am a note'
         });
@@ -176,7 +176,7 @@ test('GET: /project/1 - server admin', async (t) => {
             source: 'Development Seed',
             project_url: 'example.com/test',
             archived: false,
-            tags: [ { Key: 'Billing', Value: 'Tags' } ],
+            tags: [{ Key: 'Billing', Value: 'Tags' }],
             access: 'private',
             notes: 'I am a note'
         });
