@@ -175,7 +175,11 @@ async function server(args, config, cb) {
 
     schema.router.param('pid', async (req, res, next, pid) => {
         try {
-            req.project = await Project.from(config.pool, pid, req.user.id);
+            if (req.user.access === 'admin') {
+                req.project = await Project.from(config.pool, pid);
+            } else {
+                req.project = await Project.from(config.pool, pid, req.user.id);
+            }
         } catch (err) {
             return Err.respond(err, res);
         }
