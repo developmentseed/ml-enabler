@@ -187,6 +187,41 @@ test('GET: /project/1 - server admin', async (t) => {
     t.end();
 });
 
+test('GET: /project', async (t) => {
+    try {
+        const res = await flight.request({
+            url: '/api/project',
+            method: 'GET',
+            json: true,
+            auth: {
+                bearer: flight.token.ingalls
+            }
+        }, t);
+
+        t.ok(res.body.projects[0].created);
+        t.ok(res.body.projects[0].updated);
+        delete res.body.projects[0].created;
+        delete res.body.projects[0].updated;
+
+        t.deepEquals(res.body, {
+            total: 1,
+            projects: [{
+                id: 1,
+                name: 'Test Project',
+                source: 'Development Seed',
+                project_url: 'example.com/test',
+                archived: false,
+                access: 'private',
+                stacks: []
+            }]
+        });
+    } catch (err) {
+        t.error(err, 'no error');
+    }
+
+    t.end();
+});
+
 flight.landing(test);
 
 flight.landing(test);
