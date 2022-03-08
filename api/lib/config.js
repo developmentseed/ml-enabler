@@ -1,3 +1,4 @@
+'use strict';
 const CP = require('child_process');
 const { sql, createPool, createTypeParserPreset } = require('slonik');
 const { Err } = require('@openaddresses/batch-schema');
@@ -30,6 +31,8 @@ class Config {
         cnf.Environment = process.env.ENVIRONMENT || 'docker';
         cnf.region = process.env.AWS_DEFAULT_REGION || 'us-east-1';
 
+        cnf.domain = process.env.EMAIL_DOMAIN || 'ds.io';
+
         if (cnf.Environment === 'aws') {
             cnf.StackName = process.env.StackName;
             cnf.Stack = process.env.StackName;
@@ -44,7 +47,7 @@ class Config {
             if (!cnf.bucket) throw new Error('ASSET_BUCKET Required');
         }
 
-        cnf.url = 'http://localhost:2001';
+        cnf.url = process.env.FRONTEND_URL || 'http://localhost:2001';
         cnf.SigningSecret = process.env.SigningSecret || '123';
 
         try {
@@ -103,7 +106,7 @@ class Config {
             }
         } while (!cnf.pool);
 
-        if (cnf.is_aws()) {
+        if (cnf.Environment === 'aws') {
             try {
                 const account = await STS.getCallerIdentity().promise();
                 cnf.account = account.Account;
@@ -123,7 +126,7 @@ class Config {
     }
 
     async confirm_sns() {
-        if (!this.is_aws()) return;
+        if (this.Environment !== 'aws') return;
 
         try {
             for (const type of ['vectorize', 'delete']) {

@@ -1,3 +1,4 @@
+'use strict';
 process.env.StackName = 'test';
 
 const { sql } = require('slonik');
@@ -114,7 +115,10 @@ class Flight {
     takeoff(test, custom = {}) {
         test('test server takeoff', (t) => {
             api(Object.assign({
-                silent: true
+                silent: true,
+                meta: {
+                    'user::registration': true
+                }
             }, custom), (srv, config) => {
                 t.ok(srv, 'server object returned');
                 t.ok(config, 'config object returned');

@@ -24,7 +24,7 @@
                 <div class='col col--4'>
                     <label>Integration Type:</label>
                     <div class='select-container w-full'>
-                        <select v-model='integration.integration' class='select'>
+                        <select v-model='integration.integration' class='select select--stroke'>
                             <option value='maproulette'>MapRoulette</option>
                         </select>
                         <div class='select-arrow'></div>

@@ -1,9 +1,9 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const ProjectAccess = require('../lib/project/access');
+const User = require('../lib/user');
 
 async function router(schema, config) {
-    const user = new (require('../lib/user'))(config);
-
     /**
      * @api {get} /api/project/:pid/user List Users
      * @apiVersion 1.0.0
@@ -23,7 +23,7 @@ async function router(schema, config) {
         res: 'res.ListProjectAccess.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             res.json(await ProjectAccess.list(config.pool, req.params.pid, req.query));
         } catch (err) {

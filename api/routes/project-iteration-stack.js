@@ -1,9 +1,10 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const Iteration = require('../lib/project/iteration');
 const Stack = require('../lib/stack');
+const User = require('../lib/user');
 
 async function router(schema, config) {
-    const user = new (require('../lib/user'))(config);
 
     /**
      * @api {get} /api/project/:pid/iteration/:iterationid/stack Get Stack
@@ -23,7 +24,7 @@ async function router(schema, config) {
         res: 'res.Stack.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
             config.is_aws();
 
             const stack = await Stack.from(req.params.pid, req.params.iterationid);
@@ -53,7 +54,7 @@ async function router(schema, config) {
         res: 'res.Stack.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
             config.is_aws();
 
             const iter = await Iteration.from(config.pool, req.params.iterationid);
@@ -68,7 +69,8 @@ async function router(schema, config) {
                     iteration_id: req.params.iterationid,
                     imagery_id: iter.imagery_id,
                     inf_list: iter.inf_list,
-                    inf_supertile: iter.inf_supertile
+                    inf_supertile: iter.inf_supertile,
+                    inf_type: iter.inf_type
                 }
             );
 
@@ -99,7 +101,7 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
             config.is_aws();
 
             const stack = await Stack.from(req.params.pid, req.params.iterationid);

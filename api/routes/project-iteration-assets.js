@@ -1,13 +1,13 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const S3 = require('../lib/s3');
 const Busboy = require('busboy');
 const Iteration = require('../lib/project/iteration');
 const path = require('path');
 const Task = require('../lib/project/iteration/task');
+const User = require('../lib/user');
 
 async function router(schema, config) {
-    const user = new (require('../lib/user'))(config);
-
     /**
      * @api {post} /api/project/:pid/iteration/:iterationid/asset Upload
      * @apiVersion 1.0.0
@@ -28,7 +28,7 @@ async function router(schema, config) {
         res: 'res.Iteration.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             config.is_aws();
         } catch (err) {
@@ -106,9 +106,8 @@ async function router(schema, config) {
         query: 'req.query.DownloadIterationAsset.json'
     }, async (req, res) => {
         try {
-            req.auth = req.token;
-
-            await user.is_auth(req);
+            req.user = req.token;
+            await User.is_auth(req);
 
             config.is_aws();
 
@@ -119,7 +118,7 @@ async function router(schema, config) {
             res.type(path.parse('blob.zip').ext);
             const s3 = new S3({
                 Bucket: process.env.ASSET_BUCKET,
-                Key: iter[`${req.query.type}_link`]
+                Key: iter[`${req.query.type}_link`].replace(`${process.env.ASSET_BUCKET}/`, '')
             });
 
             return s3.stream(res, `project-${req.params.pid}-iteration-${req.params.iterationid}-${req.query.type}.zip`);

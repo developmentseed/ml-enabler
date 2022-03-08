@@ -34,11 +34,11 @@
             />
         </template>
         <template v-else-if='meta.environment !== "aws"'>
-            <div class='flex-parent flex-parent--center-main pt36'>
+            <div class='flex flex--center-main pt36'>
                 <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-info'/></svg>
             </div>
 
-            <div class='flex-parent flex-parent--center-main pt12 pb36'>
+            <div class='flex flex--center-main pt12 pb36'>
                 <h1 class='flex-child txt-h4 cursor-default align-center'>Assets can only be created when MLEnabler is running in an "aws" environment</h1>
             </div>
         </template>
@@ -78,7 +78,7 @@
             <div v-if='iteration.save_link' class='col col--12 py3'>
                 <div class='col col--12 mb6'>
                     <span>TFServing Container</span>
-                    <button @click='dwn("container")' class='mt6 btn btn--s btn--stroke round fr btn--gray'><svg class='icon'><use href='#icon-arrow-down'/></svg></button>
+                    <button @click='dwn("save")' class='mt6 btn btn--s btn--stroke round fr btn--gray'><svg class='icon'><use href='#icon-arrow-down'/></svg></button>
                 </div>
                 <pre class='pre' v-text='"s3://" + iteration.save_link'></pre>
             </div>

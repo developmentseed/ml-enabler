@@ -1,0 +1,53 @@
+{
+    "type": "object",
+    "required": [
+        "total",
+        "stacks"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "total": {
+            "type": "integer",
+            "description": "Total number of items"
+        },
+        "stacks": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "StackId",
+                    "StackName",
+                    "CreationTime",
+                    "StackStatus",
+                    "DriftInformation",
+                    "project",
+                    "iteration"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "StackId": {
+                        "type": "string"
+                    },
+                    "StackName": {
+                        "type": "string"
+                    },
+                    "CreationTime": {
+                        "type": "string"
+                    },
+                    "StackStatus": {
+                        "type": "string"
+                    },
+                    "DriftInformation": {
+                        "type": "object"
+                    },
+                    "project": {
+                        "type": "integer"
+                    },
+                    "iteration": {
+                        "type": "integer"
+                    }
+                }
+            }
+        }
+    }
+}

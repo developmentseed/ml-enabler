@@ -1,7 +1,8 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
+const User = require('../lib/user');
 
 async function router(schema, config) {
-    const user = new (require('../lib/user'))(config);
 
     /**
      * @api {get} /api/mapbox Mapbox Settings
@@ -19,7 +20,7 @@ async function router(schema, config) {
         res: 'res.Mapbox.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             res.json({
                 token: config.Mapbox

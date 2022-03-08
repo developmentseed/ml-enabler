@@ -1,4 +1,4 @@
-name: AWS ECR API
+name: API
 
 on: [push]
 
@@ -6,10 +6,21 @@ jobs:
     build:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v1
+            - uses: actions/checkout@v2
+
+            - name: Docker Build
+              working-directory: ./api
+              run: docker-compose up --build -d postgis
 
             - name: Docker Build Base
               run: docker build -t base api/
+
+            - name: Test
+              run: docker run --network api_default
+                -e "POSTGRES=postgres://docker:docker@postgis:5432/gis"
+                -e "MAPBOX_TOKEN=${{ secrets.MAPBOX_TOKEN }}"
+                -e "GitSha=testing"
+                base npm test
 
             - name: Configure AWS Credentials
               uses: aws-actions/configure-aws-credentials@v1
@@ -27,4 +38,14 @@ jobs:
 
             - name: Docker Push Base
               run: docker push ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/ml-enabler:${GITHUB_SHA}
+
+            - name: Lint
+              run: docker run base sh -c "npm run lint"
+
+            - name: Doc
+              run: docker run base sh -c "npm run doc"
+
+            - name: Docker Cleanup
+              working-directory: ./api
+              run: docker-compose kill
 

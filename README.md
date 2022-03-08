@@ -1,12 +1,50 @@
-<h1 align=center>ML Enabler v3</h1>
+<h1 align=center>ML Enabler (MLE) v3</h1>
 
-<p align=center>Frictonless TF based model storage, inferencing & discovery</p>
+<p align=center>Frictonless model storage, inferencing & discovery</p>
 
 ## Background
 
-Machine Learning has proven to be very successful to make mapping fast with high quality. With a diverse set of models and tools, it is hard to integrate them to existing tools like Tasking Manager and iD. ML Enabler is a service that provides better integration during model development as well integrating model inferences to mapping tools.
+Machine Learning has proven to be very successful to make mapping fast with high quality. With a diverse set of models and tools, it is hard to integrate them to existing tools like Tasking Manager and iD. ML Enabler (MLE) is a service that provides better integration during model development as well integrating model inferences to mapping tools.
 
-ML Enabler was initially developed by Development Seed in partnership with Humanitarian OpenStreetMap Team.
+MLE was initially developed by Development Seed in partnership with Humanitarian OpenStreetMap Team.
+
+## Features of MLE
+
+### Model Registry
+
+MLE serves as a registry of public and private machine learning models. It can track models from disparate organizations all in one place and take advantage of all of them.
+
+### On-Demand Prediction
+
+MLE makes it easy to spin up AWS infrastructure to run your model along with all necessary resources. MLE UI allows you to upload new models & generate and preview predictions, all you need is a TMS end point and an AOI.
+
+### Classification, Detection & Segmentation model support
+
+MLE supports all three categories of CV problems i.e classification, detection & segmentation.
+
+### Feedback loop
+
+MLE supports a feedback loop about predictions from within the interface. Users can tag a tile as valid or invalid. Predictions tagged as valid switch to green, predictions tagged as invalid switch to white, and predictions that haven’t been manually validated stay red.
+MLE can then convert these validated predictions back into labelled training data matched up with imagery to allow users to easily re-train a new model with the validated model predictions.
+
+## Current Limitations
+
+### Infrastructure
+
+MLE uses AWS CloudFormation and is tightly integrated with AWS infrastructure at the moment. MLE currenlty doesn't support any other public or private cloud.
+
+### Framework
+
+MLE supports TFv2 models & uses TF Serving to host the model for large scale inferencing. We have plans to add support for PyTorch in the near future.
+
+### Continuous Learning
+
+MLE's feedback loop can track metrics on model predictions verified by Human mappers. There is no active learning pipeline in place today to automatically retrain the models.
+
+To know more about MLE, please read our blogs [ML Enabler — completing the Machine Learning pipeline for mapping](https://medium.com/devseed/ml-enabler-completing-the-machine-learning-pipeline-for-mapping-3aae94fa9e94) and [On-demand machine learning predictions for mapping tools](https://developmentseed.org/blog/2020-08-05-on-demand-machine-learning-predictions-for-mapping-tools)
+
+
+## API
 
 The API uses the following terms:
 * **Model** --
@@ -49,28 +87,40 @@ See [API.md](/API.md)
 
 ## Development Setup
 
+TODO: Update
 ### Using Docker
 1. Copy `example.env` to `ml_enabler.env`
 1. Run `docker-compose build`
 2. Run `docker-compose up`
 
 ### Manual
-1. Create a virtualenv - `python3 -m venv venv`
-3. Enable the virtualenv `./venv/bin/activate`
-4. Install dependencies `pip install -r requirements.txt`
-5. Setup the database:
-  * Setup database. If you're on a Mac use Postgres.app, or use docker
-  * Copy `example.env` to `ml_enabler.env` and add database configuration
-  * Initialize tables `flask db upgrade`
-6. Start the app
-  * `export FLASK_APP="ml_enabler"`
-  * `export FLASK_ENV="development"`
-  * `flask run`
 
-### Tests
+1. Prerequisite
+  - Install @openaddresses/deploy & yarn. This will make `deploy` & `yarn` command available globally
+    ```npm install -g @openaddresses/deploy yarn```
+  - [Install aws-cli](https://aws.amazon.com/cli/) & create user-access keys
+  - Add `$(MAPBOX_TOKEN)` environment variable from your [mapbox account](https://account.mapbox.com/)
+  - Install `jq` from [here](https://stedolan.github.io/jq/download/)
 
-1. Create a database for your tests:
-  * `createdb ml_enabler_test`
-  * Enabler postgis `echo 'CREATE EXTENSION postgis' | psql -d ml_enabler_test`
-2. Run tests with `python3 -m unittest discover ml_enabler/tests/`
-
+2. Clone ml-enabler & install node-modules (*TODO: Replace these with scripts in the future*)  
+  ```
+    gh repo clone developmentseed/ml-enabler
+    cd ml-enabler/api && npm install && npx knex migrate:latest
+    cd web && yarn install
+    cd ../..
+  ```
+3. Clone a stacks database into local database for development
+  ```
+    ./clone prod
+  ```
+4. Authenticate the `deploy` cli to make any changes to the underlying AWS Infrastructure
+  > Note: `profile name` should match with the AWS credentials file located at ~/.aws/credentials
+  ```
+    deploy init
+    $(deploy env)
+  ```
+5. Run the API & web UI
+  ```
+    cd api && npm run dev
+    cd web && npm run dev
+  ```

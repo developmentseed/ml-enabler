@@ -1,0 +1,12 @@
+{
+    "type": "object",
+    "required": [
+        "value"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "value": {
+            "$ref": "./util/any.json"
+        }
+    }
+}

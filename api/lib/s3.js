@@ -1,3 +1,4 @@
+'use strict';
 const AWS = require('aws-sdk');
 const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
 const { Err } = require('@openaddresses/batch-schema');
@@ -21,6 +22,22 @@ class S3 {
             }).promise();
         } catch (err) {
             throw new Err(500, err, 'Failed to upload file');
+        }
+    }
+
+    static async exists(key) {
+        try {
+            if (!process.env.ASSET_BUCKET) throw new Err(400, null, 'ASSET_BUCKET not set');
+
+            await s3.headObject({
+                Bucket: process.env.ASSET_BUCKET,
+                Key: key
+            }).promise();
+            return true;
+        } catch (err) {
+            if (err.code === 'NotFound') return false;
+
+            throw new Err(500, err, 'Failed to determine existance');
         }
     }
 

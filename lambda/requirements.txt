@@ -1,9 +1,9 @@
-boto3==1.20.15
-numpy==1.20.2
+boto3==1.20.33
+numpy==1.22.0
 rasterio==1.1.5
-mercantile==1.1.5
-requests==2.25.0
+mercantile==1.2.1
+requests==2.27.1
 geojson==2.5.0
 pillow==8.0.1
-shapely==1.6.4
+shapely==1.8.0
 affine==2.3.0

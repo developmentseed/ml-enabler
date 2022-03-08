@@ -1,3 +1,4 @@
+'use strict';
 const fs = require('fs');
 const path = require('path');
 const { Schema, Err } = require('@openaddresses/batch-schema');
@@ -13,19 +14,33 @@ const args = require('minimist')(process.argv, {
 });
 
 const Config = require('./lib/config');
+const Settings = require('./lib/settings');
+const User = new require('./lib/user');
+const Project = new require('./lib/project');
 const UserToken = new require('./lib/token');
 
 if (require.main === module) {
     configure(args);
 }
 
-function configure(args, cb) {
-    Config.env(args).then((config) => {
+async function configure(args, cb) {
+    try {
+        const config = await Config.env(args);
+
+        if (args.meta) {
+            for (const arg in args.meta) {
+                await Settings.generate(config.pool, {
+                    key: arg,
+                    value: args.meta[arg]
+                });
+            }
+        }
+
         return server(args, config, cb);
-    }).catch((err) => {
+    } catch (err) {
         console.error(err);
         process.exit(1);
-    });
+    }
 }
 
 /**
@@ -42,8 +57,6 @@ function configure(args, cb) {
  */
 
 async function server(args, config, cb) {
-    const user = new (require('./lib/user'))(config);
-
     const app = express();
 
     const schema = new Schema(express.Router(), {
@@ -122,7 +135,7 @@ async function server(args, config, cb) {
 
             if (authorization[1].split('.')[0] === 'mle') {
                 try {
-                    req.auth = await UserToken.validate(config.pool, authorization[1]);
+                    req.user = await UserToken.validate(config.pool, authorization[1]);
                 } catch (err) {
                     return Err.respond(err, res);
                 }
@@ -132,9 +145,9 @@ async function server(args, config, cb) {
 
                     // Internal Machine Token
                     if (decoded.t === 'i') {
-                        req.auth = 'internal';
+                        req.user = 'internal';
                     } else {
-                        req.auth = await user.user(decoded.u);
+                        req.user = await User.from(config.pool, decoded.u);
                     }
                 } catch (err) {
                     return Err.respond(new Err(401, err, 'Invalid Token'), res);
@@ -144,15 +157,15 @@ async function server(args, config, cb) {
             try {
                 const decoded = jwt.verify(req.query.token, config.SigningSecret);
                 if (decoded.t === 'i') {
-                    req.auth = 'internal';
+                    req.user = 'internal';
                 } else {
-                    req.token = await user.user(decoded.u);
+                    req.token = await User.from(config.pool, decoded.u);
                 }
             } catch (err) {
                 return Err.respond(new Err(401, err, 'Invalid Token'), res);
             }
         } else {
-            req.auth = false;
+            req.user = false;
         }
 
         return next();
@@ -160,10 +173,27 @@ async function server(args, config, cb) {
 
     await schema.api();
 
+    schema.router.param('pid', async (req, res, next, pid) => {
+        try {
+            req.project = await Project.from(config.pool, pid, req.user.id);
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+
+        return next();
+    });
+
     // Load dynamic routes directory
     for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
         if (!config.silent) console.error(`ok - loaded routes/${r}`);
-        await require('./routes/' + r)(schema, config);
+
+        const ext = path.parse(r).ext;
+
+        if (ext === '.js') {
+            await require('./routes/' + r)(schema, config);
+        } else if (ext === '.mjs') {
+            (await import('./routes/' + r)).default(schema, config);
+        }
     }
 
     schema.error();

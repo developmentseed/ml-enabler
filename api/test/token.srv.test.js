@@ -1,3 +1,4 @@
+'use strict';
 const test = require('tape');
 const Flight = require('./flight');
 
@@ -248,7 +249,7 @@ test('GET: api/login - test token', async (t) => {
         }, t);
 
         t.deepEquals(res.body, {
-            uid: 2,
+            id: 2,
             username: 'ingalls_sub',
             access: 'user',
             email: 'ingalls_sub@example.com'

@@ -1,16 +1,38 @@
 {
     "name": "task-vectorize",
+    "type": "module",
     "private": true,
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "lint": "eslint index.js 'test/**/*.js' 'lib/**/*.js'",
+        "test": "tape test/**.test.js"
     },
     "author": "Nick Ingalls <nick@ingalls.ca>",
     "license": "ISC",
+    "engines": {
+        "node": ">= 16.0.0"
+    },
     "dependencies": {
+        "@mapbox/mbtiles": "^0.12.1",
+        "@mapbox/sphericalmercator": "^1.2.0",
+        "@mapbox/tilebelt": "^1.0.2",
+        "@turf/bbox-polygon": "^6.5.0",
+        "@turf/centroid": "^6.5.0",
         "aws-sdk": "^2.1039.0",
-        "tilebase": "^1.5.0"
+        "fast-png": "^6.1.0",
+        "image-js": "^0.33.1",
+        "minimist": "^1.2.5",
+        "node-fetch": "^3.2.0",
+        "randomcolor": "^0.6.2",
+        "sinon": "^13.0.1",
+        "tilebase": "^3.0.0"
+    },
+    "devDependencies": {
+        "@mapbox/mock-aws-sdk-js": "^1.0.0",
+        "eslint": "^8.7.0",
+        "eslint-plugin-node": "^11.1.0",
+        "tape": "^5.5.0"
     }
 }

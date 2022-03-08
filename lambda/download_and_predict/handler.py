@@ -2,7 +2,7 @@
 
 import os
 from typing import Dict, Any
-from download_and_predict.base import DownloadAndPredict, ModelType, SuperTileDownloader
+from download_and_predict.base import DownloadAndPredict, SuperTileDownloader
 from download_and_predict.custom_types import SQSEvent
 
 def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
@@ -12,8 +12,10 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
     stream = os.getenv('StackName')
 
     super_tile = os.getenv('INF_SUPERTILE')
+    inf_type = os.getenv('INF_TYPE')
 
     assert(stream)
+    assert(inf_type)
     assert(prediction_endpoint)
     assert(mlenabler_endpoint)
 
@@ -27,30 +29,22 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
     chips = dap.get_chips(event)
 
     # Get meta about model to determine model type (Classification vs Object Detection)
-    model_type = dap.get_meta()
+    dap.get_meta(inf_type)
 
     # construct a payload for our prediction endpoint
 
     if super_tile == 'True':
         dap = SuperTileDownloader(mlenabler_endpoint=mlenabler_endpoint, prediction_endpoint=prediction_endpoint)
-        payload = dap.get_prediction_payload(chips, model_type)
+        payload = dap.get_prediction_payload(chips)
     else:
-        payload = dap.get_prediction_payload(chips, model_type)
+        payload = dap.get_prediction_payload(chips)
 
-    if model_type == ModelType.OBJECT_DETECT:
+    if inf_type == "detection":
         print("TYPE: Object Detection")
 
         # send prediction request
         preds = dap.od_post_prediction(payload, chips)
-
-        if len(preds["predictions"]) == 0:
-            print('RESULT: No Predictions')
-        else:
-            print('RESULT: ' + str(len(preds["predictions"])) + ' Predictions')
-
-            # Save the prediction to ML-Enabler
-            dap.save_prediction(preds, stream)
-    elif model_type == ModelType.CLASSIFICATION:
+    elif inf_type == "classification":
         print("TYPE: Classification")
 
         inferences = os.getenv('INFERENCES')
@@ -59,11 +53,16 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
 
         # send prediction request
         preds = dap.cl_post_prediction(payload, chips, inferences)
+    elif inf_type == "segmentation":
+        print("TYPE: Segmentation")
 
-        # Save the prediction to ML-Enabler
-        dap.save_prediction(preds, stream)
+        # send prediction request
+        preds = dap.seg_post_prediction(payload, chips)
     else:
         print("Unknown Model")
+
+    print('Saving:', len(preds), ' predictions')
+    dap.save_prediction(preds, stream)
 
     return True
 

@@ -1,4 +1,4 @@
-FROM alpine:3.14
+FROM alpine:3.15
 
 RUN apk add nodejs npm git make bash sqlite-dev zlib-dev gcc g++ python3 py3-pip
 

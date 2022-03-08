@@ -1,34 +1,24 @@
 {
     "type": "object",
     "required": [
-        "version"
+        "key",
+        "value",
+        "created",
+        "updated"
     ],
     "additionalProperties": false,
     "properties": {
-        "version": {
-            "type": "string",
-            "description": "The version of the API"
+        "key": {
+            "type": "string"
         },
-        "stack": {
-            "type": "string",
-            "description": "The name of the deployed stack"
+        "value": {
+            "$ref": "./util/any.json"
         },
-        "environment": {
-            "type": "string",
-            "description": "Environment in which MLEnabler is deployed",
-            "default": "docker",
-            "enum": [
-                "docker",
-                "aws"
-            ]
+        "created": {
+            "type": "integer"            
         },
-        "security": {
-            "type": "string",
-            "description": "Level of authentication required to use the service",
-            "default": "authenticated",
-            "enum": [
-                "authenticated"
-            ]
+        "updated": {
+            "type": "integer"            
         }
     }
 }

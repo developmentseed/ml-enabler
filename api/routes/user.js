@@ -1,7 +1,10 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
+const User = require('../lib/user');
+const Login = require('../lib/login');
+const Settings = require('../lib/settings');
 
 async function router(schema, config) {
-    const user = new (require('../lib/user'))(config);
     const email = new (require('../lib/email'))(config);
 
     /**
@@ -21,9 +24,11 @@ async function router(schema, config) {
         res: 'res.ListUsers.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
-            res.json(await user.list(req.query));
+            const list = await User.list(config.pool, req.query);
+
+            res.json(list);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -47,21 +52,61 @@ async function router(schema, config) {
         res: 'res.User.json'
     }, async (req, res) => {
         try {
-            const usr = await user.register(req.body);
+            const has_password = !!req.body.password;
 
-            const forgot = await user.forgot(usr.username, 'verify');
-
-            if (config.args.email) {
-                await email.verify({
-                    username: usr.username,
-                    email: usr.email,
-                    token: forgot.token
-                });
-            } else if (!config.args.validate) {
-                await user.verify(forgot.token);
+            if (!(await Settings.from(config.pool, 'user::registration')).value && req.user.access !== 'admin') {
+                throw new Err(400, null, 'User Registration has been disabled');
             }
 
-            return res.json(usr);
+            const domains = (await Settings.from(config.pool, 'user::domains')).value;
+
+            if (domains.length) {
+                let matched = false;
+                for (const domain of domains) {
+                    if (req.body.email.endsWith(domain)) matched = true;
+                }
+
+                if (!matched) throw new Err(400, null, 'User Registration is restricted by email domain');
+            }
+
+            const usr = await User.generate(config.pool, {
+                ...req.body,
+                // Generate a temporary random password - can't actually be used as the user still has
+                // to verify email (unless the server is in auto-validate mode)
+                password: req.body.password || (Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8))
+            });
+
+            let token;
+            if (has_password) {
+                const forgot = await Login.forgot(config.pool, usr.username, 'verify');
+                token = forgot.token;
+
+                if (config.args.email) {
+                    await email.verify({
+                        username: usr.username,
+                        email: usr.email,
+                        token
+                    });
+                }
+            } else {
+                const forgot = await Login.forgot(config.pool, usr.username, 'reset');
+                token = forgot.token;
+
+                if (config.args.email) {
+                    await email.forgot({
+                        username: usr.username,
+                        email: usr.email,
+                        token
+                    });
+                }
+            }
+
+            if (!config.args.validate) {
+                usr.validated = true;
+                await usr.commit(config.pool);
+            }
+
+            return res.json(usr.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -88,19 +133,23 @@ async function router(schema, config) {
         res: 'res.User.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
-            if (req.auth.access !== 'admin' && req.auth.uid !== req.params.uid) {
+            if (req.user.access !== 'admin' && req.user.id !== req.params.uid) {
                 throw new Err(401, null, 'You can only edit your own user account');
             }
 
             // Only admins can change access or set validated
-            if (req.auth.access !== 'admin') {
+            if (req.user.access !== 'admin') {
                 delete req.body.access;
                 delete req.body.validated;
             }
 
-            res.json(await user.patch(req.params.uid, req.body));
+            const user = await User.from(config.pool, req.params.uid);
+            user.patch(req.body);
+            await user.commit(config.pool);
+
+            res.json(user.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }

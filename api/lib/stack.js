@@ -1,3 +1,4 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const AWS = require('aws-sdk');
 const cf = new AWS.CloudFormation({
@@ -10,7 +11,7 @@ const template = require('../cloudformation/prediction.template.js');
  * @class
  */
 class Stack {
-    static async list() {
+    static async list(prefix) {
         let stacks = [];
 
         let partial = false;
@@ -40,17 +41,19 @@ class Stack {
                 ]
             }).promise();
 
-            stacks = stacks.concat(partial);
+            stacks = stacks.concat(partial.StackSummaries);
 
             while (partial.NextToken) {
                 partial = await cf.listStacks({
                     NextToken: partial.NextToken
                 }).promise();
 
-                stacks = stacks.concat(partial);
+                stacks = stacks.concat(partial.StackSummaries);
             }
 
-            return stacks;
+            return stacks.filter((s) => {
+                return s.StackName.includes(prefix);
+            });
         } catch (err) {
             throw new Err(500, err, 'Cannot list stacks');
         }
@@ -102,6 +105,11 @@ class Stack {
             const image = `project-${pid}-iteration-${iterationid}`;
             const stack_name = `${process.env.StackName}-${image}`;
 
+            let memory_size = 512;
+            if (options.inf_type === 'segmentation') {
+                memory_size = 1024;
+            }
+
             await cf.createStack({
                 StackName: stack_name,
                 TemplateBody: JSON.stringify(template),
@@ -110,13 +118,15 @@ class Stack {
                     { ParameterKey: 'GitSha',           ParameterValue: process.env.GitSha },
                     { ParameterKey: 'StackName',        ParameterValue: process.env.StackName },
                     { ParameterKey: 'ImageTag',         ParameterValue: image },
-                    { ParameterKey: 'Inferences',       ParameterValue: options.inf_list },
+                    { ParameterKey: 'Inferences',       ParameterValue: options.inf_list.map((e) => e.name).join(',') },
                     { ParameterKey: 'ProjectId',        ParameterValue: String(options.project_id) },
                     { ParameterKey: 'IterationId',      ParameterValue: String(options.iteration_id) },
                     { ParameterKey: 'ImageryId',        ParameterValue: String(options.imagery_id) },
                     { ParameterKey: 'MaxSize',          ParameterValue: String(options.max_size) },
                     { ParameterKey: 'MaxConcurrency',   ParameterValue: String(options.max_concurrency) },
-                    { ParameterKey: 'InfSupertile',     ParameterValue: options.inf_supertile ? 'True' : 'False' }
+                    { ParameterKey: 'InfSupertile',     ParameterValue: options.inf_supertile ? 'True' : 'False' },
+                    { ParameterKey: 'InfType',          ParameterValue: options.inf_type },
+                    { ParameterKey: 'MemorySize',       ParameterValue: String(memory_size) }
                 ],
                 Capabilities: ['CAPABILITY_NAMED_IAM'],
                 OnFailure: 'ROLLBACK'

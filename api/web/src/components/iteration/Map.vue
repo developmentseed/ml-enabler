@@ -8,13 +8,16 @@
                 <button @click='$emit("refresh")' class='mx3 btn btn--stroke color-gray color-blue-on-hover round'><svg class='icon fl'><use href='#icon-refresh'/></svg></button>
             </div>
         </div>
-        <template v-if='!submissions.length'>
+        <template v-if='loading'>
+            <Loading/>
+        </template>
+        <template v-else-if='!submissions.length'>
             <div class='col col--12 py6'>
-                <div class='flex-parent flex-parent--center-main pt36'>
+                <div class='flex flex--center-main pt36'>
                     <svg class='flex-child icon w60 h60 color-gray'><use href='#icon-info'/></svg>
                 </div>
 
-                <div class='flex-parent flex-parent--center-main pt12 pb36'>
+                <div class='flex flex--center-main pt12 pb36'>
                     <h1 class='flex-child txt-h4 cursor-default'>No Inferences Uploaded</h1>
                 </div>
             </div>
@@ -26,7 +29,7 @@
                         <div class='col col--12'>
                             <label>Submission #</label>
                             <div class='select-container w-full'>
-                                <select v-model='submission' class='select select--s'>
+                                <select v-model='submission' class='select select--stroke select--s'>
                                     <template v-for='s in submissions'>
                                         <option v-bind:key='s.id' v-text='s.id'></option>
                                     </template>
@@ -34,12 +37,12 @@
                                 <div class='select-arrow'></div>
                             </div>
                         </div>
-                        <div class='col col--12'>
+                        <div v-if='iteration.inf_type !== "segmentation"' class='col col--12'>
                             <label>Inference Type</label>
                             <div class='select-container w-full'>
                                 <select v-model='inf' class='select select--s'>
-                                    <template v-for='inf in iteration.inf_list.split(",")'>
-                                        <option v-bind:key='inf' v-text='inf'></option>
+                                    <template v-for='inf in iteration.inf_list'>
+                                        <option :key='inf.name' v-text='inf.name'></option>
                                     </template>
                                 </select>
                                 <div class='select-arrow'></div>
@@ -47,7 +50,7 @@
                         </div>
                         <div class='col col--12 clearfix pt6'>
                             <div class='select-container mr6' style='width: 100px;'>
-                                <select v-model='aoi' class='select select--s'>
+                                <select v-model='aoi' class='select select--stroke select--s'>
                                     <option default value='aoi'>AOI</option>
                                     <template v-for='aoi in aois'>
                                         <template v-if='aoi.name.trim().length'>
@@ -79,7 +82,7 @@
                                     <input v-on:input='opacity = parseInt($event.target.value)' type='range' min=0 max=100 />
                                 </div>
                             </div>
-                            <div class='col col--12'>
+                            <div v-if='iteration.inf_type !== "segmentation"' class='col col--12'>
                                 <label>Threshold (<span v-text='threshold'/>%)</label>
                                 <div class='range range--s color-gray'>
                                     <input v-on:input='threshold = parseInt($event.target.value)' type='range' min=0 max=100 />
@@ -89,7 +92,7 @@
                             <div class='col col--12'>
                                 <label>Imagery</label>
                                 <div class='select-container w-full'>
-                                    <select v-model='bg' class='select select--s'>
+                                    <select v-model='bg' class='select select--stroke select--s'>
                                         <option value='default'>Default</option>
                                         <option v-for='img in imagery' v-bind:key='img.id' :value='img.id' v-text='img.name'></option>
                                     </select>
@@ -105,26 +108,26 @@
                         </button>
                     </div>
 
-                    <div class='absolute z5 w180 bg-white round px12 py12' style='bottom: 40px; left: 12px;'>
+                    <div v-if='iteration.inf_type !== "segmentation"' class='absolute z5 w180 bg-white round px12 py12' style='bottom: 40px; left: 12px;'>
                         <template v-if='inspect'>
-                            <div class='flex-parent flex-parent--center-main'>
+                            <div class='flex flex--center-main'>
                                 <div class='flex-child'>
                                     <svg class='icon w30 h30'><use xlink:href='#icon-info'/></svg>
                                 </div>
                             </div>
-                            <div class='flex-parent flex-parent--center-main'>
+                            <div class='flex flex--center-main'>
                                 <div class='flex-child'>
                                     <span v-text='inf'></span>: <span v-text='(inspect * 100).toFixed(1)'></span>%
                                 </div>
                             </div>
                         </template>
                         <template v-else>
-                            <div class='flex-parent flex-parent--center-main'>
+                            <div class='flex flex--center-main'>
                                 <div class='flex-child'>
                                     <svg class='icon w30 h30'><use xlink:href='#icon-cursor'/></svg>
                                 </div>
                             </div>
-                            <div class='flex-parent flex-parent--center-main'>
+                            <div class='flex flex--center-main'>
                                 <div class='flex-child'>
                                     <div align=center>Hover for Details</div>
                                 </div>
@@ -135,9 +138,9 @@
                     <div id="map" class='w-full h-full'></div>
                 </div>
             </div>
-            <div class='flex-parent flex-parent--center-main my18'>
+            <div class='flex flex--center-main my18'>
                 <div class='w240 round shadow-darken10 px12 py12 txt-s'>
-                    <div class='flex-parent flex-parent--center-main flex-parent--center-cross align-center'>
+                    <div class='flex flex--center-main flex--center-cross align-center'>
                         <div class='flex-child flex-child--grow wmin24'>
                             <span class='inline-block w12 h12 round-full bg-gray-light'></span>
                         </div>
@@ -160,6 +163,7 @@
 </template>
 
 <script>
+import Loading from '../util/Loading.vue';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import buffer from '@turf/buffer';
@@ -171,7 +175,7 @@ export default {
     props: ['meta', 'iteration'],
     data: function() {
         return {
-            mode: 'visualize',
+            loading: true,
             integration: false,
             clickListener: false,
             popup: false,
@@ -188,9 +192,8 @@ export default {
             aois: [],
             submission: false,
             submissions: [],
-            tilejson: {
-                inferences: []
-            }
+            inferences: [],
+            tilejson: false
         };
     },
     watch: {
@@ -198,31 +201,43 @@ export default {
             for (const aoi of this.aois) {
                 if (aoi.name !== this.aoi) continue;
 
-                const bounds = aoi.bounds.split(',');
+                const bounds = aoi.bounds.bounds;
                 this.map.fitBounds([
                     [bounds[0], bounds[1]],
                     [bounds[2], bounds[3]]
                 ]);
             }
+
             this.aoi = 'aoi';
         },
         submission: async function() {
             await this.getSubmissionTileJSON();
+
+            if (!this.map) await this.init();
+            this.styles();
         },
         bg: function() {
-            this.layers();
+            this.background();
         },
         opacity: function() {
-            for (const inf of this.tilejson.inferences) {
+            if (this.iteration.inf_type === 'segmentation') {
                 this.map.setPaintProperty(
-                    `inf-${inf}`,
-                    'fill-opacity',
-                    [ 'number', [ '*', ['get', inf], (this.opacity / 100) ] ]
+                    `tiles`,
+                    'raster-opacity',
+                    this.opacity / 100
                 );
+            } else {
+                for (const inf of this.iteration.inf_list) {
+                    this.map.setPaintProperty(
+                        `inf-${inf.name}`,
+                        'fill-opacity',
+                        [ 'number', [ '*', ['get', inf], (this.opacity / 100) ] ]
+                    );
+                }
             }
         },
         threshold: function() {
-            for (const inf of this.tilejson.inferences) {
+            for (const inf of this.iteration.inf_list) {
                 this.filter(inf);
             }
         },
@@ -233,20 +248,33 @@ export default {
     mounted: async function() {
         await this.getAOIs();
         await this.getSubmissions();
-        this.getImagery();
+        await this.getImagery();
 
-        this.inf = this.iteration.inf_list.split(',')[0];
+        this.inf = this.iteration.inf_list[0];
 
+        this.loading = false;
         if (this.submissions.length) {
             this.submission = this.submissions[0].id;
-            await this.getSubmissionTileJSON();
-
-            this.$nextTick(() => {
-                this.init();
-            });
         }
     },
     methods: {
+        init: function() {
+            return new Promise((resolve) => {
+                this.$nextTick(() => {
+                    mapboxgl.accessToken = this.tilejson.token;
+
+                    this.map = new mapboxgl.Map({
+                        container: 'map',
+                        bounds: this.tilejson.bounds,
+                        style: 'mapbox://styles/mapbox/satellite-streets-v11'
+                    });
+
+                    this.map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+
+                    this.map.on('load', resolve);
+                });
+            });
+        },
         infValidity: async function(id, valid) {
             this.popup.remove();
 
@@ -281,28 +309,15 @@ export default {
             }
         },
         hide: function() {
-            for (const inf of this.tilejson.inferences) {
-                this.map.setLayoutProperty(`inf-${inf}`, 'visibility', 'none');
+            if (!this.map) return;
+
+            for (const inf of this.iteration.inf_list) {
+                this.map.setLayoutProperty(`inf-${inf.name}`, 'visibility', 'none');
             }
 
-            this.map.setLayoutProperty(`inf-${this.inf}`, 'visibility', 'visible');
+            this.map.setLayoutProperty(`inf-${this.inf.name}`, 'visibility', 'visible');
         },
-        init: function() {
-            mapboxgl.accessToken = this.tilejson.token;
-
-            this.map = new mapboxgl.Map({
-                container: 'map',
-                bounds: this.tilejson.bounds,
-                style: 'mapbox://styles/mapbox/satellite-streets-v11'
-            });
-
-            this.map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
-
-            this.map.on('load', () => {
-                this.styles();
-            });
-        },
-        layers: function() {
+        background: function() {
             this.map.once('styledata', () => {
                 this.styles();
             });
@@ -344,9 +359,118 @@ export default {
             ]);
         },
         filter: function(inf) {
-            this.map.setFilter(`inf-${inf}`, ['>=', inf, this.threshold / 100]);
+            this.map.setFilter(`inf-${inf.name}`, ['>=', inf, this.threshold / 100]);
         },
         styles: function() {
+            if (this.tilejson.tiles[0].match(/\.png$/)) {
+                if (this.map.getSource('tiles')) {
+                    this.map.removeLayer('tiles');
+                    this.map.removeSource('tiles');
+                }
+
+                this.map.addSource('tiles', {
+                    type: 'raster',
+                    scheme: 'xyz',
+                    tileSize: 256,
+                    tiles: [ window.location.origin + this.tilejson.tiles[0] + `?token=${encodeURIComponent(localStorage.token)}` ],
+                });
+
+                this.map.addLayer({
+                    id: `tiles`,
+                    type: 'raster',
+                    source: 'tiles',
+                    paint: {
+                        'raster-opacity': this.opacity / 100
+                    }
+                });
+            } else {
+                this.map.addSource('tiles', {
+                    type: 'vector',
+                    tiles: [ window.location.origin + this.tilejson.tiles[0] + `?token=${encodeURIComponent(localStorage.token)}` ],
+                    minzoom: this.tilejson.minzoom,
+                    maxzoom: this.tilejson.maxzoom
+                });
+
+                for (const inf of this.iteration.inf_list) {
+                    this.map.addLayer({
+                        id: `inf-${inf.name}`,
+                        type: 'fill',
+                        source: 'tiles',
+                        'source-layer': 'data',
+                        paint: {
+                            'fill-color': [
+                                'case',
+                                ['==', ["feature-state", `v_${inf}`], false], '#ec747e',
+                                ['==', ["feature-state", `v_${inf}`], true], '#00b6b0',
+                                ['==', ['get', `v_${inf}`], false], '#ec747e',
+                                ['==', ['get', `v_${inf}`], true], '#00b6b0',
+                                '#ffffff'
+                            ],
+                            'fill-opacity': [
+                                'number',
+                                [ '*', ['get', inf], (this.opacity / 100) ]
+                            ]
+                        }
+                    });
+
+                    this.filter(inf);
+
+                    if (!this.clickListener) {
+                        this.map.on('click', `inf-${inf}`, (e) => {
+                            if (
+                                e.features.length === 0
+                                || !e.features[0].properties[this.inf.name]
+                                || e.features[0].properties[this.inf.name] === 0
+                            ) return;
+
+                            this.popupid = e.features[0].id;
+
+                            this.popup = new mapboxgl.Popup({
+                                className: 'infpop'
+                            })
+                                .setLngLat(e.lngLat)
+                                .setHTML(`
+                                    <div class='col col--12'>
+                                        <h1 class="txt-h5 mb3 align-center">Inf Geom</h1>
+                                        <button id="${inf}-valid" class="w-full round btn btn--gray color-green-on-hover btn--s btn--stroke mb6">Valid</button>
+                                        <button id="${inf}-invalid" class="w-full round btn btn--gray color-red-on-hover btn--s btn--stroke">Invalid</button>
+                                    </div>
+                                `)
+                                .setMaxWidth("200px")
+                                .addTo(this.map);
+
+                            this.$nextTick(() => {
+                                document.querySelector(`#${inf}-valid`).addEventListener('click', () => {
+                                    this.infValidity(this.popupid, true)
+                                });
+                                document.querySelector(`#${inf}-invalid`).addEventListener('click', () => {
+                                    this.infValidity(this.popupid, false)
+                                });
+                            });
+                        });
+
+                        this.map.on('mousemove', `inf-${inf}`, (e) => {
+                            if (
+                                e.features.length === 0
+                                || !e.features[0].properties[this.inf.name]
+                                || e.features[0].properties[this.inf.name] === 0
+                            ) {
+                                this.map.getCanvas().style.cursor = '';
+                                this.inspect = false;
+                                return;
+                            }
+
+                            this.map.getCanvas().style.cursor = 'pointer';
+
+                            this.inspect = e.features[0].properties[this.inf.name];
+                        });
+                    }
+                }
+                this.clickListener = true;
+
+                this.hide();
+            }
+
             const polyouter = buffer(bboxPolygon(this.tilejson.bounds), 0.3);
             const polyinner = buffer(bboxPolygon(this.tilejson.bounds), 0.1);
 
@@ -366,7 +490,7 @@ export default {
             };
 
             for (const aoi of this.aois) {
-                const bounds = aoi.bounds.split(',');
+                const bounds = aoi.bounds.bounds;
                 const aoipolyouter = buffer(bboxPolygon(bounds), 0.3);
                 const aoipolyinner = buffer(bboxPolygon(bounds), 0.1);
                 poly.features.push({
@@ -379,15 +503,6 @@ export default {
                             aoipolyinner.geometry.coordinates[0]
                         ]
                     }
-                });
-            }
-
-            if (!this.map.getSource('tiles')) {
-                this.map.addSource('tiles', {
-                    type: 'vector',
-                    tiles: this.tilejson.tiles,
-                    minzoom: this.tilejson.minzoom,
-                    maxzoom: this.tilejson.maxzoom
                 });
             }
 
@@ -410,84 +525,6 @@ export default {
                 });
             }
 
-            for (const inf of this.tilejson.inferences) {
-                this.map.addLayer({
-                    id: `inf-${inf}`,
-                    type: 'fill',
-                    source: 'tiles',
-                    'source-layer': 'data',
-                    paint: {
-                        'fill-color': [
-                            'case',
-                            ['==', ["feature-state", `v_${inf}`], false], '#ec747e',
-                            ['==', ["feature-state", `v_${inf}`], true], '#00b6b0',
-                            ['==', ['get', `v_${inf}`], false], '#ec747e',
-                            ['==', ['get', `v_${inf}`], true], '#00b6b0',
-                            '#ffffff'
-                        ],
-                        'fill-opacity': [
-                            'number',
-                            [ '*', ['get', inf], (this.opacity / 100) ]
-                        ]
-                    }
-                });
-
-                this.filter(inf);
-
-                if (!this.clickListener) {
-                    this.map.on('click', `inf-${inf}`, (e) => {
-                        if (
-                            e.features.length === 0
-                            || !e.features[0].properties[this.inf]
-                            || e.features[0].properties[this.inf] === 0
-                        ) return;
-
-                        this.popupid = e.features[0].id;
-
-                        this.popup = new mapboxgl.Popup({
-                            className: 'infpop'
-                        })
-                            .setLngLat(e.lngLat)
-                            .setHTML(`
-                                <div class='col col--12'>
-                                    <h1 class="txt-h5 mb3 align-center">Inf Geom</h1>
-                                    <button id="${inf}-valid" class="w-full round btn btn--gray color-green-on-hover btn--s btn--stroke mb6">Valid</button>
-                                    <button id="${inf}-invalid" class="w-full round btn btn--gray color-red-on-hover btn--s btn--stroke">Invalid</button>
-                                </div>
-                            `)
-                            .setMaxWidth("200px")
-                            .addTo(this.map);
-
-                        this.$nextTick(() => {
-                            document.querySelector(`#${inf}-valid`).addEventListener('click', () => {
-                                this.infValidity(this.popupid, true)
-                            });
-                            document.querySelector(`#${inf}-invalid`).addEventListener('click', () => {
-                                this.infValidity(this.popupid, false)
-                            });
-                        });
-                    });
-
-                    this.map.on('mousemove', `inf-${inf}`, (e) => {
-                        if (
-                            e.features.length === 0
-                            || !e.features[0].properties[this.inf]
-                            || e.features[0].properties[this.inf] === 0
-                        ) {
-                            this.map.getCanvas().style.cursor = '';
-                            this.inspect = false;
-                            return;
-                        }
-
-                        this.map.getCanvas().style.cursor = 'pointer';
-
-                        this.inspect = e.features[0].properties[this.inf];
-                    });
-                }
-            }
-            this.clickListener = true;
-
-            this.hide();
         },
         fullscreen: function() {
             const container = document.querySelector('#map-container');
@@ -517,7 +554,9 @@ export default {
         getSubmissions: async function() {
             try {
                 const res = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/submission`);
-                this.submissions = res.submissions;
+                this.submissions = res.submissions.filter((s) => {
+                    return s.tiles;
+                });
             } catch (err) {
                 this.$emit('err', err);
             }
@@ -532,6 +571,7 @@ export default {
         },
     },
     components: {
+        Loading,
         IterationHeader
     }
 }

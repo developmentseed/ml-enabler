@@ -7,9 +7,7 @@
         </div>
 
         <template v-if='loading'>
-            <div class='flex-parent flex-parent--center-main w-full py24'>
-                <div class='flex-child loading py24'></div>
-            </div>
+            <Loading/>
         </template>
         <template v-else-if='submissions.length'>
             <div class='col col--12 grid grid--gut12'>
@@ -17,7 +15,7 @@
                     <h2 class='txt-h4 py12'>Export Inferences</h2>
                 </div>
                 <div class='col col--6'>
-                    <div class="flex-parent-inline fr py12">
+                    <div class="flex-inline fr py12">
                         <button @click='mode = "download"' :class='{
                             "btn--stroke": mode !== "download"
                         }' class="btn btn--pill btn--pill-stroke btn--s btn--pill-hl round">Download</button>
@@ -31,7 +29,7 @@
                     <div class='col col--2'>
                         <label>Submission</label>
                         <div class='select-container w-full'>
-                            <select v-model='params.submission' class='select'>
+                            <select v-model='params.submission' class='select select--stroke'>
                                 <option value='all'>All</option>
                                 <option :key='s.id' v-for='s in submissions' :value='s.id'><span v-text='s.id'/></option>
                             </select>
@@ -41,11 +39,10 @@
                     <div class='col col--5'>
                         <label>Format</label>
                         <div class='select-container w-full'>
-                            <select v-model='params.format' class='select'>
+                            <select v-model='params.format' class='select select--stroke'>
                                 <option value='geojson'>GeoJSON</option>
                                 <option value='geojsonld'>GeoJSON LD</option>
                                 <option value='csv'>CSV</option>
-                                <option value='npz'>NPZ</option>
                             </select>
                             <div class='select-arrow'></div>
                         </div>
@@ -53,9 +50,9 @@
                     <div class='col col--5'>
                         <label>Inferences</label>
                         <div class='select-container w-full'>
-                            <select v-model='params.inferences' class='select'>
+                            <select v-model='params.inferences' class='select select--stroke'>
                                 <option value='all'>All</option>
-                                <option :key='inf' v-for='inf in iteration.inf_list.split(",")' :value='inf'><span v-text='inf'/></option>
+                                <option :key='inf.name' v-for='inf in iteration.inf_list' :value='inf.name'><span v-text='inf.name'/></option>
                             </select>
                             <div class='select-arrow'></div>
                         </div>
@@ -98,11 +95,11 @@
                 </template>
                 <template v-else-if='mode === "complete"'>
                     <div class='col col--12 py6'>
-                        <div class='flex-parent flex-parent--center-main pt36'>
+                        <div class='flex flex--center-main pt36'>
                             <svg class='flex-child icon w60 h60 color-gray'><use href='#icon-info'/></svg>
                         </div>
 
-                        <div class='flex-parent flex-parent--center-main pt12 pb36'>
+                        <div class='flex flex--center-main pt12 pb36'>
                             <h1 class='flex-child txt-h4 cursor-default'>Integration Successful</h1>
                         </div>
                     </div>
@@ -114,11 +111,11 @@
         </template>
         <template v-else>
             <div class='col col--12 py6'>
-                <div class='flex-parent flex-parent--center-main pt36'>
+                <div class='flex flex--center-main pt36'>
                     <svg class='flex-child icon w60 h60 color-gray'><use href='#icon-info'/></svg>
                 </div>
 
-                <div class='flex-parent flex-parent--center-main pt12 pb36'>
+                <div class='flex flex--center-main pt12 pb36'>
                     <h1 class='flex-child txt-h4 cursor-default'>No Inferences Uploaded</h1>
                 </div>
             </div>
@@ -128,6 +125,7 @@
 
 <script>
 import IterationHeader from './IterationHeader.vue';
+import Loading from './../util/Loading.vue';
 
 export default {
     name: 'Export',
@@ -168,7 +166,11 @@ export default {
 
             url.searchParams.set('format', this.params.format);
             url.searchParams.set('inferences', this.params.inferences);
-            url.searchParams.set('submission', this.params.submission);
+            url.searchParams.set('token', localStorage.token);
+
+            if (this.params.submission !== 'all') {
+                url.searchParams.set('submission', this.params.submission);
+            }
 
             if (this.params.inferences !== 'all') {
                 url.searchParams.set('threshold', this.params.threshold / 100);
@@ -187,7 +189,9 @@ export default {
         getSubmissions: async function() {
             try {
                 const res = await window.std(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/submission`);
-                this.submissions = res.submissions;
+                this.submissions = res.submissions.filter((s) => {
+                    return s.storage;
+                });
             } catch (err) {
                 this.$emit('err', err);
             }
@@ -199,6 +203,7 @@ export default {
         },
     },
     components: {
+        Loading,
         IterationHeader
     }
 }

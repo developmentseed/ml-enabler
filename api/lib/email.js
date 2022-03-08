@@ -1,3 +1,4 @@
+'use strict';
 const Mailgen = require('mailgen');
 const { Err } = require('@openaddresses/batch-schema');
 const AWS = require('aws-sdk');
@@ -25,38 +26,6 @@ class Email {
     }
 
     /**
-     * Send an org invite to a user
-     *
-     * @param {Object} user
-     * @param {String} user.email - Email to invite
-     * @param {String} user.token - Invite Token
-     * @param {Org} org
-     */
-    async invite(user, org) {
-        const email = {
-            body: {
-                name: user.email,
-                intro: 'ML-Enabler Invite',
-                action: {
-                    instructions: `Hello, You have been invited to join ${org.name}`,
-                    button: {
-                        color: 'green',
-                        text: 'Accept Invite',
-                        link: `${this.config.url}/org/${org.id}/user/accept?token=${user.token}`
-                    }
-                },
-                outro: 'Not sure what this is? Just ignore me!'
-            }
-        };
-
-        try {
-            return await this.send(user.email, 'BRI Organisation Invitation', this.mailGenerator.generate(email));
-        } catch (err) {
-            throw new Err(500, err, 'Internal Org Invite Error');
-        }
-    }
-
-    /**
      * Send an email verification to the user
      *
      * @param {Object} user
@@ -74,7 +43,7 @@ class Email {
                     button: {
                         color: 'green',
                         text: 'Verify Email',
-                        link: `${this.config.url}/login/verify?token=${user.token}`
+                        link: `${this.config.url}/#/login/verify?token=${user.token}`
                     }
                 },
                 outro: ''
@@ -82,7 +51,7 @@ class Email {
         };
 
         try {
-            return await this.send(user.email, 'BRI Email Verification', this.mailGenerator.generate(email));
+            return await this.send(user.email, 'ML-Enabler Email Verification', this.mailGenerator.generate(email));
         } catch (err) {
             throw new Err(500, err, 'Internal User Confirmation Error');
         }
@@ -98,7 +67,7 @@ class Email {
                     button: {
                         color: 'green',
                         text: 'Password Reset',
-                        link: `${this.config.url}/login/reset?token=${user.token}`
+                        link: `${this.config.url}/#/login/reset?token=${user.token}`
                     }
                 },
                 outro: ''
@@ -106,7 +75,7 @@ class Email {
         };
 
         try {
-            return await this.send(user.email, 'BRI Password Reset', this.mailGenerator.generate(email));
+            return await this.send(user.email, 'ML-Enabler Password Reset', this.mailGenerator.generate(email));
         } catch (err) {
             throw new Err(500, err, 'Internal User Forgot Error');
         }

@@ -1,6 +1,7 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
+const Generic = require('@openaddresses/batch-generic');
 const { sql } = require('slonik');
-const Generic = require('../generic');
 
 /**
  * @class
@@ -112,7 +113,7 @@ class ProjectIteration extends Generic {
                     ${iter.hint},
                     ${iter.imagery_id},
                     ${iter.inf_binary},
-                    ${iter.inf_list},
+                    ${JSON.stringify(iter.inf_list)},
                     ${iter.inf_supertile},
                     ${iter.inf_type},
                     ${iter.tile_zoom},

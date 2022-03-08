@@ -1,9 +1,9 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const Imagery = require('../lib/project/imagery');
+const User = require('../lib/user');
 
 async function router(schema, config) {
-    const user = new (require('../lib/user'))(config);
-
     /**
      * @api {get} /api/project/:pid/imagery List Imagery
      * @apiVersion 1.0.0
@@ -23,7 +23,7 @@ async function router(schema, config) {
         res: 'res.ListImagery.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             req.query.pid = req.params.pid;
             res.json(await Imagery.list(config.pool, req.params.pid, req.query));
@@ -51,7 +51,7 @@ async function router(schema, config) {
         res: 'res.Imagery.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             req.body.pid = req.params.pid;
             const img = await Imagery.generate(config.pool, req.body);
@@ -80,7 +80,7 @@ async function router(schema, config) {
         res: 'res.Imagery.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             const img = await Imagery.from(config.pool, req.params.imageryid);
 
@@ -110,7 +110,7 @@ async function router(schema, config) {
         res: 'res.Imagery.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             const img = await Imagery.from(config.pool, req.params.imageryid);
             img.patch(req.body);
@@ -140,7 +140,7 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             const img = await Imagery.from(config.pool, req.params.imageryid);
             await img.delete(config.pool);

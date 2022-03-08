@@ -1,9 +1,9 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const Integration = require('../lib/project/integration');
+const User = require('../lib/user');
 
 async function router(schema, config) {
-    const user = new (require('../lib/user'))(config);
-
     /**
      * @api {get} /api/project/:pid/integration List Integration
      * @apiVersion 1.0.0
@@ -23,7 +23,7 @@ async function router(schema, config) {
         res: 'res.ListIntegrations.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             req.query.pid = req.params.pid;
             res.json(await Integration.list(config.pool, req.params.pid, req.query));
@@ -51,7 +51,7 @@ async function router(schema, config) {
         res: 'res.Integration.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             req.body.pid = req.params.pid;
             const integ = await Integration.generate(config.pool, req.body);
@@ -80,7 +80,7 @@ async function router(schema, config) {
         res: 'res.Integration.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             const integ = await Integration.from(config.pool, req.params.integrationid);
             return res.json(integ.serialize());
@@ -107,7 +107,7 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             const integ = await Integration.from(config.pool, req.params.integrationid);
             await integ.delete(config.pool);

@@ -45,6 +45,15 @@ module.exports = {
             Type: 'String',
             Description: 'Model was trained and should inference on supertiles'
         },
+        InfType: {
+            Type: 'String',
+            Description: 'What type of model is being inferenced'
+        },
+        MemorySize: {
+            Type: 'Number',
+            Default: 512,
+            Description: 'Lambda Memory Limits'
+        },
     },
     Resources: {
         PredSQSAlarn: {
@@ -149,7 +158,6 @@ module.exports = {
             Type: 'AWS::Lambda::Function',
             DependsOn: ['PredLambdaLogs'],
             Properties: {
-                Layers: [ 'arn:aws:lambda:us-east-1:552188055668:layer:geolambda:2' ],
                 Code: {
                     S3Bucket: 'devseed-artifacts',
                     S3Key: cf.join(['ml-enabler/lambda-', cf.ref('GitSha'), '.zip' ])
@@ -157,16 +165,17 @@ module.exports = {
                 FunctionName: cf.join([ cf.stackName, '-queue']),
                 Role: cf.importValue(cf.join([cf.ref('StackName'), '-lambda-role'])),
                 Handler: 'download_and_predict.handler.handler',
-                MemorySize: 512,
-                Runtime: 'python3.7',
+                MemorySize: cf.ref('MemorySize'),
+                Runtime: 'python3.8',
                 ReservedConcurrentExecutions: cf.ref('MaxConcurrency'),
-                Timeout: 240,
+                Timeout: 900,
                 Environment: {
                     Variables: {
                         GDAL_DATA: '/opt/share/gdal',
                         PROJ_LIB: '/opt/share/proj',
                         StackName: cf.stackName,
                         INFERENCES: cf.ref('Inferences'),
+                        INF_TYPE: cf.ref('InfType'),
                         INF_SUPERTILE: cf.ref('InfSupertile'),
                         IMAGERY_ID: cf.ref('ImageryId'),
                         PREDICTION_ENDPOINT: cf.join([
@@ -391,7 +400,7 @@ module.exports = {
             Properties: {
                 Family: cf.ref('ImageTag'),
                 Cpu: 8192,
-                Memory: 61401,
+                Memory: 60000,
                 TaskRoleArn: cf.importValue(cf.join([
                     cf.ref('StackName'), '-task-role'
                 ])),
@@ -483,7 +492,7 @@ module.exports = {
     Mappings: {
         AWSRegionToAMI: {
             DOCS: { LIST: 'http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html' },
-            'us-east-1': { AMIID: 'ami-07eb64b216d4d3522' }
+            'us-east-1': { AMIID: 'ami-03ab174c20b61472c' }
         },
         AWSRegion2AZ: {
             'us-east-1': {

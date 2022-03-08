@@ -24,7 +24,7 @@
             "type": "integer"
         },
         "inf_list": {
-            "type": "string"
+            "$ref": "util/inf-list.json"
         },
         "inf_type": {
             "type": "string",

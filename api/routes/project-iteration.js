@@ -1,9 +1,10 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const Iteration = require('../lib/project/iteration');
+const Stack = require('../lib/stack');
+const User = require('../lib/user');
 
 async function router(schema, config) {
-    const user = new (require('../lib/user'))(config);
-
     /**
      * @api {get} /api/project/:pid/iteration List Iteration
      * @apiVersion 1.0.0
@@ -23,10 +24,31 @@ async function router(schema, config) {
         res: 'res.ListIterations.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             req.query.pid = req.params.pid;
-            res.json(await Iteration.list(config.pool, req.params.pid, req.query));
+            const list = await Iteration.list(config.pool, req.params.pid, req.query);
+
+            let stacks = [];
+            if (config.Environment) {
+                stacks = (await Stack.list(config.StackName + '-')).map((s) => {
+                    return s.StackName;
+                });
+            }
+
+            list.iterations = list.iterations.map((i) => {
+                i.stack = false;
+
+                for (const s of stacks) {
+                    if (s.includes(config.StackName + '-project-' + req.params.pid + '-iteration-' + i.id)) {
+                        i.stack = true;
+                    }
+                }
+
+                return i;
+            });
+
+            return res.json(list);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -51,7 +73,7 @@ async function router(schema, config) {
         res: 'res.Iteration.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             req.body.pid = req.params.pid;
             const iter = await Iteration.generate(config.pool, req.body);
@@ -80,7 +102,7 @@ async function router(schema, config) {
         res: 'res.Iteration.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             const iter = await Iteration.from(config.pool, req.params.iterationid);
             return res.json(iter.serialize());
@@ -108,7 +130,7 @@ async function router(schema, config) {
         res: 'res.Iteration.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             const iter = await Iteration.from(config.pool, req.params.iterationid);
             iter.patch(req.body);

@@ -1,6 +1,7 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
+const Generic = require('@openaddresses/batch-generic');
 const { sql } = require('slonik');
-const Generic = require('../../generic');
 const S3 = require('../../s3');
 
 /**
@@ -65,19 +66,32 @@ class Submission extends Generic {
         return await this.list_s3(this.deserialize(pgres.rows, 'submissions'));
     }
 
+    static async from(pool, id, pid) {
+        const sub = await super.from(pool, id);
+
+        sub.storage = await S3.exists(`project/${pid}/iteration/${sub.iter_id}/submission-${sub.id}.geojson`);
+        sub.tiles = await S3.exists(`project/${pid}/iteration/${sub.iter_id}/submission-${sub.id}.tilebase`);
+
+        return sub;
+    }
+
     static async list_s3(list) {
         if (!list.submissions.length) return list;
 
         const s3m = {};
-        (await S3.list(`project/${list.submissions[0].pid}/iteration/${list.submissions[0].iter_id}/submission-`)).forEach((l) => {
-            const match = l.Key.match(/submission-(\d+).geojson/);
-            if (!match) return;
+        const s3t = {};
 
-            s3m[match[1]] = l.Key;
+        (await S3.list(`project/${list.submissions[0].pid}/iteration/${list.submissions[0].iter_id}/submission-`)).forEach((l) => {
+            const geojson_match = l.Key.match(/submission-(\d+).geojson/);
+            if (geojson_match) s3m[geojson_match[1]] = l.Key;
+
+            const tiles_match = l.Key.match(/submission-(\d+).tilebase/);
+            if (tiles_match) s3t[tiles_match[1]] = l.Key;
         });
 
         for (const sub of list.submissions) {
             sub.storage = !!s3m[sub.id];
+            sub.tiles = !!s3t[sub.id];
         }
 
         return list;

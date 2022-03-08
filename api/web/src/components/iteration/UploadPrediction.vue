@@ -1,53 +1,34 @@
 <template>
     <div class="col col--12">
         <div class='col col--12'>
-            <FilePond
-                name='file'
-                ref='pond'
-                :label-idle='label'
-                v-bind:allow-multiple='false'
-                v-on:processfile='uploaded'
-                :accepted-file-types='filetype'
-                :fileValidateTypeDetectType='detect'
-                allowRevert='false'
-                :server='server'
-                v-bind:files='files'
+            <Upload
+                :label='label'
+                :url='url'
+                :headers='headers'
+                :mimetype='filetype'
+                single=true
+                err='error($event)'
+                @ok='close'
             />
         </div>
 
-        <div v-if='done' class='col col--12 py12'>
-            <button @click='close' class='btn btn--stroke round fr color-blue-light color-blue-on-hover'>Done</button>
-        </div>
     </div>
 </template>
 
 <script>
-import vueFilePond from 'vue-filepond';
-import 'filepond/dist/filepond.min.css';
-import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
-const FilePond = vueFilePond(FilePondPluginFileValidateType);
+import Upload from '../util/Upload.vue';
 
 export default {
     name: 'UploadPrediction',
     props: ['iteration', 'type'],
-    components: {
-        FilePond
-    },
     data: function() {
         return {
-            done: false,
-            files: [],
             label: '',
-            server: {
-                url: this.type === 'inferences'
-                    ? `/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/import`
-                    : `/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/asset?type=${this.type}`,
-                process: {
-                    onerror: this.error,
-                    headers: {
-                        Authorization: `Bearer ${localStorage.token}`
-                    }
-                }
+            url: this.type === 'inferences'
+                ? new URL(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/import`, window.location.origin)
+                : new URL(`/api/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/asset?type=${this.type}`, window.location.origin),
+            headers: {
+                Authorization: `Bearer ${localStorage.token}`
             },
             filetype: ''
         };
@@ -78,14 +59,12 @@ export default {
         error: function(res) {
             this.$emit('err', new Error(JSON.parse(res).message));
         },
-        uploaded: function(err) {
-            if (err) return;
-
-            this.done = true;
-        },
         close: function() {
             this.$emit('close');
         }
+    },
+    components: {
+       Upload
     }
 }
 </script>

@@ -3,6 +3,13 @@ const cf = require('@mapbox/cloudfriend');
 module.exports = [{
     Effect: 'Allow',
     Action: [
+        'ses:SendEmail',
+        'ses:SendRawEmail'
+    ],
+    Resource: ['*']
+},{
+    Effect: 'Allow',
+    Action: [
         'cloudformation:CreateStack',
         'cloudformation:DeleteStack',
         'cloudformation:ListStacks',

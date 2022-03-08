@@ -25,7 +25,7 @@
             <template v-if='showSearch'>
                 <div class='col col--12 px24 py6'>
                     <div class='relative'>
-                        <div class='absolute flex-parent flex-parent--center-cross flex-parent--center-main w36 h36'>
+                        <div class='absolute flex flex--center-cross flex--center-main w36 h36'>
                             <svg class='icon'><use xlink:href='#icon-search'></use></svg>
                         </div>
                         <input ref='search' v-model='search' class='input pl36' placeholder='Model Name'>
@@ -33,19 +33,14 @@
                 </div>
             </template>
             <template v-if='loading.projects'>
-                <div class='flex-parent flex-parent--center-main w-full'>
-                    <div class='flex-child loading py24'></div>
-                </div>
-                <div class='flex-parent flex-parent--center-main w-full'>
-                    <div class='flex-child py24'>Loading Projects</div>
-                </div>
+                <Loading desc='Loading Projects'/>
             </template>
             <template v-else-if='projects.length === 0'>
-                <div class='flex-parent flex-parent--center-main pt36'>
+                <div class='flex flex--center-main pt36'>
                     <svg class='flex-child icon w60 h60 color--gray'><use href='#icon-info'/></svg>
                 </div>
 
-                <div class='flex-parent flex-parent--center-main pt12 pb36'>
+                <div class='flex flex--center-main pt12 pb36'>
                     <h1 class='flex-child txt-h4 cursor-default'>No Projects Found</h1>
                 </div>
             </template>
@@ -69,7 +64,7 @@
                                     Project Page
                                 </div>
 
-                                <div v-if='false' class='fr bg-green-faint bg-green-on-hover color-white-on-hover color-green inline-block px6 py3 round txt-xs txt-bold mr3'>
+                                <div v-if='project.stacks.length' class='fr bg-green-faint bg-green-on-hover color-white-on-hover color-green inline-block px6 py3 round txt-xs txt-bold mr3'>
                                     Active Stack
                                 </div>
                                 <div v-if='project.archived' class='fr bg-gray-faint bg-gray-on-hover color-white-on-hover color-gray inline-block px6 py3 round txt-xs txt-bold mr3'>
@@ -92,6 +87,7 @@
 
 <script>
 import Pager from './util/Pager.vue';
+import Loading from './util/Loading.vue';
 
 export default {
     name: 'Home',
@@ -164,6 +160,7 @@ export default {
         }
     },
     components: {
+        Loading,
         Pager
     }
 }

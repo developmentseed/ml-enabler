@@ -1,4 +1,4 @@
-FROM docker:20.10.12-dind
+FROM docker:19.03.0-dind
 
 ENV SHELL /bin/bash
 ENV DEBIAN_FRONTEND=noninteractive

@@ -1,3 +1,4 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const StackQueue = require('../lib/stack/queue');
 const Task = require('../lib/project/iteration/task');
@@ -5,9 +6,9 @@ const Iteration = require('../lib/project/iteration');
 const Imagery = require('../lib/project/imagery');
 const Submission = require('../lib/project/iteration/submission');
 const CWAlarm = require('../lib/cw-alarm');
+const User = require('../lib/user');
 
 async function router(schema, config) {
-    const user = new (require('../lib/user'))(config);
     const alarm = new CWAlarm(config);
 
     /**
@@ -28,7 +29,7 @@ async function router(schema, config) {
         res: 'res.StackQueue.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
             config.is_aws();
 
             const queue = await StackQueue.from(req.params.pid, req.params.iterationid);
@@ -56,7 +57,7 @@ async function router(schema, config) {
         res: 'res.StackQueue.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
             config.is_aws();
 
             await StackQueue.delete(req.params.pid, req.params.iterationid);
@@ -88,7 +89,7 @@ async function router(schema, config) {
         res: 'res.StackQueue.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
             config.is_aws();
 
             const iter = await Iteration.from(config.pool, req.params.iterationid);

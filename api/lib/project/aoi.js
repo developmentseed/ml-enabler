@@ -1,6 +1,7 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
+const Generic = require('@openaddresses/batch-generic');
 const { sql } = require('slonik');
-const Generic = require('../generic');
 const bboxPolygon = require('@turf/bbox-polygon').default;
 
 /**
@@ -53,6 +54,7 @@ class ProjectAOI extends Generic {
                     aois
                 WHERE
                     aois.name ~ ${query.filter}
+                    AND pid = ${pid}
                 ORDER BY
                     ${sql.identifier(['aois', query.sort])} ${query.order}
                 LIMIT

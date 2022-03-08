@@ -1,9 +1,11 @@
+'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const Project = require('../lib/project');
 const ProjectAccess = require('../lib/project/access');
+const Stack = require('../lib/stack');
+const User = require('../lib/user');
 
 async function router(schema, config) {
-    const user = new (require('../lib/user'))(config);
 
     /**
      * @api {get} /api/project List Projects
@@ -23,10 +25,32 @@ async function router(schema, config) {
         res: 'res.ListProjects.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
-            req.query.uid = req.auth.uid;
-            res.json(await Project.list(config.pool, req.query));
+            req.query.uid = req.user.id;
+
+            const list = await Project.list(config.pool, req.query);
+
+            let stacks = [];
+            if (config.Environment) {
+                stacks = (await Stack.list(config.StackName + '-')).map((s) => {
+                    return s.StackName;
+                });
+            }
+
+            list.projects = list.projects.map((p) => {
+                p.stacks = [];
+
+                for (const s of stacks) {
+                    if (s.includes(config.StackName + '-project-' + p.id)) {
+                        p.stacks.push(s);
+                    }
+                }
+
+                return p;
+            });
+
+            return res.json(list);
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -50,7 +74,7 @@ async function router(schema, config) {
         res: 'res.Project.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
             if (!req.body.users.length) throw new Err(400, null, 'Users list cannot be empty');
 
@@ -84,11 +108,9 @@ async function router(schema, config) {
         res: 'res.Project.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
-            const project = await Project.from(config.pool, req.params.pid);
-
-            return res.json(project.serialize());
+            return res.json(req.project.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -113,13 +135,12 @@ async function router(schema, config) {
         res: 'res.Project.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
-            const project = await Project.from(config.pool, req.params.pid);
-            project.patch(req.body);
-            await project.commit(config.pool);
+            req.project.patch(req.body);
+            await req.project.commit(config.pool);
 
-            return res.json(project.serialize());
+            return res.json(req.project.serialize());
         } catch (err) {
             return Err.respond(err, res);
         }
@@ -142,10 +163,9 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await user.is_auth(req);
+            await User.is_auth(req);
 
-            const project = await Project.from(config.pool, req.params.pid);
-            await project.delete(config.pool);
+            await req.project.delete(config.pool);
 
             return res.json({
                 status: 200,
