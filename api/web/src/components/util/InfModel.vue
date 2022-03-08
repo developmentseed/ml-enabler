@@ -4,6 +4,7 @@
     <div class='select-container w-full'>
         <select :disabled='disabled' v-model='model' class='select select--stroke'>
             <option value='tensorflow'>Tensorflow</option>
+            <option value='pytorch'>PyTorch</option>
         </select>
         <div class='select-arrow'></div>
     </div>
