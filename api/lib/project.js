@@ -126,7 +126,7 @@ class Project extends Generic {
      * @returns {Project}
      */
     static async from(pool, id, uid) {
-        if (!uid) return this.super.from(pool, id);
+        if (!uid) return super.from(pool, id);
 
         let pgres;
         try {
