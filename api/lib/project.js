@@ -4,6 +4,8 @@ const Generic = require('@openaddresses/batch-generic');
 const { sql } = require('slonik');
 
 /**
+ * Class representing rows in projects table
+ *
  * @class
  */
 class Project extends Generic {
@@ -12,7 +14,7 @@ class Project extends Generic {
     static _res = require('../schema/res.Project.json');
 
     /**
-     * Return a list of users
+     * Return a list of Projects
      *
      * @param {Pool} pool - Instantiated Postgres Pool
      *
@@ -23,6 +25,8 @@ class Project extends Generic {
      * @param {boolean} [query.archived=false] - Only show archived projects
      * @param {String} [query.sort=created] Field to sort by
      * @param {String} [query.order=asc] Sort Order (asc/desc)
+     *
+     * @returns {Object}
      */
     static async list(pool, query) {
         if (!query) query = {};
@@ -80,6 +84,13 @@ class Project extends Generic {
         return this.deserialize(pgres.rows);
     }
 
+    /**
+     * Save a Project to the database
+     *
+     * @param {Pool}    pool    Instantiated Postgres Pool
+     *
+     * @returns {Project}
+     */
     async commit(pool) {
         if (this.id === false) throw new Err(500, null, 'Project.id must be populated');
 
@@ -104,6 +115,66 @@ class Project extends Generic {
         }
     }
 
+    /**
+     * Return an individual Project and if an optional uid parameter is provided,
+     * only return the project if the user has access to it
+     *
+     * @param {Pool}    pool    Instantiated Postgres Pool
+     * @param {Number}  id      Project ID
+     * @param {Number}  [uid]   Optional User ID
+     *
+     * @returns {Project}
+     */
+    static async from(pool, id, uid) {
+        if (!uid) return this.super.from(pool, id);
+
+        let pgres;
+        try {
+            pgres = await pool.query(sql`
+                SELECT
+                    projects.id,
+                    projects.created,
+                    projects.updated,
+                    projects.name,
+                    projects.source,
+                    projects.archived,
+                    projects.project_url,
+                    projects.access,
+                    projects.tags,
+                    projects.notes
+                FROM
+                    projects,
+                    projects_access
+                WHERE
+                    AND (
+                        projects.access = 'public'
+                        OR (
+                            projects_access.uid = ${uid}
+                            AND projects_access.pid = projects.id
+                        )
+                    )
+            `);
+        } catch (err) {
+            throw new Err(500, err, 'Internal User Error');
+        }
+
+        if (!pgres.rows.length) throw new Err(404, null, 'Project does not exist or user does not have access');
+
+        return this.deserialize(pgres.rows);
+    }
+
+    /**
+     * Generate a new Project and save it to the database
+     *
+     * @param {Pool}        pool                Instantiated Postgres Pool
+     * @param {object}      prj                 Project Body
+     * @param {string}      prj.name            Project Name
+     * @param {string}      prj.source          Project Developer Org
+     * @param {string}      prj.project_url     Project Reference URL
+     * @param {object[]}    prj.tags            Project Billing Tags
+     * @param {string}      prj.access          Project Access (public/private)
+     * @param {string}      prj.notes           Project Notes
+     */
     static async generate(pool, prj) {
         try {
             const pgres = await pool.query(sql`
@@ -124,7 +195,7 @@ class Project extends Generic {
                 ) RETURNING *
             `);
 
-            return Project.deserialize(pgres.rows[0]);
+            return this.deserialize(pgres.rows[0]);
         } catch (err) {
             if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
                 throw new Err(400, null, 'Project by that name already exists');

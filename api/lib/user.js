@@ -24,7 +24,7 @@ class User extends Generic {
      * @param {String} [query.sort=created] Field to sort by
      * @param {String} [query.order=asc] Sort Order (asc/desc)
      */
-    async list(pool, query) {
+    static async list(pool, query) {
         if (!query) query = {};
         if (!query.limit) query.limit = 100;
         if (!query.page) query.page = 0;
@@ -181,7 +181,7 @@ class User extends Generic {
             return this.deserialize(pgres.rows[0]);
         } catch (err) {
             if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
-                throw new Err(500, err, 'User already exists');
+                throw new Err(400, err, 'User already exists');
             }
             throw new Err(500, err, 'Failed to register user');
         }

@@ -1,14 +1,14 @@
 {
     "type": "object",
     "required": [
-        "uid",
+        "id",
         "username",
         "email",
         "access"
     ],
     "additionalProperties": false,
     "properties": {
-        "uid": {
+        "id": {
             "type": "integer"
         },
         "username": {
