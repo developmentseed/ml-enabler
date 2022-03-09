@@ -12,16 +12,18 @@
     "additionalProperties": false,
     "properties": {
         "id": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Imagery ID"
         },
         "pid": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Project ID"
         },
         "created": {
-            "type": "integer"
+            "$ref": "./util/created.json"
         },
         "updated": {
-            "type": "integer"
+            "$ref": "./util/updated.json"
         },
         "name": {
             "type": "string"

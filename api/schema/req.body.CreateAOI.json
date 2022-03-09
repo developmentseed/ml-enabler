@@ -7,16 +7,15 @@
     ],
     "properties": {
         "iter_id": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Iteration ID"
         },
         "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Human readable name of the AOI"
         },
         "bounds": {
-            "type": "array",
-            "items": {
-                "type": "number"
-            }
+            "$ref": "./util/bounds.json"
         }
     }
 }

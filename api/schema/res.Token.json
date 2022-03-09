@@ -15,7 +15,7 @@
             "description": "Human Readable name of the API Token"
         },
         "created": {
-            "type": "integer"
+            "$ref": "./util/created.json"
         },
         "token": {
             "type": "string",

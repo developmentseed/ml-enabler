@@ -19,7 +19,7 @@
             "type": "string"
         },
         "created": {
-            "type": "integer"
+            "$ref": "./util/created.json"
         }
     }
 }
