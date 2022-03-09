@@ -3,7 +3,7 @@
     "additionalProperties": false,
     "properties": {
         "uid": {
-            "type": "ineger",
+            "type": "integer",
             "description": "User ID to add to project"
         },
         "access": {

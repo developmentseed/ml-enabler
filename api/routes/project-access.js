@@ -47,12 +47,13 @@ async function router(schema, config) {
     await schema.post('/project/:pid/user', {
         ':pid': 'integer',
         ':id': 'integer',
-        body: 'req.query.ListProjectAccess.json',
+        body: 'req.body.CreateProjectAccess.json',
         res: 'res.ListProjectAccess.json'
     }, async (req, res) => {
         try {
             await User.is_auth(req);
 
+            req.body.pid = req.params.pid;
             const access = await ProjectAccess.generate(config.pool, req.body);
             return res.json(access.serialize());
         } catch (err) {
