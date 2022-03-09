@@ -7,9 +7,9 @@
         </div>
         <div class='col col--4'>
             <div class='select-container fr'>
-                <select v-model='user.access' class='select select--stroke'>
+                <select v-on:change='modifyUser(user)' v-model='user.access' class='select select--stroke'>
                     <option>read</option>
-                    <option>write</option>
+                    <option>user</option>
                     <option>admin</option>
                 </select>
                 <div class='select-arrow'></div>
@@ -72,6 +72,18 @@ export default {
             this.search.user = null;
 
             this.getProjectUsers();
+        },
+        modifyUser: async function(user) {
+            try {
+                await window.std(`/api/project/${this.proj.id}/user/${user.id}`, {
+                    method: 'PATCH',
+                    body: {
+                        access: user.access
+                    }
+                });
+            } catch (err) {
+                this.$emit('err', err);
+            }
         },
         getProjectUsers: async function() {
             try {
