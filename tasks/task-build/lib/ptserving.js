@@ -6,7 +6,7 @@ const fs = require('fs');
 
 const base = 'pytorch/torchserve:0.5.0-gpu';
 
-async function docker(tmp, model, tagged_model) {
+function docker(tmp, model, tagged_model) {
     console.error(`ok - pulling ${base} docker image`);
 
     CP.execSync(`

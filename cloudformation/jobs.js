@@ -95,6 +95,9 @@ const stack = {
                     Attempts: 1
                 },
                 Parameters: { },
+                Timeout: {
+                    AttemptDurationSeconds: 2 * 60 * 60 // 2hr timeout
+                },
                 ContainerProperties: {
                     Environment: [
                         { Name: 'StackName' , Value: cf.stackName },
@@ -119,6 +122,9 @@ const stack = {
                 JobDefinitionName: cf.join('-', [cf.stackName, 'build-job']),
                 RetryStrategy: {
                     Attempts: 1
+                },
+                Timeout: {
+                    AttemptDurationSeconds: 2 * 60 * 60 // 2hr timeout
                 },
                 Parameters: { },
                 ContainerProperties: {
@@ -148,6 +154,9 @@ const stack = {
                     Attempts: 1
                 },
                 Parameters: { },
+                Timeout: {
+                    AttemptDurationSeconds: 2 * 60 * 60 // 2hr timeout
+                },
                 ContainerProperties: {
                     Command: ['python', './task.py'],
                     Environment: [
@@ -173,6 +182,9 @@ const stack = {
                 JobDefinitionName: cf.join('-', [cf.stackName, 'vectorize-job']),
                 RetryStrategy: {
                     Attempts: 1
+                },
+                Timeout: {
+                    AttemptDurationSeconds: 2 * 60 * 60 // 2hr timeout
                 },
                 Parameters: { },
                 ContainerProperties: {
