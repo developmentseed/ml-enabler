@@ -11,10 +11,15 @@
     ],
     "properties": {
         "name": {
-            "type": "string"
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 40,
+            "description": "Human readable Project name"
         },
         "source": {
-            "type": "string"
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 40
         },
         "project_url": {
             "type": "string"
@@ -26,7 +31,8 @@
             "$ref": "./util/project-access.json"
         },
         "notes": {
-            "type": "string"
+            "type": "string",
+            "default": ""
         },
         "users": {
             "$ref": "./util/project-users.json"
