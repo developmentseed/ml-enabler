@@ -39,6 +39,7 @@ class Task {
         if (!opts.silent) opts.silent = false;
 
         const tmp = os.tmpdir() + '/' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        mkdir(tmp);
 
         if (!opts.silent) console.error(`ok - tmp dir: ${tmp}`);
         for (const opt of ['url', 'token', 'model', 'ecr', 'task']) {
@@ -147,6 +148,7 @@ function get_iteration(opts, project, iteration) {
         request({
             method: 'GET',
             url: `${opts.url}/api/project/${project}/iteration/${iteration}`,
+            json: true,
             auth: {
                 bearer: opts.token
             }
@@ -154,7 +156,7 @@ function get_iteration(opts, project, iteration) {
             if (err) return reject(err);
 
             if (res.statusCode === 200) {
-                return resolve(res);
+                return resolve(res.body);
             } else {
                 return reject(res.statusCode + ':' + typeof res.body === 'object' ? JSON.stringify(res.body) : res.body);
             }
@@ -298,6 +300,8 @@ function dockerd() {
                 setTimeout(() => {
                     return resolve(dockerd);
                 }, 5000);
+            } else if (/ensure docker is not running/.test(data)) {
+                return resolve(dockerd);
             }
         }).on('error', (err) => {
             return reject(err);
