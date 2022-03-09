@@ -19,16 +19,16 @@ class Task {
     /**
      * Take an input file and output a TileBase file
      *
-     * @param {String} input GeoJSON input path
-     * @param {Object} opts Options Object
-     * @param {object} [opts.tmp=./data]    Temp Folder
-     * @param {string} opts.url             MLEnabler API URL
-     * @param {string} opts.token           MLEnabler API Token
-     * @param {string} opts.project         MLEnabler Project ID
-     * @param {string} opts.iteration       MLEnabler Iteration ID
-     * @param {string} opts.submission      MLEnabler Submission ID
-     * @param {string} [opts.bucket=false]  S3 Bucket to put data - if omitted, data is not uploaded
-     * @param {boolean} [opts.silent=false] Should output be squelched
+     * @param {String}  input                   GeoJSON input path
+     * @param {Object}  opts                    Options Object
+     * @param {object}  [opts.tmp=./data]       Temp Folder
+     * @param {string}  opts.url                MLEnabler API URL
+     * @param {string}  opts.token              MLEnabler API Token
+     * @param {string}  opts.project            MLEnabler Project ID
+     * @param {string}  opts.iteration          MLEnabler Iteration ID
+     * @param {string}  opts.submission         MLEnabler Submission ID
+     * @param {string}  [opts.bucket=false]     S3 Bucket to put data - if omitted, data is not uploaded
+     * @param {boolean} [opts.silent=false]     Should output be squelched
      */
     static async vectorize(input, opts = {}) {
         if (!opts.tmp) opts.tmp = new URL('./data/', import.meta.url).pathname;
@@ -161,11 +161,13 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     });
 
 
-    console.log('ok - starting Task.vectorize');
-    console.log(`ok - bucket: ${args.bucket}`);
-    console.log(`ok - project: ${args.project}`);
-    console.log(`ok - iteration: ${args.iteration}`);
-    console.log(`ok - submission: ${args.submission}`);
+    if (!args.silent) {
+        console.log('ok - starting Task.vectorize');
+        console.log(`ok - bucket: ${args.bucket}`);
+        console.log(`ok - project: ${args.project}`);
+        console.log(`ok - iteration: ${args.iteration}`);
+        console.log(`ok - submission: ${args.submission}`);
+    }
 
     Task.vectorize(args.input, {
         tmp: args.tmp,

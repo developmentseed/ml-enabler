@@ -125,7 +125,7 @@ const stack = {
                     Command: ['./task.js'],
                     Environment: [
                         { Name: 'StackName' , Value: cf.stackName },
-                        { Name: 'BATCH_ECR' , Value: cf.ref('BatchECR') },
+                        { Name: 'BATCH_ECR' , Value: cf.join([cf.accountId, '.dkr.ecr.', cf.region, '.amazonaws.com/', cf.ref('BatchECR')]) },
                         { Name: 'AWS_ACCOUNT_ID', Value: cf.accountId },
                         { Name: 'AWS_REGION', Value: cf.region },
                         { Name: 'API_URL', Value: cf.join(['http://', cf.getAtt('MLEnablerELB', 'DNSName')]) }
