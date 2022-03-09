@@ -49,7 +49,7 @@ export default {
         this.getProjectUsers();
     },
     methods: {
-        addUser: function() {
+        addUser: async function() {
             for (const user of this.users) {
                 if (this.search.user.id === user.uid) {
                     this.search.user = null;
@@ -57,13 +57,21 @@ export default {
                 }
             }
 
-            this.users.push({
-                uid: this.search.user.id,
-                username: this.search.user.username,
-                access: 'read'
-            });
+            try {
+                await window.std(`/api/project/${this.proj.id}/user`, {
+                    method: 'POST',
+                    body: {
+                        uid: this.search.user.id,
+                        access: 'read'
+                    }
+                });
+            } catch (err) {
+                this.$emit('err', err);
+            }
 
             this.search.user = null;
+
+            this.getProjectUsers();
         },
         getProjectUsers: async function() {
             try {

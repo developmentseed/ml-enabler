@@ -1,0 +1,13 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "uid": {
+            "type": "ineger",
+            "description": "User ID to add to project"
+        },
+        "access": {
+            "$ref": "./util/access.json"
+        }
+    }
+}
