@@ -5,7 +5,7 @@ const unzipper = require('unzipper');
 const find = require('find');
 const request = require('request');
 const mkdir = require('mkdirp').sync;
-const { pipeline } = require('stream/promises');
+const { pipeline } = require('stream');
 const fs = require('fs');
 const fse = require('fs-extra');
 const os = require('os');
@@ -217,38 +217,45 @@ function std_model(tmp, iteration) {
     }
 }
 
-async function download(tmp, model, iteration) {
+function download(tmp, model, iteration) {
     console.error(`ok - fetching ${model}`);
 
-    if (iteration.model_type === 'tensorflow') {
-        const loc = path.resolve(tmp, 'model.zip');
+    return new Promise((resolve, reject) => {
+        if (iteration.model_type === 'tensorflow') {
+            const loc = path.resolve(tmp, 'model.zip');
 
-        await pipeline(
-            s3.getObject({
-                Bucket: model.split('/')[0],
-                Key: model.split('/').splice(1).join('/')
-            }).createReadStream(),
-            unzipper.Extract({
-                path: path.resolve(tmp, '/src')
-            })
-        );
+            pipeline(
+                s3.getObject({
+                    Bucket: model.split('/')[0],
+                    Key: model.split('/').splice(1).join('/')
+                }).createReadStream(),
+                unzipper.Extract({
+                    path: path.resolve(tmp, '/src')
+                })
+                , (err) => {
+                    if (err) return reject(err);
 
-        console.error(`ok - saved: ${loc}`);
-        return loc;
-    } else if (iteration.model_type === 'pytorch') {
-        const loc = path.resolve(tmp, 'model.mar');
+                    console.error(`ok - saved: ${loc}`);
+                    return resolve(loc);
+                });
+        } else if (iteration.model_type === 'pytorch') {
+            const loc = path.resolve(tmp, 'model.mar');
 
-        await pipeline(
-            s3.getObject({
-                Bucket: model.split('/')[0],
-                Key: model.split('/').splice(1).join('/')
-            }).createReadStream(),
-            fs.createWriteStream(loc)
-        );
-        console.error(`ok - saved: ${loc}`);
+            pipeline(
+                s3.getObject({
+                    Bucket: model.split('/')[0],
+                    Key: model.split('/').splice(1).join('/')
+                }).createReadStream(),
+                fs.createWriteStream(loc)
+                , (err) => {
+                    if (err) return reject(err);
 
-        return loc;
-    }
+                    console.error(`ok - saved: ${loc}`);
+
+                    return resolve(loc);
+                });
+        }
+    });
 }
 
 function dockerd() {
