@@ -89,7 +89,7 @@ if (require.main === module) {
             token: process.env.TOKEN,
             model: process.env.MODEL,
             ecr: process.env.BATCH_ECR,
-            tasl: process.env.TASK_ID
+            task: process.env.TASK_ID
         }
     });
 
@@ -100,7 +100,14 @@ if (require.main === module) {
         console.log(`ok - model: ${args.model}`);
     }
 
-    Task.build(args);
+    (async () => {
+        try {
+            await Task.build(args);
+        } catch (err) {
+            console.error(err);
+            process.exit(1);
+        }
+    })()
 }
 
 function get_project_id(model) {

@@ -26,10 +26,12 @@
             "$ref": "./util/updated.json"
         },
         "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Human readable name of the Imagery source"
         },
         "url": {
-            "type": "string"
+            "type": "string",
+            "description": "URL to the imagery source"
         },
         "fmt": {
             "type": "string"
