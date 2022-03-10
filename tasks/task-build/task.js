@@ -107,7 +107,7 @@ if (require.main === module) {
             console.error(err);
             process.exit(1);
         }
-    })()
+    })();
 }
 
 function get_project_id(model) {
@@ -347,7 +347,7 @@ async function docker(opts, tmp, model, iteration) {
 
     await s3.putObject({
         Bucket: model.split('/')[0],
-        Key: model.split('/').splice(1).join('/').replace(/model\.zip/, `docker-${tagged_model}.tar.gz`),
+        Key: model.split('/').splice(1).join('/').replace(/model\.(mar|zip)/, `docker-${tagged_model}.tar.gz`),
         Body: fs.createReadStream(path.resolve(tmp, `docker-${tagged_model}.tar.gz`))
     }).promise();
 
@@ -355,7 +355,7 @@ async function docker(opts, tmp, model, iteration) {
 
     return {
         docker: `${opts.ecr}:${tagged_model}`,
-        save: model.split('/')[0] + '/' + model.split('/').splice(1).join('/').replace(/model\.zip/, `docker-${tagged_model}.tar.gz`)
+        save: model.split('/')[0] + '/' + model.split('/').splice(1).join('/').replace(/model\.(zip|mar)/, `docker-${tagged_model}.tar.gz`)
     };
 }
 
