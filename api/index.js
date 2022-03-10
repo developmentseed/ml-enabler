@@ -175,10 +175,17 @@ async function server(args, config, cb) {
 
     schema.router.param('pid', async (req, res, next, pid) => {
         try {
-            if (req.user.access === 'admin') {
+            if ((req.user && req.user.access === 'admin') || (req.token && req.token.access === 'admin'))  {
                 req.project = await Project.from(config.pool, pid);
             } else {
-                req.project = await Project.from(config.pool, pid, req.user.id);
+                let uid;
+                if (req.user) {
+                    uid = req.user.id;
+                } else if (req.token) {
+                    uid = req.token.id;
+                }
+
+                req.project = await Project.from(config.pool, pid, uid);
             }
         } catch (err) {
             return Err.respond(err, res);
