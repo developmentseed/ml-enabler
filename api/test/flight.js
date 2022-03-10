@@ -146,7 +146,7 @@ class Flight {
                 method: 'POST',
                 body: {
                     username: username,
-                    password: 'test',
+                    password: 'testing123',
                     email: `${username}@example.com`
                 }
             });
@@ -169,9 +169,11 @@ class Flight {
                 method: 'POST',
                 body: {
                     username: username,
-                    password: 'test'
+                    password: 'testing123'
                 }
             });
+
+            if (login.statusCode !== 200) throw new Error(login.body.message);
 
             this.token[username] = login.body.token;
             t.end();

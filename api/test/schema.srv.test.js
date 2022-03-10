@@ -121,11 +121,14 @@ test('GET: api/schema?method=POST&url=/login', async (t) => {
                 properties: {
                     username: {
                         type: 'string',
-                        description: 'username'
+                        description: 'username',
+                        minLength: 2,
+                        maxLength: 40
                     },
                     password: {
                         type: 'string',
-                        description: 'password'
+                        description: 'password',
+                        minLength: 8
                     }
                 }
             },
