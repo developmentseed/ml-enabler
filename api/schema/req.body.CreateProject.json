@@ -18,7 +18,6 @@
         },
         "source": {
             "type": "string",
-            "default": "",
             "minLength": 2,
             "maxLength": 40
         },
