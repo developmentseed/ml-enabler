@@ -18,7 +18,8 @@
         "inf_supertile",
         "version",
         "hint",
-        "imagery_id"
+        "imagery_id",
+        "gitsha"
     ],
     "additionalProperties": false,
     "properties": {

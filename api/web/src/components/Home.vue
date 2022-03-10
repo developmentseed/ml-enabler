@@ -68,7 +68,6 @@
                                     <svg class='icon' style='height: 15px; width: 15px;'><use xlink:href='#icon-github'/></svg>
                                 </div>
 
-
                                 <div v-if='project.stacks.length' class='fr bg-green-faint bg-green-on-hover color-white-on-hover color-green inline-block px6 py3 round txt-xs txt-bold mr3'>
                                     Active Stack
                                 </div>

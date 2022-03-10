@@ -11,7 +11,8 @@
         "archived",
         "tags",
         "access",
-        "notes"
+        "notes",
+        "repo"
     ],
     "properties": {
         "id": {

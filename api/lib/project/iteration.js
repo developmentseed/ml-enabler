@@ -121,7 +121,7 @@ class ProjectIteration extends Generic {
                     ${iter.tile_zoom},
                     ${iter.version},
                     ${iter.model_type},
-                    ${iter.gitsha || ''}
+                    ${iter.gitsha || null}
                 ) RETURNING *
             `);
 

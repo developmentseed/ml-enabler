@@ -11,7 +11,7 @@
     <template v-if='!folding'>
         <div class='col col--12'>
             <label>GitSha</label>
-            <input :disabled='disabled' v-model='version' class='input' placeholder='GitSha'/>
+            <input :disabled='disabled' v-model='gitsha' class='input' placeholder='GitSha'/>
         </div>
     </template>
 </div>
@@ -29,7 +29,7 @@ export default {
     },
     data: function() {
         return {
-            version: '',
+            gitsha: '',
             folding: true
         }
     },
@@ -39,7 +39,7 @@ export default {
         }
     },
     watch: {
-        version: function() {
+        gitsha: function() {
             this.$emit('gitsha', this.gitsha);
         }
     }

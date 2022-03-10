@@ -144,7 +144,7 @@ export default {
     methods: {
         postProject: async function(archive) {
             let error = false;
-            if (this.project.repo && !this.project.repo.match(/https:\/\/github.com\/[a-z\-]+\/[a-z\-]+/)) {
+            if (this.project.repo && !this.project.repo.match(/https:\/\/github.com\/[a-z-]+\/[a-z-]+/)) {
                 this.errors.repo = true;
                 error = true
             }

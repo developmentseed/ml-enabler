@@ -23,7 +23,8 @@
                     "archived",
                     "project_url",
                     "access",
-                    "stacks"
+                    "stacks",
+                    "repo"
                 ],
                 "additionalProperties": false,
                 "properties": {
