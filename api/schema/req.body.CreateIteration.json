@@ -54,7 +54,9 @@
             "type": "integer"
         },
         "gitsha": {
-            "type": "string"
+            "type": "string",
+            "minLength": 7,
+            "maxLength": 40
         }
     }
 }
