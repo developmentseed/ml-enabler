@@ -46,6 +46,13 @@
                     :disabled='true'
                 />
             </div>
+
+            <div class='col col--12 pt6'>
+                <InfGitSha
+                    :_gitsha='iteration.gitsha'
+                    :disabled='true'
+                />
+            </div>
         </div>
     </div>
 </template>
@@ -57,6 +64,7 @@ import InfVersion from './../util/InfVersion.vue';
 import InfType from './../util/InfType.vue';
 import InfList from './../util/InfList.vue';
 import InfImagery from './../util/InfImagery.vue';
+import InfGitSha from './../util/InfGitSha.vue';
 
 export default {
     name: 'Config',
@@ -67,6 +75,7 @@ export default {
         InfType,
         InfList,
         InfImagery,
+        InfGitSha,
         IterationHeader,
     }
 }
