@@ -254,7 +254,8 @@ test('GET: /project', async (t) => {
                 project_url: 'example.com/test',
                 archived: false,
                 access: 'private',
-                stacks: []
+                stacks: [],
+                repo: null
             }]
         });
     } catch (err) {
