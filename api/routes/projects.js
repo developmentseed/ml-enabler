@@ -32,7 +32,7 @@ async function router(schema, config) {
             const list = await Project.list(config.pool, req.query);
 
             let stacks = [];
-            if (config.Environment) {
+            if (config.Environment === 'aws') {
                 stacks = (await Stack.list(config.StackName + '-')).map((s) => {
                     return s.StackName;
                 });

@@ -95,6 +95,9 @@ const stack = {
                     Attempts: 1
                 },
                 Parameters: { },
+                Timeout: {
+                    AttemptDurationSeconds: 2 * 60 * 60 // 2hr timeout
+                },
                 ContainerProperties: {
                     Environment: [
                         { Name: 'StackName' , Value: cf.stackName },
@@ -120,12 +123,15 @@ const stack = {
                 RetryStrategy: {
                     Attempts: 1
                 },
+                Timeout: {
+                    AttemptDurationSeconds: 2 * 60 * 60 // 2hr timeout
+                },
                 Parameters: { },
                 ContainerProperties: {
                     Command: ['./task.js'],
                     Environment: [
                         { Name: 'StackName' , Value: cf.stackName },
-                        { Name: 'BATCH_ECR' , Value: cf.ref('BatchECR') },
+                        { Name: 'BATCH_ECR' , Value: cf.join([cf.accountId, '.dkr.ecr.', cf.region, '.amazonaws.com/', cf.ref('BatchECR')]) },
                         { Name: 'AWS_ACCOUNT_ID', Value: cf.accountId },
                         { Name: 'AWS_REGION', Value: cf.region },
                         { Name: 'API_URL', Value: cf.join(['http://', cf.getAtt('MLEnablerELB', 'DNSName')]) }
@@ -148,6 +154,9 @@ const stack = {
                     Attempts: 1
                 },
                 Parameters: { },
+                Timeout: {
+                    AttemptDurationSeconds: 2 * 60 * 60 // 2hr timeout
+                },
                 ContainerProperties: {
                     Command: ['python', './task.py'],
                     Environment: [
@@ -173,6 +182,9 @@ const stack = {
                 JobDefinitionName: cf.join('-', [cf.stackName, 'vectorize-job']),
                 RetryStrategy: {
                     Attempts: 1
+                },
+                Timeout: {
+                    AttemptDurationSeconds: 2 * 60 * 60 // 2hr timeout
                 },
                 Parameters: { },
                 ContainerProperties: {

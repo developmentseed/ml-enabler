@@ -20,7 +20,7 @@ import Upload from '../util/Upload.vue';
 
 export default {
     name: 'UploadPrediction',
-    props: ['prediction', 'type'],
+    props: ['iteration', 'type'],
     data: function() {
         return {
             label: '',
@@ -37,6 +37,12 @@ export default {
         if (this.type === 'inferences') {
             this.label = 'Drop labels.geojson here';
             this.filetype = 'application/geo+json';
+        } else if (this.iteration.model_type === 'pytorch') {
+            this.label = `Drop pytorch.mar here`;
+            this.filetype = 'application/octet-stream';
+        } else if (this.iteration.model_type === 'tensorflow') {
+            this.label = `Drop ${this.type}.zip here`;
+            this.filetype = 'application/zip';
         } else {
             this.label = `Drop ${this.type}.zip here`;
             this.filetype = 'application/zip';

@@ -8,14 +8,20 @@
     "properties": {
         "username": {
             "type": "string",
+            "minLength": 2,
+            "maxLength": 40,
             "description": "username"
         },
         "password": {
             "type": "string",
+            "minLength": 2,
+            "maxLength": 40,
             "description": "password"
         },
         "email": {
             "type": "string",
+            "minLength": 2,
+            "maxLength": 320,
             "description": "email"
         }
     }

@@ -30,6 +30,68 @@ async function router(schema, config) {
             return Err.respond(err, res);
         }
     });
+
+    /**
+     * @api {post} /api/project/:pid/user Add User
+     * @apiVersion 1.0.0
+     * @apiName CreateProjectAccess
+     * @apiGroup ProjectAccess
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Create another project user
+     *
+     * @apiSchema (Body) {jsonschema=../schema/req.body.CreateProjectAccess.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.ProjectAccess.json} apiSuccess
+     */
+    await schema.post('/project/:pid/user', {
+        ':pid': 'integer',
+        ':id': 'integer',
+        body: 'req.body.CreateProjectAccess.json',
+        res: 'res.ListProjectAccess.json'
+    }, async (req, res) => {
+        try {
+            await User.is_auth(req);
+
+            req.body.pid = req.params.pid;
+            const access = await ProjectAccess.generate(config.pool, req.body);
+            return res.json(access.serialize());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
+     * @api {patch} /api/project/:pid/user/:id Patch User
+     * @apiVersion 1.0.0
+     * @apiName PatchProjectAccess
+     * @apiGroup ProjectAccess
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Create another project user
+     *
+     * @apiSchema (Body) {jsonschema=../schema/req.body.PatchProjectAccess.json} apiParam
+     * @apiSchema {jsonschema=../schema/res.ProjectAccess.json} apiSuccess
+     */
+    await schema.patch('/project/:pid/user/:id', {
+        ':pid': 'integer',
+        ':id': 'integer',
+        body: 'req.body.PatchProjectAccess.json',
+        res: 'res.ProjectAccess.json'
+    }, async (req, res) => {
+        try {
+            await User.is_auth(req);
+
+            const access = await ProjectAccess.from(config.pool, req.params.id);
+            access.patch(req.body);
+            await access.commit(config.pool);
+
+            return res.json(access.serialize());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
 }
 
 module.exports = router;

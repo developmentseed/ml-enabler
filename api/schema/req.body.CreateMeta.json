@@ -7,7 +7,9 @@
     "additionalProperties": false,
     "properties": {
         "key": {
-            "type": "string"
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 40
         },
         "value": {
             "$ref": "./util/any.json"

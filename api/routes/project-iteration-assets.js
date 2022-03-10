@@ -44,7 +44,12 @@ async function router(schema, config) {
         let iter, file, key;
         try {
             iter = await Iteration.from(config.pool, req.params.iterationid);
-            key = `project/${req.params.pid}/iteration/${req.params.iterationid}/${req.query.type}.zip`;
+
+            if (iter.model_type === 'pytorch') {
+                key = `project/${req.params.pid}/iteration/${req.params.iterationid}/model.mar`;
+            } else {
+                key = `project/${req.params.pid}/iteration/${req.params.iterationid}/${req.query.type}.zip`;
+            }
         } catch (err) {
             return Err.respond(err, res);
         }

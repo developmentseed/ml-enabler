@@ -9,17 +9,19 @@
     "additionalProperties": false,
     "properties": {
         "id": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Token ID"
         },
         "name": {
             "type": "string",
             "description": "Human Readable name of the API Token"
         },
         "token": {
-            "type": "string"
+            "type": "string",
+            "description": "API Token (Only returned once at creation time)"
         },
         "created": {
-            "type": "integer"
+            "$ref": "./util/created.json"
         }
     }
 }

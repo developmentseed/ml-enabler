@@ -1,0 +1,10 @@
+{
+    "type": "array",
+    "description": "GeoJSON bounds Array",
+    "minItems": 4,
+    "maxItems": 4,
+    "items": {
+        "type": "number",
+        "description": "GeoJSON bounds Coordinate"
+    }
+}

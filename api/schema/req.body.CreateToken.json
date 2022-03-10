@@ -7,6 +7,8 @@
     "properties": {
         "name": {
             "type": "string",
+            "minLength": 2,
+            "maxLength": 40,
             "description": "Human Readable name of the API Token"
         }
     }

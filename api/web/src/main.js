@@ -32,6 +32,7 @@ import Export  from './components/iteration/Export.vue';
 import Map  from './components/iteration/Map.vue';
 import Stack from './components/iteration/Stack.vue';
 import PredTasks from './components/iteration/PredTasks.vue';
+import TaskLogs from './components/iteration/tasks/Logs.vue';
 
 Vue.use(VueRouter);
 Vue.use(FloatingVue);
@@ -107,7 +108,11 @@ const router = new VueRouter({
                 },{
                     name: 'tasks',
                     path: 'tasks',
-                    component: PredTasks
+                    component: PredTasks,
+                },{
+                    name: 'tasklogs',
+                    path: 'tasks/:taskid/logs',
+                    component: TaskLogs
                 },{
                     name: 'map',
                     path: 'map',

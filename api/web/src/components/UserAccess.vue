@@ -1,33 +1,31 @@
 <template>
-    <div class="col col--12">
-        <div class='w-full ml12 border-b border--gray-light mb12'/>
-
-        <div :key='user.uid' v-for='(user, user_idx) in users' class='col col--12 grid grid--gut12 my3'>
-            <div class='col col--8'>
-                <button @click='users.splice(user_idx, 1)' class='fl mr12 round btn btn--s mt6 btn--stroke color-gray'><svg class='icon'><use xlink:href='#icon-close'/></svg></button>
-                <span v-text='user.username'/>
-            </div>
-            <div class='col col--4'>
-                <div class='select-container fr'>
-                    <select v-model='user.access' class='select select--stroke'>
-                        <option>read</option>
-                        <option>write</option>
-                        <option>admin</option>
-                    </select>
-                    <div class='select-arrow'></div>
-                </div>
+<div class='grid col col--12'>
+    <div :key='user.id' v-for='(user, user_idx) in users' class='col col--12 grid grid--gut12 my3'>
+        <div class='col col--8'>
+            <button @click='users.splice(user_idx, 1)' class='fl mr12 round btn btn--s mt6 btn--stroke color-gray'><svg class='icon'><use xlink:href='#icon-close'/></svg></button>
+            <span v-text='user.username'/>
+        </div>
+        <div class='col col--4'>
+            <div class='select-container fr'>
+                <select v-on:change='modifyUser(user)' v-model='user.access' class='select select--stroke'>
+                    <option>read</option>
+                    <option>user</option>
+                    <option>admin</option>
+                </select>
+                <div class='select-arrow'></div>
             </div>
         </div>
-
-        <label class='ml12'>Add User to Project</label>
-        <vSelect
-            label='username'
-            class='ml12 w-full'
-            v-model='search.user'
-            :options='search.users'
-            @input='addUser'
-        />
     </div>
+
+    <label class='ml12'>Add User to Project</label>
+    <vSelect
+        label='username'
+        class='ml12 w-full'
+        v-model='search.user'
+        :options='search.users'
+        @input='addUser'
+    />
+</div>
 </template>
 
 <script>
@@ -51,7 +49,7 @@ export default {
         this.getProjectUsers();
     },
     methods: {
-        addUser: function() {
+        addUser: async function() {
             for (const user of this.users) {
                 if (this.search.user.id === user.uid) {
                     this.search.user = null;
@@ -59,25 +57,46 @@ export default {
                 }
             }
 
-            this.users.push({
-                uid: this.search.user.id,
-                username: this.search.user.username,
-                access: 'read'
-            });
+            try {
+                await window.std(`/api/project/${this.proj.id}/user`, {
+                    method: 'POST',
+                    body: {
+                        uid: this.search.user.id,
+                        access: 'read'
+                    }
+                });
+            } catch (err) {
+                this.$emit('err', err);
+            }
 
             this.search.user = null;
+
+            this.getProjectUsers();
+        },
+        modifyUser: async function(user) {
+            try {
+                await window.std(`/api/project/${this.proj.id}/user/${user.id}`, {
+                    method: 'PATCH',
+                    body: {
+                        access: user.access
+                    }
+                });
+            } catch (err) {
+                this.$emit('err', err);
+            }
         },
         getProjectUsers: async function() {
             try {
-                const users = await window.std(`/api/project/${this.proj.id}/user`);
-                this.users = users.access;
+                const list = await window.std(`/api/project/${this.proj.id}/user`);
+                this.users = list.projects_access;
             } catch (err) {
                 this.$emit('err', err);
             }
         },
         getUsers: async function() {
             try {
-                this.search.users = (await window.std('/api/user')).users;
+                const list = await window.std('/api/user');
+                this.search.users = list.users;
             } catch (err) {
                 this.$emit('err', err);
             }

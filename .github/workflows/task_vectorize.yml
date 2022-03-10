@@ -1,4 +1,4 @@
-name: AWS ECR Task
+name: Task-Vectorize
 
 on: [push]
 
@@ -10,6 +10,12 @@ jobs:
 
             - name: Docker Build Task
               run: docker build -t task-vectorize tasks/task-vectorize/
+
+            - name: npm lint
+              run: docker run task-vectorize npm run lint
+
+            - name: npm test
+              run: docker run task-vectorize npm test
 
             - name: Configure AWS Credentials
               uses: aws-actions/configure-aws-credentials@v1
