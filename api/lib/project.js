@@ -54,7 +54,8 @@ class Project extends Generic {
                     projects.source,
                     projects.archived,
                     projects.project_url,
-                    projects.access
+                    projects.access,
+                    projects.repo
                 FROM
                     projects,
                     projects_access
