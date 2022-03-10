@@ -18,11 +18,13 @@
         },
         "source": {
             "type": "string",
+            "default": "",
             "minLength": 2,
             "maxLength": 40
         },
         "project_url": {
-            "type": "string"
+            "type": "string",
+            "default": ""
         },
         "tags": {
             "$ref": "./util/project-tags.json"
