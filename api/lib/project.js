@@ -104,7 +104,7 @@ class Project extends Generic {
                         tags        = ${JSON.stringify(this.tags)}::JSONB,
                         access      = ${this.access},
                         notes       = ${this.notes},
-                        repo        = ${this.repo || ''},
+                        repo        = ${this.repo || null},
                         updated     = NOW()
                     WHERE
                         id = ${this.id}
@@ -199,7 +199,7 @@ class Project extends Generic {
                     ${JSON.stringify(prj.tags)}::JSONB,
                     ${prj.access},
                     ${prj.notes},
-                    ${prj.repo || ''}
+                    ${prj.repo || null}
                 ) RETURNING *
             `);
 

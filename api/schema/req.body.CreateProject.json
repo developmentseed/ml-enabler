@@ -7,8 +7,7 @@
         "project_url",
         "tags",
         "access",
-        "users",
-        "repo"
+        "users"
     ],
     "properties": {
         "name": {

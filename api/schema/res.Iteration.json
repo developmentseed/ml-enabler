@@ -78,7 +78,7 @@
             "type": "integer"
         },
         "gitsha": {
-            "type": "string"
+            "type": ["string", "null"]
         }
     }
 }
