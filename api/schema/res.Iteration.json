@@ -76,6 +76,9 @@
         },
         "imagery_id": {
             "type": "integer"
+        },
+        "gitsha": {
+            "type": "string"
         }
     }
 }

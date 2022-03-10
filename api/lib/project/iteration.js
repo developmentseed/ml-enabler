@@ -52,7 +52,8 @@ class ProjectIteration extends Generic {
                     model_link,
                     checkpoint_link,
                     tfrecord_link,
-                    save_link
+                    save_link,
+                    gitsha
                 FROM
                     iterations
                 WHERE
@@ -107,7 +108,8 @@ class ProjectIteration extends Generic {
                     inf_type,
                     tile_zoom,
                     version,
-                    model_type
+                    model_type,
+                    gitsha
                 ) VALUES (
                     ${iter.pid},
                     ${iter.hint},
@@ -118,7 +120,8 @@ class ProjectIteration extends Generic {
                     ${iter.inf_type},
                     ${iter.tile_zoom},
                     ${iter.version},
-                    ${iter.model_type}
+                    ${iter.model_type},
+                    ${iter.gitsha || ''}
                 ) RETURNING *
             `);
 

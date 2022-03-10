@@ -22,6 +22,9 @@
         },
         "notes": {
             "type": "string"
+        },
+        "repo": {
+            "type": "string"
         }
     }
 }
