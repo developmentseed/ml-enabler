@@ -60,8 +60,12 @@
                                 </div>
                             </div>
                             <div class='col col--6'>
-                                <div @click.prevent.stop='external(project.projectUrl)' class='fr bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>
+                                <div v-if='project.project_url' @click.prevent.stop='external(project.project_url)' class='fr bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer mr3'>
                                     Project Page
+                                </div>
+
+                                <div v-if='project.repo' @click.prevent.stop='external(project.repo)' class='fr bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer mr3'>
+                                    <svg class='icon' style='height: 15px; width: 15px;'><use xlink:href='#icon-github'/></svg>
                                 </div>
 
                                 <div v-if='project.stacks.length' class='fr bg-green-faint bg-green-on-hover color-white-on-hover color-green inline-block px6 py3 round txt-xs txt-bold mr3'>

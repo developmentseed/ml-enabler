@@ -13,7 +13,7 @@
                     <svg class='icon'><use href='#icon-close'/></svg>
                 </button>
 
-                <button v-if='project.projectUrl' @click='external(project.projectUrl)' class='mr12 btn fr round btn--stroke color-gray color-black-on-hover'>
+                <button v-if='project.project_url' @click='external(project.project_url)' class='mr12 btn fr round btn--stroke color-gray color-black-on-hover'>
                     <svg class='icon'><use href='#icon-link'/></svg>
                 </button>
 
@@ -87,6 +87,11 @@
                                     <div v-if='iter.model_link' class='fr mx3 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>
                                         Model
                                     </div>
+
+                                    <div v-if='project.repo && iter.gitsha' @click.prevent.stop='external(project.repo + "/commit/" + iter.gitsha)' class='fr bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer mx3'>
+                                        <svg class='icon' style='height: 15px; width: 15px;'><use xlink:href='#icon-github'/></svg>
+                                    </div>
+
                                     <div v-if='iter.save_link' class='fr mx3 bg-blue-faint bg-blue-on-hover color-white-on-hover color-blue inline-block px6 py3 round txt-xs txt-bold cursor-pointer'>
                                         Container
                                     </div>

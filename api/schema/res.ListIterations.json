@@ -66,6 +66,9 @@
                     "stack": {
                         "type": "boolean",
                         "description": "Is there is an inference stack running"
+                    },
+                    "gitsha": {
+                        "type": ["string", "null"]
                     }
                 }
             }

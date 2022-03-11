@@ -54,7 +54,8 @@ class Project extends Generic {
                     projects.source,
                     projects.archived,
                     projects.project_url,
-                    projects.access
+                    projects.access,
+                    projects.repo
                 FROM
                     projects,
                     projects_access
@@ -104,6 +105,7 @@ class Project extends Generic {
                         tags        = ${JSON.stringify(this.tags)}::JSONB,
                         access      = ${this.access},
                         notes       = ${this.notes},
+                        repo        = ${this.repo || null},
                         updated     = NOW()
                     WHERE
                         id = ${this.id}
@@ -141,7 +143,8 @@ class Project extends Generic {
                     projects.project_url,
                     projects.access,
                     projects.tags,
-                    projects.notes
+                    projects.notes,
+                    projects.repo
                 FROM
                     projects,
                     projects_access
@@ -177,6 +180,7 @@ class Project extends Generic {
      * @param {object[]}    prj.tags            Project Billing Tags
      * @param {string}      prj.access          Project Access (public/private)
      * @param {string}      prj.notes           Project Notes
+     * @param {string}      prj.repo            Project Git Repo
      */
     static async generate(pool, prj) {
         try {
@@ -187,14 +191,16 @@ class Project extends Generic {
                     project_url,
                     tags,
                     access,
-                    notes
+                    notes,
+                    repo
                 ) VALUES (
                     ${prj.name},
                     ${prj.source},
                     ${prj.project_url},
                     ${JSON.stringify(prj.tags)}::JSONB,
                     ${prj.access},
-                    ${prj.notes}
+                    ${prj.notes},
+                    ${prj.repo || null}
                 ) RETURNING *
             `);
 

@@ -26,6 +26,7 @@
             "default": "created",
             "enum": [
                 "id",
+                "repo",
                 "created",
                 "updated",
                 "name",

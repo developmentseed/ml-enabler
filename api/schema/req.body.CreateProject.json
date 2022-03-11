@@ -22,7 +22,8 @@
             "maxLength": 40
         },
         "project_url": {
-            "type": "string"
+            "type": "string",
+            "default": ""
         },
         "tags": {
             "$ref": "./util/project-tags.json"
@@ -36,6 +37,11 @@
         },
         "users": {
             "$ref": "./util/project-users.json"
+        },
+        "repo": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 128
         }
     }
 }

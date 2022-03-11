@@ -70,25 +70,39 @@
                 <template v-if='showAdvanced'>
                     <div class='w-full ml12 border-b border--gray-light mb12'/>
 
+                    <div class='col col--12 grid'>
+                        <label>Git Repository</label>
+
+                        <input v-model='project.repo' class='input' placeholder='https://github.com/example/repo' :class='{
+                            "border": errors.repo,
+                            "border--red": errors.repo
+                        }'/>
+
+                        <div v-if='errors.repo' class='col col--12 round py3 bg-red mt6 align-center color-white'>
+                            Repo must follow the format: https://github.com/&lt;user&gt;/&lt;repo&gt;
+                        </div>
+                    </div>
+
                     <div class='col col--12'>
                         <label>Stack Tags</label>
+
+                        <div class='col col--12 grid grid--gut12' :key='tag_idx' v-for='(tag, tag_idx) in project.tags'>
+                            <div class='col col--4 py6'>
+                                <input v-model='tag.Key' input='text' class='input w-full' placeholder='Key'/>
+                            </div>
+                            <div class='col col--7 py6'>
+                                <input v-model='tag.Value' input='text' class='input w-full' placeholder='Value'/>
+                            </div>
+                            <div class='col col--1 py6'>
+                                <button @click='project.tags.splice(tag_idx, 1)' class='btn btn--stroke round color-gray color-blue-on-hover h36'><svg class='icon'><use href='#icon-close'/></svg></button>
+                            </div>
+                        </div>
+
+                        <div class='col col--12 py6'>
+                            <button @click='project.tags.push({"Key": "", "Value": ""})' class='btn btn--stroke round color-gray color-blue-on-hover'><svg class='icon'><use href='#icon-plus'/></svg></button>
+                        </div>
                     </div>
 
-                    <div class='col col--12 grid grid--gut12' :key='tag_idx' v-for='(tag, tag_idx) in project.tags'>
-                        <div class='col col--4 py6'>
-                            <input v-model='tag.Key' input='text' class='input w-full' placeholder='Key'/>
-                        </div>
-                        <div class='col col--7 py6'>
-                            <input v-model='tag.Value' input='text' class='input w-full' placeholder='Value'/>
-                        </div>
-                        <div class='col col--1 py6'>
-                            <button @click='project.tags.splice(tag_idx, 1)' class='btn btn--stroke round color-gray color-blue-on-hover h36'><svg class='icon'><use href='#icon-close'/></svg></button>
-                        </div>
-                    </div>
-
-                    <div class='col col--12 py6'>
-                        <button @click='project.tags.push({"Key": "", "Value": ""})' class='btn btn--stroke round color-gray color-blue-on-hover'><svg class='icon'><use href='#icon-plus'/></svg></button>
-                    </div>
                 </template>
 
                 <div class='col col--12 py12'>
@@ -110,6 +124,9 @@ export default {
         return {
             showUser: false,
             showAdvanced: false,
+            errors: {
+                repo: false
+            },
             project: {
                 name: '',
                 notes: '',
@@ -126,6 +143,14 @@ export default {
     },
     methods: {
         postProject: async function(archive) {
+            let error = false;
+            if (this.project.repo && !this.project.repo.match(/https:\/\/github.com\/[a-z-]+\/[a-z-]+/)) {
+                this.errors.repo = true;
+                error = true
+            }
+
+            if (error) return;
+
             try {
                 await window.std(`/api/project/${this.$route.params.projectid}`, {
                     method: 'PATCH',
@@ -137,6 +162,7 @@ export default {
                         source: this.project.source,
                         project_url: this.project.project_url,
                         tags: this.project.tags,
+                        repo: this.project.repo || null
                     }
                 });
 

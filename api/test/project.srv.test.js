@@ -89,7 +89,8 @@ test('POST: /project', async (t) => {
             archived: false,
             tags: [{ Key: 'Billing', Value: 'Tags' }],
             access: 'private',
-            notes: 'I am a note'
+            notes: 'I am a note',
+            repo: null
         });
     } catch (err) {
         t.error(err, 'no error');
@@ -161,7 +162,8 @@ test('GET: /project/1', async (t) => {
             archived: false,
             tags: [{ Key: 'Billing', Value: 'Tags' }],
             access: 'private',
-            notes: 'I am a note'
+            notes: 'I am a note',
+            repo: null
         });
     } catch (err) {
         t.error(err, 'no error');
@@ -217,7 +219,8 @@ test('GET: /project/1 - server admin', async (t) => {
             archived: false,
             tags: [{ Key: 'Billing', Value: 'Tags' }],
             access: 'private',
-            notes: 'I am a note'
+            notes: 'I am a note',
+            repo: null
         });
     } catch (err) {
         t.error(err, 'no error');
@@ -251,7 +254,8 @@ test('GET: /project', async (t) => {
                 project_url: 'example.com/test',
                 archived: false,
                 access: 'private',
-                stacks: []
+                stacks: [],
+                repo: null
             }]
         });
     } catch (err) {

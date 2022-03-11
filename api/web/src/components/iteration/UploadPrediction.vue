@@ -6,7 +6,7 @@
                 :url='url'
                 :headers='headers'
                 :mimetype='filetype'
-                single=true
+                :single='true'
                 err='error($event)'
                 @ok='close'
             />

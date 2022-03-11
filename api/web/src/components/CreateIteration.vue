@@ -43,6 +43,13 @@
                     />
                 </div>
 
+                <div class='col col--12 pt6'>
+                    <InfGitSha
+                        @gitsha='iter.gitsha = $event'
+                        @err='$emit("err", $event)'
+                    />
+                </div>
+
                 <div class='col col--12 py12'>
                     <button @click='postIteration' class='btn btn--stroke round fr color-gray color-green-on-hover'>Add <span v-text='type'/></button>
                 </div>
@@ -58,6 +65,7 @@ import InfList from './util/InfList.vue';
 import InfVersion from './util/InfVersion.vue';
 import InfModel from './util/InfModel.vue';
 import InfImagery from './util/InfImagery.vue';
+import InfGitSha from './util/InfGitSha.vue';
 
 export default {
     name: 'CreateIteration',
@@ -76,7 +84,8 @@ export default {
                 model_type: 'tensorflow',
                 inf_type: 'classification',
                 inf_binary: false,
-                inf_supertile: false
+                inf_supertile: false,
+                gitsha: null
             }
         };
     },
@@ -102,7 +111,8 @@ export default {
                         inf_type: this.iter.inf_type,
                         inf_binary: this.iter.inf_binary,
                         inf_supertile: this.iter.inf_supertile,
-                        model_type: this.iter.model_type
+                        model_type: this.iter.model_type,
+                        gitsha: this.iter.gitsha
                     }
                 });
 
@@ -118,7 +128,8 @@ export default {
         InfList,
         InfVersion,
         InfModel,
-        InfImagery
+        InfImagery,
+        InfGitSha
     }
 }
 </script>

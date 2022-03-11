@@ -21,6 +21,7 @@
             "default": "created",
             "enum": [
                 "id",
+                "gitsha",
                 "created",
                 "updated",
                 "tile_zoom",
