@@ -10,7 +10,7 @@
                     <svg class='icon'><use href='#icon-refresh'/></svg>
                 </button>
 
-                <button v-if='complete.includes(stack.status)' @click='deleteStack' v-tooltip='"Delete Stack"' class='mr12 btn fr round btn--stroke color-gray color-red-on-hover'>
+                <button @click='deleteStack' v-tooltip='"Delete Stack"' class='mr12 btn fr round btn--stroke color-gray color-red-on-hover'>
                     <svg class='icon'><use href='#icon-trash'/></svg>
                 </button>
             </div>
