@@ -11,6 +11,15 @@ module.exports = {
             Type: 'String',
             Description: 'Name of parent stack'
         },
+        ModelType: {
+            Type: 'String',
+            Description: 'PyTorch or Tensorflow model',
+            Default: 'tensorflow',
+            AllowedValues: [
+                'tensorflow',
+                'pytorch'
+            ]
+        },
         ImageTag: {
             Type: 'String',
             Description: 'ECR Image tag to deploy'
@@ -200,7 +209,7 @@ module.exports = {
                 Port: 8501,
                 Protocol: 'HTTP',
                 VpcId: cf.importValue(cf.join([cf.ref('StackName'), '-vpc'])),
-                HealthCheckPath: '/v1/models/default',
+                HealthCheckPath: cf.findInMap('HealthCheck', cf.ref('ModelType'), 'PATH'),
                 Matcher: {
                     HttpCode: '200,202,302,304'
                 }
@@ -297,12 +306,12 @@ module.exports = {
                                 ])
                             }
                         },
-                        "services": {
-                            "sysvinit": {
+                        services: {
+                            sysvinit: {
                                 "cfn-hup": {
-                                    "enabled": "true",
-                                    "ensureRunning": "true",
-                                    "files": [
+                                    enabled: "true",
+                                    ensureRunning: "true",
+                                    files: [
                                         "/etc/cfn/cfn-hup.conf",
                                         "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
                                     ]
@@ -314,7 +323,7 @@ module.exports = {
             },
             Properties: {
                 SecurityGroups: [ cf.ref('PredECSHostSecurityGroup') ],
-                ImageId: { "Fn::FindInMap": [ "AWSRegionToAMI", cf.region, "AMIID" ] },
+                ImageId: cf.findInMap('AWSRegionToAMI', cf.region, 'AMIID'),
                 InstanceType: "p3.2xlarge",
                 IamInstanceProfile: cf.ref('PredInstanceProfile'),
                 BlockDeviceMappings: [{
@@ -493,6 +502,14 @@ module.exports = {
         AWSRegionToAMI: {
             DOCS: { LIST: 'http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html' },
             'us-east-1': { AMIID: 'ami-03ab174c20b61472c' }
+        },
+        HealthCheck: {
+            pytorch: {
+                PATH: '/ping',
+            },
+            tensorflow: {
+                PATH: '/v1/models/default'
+            }
         },
         AWSRegion2AZ: {
             'us-east-1': {

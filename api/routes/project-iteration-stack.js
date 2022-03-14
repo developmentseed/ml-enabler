@@ -70,7 +70,8 @@ async function router(schema, config) {
                     imagery_id: iter.imagery_id,
                     inf_list: iter.inf_list,
                     inf_supertile: iter.inf_supertile,
-                    inf_type: iter.inf_type
+                    inf_type: iter.inf_type,
+                    model_type: iter.model_type
                 }
             );
 
