@@ -13,9 +13,7 @@
                 <label>Submission #</label>
                 <div class='select-container w-full'>
                     <select v-model='config.submission' class='select select--s select--stroke'>
-                        <template v-for='s in submissions'>
-                            <option v-bind:key='s.id' v-text='s.id'></option>
-                        </template>
+                        <option v-for='s in submissions' v-bind:key='s.id' v-text='s.id'></option>
                     </select>
                     <div class='select-arrow'></div>
                 </div>

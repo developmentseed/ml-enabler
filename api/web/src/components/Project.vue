@@ -66,10 +66,12 @@
                         </div>
                     </template>
                     <template v-else>
-                        <div :key='iter.id' v-for='iter in iterations' @click='$router.push({ name: "iteration", params: {
-                            projectid: $route.params.projectid,
-                            iterationid: iter.id
-                        }})' class='cursor-pointer col col--12'>
+                        <div
+                            :key='iter.id'
+                            v-for='iter in iterations'
+                            @click='$router.push(`/project/${$route.params.projectid}/iteration/${iter.id}`)'
+                            class='cursor-pointer col col--12'
+                        >
                             <div class='col col--12 grid py6 px12 bg-darken10-on-hover'>
                                 <div class='col col--6'>
                                     <div class='col col--12 clearfix'>

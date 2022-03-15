@@ -1,5 +1,5 @@
-import Vue from 'vue'
-import VueRouter from  'vue-router'
+import { createApp } from 'vue'
+import * as VueRouter from 'vue-router'
 
 import 'floating-vue/dist/style.css'
 import FloatingVue from 'floating-vue'
@@ -34,12 +34,8 @@ import Stack from './components/iteration/Stack.vue';
 import PredTasks from './components/iteration/PredTasks.vue';
 import TaskLogs from './components/iteration/tasks/Logs.vue';
 
-Vue.use(VueRouter);
-Vue.use(FloatingVue);
-Vue.config.productionTip = false
-
-const router = new VueRouter({
-    mode: 'hash',
+const router = new VueRouter.createRouter({
+    history: VueRouter.createWebHashHistory(),
     routes: [
         { path: '/', name: 'home', component: Home },
 
@@ -91,47 +87,50 @@ const router = new VueRouter({
             },{
                 name: 'iteration',
                 path: '/project/:projectid/iteration/:iterationid',
-                redirect: '/project/:projectid/iteration/:iterationid/assets',
+                redirect: {
+                    name: 'assets'
+                },
                 component: Iteration,
                 children: [{
                     name: 'config',
-                    path: 'config',
+                    path: '/project/:projectid/iteration/:iterationid/config',
                     component: Config
                 },{
                     name: 'assets',
-                    path: 'assets',
+                    path: '/project/:projectid/iteration/:iterationid/assets',
                     component: Assets
                 },{
                     name: 'stack',
-                    path: 'stack',
+                    path: '/project/:projectid/iteration/:iterationid/stack',
                     component: Stack
                 },{
                     name: 'tasks',
-                    path: 'tasks',
+                    path: '/project/:projectid/iteration/:iterationid/tasks',
                     component: PredTasks,
                 },{
                     name: 'tasklogs',
-                    path: 'tasks/:taskid/logs',
+                    path: '/project/:projectid/iteration/:iterationid/tasks/:taskid/logs',
                     component: TaskLogs
                 },{
                     name: 'map',
-                    path: 'map',
+                    path: '/project/:projectid/iteration/:iterationid/map',
                     component: Map
                 },{
                     name: 'export',
-                    path: 'export',
+                    path: '/project/:projectid/iteration/:iterationid/export',
                     component: Export
                 }]
             }]
         },
 
-        { path: '*', name: 'lost', component: Lost }
+        { path: '/.*', name: 'lost', component: Lost }
     ]
 });
 
 window.api = window.location.origin
 
-new Vue({
-    router,
-    render: h => h(App)
-}).$mount('#app')
+const app = createApp(App);
+app.config.devtools = true
+app.use(router);
+app.use(FloatingVue);
+app.mount('#app');
