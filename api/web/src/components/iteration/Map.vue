@@ -30,9 +30,7 @@
                             <label>Submission #</label>
                             <div class='select-container w-full'>
                                 <select v-model='submission' class='select select--stroke select--s'>
-                                    <template v-for='s in submissions'>
-                                        <option v-bind:key='s.id' v-text='s.id'></option>
-                                    </template>
+                                    <option v-for='s in submissions' v-bind:key='s.id' v-text='s.id'></option>
                                 </select>
                                 <div class='select-arrow'></div>
                             </div>
@@ -41,9 +39,7 @@
                             <label>Inference Type</label>
                             <div class='select-container w-full'>
                                 <select v-model='inf' class='select select--s'>
-                                    <template v-for='inf in iteration.inf_list'>
-                                        <option :key='inf.name' v-text='inf.name'></option>
-                                    </template>
+                                    <option v-for='inf in iteration.inf_list' :key='inf.name' v-text='inf.name'></option>
                                 </select>
                                 <div class='select-arrow'></div>
                             </div>
