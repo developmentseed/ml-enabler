@@ -206,10 +206,10 @@ module.exports = {
             Type: 'AWS::ElasticLoadBalancingV2::TargetGroup',
             DependsOn: 'PredELB',
             Properties: {
-                Port: 8501,
+                Port: cf.findInMap('HealthCheck', cf.ref('ModelType'), 'Port'),
                 Protocol: 'HTTP',
                 VpcId: cf.importValue(cf.join([cf.ref('StackName'), '-vpc'])),
-                HealthCheckPath: cf.findInMap('HealthCheck', cf.ref('ModelType'), 'PATH'),
+                HealthCheckPath: cf.findInMap('HealthCheck', cf.ref('ModelType'), 'Path'),
                 Matcher: {
                     HttpCode: '200,202,302,304'
                 }
@@ -388,7 +388,7 @@ module.exports = {
                 'PredHTTPListener',
                 'PredTargetGroup'
             ],
-            "Properties": {
+            Properties: {
                 ServiceName: cf.ref('ImageTag'),
                 Cluster: cf.importValue(cf.join([ cf.ref('StackName'), '-cluster' ])),
                 TaskDefinition: cf.ref('PredTaskDefinition'),
@@ -399,7 +399,7 @@ module.exports = {
                 },
                 LoadBalancers: [{
                     ContainerName: 'pred-app',
-                    ContainerPort: 8501,
+                    ContainerPort: cf.findInMap('HealthCheck', cf.ref('ModelType'), 'Port'),
                     TargetGroupArn: cf.ref('PredTargetGroup')
                 }]
             }
@@ -425,8 +425,9 @@ module.exports = {
                         '-ecr:',
                         cf.ref('ImageTag'),
                     ]),
+                    Command: cf.findInMap('HealthCheck', cf.ref('ModelType'), 'Command'),
                     PortMappings: [{
-                        ContainerPort: 8501
+                        ContainerPort: cf.findInMap('HealthCheck', cf.ref('ModelType'), 'Port'),
                     }],
                     Environment: [],
                     LogConfiguration: {
@@ -505,10 +506,14 @@ module.exports = {
         },
         HealthCheck: {
             pytorch: {
-                PATH: '/ping',
+                Path: '/ping',
+                Port: 8080,
+                Command: ['torchserve', '--model-store=/home/model-server/model-store/']
             },
             tensorflow: {
-                PATH: '/v1/models/default'
+                Path: '/v1/models/default',
+                Port: 8501,
+                Command: ['/usr/bin/tf_serving_entrypoint.sh']
             }
         },
         AWSRegion2AZ: {
