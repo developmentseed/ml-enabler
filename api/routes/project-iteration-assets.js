@@ -121,7 +121,7 @@ async function router(schema, config) {
                 Key: iter[`${req.query.type}_link`].replace(`${process.env.ASSET_BUCKET}/`, '')
             });
 
-            return s3.stream(res, `project-${req.params.pid}-iteration-${req.params.iterationid}-${req.query.type}.zip`);
+            return s3.stream(res, `project-${req.params.pid}-iteration-${req.params.iterationid}-${req.query.type}.${iter.model_type === 'tensorflow' ? 'zip' : 'mar'}`);
         } catch (err) {
             return Err.respond(err, res);
         }
