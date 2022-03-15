@@ -317,7 +317,7 @@ function dockerd() {
 }
 
 async function docker(opts, tmp, model, iteration) {
-    const tagged_model = model.split('/').splice(1).join('-').replace(/-model\.zip/, '');
+    const tagged_model = model.split('/').splice(1).join('-').replace(/-model\.(zip|mar)/, '');
 
     let tag;
     if (iteration.model_type === 'tensorflow') {
