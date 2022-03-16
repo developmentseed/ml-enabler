@@ -186,10 +186,9 @@ module.exports = {
                         INFERENCES: cf.ref('Inferences'),
                         INF_TYPE: cf.ref('InfType'),
                         INF_SUPERTILE: cf.ref('InfSupertile'),
+                        MODEL_TYPE: cf.ref('ModelType'),
                         IMAGERY_ID: cf.ref('ImageryId'),
-                        PREDICTION_ENDPOINT: cf.join([
-                            'http://', cf.getAtt('PredELB', 'DNSName'), '/v1/models/default/versions/001'
-                        ]),
+                        PREDICTION_ENDPOINT: cf.findInMap('Models', cf.ref('ModelType'), 'Prediction'),
                         MLENABLER_ENDPOINT: cf.importValue(cf.join([cf.ref('StackName'), '-api']))
                     }
                 }
@@ -206,10 +205,10 @@ module.exports = {
             Type: 'AWS::ElasticLoadBalancingV2::TargetGroup',
             DependsOn: 'PredELB',
             Properties: {
-                Port: cf.findInMap('HealthCheck', cf.ref('ModelType'), 'Port'),
+                Port: cf.findInMap('Models', cf.ref('ModelType'), 'Port'),
                 Protocol: 'HTTP',
                 VpcId: cf.importValue(cf.join([cf.ref('StackName'), '-vpc'])),
-                HealthCheckPath: cf.findInMap('HealthCheck', cf.ref('ModelType'), 'Path'),
+                HealthCheckPath: cf.findInMap('Models', cf.ref('ModelType'), 'Path'),
                 Matcher: {
                     HttpCode: '200,202,302,304'
                 }
@@ -399,7 +398,7 @@ module.exports = {
                 },
                 LoadBalancers: [{
                     ContainerName: 'pred-app',
-                    ContainerPort: cf.findInMap('HealthCheck', cf.ref('ModelType'), 'Port'),
+                    ContainerPort: cf.findInMap('Models', cf.ref('ModelType'), 'Port'),
                     TargetGroupArn: cf.ref('PredTargetGroup')
                 }]
             }
@@ -425,9 +424,9 @@ module.exports = {
                         '-ecr:',
                         cf.ref('ImageTag'),
                     ]),
-                    Command: cf.findInMap('HealthCheck', cf.ref('ModelType'), 'Command'),
+                    Command: cf.findInMap('Models', cf.ref('ModelType'), 'Command'),
                     PortMappings: [{
-                        ContainerPort: cf.findInMap('HealthCheck', cf.ref('ModelType'), 'Port'),
+                        ContainerPort: cf.findInMap('Models', cf.ref('ModelType'), 'Port'),
                     }],
                     Environment: [],
                     LogConfiguration: {
@@ -504,7 +503,7 @@ module.exports = {
             DOCS: { LIST: 'http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html' },
             'us-east-1': { AMIID: 'ami-03ab174c20b61472c' }
         },
-        HealthCheck: {
+        Models: {
             pytorch: {
                 Path: '/ping',
                 Port: 8080,
@@ -514,14 +513,20 @@ module.exports = {
                     '--ncs',
                     '--model-store=/home/model-server/model-store/',
                     '--models=model.mar'
-                ]
+                ],
+                Prediction: cf.join([
+                    'http://', cf.getAtt('PredELB', 'DNSName'), '/v1/models/default/versions/001'
+                ])
             },
             tensorflow: {
                 Path: '/v1/models/default',
                 Port: 8501,
                 Command: [
                     '/usr/bin/tf_serving_entrypoint.sh'
-                ]
+                ],
+                Prediction: cf.join([
+                    'http://', cf.getAtt('PredELB', 'DNSName'), '/v1/models/default:predict'
+                ])
             }
         },
         AWSRegion2AZ: {

@@ -13,11 +13,13 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
 
     super_tile = os.getenv('INF_SUPERTILE')
     inf_type = os.getenv('INF_TYPE')
+    model_type = os.getenv('MODEL_TYPE')
 
     assert(stream)
     assert(inf_type)
     assert(prediction_endpoint)
     assert(mlenabler_endpoint)
+    assert(model_type)
 
     # instantiate our DownloadAndPredict class
     dap = DownloadAndPredict(
