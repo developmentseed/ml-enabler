@@ -35,13 +35,25 @@ function docker(tmp, model, tagged_model) {
     `);
 
     CP.execSync(`
-        docker cp ${tmp}/model.mar serving_base:/home/model-server/model-store/
+        mkdir ${tmp}/model
+    `);
+
+    CP.execSync(`
+        unzip ${tmp}/model.mar ${tmp}/model/
+    `);
+
+    CP.execSync(`
+        docker cp ${tmp}/model/ serving_base:/home/model-server/model-store/
+    `);
+
+    CP.execSync(`
+        docker cp ${path.resolve(__dirname, 'fixtures/py-build.sh')} serving_base:/home/model-server/
     `);
 
     const tag = `developmentseed/default:${Math.random().toString(36).substring(2, 15)}`;
 
     CP.execSync(`
-        docker commit --change 'CMD torchserve --start --model-store model-store --models default=model.mar' serving_base ${tag}
+        docker commit --change 'CMD ./py-build.sh' serving_base ${tag}
     `);
 
     return tag;
