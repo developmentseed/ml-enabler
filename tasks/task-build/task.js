@@ -17,9 +17,6 @@ const AWS = require('aws-sdk');
 const TFServing = require('./lib/tfserving');
 const PTServing = require('./lib/ptserving');
 
-const batch = new AWS.Batch({ region: process.env.AWS_REGION || 'us-east-1' });
-const s3 = new AWS.S3({ region: process.env.AWS_REGION || 'us-east-1' });
-
 /**
  * @class
  */
@@ -75,7 +72,7 @@ class Task {
 
         await set_link(opts, project_id, iteration_id, links);
 
-        dd.kill();
+        if (dd) dd.kill();
     }
 }
 
@@ -121,6 +118,8 @@ function get_iteration_id(model) {
 }
 
 function get_log_link(opts) {
+    const batch = new AWS.Batch({ region: process.env.AWS_REGION || 'us-east-1' });
+
     return new Promise((resolve, reject) => {
         // Allow local runs
 
@@ -128,6 +127,7 @@ function get_log_link(opts) {
 
         function link() {
             if (!opts.silent) console.error(`ok - getting meta for job: ${process.env.AWS_BATCH_JOB_ID}`);
+
 
             batch.describeJobs({
                 jobs: [process.env.AWS_BATCH_JOB_ID]
@@ -154,7 +154,7 @@ function get_iteration(opts, project, iteration) {
     return new Promise((resolve, reject) => {
         request({
             method: 'GET',
-            url: `${opts.url}/api/project/${project}/iteration/${iteration}`,
+            url: new URL(`/api/project/${project}/iteration/${iteration}`, opts.url),
             json: true,
             auth: {
                 bearer: opts.token
@@ -177,7 +177,7 @@ function set_log_link(opts, project, iteration, task, log) {
 
         request({
             method: 'PATCH',
-            url: `${opts.url}/api/project/${project}/iteration/${iteration}/task/${task}`,
+            url: new URL(`/api/project/${project}/iteration/${iteration}/task/${task}`, opts.url),
             auth: {
                 bearer: opts.token
             },
@@ -203,7 +203,7 @@ function set_link(opts, project, iteration, patch) {
 
         request({
             method: 'PATCH',
-            url: `${opts.url}/api/project/${project}/iteration/${iteration}`,
+            url: new URL(`/api/project/${project}/iteration/${iteration}`, opts.url),
             auth: {
                 bearer: opts.token
             },
@@ -256,6 +256,8 @@ function std_model(opts, tmp, iteration) {
 function download(opts, tmp, iteration) {
     if (!opts.silent) console.error(`ok - fetching ${opts.model}`);
 
+    const s3 = new AWS.S3({ region: process.env.AWS_REGION || 'us-east-1' });
+
     return new Promise((resolve, reject) => {
         if (iteration.model_type === 'tensorflow') {
             const loc = path.resolve(tmp, 'model.zip');
@@ -290,6 +292,8 @@ function download(opts, tmp, iteration) {
 
                     return resolve(loc);
                 });
+        } else {
+            return reject(new Error('Model Type not supported'));
         }
     });
 }
@@ -297,6 +301,14 @@ function download(opts, tmp, iteration) {
 function dockerd() {
     return new Promise((resolve, reject) => {
         console.error('ok - spawning dockerd');
+
+        const info = CP.spawnSync('docker', ['info']);
+
+        if (!info.error) {
+            // Dockerd is already running
+            return resolve(null);
+        }
+
         const dockerd = CP.spawn('dockerd');
 
         dockerd.stderr.on('data', (data) => {
@@ -345,6 +357,8 @@ async function docker(opts, tmp, model, iteration) {
     `);
     if (!opts.silent) console.error('ok - saved image to disk');
 
+    const s3 = new AWS.S3({ region: process.env.AWS_REGION || 'us-east-1' });
+
     await s3.putObject({
         Bucket: model.split('/')[0],
         Key: model.split('/').splice(1).join('/').replace(/model\.(mar|zip)/, `docker-${tagged_model}.tar.gz`),
@@ -359,4 +373,4 @@ async function docker(opts, tmp, model, iteration) {
     };
 }
 
-module.export = Task;
+module.exports = Task;
