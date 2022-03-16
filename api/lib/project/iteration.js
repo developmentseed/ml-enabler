@@ -127,6 +127,10 @@ class ProjectIteration extends Generic {
 
             return ProjectIteration.deserialize(pgres.rows[0]);
         } catch (err) {
+            if (err.originalError && err.originalError.code === '23505') {
+                throw new Err(400, null, 'Iteration by that version already exists');
+            }
+
             throw new Err(500, err, 'Failed to generate Integration');
         }
     }

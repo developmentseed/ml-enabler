@@ -11,7 +11,7 @@
     "properties": {
         "id": {
             "type": "integer",
-            "description": "Unique ID of User"
+            "description": "User ID"
         },
         "validated": {
             "$ref": "./util/validated.json"

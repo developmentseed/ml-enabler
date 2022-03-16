@@ -266,5 +266,3 @@ test('GET: /project', async (t) => {
 });
 
 flight.landing(test);
-
-flight.landing(test);
