@@ -508,12 +508,20 @@ module.exports = {
             pytorch: {
                 Path: '/ping',
                 Port: 8080,
-                Command: ['torchserve', '--model-store=/home/model-server/model-store/']
+                Command: [
+                    'torchserve',
+                    '--start',
+                    '--ncs',
+                    '--model-store=/home/model-server/model-store/'
+                    '--models=model.mar'
+                ]
             },
             tensorflow: {
                 Path: '/v1/models/default',
                 Port: 8501,
-                Command: ['/usr/bin/tf_serving_entrypoint.sh']
+                Command: [
+                    '/usr/bin/tf_serving_entrypoint.sh'
+                ]
             }
         },
         AWSRegion2AZ: {
