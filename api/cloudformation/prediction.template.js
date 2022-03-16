@@ -512,7 +512,7 @@ module.exports = {
                     'torchserve',
                     '--start',
                     '--ncs',
-                    '--model-store=/home/model-server/model-store/'
+                    '--model-store=/home/model-server/model-store/',
                     '--models=model.mar'
                 ]
             },
