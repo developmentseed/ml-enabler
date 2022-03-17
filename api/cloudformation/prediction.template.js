@@ -305,7 +305,7 @@ module.exports = {
             Type: 'AWS::SQS::Queue',
             Properties: {
                 QueueName: cf.join([cf.stackName, '-queue' ]),
-                VisibilityTimeout: 60,
+                VisibilityTimeout: 1200,
                 RedrivePolicy: {
                     deadLetterTargetArn: cf.getAtt('PredDeadQueue', 'Arn'),
                     maxReceiveCount: 3
