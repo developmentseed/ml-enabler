@@ -130,6 +130,51 @@ module.exports = {
                         Period: 60,
                         Stat: 'Maximum'
                     }
+                },{
+                    Id: 'm4',
+                    ReturnData: false,
+                    MetricStat: {
+                        Metric: {
+                            Namespace: 'AWS/SQS',
+                            MetricName: 'ApproximateNumberOfMessagesNotVisible',
+                            Dimensions: [{
+                                Name: 'QueueName',
+                                Value: cf.join([cf.stackName, '-dead-queue'])
+                            }]
+                        },
+                        Period: 60,
+                        Stat: 'Maximum'
+                    }
+                },{
+                    Id: 'm5',
+                    ReturnData: false,
+                    MetricStat: {
+                        Metric: {
+                            Namespace: 'AWS/SQS',
+                            MetricName: 'ApproximateNumberOfMessagesVisible',
+                            Dimensions: [{
+                                Name: 'QueueName',
+                                Value: cf.join([cf.stackName, '-dead-queue'])
+                            }]
+                        },
+                        Period: 60,
+                        Stat: 'Maximum'
+                    }
+                },{
+                    Id: 'm6',
+                    ReturnData: false,
+                    MetricStat: {
+                        Metric: {
+                            Namespace: 'AWS/SQS',
+                            MetricName: 'ApproximateNumberOfMessagesDelayed',
+                            Dimensions: [{
+                                    Name: 'QueueName',
+                                    Value: cf.join([cf.stackName, '-dead-queue'])
+                                }]
+                        },
+                        Period: 60,
+                        Stat: 'Maximum'
+                    }
                 }]
             }
         },
@@ -260,7 +305,7 @@ module.exports = {
             Type: 'AWS::SQS::Queue',
             Properties: {
                 QueueName: cf.join([cf.stackName, '-queue' ]),
-                VisibilityTimeout: 2880,
+                VisibilityTimeout: 60,
                 RedrivePolicy: {
                     deadLetterTargetArn: cf.getAtt('PredDeadQueue', 'Arn'),
                     maxReceiveCount: 3
