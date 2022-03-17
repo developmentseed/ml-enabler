@@ -51,7 +51,7 @@ export default {
             this.getLogs(true);
         }, 10 * 1000);
     },
-    destroyed: function() {
+    unmounted: function() {
         if (this.looping) clearInterval(this.looping);
     },
     methods: {

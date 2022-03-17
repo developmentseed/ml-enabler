@@ -99,7 +99,7 @@ export default {
             this.getTasks(true);
         }, 10 * 1000);
     },
-    destroyed: function() {
+    unmounted: function() {
         if (this.looping) clearInterval(this.looping);
     },
     methods: {

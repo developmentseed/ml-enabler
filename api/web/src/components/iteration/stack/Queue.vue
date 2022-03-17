@@ -95,6 +95,10 @@ export default {
         if (this.looping) clearInterval(this.looping);
         this.looping = false;
     },
+    deactivated: function() {
+        if (this.looping) clearInterval(this.looping);
+        this.looping = false;
+    },
     methods: {
         datefmt: function(dt) {
              const date = new Date(dt);
