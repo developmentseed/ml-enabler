@@ -34,10 +34,12 @@ class Task {
      * @param {string}  opts.task               MLEnabler Task ID
      * @param {boolean} [opts.dryrun=false]     Don't upload output to AWS ECR
      * @param {boolean} [opts.silent=false]     Should output be squelched
+     * @param {boolean} [opts.dockerd=false]    Is Dockerd managed externally
      */
     static async build(opts) {
         if (!opts.silent) opts.silent = false;
         if (!opts.dryrun) opts.dryrun = false;
+        if (!opts.dockerd) opts.dockerd = false;
 
         const tmp = os.tmpdir() + '/' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         mkdir(tmp);
@@ -61,7 +63,8 @@ class Task {
 
         await set_link(opts, project_id, iteration_id, links);
 
-        const dd = await dockerd();
+        let dd = null;
+        if (!opts.dockerd) dd = await dockerd();
 
         const iteration = await get_iteration(opts, project_id, iteration_id);
 
@@ -305,13 +308,6 @@ function download(opts, tmp, iteration) {
 function dockerd() {
     return new Promise((resolve, reject) => {
         console.error('ok - spawning dockerd');
-
-        const info = CP.spawnSync('docker', ['info']);
-
-        if (!info.error) {
-            // Dockerd is already running
-            return resolve(null);
-        }
 
         const dockerd = CP.spawn('dockerd');
 

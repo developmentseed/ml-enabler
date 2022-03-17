@@ -42,7 +42,8 @@ test('PyTorch Segmentation', async (t) => {
             url: 'http://example.com',
             token: '123',
             model: 'ml-enabler-test-1234-us-east-1/project/1/iteration/18/model.mar',
-            dryrun: true
+            dryrun: true,
+            dockerd: true
         });
     } catch (err) {
         t.error(err);
