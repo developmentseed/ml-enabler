@@ -34,7 +34,7 @@ from download_and_predict.custom_types import SQSEvent
 
 firehose = boto3.client('firehose')
 
-class ModelMeta:
+class TFModelMeta:
     def __init__(self, meta, inf_type):
         self.raw = meta
 
@@ -63,14 +63,14 @@ class ModelMeta:
             self.size = { 'x': 256, 'y': 256 }
 
 
-class DownloadAndPredict(object):
+class TFDownloadAndPredict(object):
     """
     base object DownloadAndPredict implementing all necessary methods to
     make machine learning predictions
     """
 
     def __init__(self, mlenabler_endpoint: str, prediction_endpoint: str):
-        super(DownloadAndPredict, self).__init__()
+        super(TFDownloadAndPredict, self).__init__()
 
         self.mlenabler_endpoint = mlenabler_endpoint
         self.prediction_endpoint = prediction_endpoint
@@ -81,21 +81,6 @@ class DownloadAndPredict(object):
         r.raise_for_status()
 
         self.meta = ModelMeta(r.json(), inf_type)
-
-    @staticmethod
-    def get_chips(event: SQSEvent) -> List[str]:
-        """
-        Return the body of our incoming SQS messages as an array of dicts
-        Expects events of the following format:
-
-        { 'Records': [ { "body": '{ "url": "", "bounds": "" }' }] }
-
-        """
-        chips = []
-        for record in event['Records']:
-            chips.append(json.loads(record['body']))
-
-        return chips
 
     def b64encode_image(self, image_binary: bytes) -> str:
         return b64encode(image_binary).decode('utf-8')
@@ -122,12 +107,6 @@ class DownloadAndPredict(object):
         img = img * (1/255)
 
         return img
-
-    def get_images(self, chips: List[dict]) -> Iterator[Tuple[dict, bytes]]:
-        for chip in chips:
-            print("IMAGE: " + chip.get('url'))
-            r = requests.get(chip.get('url'))
-            yield (chip, r.content)
 
     def get_prediction_payload(self, chips: List[dict]) -> Tuple[List[dict], Dict[str, Any]]:
         """
@@ -268,16 +247,6 @@ class DownloadAndPredict(object):
 
         return pred_list
 
-    def save_prediction(self, payload, stream):
-        firehose.put_record_batch(
-            DeliveryStreamName=stream,
-            Records=[{
-                "Data": json.dumps(p)
-            } for p in payload]
-        )
-
-        return True
-
     def tf_bbox_geo(self, bbox, chip_bounds):
         pred = [bbox[1], bbox[0], bbox[3], bbox[2]]
         # Affine Transform
@@ -288,42 +257,3 @@ class DownloadAndPredict(object):
         geographic_bbox = affinity.affine_transform(geometry.box(*pred), a_lst)
 
         return geographic_bbox
-
-class SuperTileDownloader(DownloadAndPredict):
-    def __init__(self, mlenabler_endpoint: str, prediction_endpoint: str):
-    # type annotatation error ignored, re: https://github.com/python/mypy/issues/5887
-        super(DownloadAndPredict, self).__init__()
-        self.mlenabler_endpoint = mlenabler_endpoint
-        self.prediction_endpoint = prediction_endpoint
-
-    def get_images(self, chips: List[dict]) -> Iterator[Tuple[dict, bytes]]:
-        """return bounds of original tile filled with the 4 child chips 1 zoom level up in bytes"""
-        for chip in chips:
-            w_lst = []
-            for i in range(2):
-                for j in range(2):
-                    window = Window(i * 256, j * 256, 256, 256)
-                    w_lst.append(window)
-
-            child_tiles = children(chip.get('x'), chip.get('y'), chip.get('z')) #get this from database (tile_zoom)
-            child_tiles.sort()
-
-            with MemoryFile() as memfile:
-                with memfile.open(driver='jpeg', height=512, width=512, count=3, dtype=rasterio.uint8) as dataset:
-                    for num, t in enumerate(child_tiles):
-                        url = chip.get('url').replace(str(chip.get('x')), str(t.x), 1).replace(str(chip.get('y')), str(t.y), 1).replace(str(chip.get('z')), str(t.z), 1)
-
-                        r = requests.get(url)
-                        img = np.array(Image.open(io.BytesIO(r.content)), dtype=np.uint8)
-                        try:
-                            img = img.reshape((256, 256, 3)) # 4 channels returned from some endpoints, but not all
-                        except ValueError:
-                            img = img.reshape((256, 256, 4))
-                        img = img[:, :, :3]
-                        img = np.rollaxis(img, 2, 0)
-                        dataset.write(img, window=w_lst[num])
-                dataset_b = memfile.read() #but this fails
-                yield(
-                    chip,
-                    dataset_b)
-

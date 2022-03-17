@@ -2,7 +2,8 @@
 
 import os
 from typing import Dict, Any
-from download_and_predict.base import DownloadAndPredict, SuperTileDownloader
+from download_and_predict.tensorflow import TFDownloadAndPredict, TFSuperTileDownloader
+from download_and_predict.pytorch import PTDownloadAndPredict, PTSuperTileDownloader
 from download_and_predict.custom_types import SQSEvent
 
 def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
