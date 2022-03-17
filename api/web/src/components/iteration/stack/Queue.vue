@@ -91,11 +91,7 @@ export default {
 
         this.refresh();
     },
-    destroyed: function() {
-        if (this.looping) clearInterval(this.looping);
-        this.looping = false;
-    },
-    deactivated: function() {
+    unmounted: function() {
         if (this.looping) clearInterval(this.looping);
         this.looping = false;
     },
