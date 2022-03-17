@@ -305,7 +305,7 @@ module.exports = {
             Type: 'AWS::SQS::Queue',
             Properties: {
                 QueueName: cf.join([cf.stackName, '-queue' ]),
-                VisibilityTimeout: 60,
+                VisibilityTimeout: 1200,
                 RedrivePolicy: {
                     deadLetterTargetArn: cf.getAtt('PredDeadQueue', 'Arn'),
                     maxReceiveCount: 3
@@ -559,7 +559,7 @@ module.exports = {
                     '--start',
                     '--ncs',
                     '--model-store=/home/model-server/model-store/',
-                    '--models=model.mar'
+                    '--models=default=default.mar'
                 ],
                 Prediction: '/v1/models/default'
             },

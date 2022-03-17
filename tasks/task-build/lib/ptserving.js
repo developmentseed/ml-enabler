@@ -41,29 +41,15 @@ function docker(tmp, model, tagged_model) {
         docker run -d --name serving_base ${base}
     `);
 
-    CP.execSync(`
-        mkdir ${tmp}/model
-    `);
-
-    console.error('ok - extracting model');
-    CP.execSync(`
-        unzip ${tmp}/model.mar -d ${tmp}/model/
-    `);
-
     console.error('ok - syncing model');
     CP.execSync(`
-        docker cp ${tmp}/model/ serving_base:/home/model-server/model-store/
-    `);
-
-    console.error('ok - syncing build script');
-    CP.execSync(`
-        docker cp ${path.resolve(__dirname, 'fixtures/py-build.sh')} serving_base:/home/model-server/
+        docker cp ${tmp}/model.mar serving_base:/home/model-server/model-store/default.mar
     `);
 
     const tag = `developmentseed/default:${Math.random().toString(36).substring(2, 15)}`;
 
     CP.execSync(`
-        docker commit --change 'CMD ./py-build.sh' serving_base ${tag}
+        docker commit --change 'CMD torchserve --start --ncs --model-store=/home/model-server/model-store/ --models default=default.mar' serving_base ${tag}
     `);
 
     console.error('ok - built base image');

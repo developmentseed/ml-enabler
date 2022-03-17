@@ -91,7 +91,7 @@ export default {
 
         this.refresh();
     },
-    destroyed: function() {
+    unmounted: function() {
         if (this.looping) clearInterval(this.looping);
         this.looping = false;
     },
