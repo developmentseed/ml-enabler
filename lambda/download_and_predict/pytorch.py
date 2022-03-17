@@ -4,21 +4,15 @@ to a remote ML serving image, and saving them
 @author:Development Seed
 """
 import json
-import base64
 import affine
 import geojson
 import requests
 import rasterio
-import shapely
 import boto3
 
-from shapely.geometry import box
+from download_and_predict.chips import Chips
 from requests.auth import HTTPBasicAuth
-from shapely import affinity, geometry
-from enum import Enum
-from functools import reduce
 from io import BytesIO
-from base64 import b64encode
 from urllib.parse import urlparse
 from typing import Dict, List, NamedTuple, Callable, Optional, Tuple, Any, Iterator
 from rasterio.io import MemoryFile
@@ -92,7 +86,7 @@ class PTDownloadAndPredict(object):
                 "y": chips[i].get("y"),
                 "z": chips[i].get("z"),
                 "submission_id": chips[i].get('submission'),
-                "image": self.b64encode_image(img_bytes.getvalue())
+                "image": Chips.b64encode_image(img_bytes.getvalue())
             }
 
         except requests.exceptions.HTTPError as e:
