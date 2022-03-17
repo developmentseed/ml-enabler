@@ -7,11 +7,18 @@ const fs = require('fs');
 const base = 'pytorch/torchserve:0.5.0-gpu';
 
 function docker(tmp, model, tagged_model) {
-    console.error(`ok - pulling ${base} docker image`);
+    const exists = !!String(CP.execSync(`
+        docker images ${base}
+    `)).split('\n')[1];
 
-    CP.execSync(`
-        docker pull ${base}
-    `);
+
+    if (!exists) {
+        console.error(`ok - pulling ${base} docker image`);
+
+        CP.execSync(`
+            docker pull ${base}
+        `);
+    }
 
     // Ignore errors, these are to ensure the next commands don't err
     try {
