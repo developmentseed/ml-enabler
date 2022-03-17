@@ -516,7 +516,7 @@ module.exports = {
                     '--model-store=/home/model-server/model-store/',
                     '--models=model.mar'
                 ],
-                Prediction: '/v1/models/default/versions/001'
+                Prediction: '/v1/models/default'
             },
             tensorflow: {
                 Path: '/v1/models/default',
@@ -524,7 +524,7 @@ module.exports = {
                 Command: [
                     '/usr/bin/tf_serving_entrypoint.sh'
                 ],
-                Prediction: '/v1/models/default'
+                Prediction: '/v1/models/default/versions/001'
             }
         },
         AWSRegion2AZ: {
