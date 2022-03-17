@@ -14,6 +14,10 @@ test('PyTorch Segmentation', async (t) => {
             id: 18,
             model_type: 'pytorch'
         })
+        .patch('/api/project/1/iteration/18')
+        .reply(200, {
+            id: 18
+        })
 
     AWS.stub('S3', 'getObject', function(params) {
         t.equals(params.Bucket, 'ml-enabler-test-1234-us-east-1');
@@ -26,7 +30,7 @@ test('PyTorch Segmentation', async (t) => {
 
     AWS.stub('S3', 'putObject', function(params) {
         t.equals(params.Bucket, 'ml-enabler-test-1234-us-east-1');
-        t.equals(params.Key, 'project/1/iteration/18/docker.mar');
+        t.equals(params.Key, 'project/1/iteration/18/docker-project-1-iteration-18.tar.gz');
 
         return this.request.promise.returns(Promise.resolve());
     });
