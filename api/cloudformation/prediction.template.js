@@ -559,7 +559,7 @@ module.exports = {
                     '--start',
                     '--ncs',
                     '--model-store=/home/model-server/model-store/',
-                    '--models=model.mar'
+                    '--models=default=default.mar'
                 ],
                 Prediction: '/v1/models/default'
             },
