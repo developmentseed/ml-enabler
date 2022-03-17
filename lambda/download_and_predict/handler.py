@@ -2,14 +2,14 @@
 
 import os
 from typing import Dict, Any
-from download_and_predict.tensorflow import TFDownloadAndPredict, TFSuperTileDownloader
-from download_and_predict.pytorch import PTDownloadAndPredict, PTSuperTileDownloader
+from download_and_predict.tensorflow import TFDownloadAndPredict
+from download_and_predict.pytorch import PTDownloadAndPredict
+from download_and_predict.chips import Chips
 from download_and_predict.custom_types import SQSEvent
 
 def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
     # read all our environment variables to throw errors early
     prediction_endpoint = os.getenv('PREDICTION_ENDPOINT')
-    mlenabler_endpoint = os.getenv('MLENABLER_ENDPOINT')
     stream = os.getenv('StackName')
 
     super_tile = os.getenv('INF_SUPERTILE')
@@ -19,53 +19,66 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
     assert(stream)
     assert(inf_type)
     assert(prediction_endpoint)
-    assert(mlenabler_endpoint)
     assert(model_type)
 
     # instantiate our DownloadAndPredict class
-    dap = DownloadAndPredict(
-        mlenabler_endpoint=mlenabler_endpoint,
-        prediction_endpoint=prediction_endpoint
-    )
+    if model_type == "tensorflow":
+        dap = TFDownloadAndPredict(
+            prediction_endpoint=prediction_endpoint
+        )
+    elif model_type == "pytorch":
+        dap = PTDownloadAndPredict(
+            prediction_endpoint=prediction_endpoint
+        )
 
-    # get tiles from our SQS event
-    chips = dap.get_chips(event)
-
-    # Get meta about model to determine model type (Classification vs Object Detection)
     dap.get_meta(inf_type)
 
-    # construct a payload for our prediction endpoint
 
+    # get tiles from our SQS event
+    chips = Chips.get_chips(event)
+
+    # tiles & images zipped
     if super_tile == 'True':
-        dap = SuperTileDownloader(mlenabler_endpoint=mlenabler_endpoint, prediction_endpoint=prediction_endpoint)
-        payload = dap.get_prediction_payload(chips)
+        t_i = Chips.get_super_images(chips)
     else:
-        payload = dap.get_prediction_payload(chips)
+        t_i = Chips.get_images(chips)
 
-    if inf_type == "detection":
-        print("TYPE: Object Detection")
+    if model_type == "tensorflow":
+        payload = dap.get_prediction_payload(t_i)
 
-        # send prediction request
-        preds = dap.od_post_prediction(payload, chips)
-    elif inf_type == "classification":
-        print("TYPE: Classification")
+        if inf_type == "detection":
+            print("TYPE: Object Detection")
 
-        inferences = os.getenv('INFERENCES')
-        assert(inferences)
-        inferences = inferences.split(',')
+            # send prediction request
+            preds = dap.od_post_prediction(payload, chips)
+        elif inf_type == "classification":
+            print("TYPE: Classification")
 
-        # send prediction request
-        preds = dap.cl_post_prediction(payload, chips, inferences)
-    elif inf_type == "segmentation":
-        print("TYPE: Segmentation")
+            inferences = os.getenv('INFERENCES')
+            assert(inferences)
+            inferences = inferences.split(',')
 
-        # send prediction request
-        preds = dap.seg_post_prediction(payload, chips)
-    else:
-        print("Unknown Model")
+            # send prediction request
+            preds = dap.cl_post_prediction(payload, chips, inferences)
+        elif inf_type == "segmentation":
+            print("TYPE: Segmentation")
+
+            # send prediction request
+            preds = dap.seg_post_prediction(payload, chips)
+        else:
+            print("Unknown Model")
+    elif model_type == "pytorch":
+        preds = []
+
+        for payload in dap.get_prediction_payloads(t_i):
+            if inf_type == "segmentation":
+                print("TYPE: Segmentation")
+
+                # send prediction request
+                preds.append(dap.segmentation(payload, chips))
 
     print('Saving:', len(preds), ' predictions')
-    dap.save_prediction(preds, stream)
+    Chips.save(preds, stream)
 
     return True
 

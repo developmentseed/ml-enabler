@@ -29,6 +29,7 @@ import io
 import mercantile
 from mercantile import children
 import numpy as np
+from base64 import b64encode
 
 from download_and_predict.custom_types import SQSEvent
 
@@ -36,7 +37,7 @@ firehose = boto3.client('firehose')
 
 class Chips:
     @staticmethod
-    def save_result(payload, stream):
+    def save(payload, stream):
         firehose.put_record_batch(
             DeliveryStreamName=stream,
             Records=[{
@@ -46,6 +47,10 @@ class Chips:
 
         return True
 
+
+    @staticmethod
+    def b64encode_image(image_binary: bytes) -> str:
+        return b64encode(image_binary).decode('utf-8')
 
     @staticmethod
     def get_chips(event: SQSEvent) -> List[str]:

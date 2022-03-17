@@ -69,10 +69,9 @@ class TFDownloadAndPredict(object):
     make machine learning predictions
     """
 
-    def __init__(self, mlenabler_endpoint: str, prediction_endpoint: str):
+    def __init__(self, prediction_endpoint: str):
         super(TFDownloadAndPredict, self).__init__()
 
-        self.mlenabler_endpoint = mlenabler_endpoint
         self.prediction_endpoint = prediction_endpoint
         self.meta = False
 
@@ -108,7 +107,7 @@ class TFDownloadAndPredict(object):
 
         return img
 
-    def get_prediction_payload(self, chips: List[dict]) -> Tuple[List[dict], Dict[str, Any]]:
+    def get_prediction_payload(self, t_i) -> Tuple[List[dict], Dict[str, Any]]:
         """
         chps: list image tilesk
         imagery: str an imagery API endpoint with three variables {z}/{x}/{y} to replace
@@ -118,8 +117,7 @@ class TFDownloadAndPredict(object):
         need to match up the tile indicies with their corresponding images
         """
 
-        tiles_and_images = self.get_images(chips)
-        tile_indices, images = zip(*tiles_and_images)
+        tile_indices, images = zip(*t_i)
 
         if self.meta.inf_type == "segmentation":
             # Hack submit as list for seg - b64 for others - eventually detemine & support both for any inf
