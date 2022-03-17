@@ -39,7 +39,7 @@ function docker(tmp, model, tagged_model) {
     `);
 
     CP.execSync(`
-        unzip ${tmp}/model.mar ${tmp}/model/
+        unzip ${tmp}/model.mar -d ${tmp}/model/
     `);
 
     CP.execSync(`

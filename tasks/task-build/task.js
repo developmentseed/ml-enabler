@@ -30,10 +30,12 @@ class Task {
      * @param {string}  opts.token              MLEnabler API Token
      * @param {string}  opts.ecr                AWS ECR name
      * @param {string}  opts.task               MLEnabler Task ID
+     * @param {boolean} [opts.dryrun=false]     Don't upload output to AWS ECR
      * @param {boolean} [opts.silent=false]     Should output be squelched
      */
     static async build(opts) {
         if (!opts.silent) opts.silent = false;
+        if (!opts.dryrun) opts.dryrun = false;
 
         const tmp = os.tmpdir() + '/' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         mkdir(tmp);
@@ -343,18 +345,22 @@ async function docker(opts, tmp, model, iteration) {
         docker tag ${tag} ${push}
     `);
 
-    CP.execSync(`
-        $(aws ecr get-login --region us-east-1 --no-include-email)
-    `);
+    if (!opts.dryrun) {
+        CP.execSync(`
+            $(aws ecr get-login --region us-east-1 --no-include-email)
+        `);
 
-    CP.execSync(`
-        docker push ${push}
-    `);
-    if (!opts.silent) console.error('ok - pushed image to AWS:ECR');
+        CP.execSync(`
+            docker push ${push}
+        `);
+
+        if (!opts.silent) console.error('ok - pushed image to AWS:ECR');
+    }
 
     CP.execSync(`
         docker save ${tag} | gzip > ${tmp}/docker-${tagged_model}.tar.gz
     `);
+
     if (!opts.silent) console.error('ok - saved image to disk');
 
     const s3 = new AWS.S3({ region: process.env.AWS_REGION || 'us-east-1' });

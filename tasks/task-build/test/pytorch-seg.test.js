@@ -24,13 +24,21 @@ test('PyTorch Segmentation', async (t) => {
         });
     });
 
+    AWS.stub('S3', 'putObject', function(params) {
+        t.equals(params.Bucket, 'ml-enabler-test-1234-us-east-1');
+        t.equals(params.Key, 'project/1/iteration/18/docker.mar');
+
+        return this.request.promise.returns(Promise.resolve());
+    });
+
     try {
         await Task.build({
             ecr: 'test',
             task: 1,
             url: 'http://example.com',
             token: '123',
-            model: 'ml-enabler-test-1234-us-east-1/project/1/iteration/18/model.mar'
+            model: 'ml-enabler-test-1234-us-east-1/project/1/iteration/18/model.mar',
+            dryrun: true
         });
     } catch (err) {
         t.error(err);
