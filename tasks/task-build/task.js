@@ -17,6 +17,8 @@ const AWS = require('aws-sdk');
 const TFServing = require('./lib/tfserving');
 const PTServing = require('./lib/ptserving');
 
+const region = process.env.AWS_REGION || 'us-east-1';
+
 /**
  * @class
  */
@@ -120,7 +122,7 @@ function get_iteration_id(model) {
 }
 
 function get_log_link(opts) {
-    const batch = new AWS.Batch({ region: process.env.AWS_REGION || 'us-east-1' });
+    const batch = new AWS.Batch({ region });
 
     return new Promise((resolve, reject) => {
         // Allow local runs
@@ -258,7 +260,7 @@ function std_model(opts, tmp, iteration) {
 function download(opts, tmp, iteration) {
     if (!opts.silent) console.error(`ok - fetching ${opts.model}`);
 
-    const s3 = new AWS.S3({ region: process.env.AWS_REGION || 'us-east-1' });
+    const s3 = new AWS.S3({ region });
 
     return new Promise((resolve, reject) => {
         if (iteration.model_type === 'tensorflow') {
@@ -341,15 +343,19 @@ async function docker(opts, tmp, model, iteration) {
     }
 
     const push = `${opts.ecr}:${tagged_model}`;
+
+    if (!opts.silent) console.error('ok - tagging docker image');
     CP.execSync(`
         docker tag ${tag} ${push}
     `);
 
     if (!opts.dryrun) {
+        if (!opts.silent) console.error('ok - getting AWS ECR credentials');
         CP.execSync(`
-            $(aws ecr get-login --region us-east-1 --no-include-email)
+            $(aws ecr get-login --region ${region} --no-include-email)
         `);
 
+        if (!opts.silent) console.error('ok - pushing image to AWS ECR');
         CP.execSync(`
             docker push ${push}
         `);
@@ -357,13 +363,13 @@ async function docker(opts, tmp, model, iteration) {
         if (!opts.silent) console.error('ok - pushed image to AWS:ECR');
     }
 
+    if (!opts.silent) console.error('ok - saving image to disk');
     CP.execSync(`
         docker save ${tag} | gzip > ${tmp}/docker-${tagged_model}.tar.gz
     `);
-
     if (!opts.silent) console.error('ok - saved image to disk');
 
-    const s3 = new AWS.S3({ region: process.env.AWS_REGION || 'us-east-1' });
+    const s3 = new AWS.S3({ region });
 
     await s3.putObject({
         Bucket: model.split('/')[0],

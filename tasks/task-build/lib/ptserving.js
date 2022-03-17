@@ -45,14 +45,17 @@ function docker(tmp, model, tagged_model) {
         mkdir ${tmp}/model
     `);
 
+    console.error('ok - extracting model');
     CP.execSync(`
         unzip ${tmp}/model.mar -d ${tmp}/model/
     `);
 
+    console.error('ok - syncing model');
     CP.execSync(`
         docker cp ${tmp}/model/ serving_base:/home/model-server/model-store/
     `);
 
+    console.error('ok - syncing build script');
     CP.execSync(`
         docker cp ${path.resolve(__dirname, 'fixtures/py-build.sh')} serving_base:/home/model-server/
     `);
@@ -63,6 +66,7 @@ function docker(tmp, model, tagged_model) {
         docker commit --change 'CMD ./py-build.sh' serving_base ${tag}
     `);
 
+    console.error('ok - built base image');
     return tag;
 }
 
