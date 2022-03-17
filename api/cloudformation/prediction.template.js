@@ -188,7 +188,9 @@ module.exports = {
                         INF_SUPERTILE: cf.ref('InfSupertile'),
                         MODEL_TYPE: cf.ref('ModelType'),
                         IMAGERY_ID: cf.ref('ImageryId'),
-                        PREDICTION_ENDPOINT: cf.findInMap('Models', cf.ref('ModelType'), 'Prediction'),
+                        PREDICTION_ENDPOINT: cf.join([
+                            'http://', cf.getAtt('PredELB', 'DNSName'), cf.findInMap('Models', cf.ref('ModelType'), 'Prediction')
+                        ]),
                         MLENABLER_ENDPOINT: cf.importValue(cf.join([cf.ref('StackName'), '-api']))
                     }
                 }
@@ -514,9 +516,7 @@ module.exports = {
                     '--model-store=/home/model-server/model-store/',
                     '--models=model.mar'
                 ],
-                Prediction: cf.join([
-                    'http://', cf.getAtt('PredELB', 'DNSName'), '/v1/models/default/versions/001'
-                ])
+                Prediction: '/v1/models/default/versions/001'
             },
             tensorflow: {
                 Path: '/v1/models/default',
@@ -524,9 +524,7 @@ module.exports = {
                 Command: [
                     '/usr/bin/tf_serving_entrypoint.sh'
                 ],
-                Prediction: cf.join([
-                    'http://', cf.getAtt('PredELB', 'DNSName'), '/v1/models/default:predict'
-                ])
+                Prediction: '/v1/models/default'
             }
         },
         AWSRegion2AZ: {
