@@ -1,0 +1,21 @@
+{
+    "json": true,
+    "url": "/api/project",
+    "method": "POST",
+    "body": {
+        "name": "Test Project",
+        "source": "Development Seed",
+        "project_url": "example.com/test",
+        "access": "private",
+        "notes": "I am a note",
+        "tags": [{
+            "Key": "Billing",
+            "Value": "Tags"
+        }],
+        "users": [{
+            "uid": 1,
+            "access": "admin"
+        }]
+
+    }
+}

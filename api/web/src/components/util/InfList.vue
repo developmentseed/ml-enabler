@@ -63,9 +63,12 @@ export default {
         binary: function() {
             this.$emit('binary', this.binary);
         },
-        list: function() {
-            if (this.list.length > 2) this.binary = false;
-            this.$emit('list', this.list);
+        list: {
+            deep: true,
+            handler() {
+                if (this.list.length > 2) this.binary = false;
+                this.$emit('list', this.list);
+            }
         }
     },
     methods: {

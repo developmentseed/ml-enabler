@@ -3,6 +3,7 @@ const { Err } = require('@openaddresses/batch-schema');
 const Iteration = require('../lib/project/iteration');
 const Stack = require('../lib/stack');
 const User = require('../lib/user');
+const Imagery = require('../lib/project/imagery');
 
 async function router(schema, config) {
     /**
@@ -76,6 +77,12 @@ async function router(schema, config) {
             await User.is_auth(req);
 
             req.body.pid = req.params.pid;
+
+            const img = await Imagery.from(config.pool, req.body.imagery_id);
+
+            if (img.pid !== req.params.pid) {
+                throw new Err(401, null, 'Referenced imagery must be part of project');
+            }
 
             const iter = await Iteration.generate(config.pool, req.body);
 

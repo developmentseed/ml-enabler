@@ -17,8 +17,7 @@ const AWS = require('aws-sdk');
 const TFServing = require('./lib/tfserving');
 const PTServing = require('./lib/ptserving');
 
-const batch = new AWS.Batch({ region: process.env.AWS_REGION || 'us-east-1' });
-const s3 = new AWS.S3({ region: process.env.AWS_REGION || 'us-east-1' });
+const region = process.env.AWS_REGION || 'us-east-1';
 
 /**
  * @class
@@ -33,10 +32,14 @@ class Task {
      * @param {string}  opts.token              MLEnabler API Token
      * @param {string}  opts.ecr                AWS ECR name
      * @param {string}  opts.task               MLEnabler Task ID
+     * @param {boolean} [opts.dryrun=false]     Don't upload output to AWS ECR
      * @param {boolean} [opts.silent=false]     Should output be squelched
+     * @param {boolean} [opts.dockerd=false]    Is Dockerd managed externally
      */
     static async build(opts) {
         if (!opts.silent) opts.silent = false;
+        if (!opts.dryrun) opts.dryrun = false;
+        if (!opts.dockerd) opts.dockerd = false;
 
         const tmp = os.tmpdir() + '/' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         mkdir(tmp);
@@ -60,7 +63,8 @@ class Task {
 
         await set_link(opts, project_id, iteration_id, links);
 
-        const dd = await dockerd();
+        let dd = null;
+        if (!opts.dockerd) dd = await dockerd();
 
         const iteration = await get_iteration(opts, project_id, iteration_id);
 
@@ -75,7 +79,7 @@ class Task {
 
         await set_link(opts, project_id, iteration_id, links);
 
-        dd.kill();
+        if (dd) dd.kill();
     }
 }
 
@@ -121,6 +125,8 @@ function get_iteration_id(model) {
 }
 
 function get_log_link(opts) {
+    const batch = new AWS.Batch({ region });
+
     return new Promise((resolve, reject) => {
         // Allow local runs
 
@@ -128,6 +134,7 @@ function get_log_link(opts) {
 
         function link() {
             if (!opts.silent) console.error(`ok - getting meta for job: ${process.env.AWS_BATCH_JOB_ID}`);
+
 
             batch.describeJobs({
                 jobs: [process.env.AWS_BATCH_JOB_ID]
@@ -154,7 +161,7 @@ function get_iteration(opts, project, iteration) {
     return new Promise((resolve, reject) => {
         request({
             method: 'GET',
-            url: `${opts.url}/api/project/${project}/iteration/${iteration}`,
+            url: new URL(`/api/project/${project}/iteration/${iteration}`, opts.url),
             json: true,
             auth: {
                 bearer: opts.token
@@ -177,7 +184,7 @@ function set_log_link(opts, project, iteration, task, log) {
 
         request({
             method: 'PATCH',
-            url: `${opts.url}/api/project/${project}/iteration/${iteration}/task/${task}`,
+            url: new URL(`/api/project/${project}/iteration/${iteration}/task/${task}`, opts.url),
             auth: {
                 bearer: opts.token
             },
@@ -203,7 +210,7 @@ function set_link(opts, project, iteration, patch) {
 
         request({
             method: 'PATCH',
-            url: `${opts.url}/api/project/${project}/iteration/${iteration}`,
+            url: new URL(`/api/project/${project}/iteration/${iteration}`, opts.url),
             auth: {
                 bearer: opts.token
             },
@@ -256,6 +263,8 @@ function std_model(opts, tmp, iteration) {
 function download(opts, tmp, iteration) {
     if (!opts.silent) console.error(`ok - fetching ${opts.model}`);
 
+    const s3 = new AWS.S3({ region });
+
     return new Promise((resolve, reject) => {
         if (iteration.model_type === 'tensorflow') {
             const loc = path.resolve(tmp, 'model.zip');
@@ -290,6 +299,8 @@ function download(opts, tmp, iteration) {
 
                     return resolve(loc);
                 });
+        } else {
+            return reject(new Error('Model Type not supported'));
         }
     });
 }
@@ -297,6 +308,7 @@ function download(opts, tmp, iteration) {
 function dockerd() {
     return new Promise((resolve, reject) => {
         console.error('ok - spawning dockerd');
+
         const dockerd = CP.spawn('dockerd');
 
         dockerd.stderr.on('data', (data) => {
@@ -327,23 +339,33 @@ async function docker(opts, tmp, model, iteration) {
     }
 
     const push = `${opts.ecr}:${tagged_model}`;
+
+    if (!opts.silent) console.error('ok - tagging docker image');
     CP.execSync(`
         docker tag ${tag} ${push}
     `);
 
-    CP.execSync(`
-        $(aws ecr get-login --region us-east-1 --no-include-email)
-    `);
+    if (!opts.dryrun) {
+        if (!opts.silent) console.error('ok - getting AWS ECR credentials');
+        CP.execSync(`
+            $(aws ecr get-login --region ${region} --no-include-email)
+        `);
 
-    CP.execSync(`
-        docker push ${push}
-    `);
-    if (!opts.silent) console.error('ok - pushed image to AWS:ECR');
+        if (!opts.silent) console.error('ok - pushing image to AWS ECR');
+        CP.execSync(`
+            docker push ${push}
+        `);
 
+        if (!opts.silent) console.error('ok - pushed image to AWS:ECR');
+    }
+
+    if (!opts.silent) console.error('ok - saving image to disk');
     CP.execSync(`
         docker save ${tag} | gzip > ${tmp}/docker-${tagged_model}.tar.gz
     `);
     if (!opts.silent) console.error('ok - saved image to disk');
+
+    const s3 = new AWS.S3({ region });
 
     await s3.putObject({
         Bucket: model.split('/')[0],
@@ -359,4 +381,4 @@ async function docker(opts, tmp, model, iteration) {
     };
 }
 
-module.export = Task;
+module.exports = Task;

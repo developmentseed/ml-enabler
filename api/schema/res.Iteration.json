@@ -24,7 +24,12 @@
     "additionalProperties": false,
     "properties": {
         "id": {
-            "type": "integer"
+            "type": "integer",
+            "description": "Iteration ID"
+        },
+        "pid": {
+            "type": "integer",
+            "description": "Project ID"
         },
         "created": {
             "$ref": "./util/created.json"
@@ -33,10 +38,10 @@
             "$ref": "./util/updated.json"
         },
         "docker_link": {
-            "type": "string"
+            "type": ["string", "null"]
         },
         "model_link": {
-            "type": "string"
+            "type": ["string", "null"]
         },
         "model_type": {
             "type": "string",
@@ -46,13 +51,13 @@
             ]
         },
         "checkpoint_link": {
-            "type": "string"
+            "type": ["string", "null"]
         },
         "tfrecord_link": {
-            "type": "string"
+            "type": ["string", "null"]
         },
         "save_link": {
-            "type": "string"
+            "type": ["string", "null"]
         },
         "tile_zoom": {
             "type": "integer"
@@ -70,7 +75,8 @@
             "type": "boolean"
         },
         "version": {
-            "type": "string"
+            "type": "string",
+            "description": "SemVer String"
         },
         "hint": {
             "type": "string"

@@ -112,7 +112,7 @@ export default {
                         inf_binary: this.iter.inf_binary,
                         inf_supertile: this.iter.inf_supertile,
                         model_type: this.iter.model_type,
-                        gitsha: this.iter.gitsha
+                        gitsha: this.iter.gitsha || undefined
                     }
                 });
 

@@ -130,6 +130,51 @@ module.exports = {
                         Period: 60,
                         Stat: 'Maximum'
                     }
+                },{
+                    Id: 'm4',
+                    ReturnData: false,
+                    MetricStat: {
+                        Metric: {
+                            Namespace: 'AWS/SQS',
+                            MetricName: 'ApproximateNumberOfMessagesNotVisible',
+                            Dimensions: [{
+                                Name: 'QueueName',
+                                Value: cf.join([cf.stackName, '-dead-queue'])
+                            }]
+                        },
+                        Period: 60,
+                        Stat: 'Maximum'
+                    }
+                },{
+                    Id: 'm5',
+                    ReturnData: false,
+                    MetricStat: {
+                        Metric: {
+                            Namespace: 'AWS/SQS',
+                            MetricName: 'ApproximateNumberOfMessagesVisible',
+                            Dimensions: [{
+                                Name: 'QueueName',
+                                Value: cf.join([cf.stackName, '-dead-queue'])
+                            }]
+                        },
+                        Period: 60,
+                        Stat: 'Maximum'
+                    }
+                },{
+                    Id: 'm6',
+                    ReturnData: false,
+                    MetricStat: {
+                        Metric: {
+                            Namespace: 'AWS/SQS',
+                            MetricName: 'ApproximateNumberOfMessagesDelayed',
+                            Dimensions: [{
+                                    Name: 'QueueName',
+                                    Value: cf.join([cf.stackName, '-dead-queue'])
+                                }]
+                        },
+                        Period: 60,
+                        Stat: 'Maximum'
+                    }
                 }]
             }
         },
@@ -188,7 +233,9 @@ module.exports = {
                         INF_SUPERTILE: cf.ref('InfSupertile'),
                         MODEL_TYPE: cf.ref('ModelType'),
                         IMAGERY_ID: cf.ref('ImageryId'),
-                        PREDICTION_ENDPOINT: cf.findInMap('Models', cf.ref('ModelType'), 'Prediction'),
+                        PREDICTION_ENDPOINT: cf.join([
+                            'http://', cf.getAtt('PredELB', 'DNSName'), cf.findInMap('Models', cf.ref('ModelType'), 'Prediction')
+                        ]),
                         MLENABLER_ENDPOINT: cf.importValue(cf.join([cf.ref('StackName'), '-api']))
                     }
                 }
@@ -258,7 +305,7 @@ module.exports = {
             Type: 'AWS::SQS::Queue',
             Properties: {
                 QueueName: cf.join([cf.stackName, '-queue' ]),
-                VisibilityTimeout: 2880,
+                VisibilityTimeout: 60,
                 RedrivePolicy: {
                     deadLetterTargetArn: cf.getAtt('PredDeadQueue', 'Arn'),
                     maxReceiveCount: 3
@@ -514,9 +561,7 @@ module.exports = {
                     '--model-store=/home/model-server/model-store/',
                     '--models=model.mar'
                 ],
-                Prediction: cf.join([
-                    'http://', cf.getAtt('PredELB', 'DNSName'), '/v1/models/default/versions/001'
-                ])
+                Prediction: '/v1/models/default'
             },
             tensorflow: {
                 Path: '/v1/models/default',
@@ -524,9 +569,7 @@ module.exports = {
                 Command: [
                     '/usr/bin/tf_serving_entrypoint.sh'
                 ],
-                Prediction: cf.join([
-                    'http://', cf.getAtt('PredELB', 'DNSName'), '/v1/models/default:predict'
-                ])
+                Prediction: '/v1/models/default/versions/001'
             }
         },
         AWSRegion2AZ: {

@@ -1,0 +1,10 @@
+{
+    "json": true,
+    "url": "/api/project/1/imagery",
+    "method": "POST",
+    "body": {
+        "name": "Test Imagery",
+        "fmt": "wms",
+        "url": "https://example.com/{z}/{x}/{y}.png"
+    }
+}
