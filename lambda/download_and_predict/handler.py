@@ -1,5 +1,3 @@
-"""Example AWS Lambda function for chip-n-scale"""
-
 import os
 from typing import Dict, Any
 from download_and_predict.tensorflow import TFDownloadAndPredict
@@ -70,14 +68,16 @@ def handler(event: SQSEvent, context: Dict[str, Any]) -> bool:
     elif model_type == "pytorch":
         preds = []
 
-        for payload in dap.get_prediction_payloads(t_i):
+        payloads = dap.get_prediction_payloads(t_i)
+        for i in range(len(payloads)):
             if inf_type == "segmentation":
                 print("TYPE: Segmentation")
 
                 # send prediction request
-                preds.append(dap.segmentation(payload, chips))
+                preds.append(dap.segmentation(payloads[i], chips[i]))
 
     print('Saving:', len(preds), ' predictions')
+
     Chips.save(preds, stream)
 
     return True

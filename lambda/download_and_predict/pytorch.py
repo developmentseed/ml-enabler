@@ -66,26 +66,31 @@ class PTDownloadAndPredict(object):
     def classification(self, payload, chips):
         print("UNSUPPORTED")
 
-    def segmentation(self, payload, chips):
+    def segmentation(self, payload, chip):
         try:
-            print(payload)
             r = requests.post(self.prediction_endpoint + ":predict", data=payload)
             r.raise_for_status()
 
-            pred = np.argmax(np.array(r.content), axis=-1).astype('uint8')
+            lst = r.json()
+
+            img = np.ndarray((len(lst), len(lst[0])), dtype=np.uint8)
+
+            for x in range(len(lst)):
+                for y in range(len(lst[x])):
+                    img[x][y] = int(lst[x][y][0])
+
 
             img_bytes = BytesIO()
-            # TODO don't assume input image size starts at 256^2 - and that the desired end state is 256^2
-            Image.fromarray(pred).resize((256, 256)).save(img_bytes, 'PNG')
+            Image.fromarray(img).resize((256, 256)).save(img_bytes, 'PNG')
 
             return {
                 "type": "Image",
-                "name": chips[i].get("name"),
-                "bounds": chips[i].get("bounds"),
-                "x": chips[i].get("x"),
-                "y": chips[i].get("y"),
-                "z": chips[i].get("z"),
-                "submission_id": chips[i].get('submission'),
+                "name": chip.get("name"),
+                "bounds": chip.get("bounds"),
+                "x": chip.get("x"),
+                "y": chip.get("y"),
+                "z": chip.get("z"),
+                "submission_id": chip.get('submission'),
                 "image": Chips.b64encode_image(img_bytes.getvalue())
             }
 
