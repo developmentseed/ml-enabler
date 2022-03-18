@@ -4,19 +4,19 @@ const CP = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-const base = 'pytorch/torchserve:0.5.0-gpu';
+const VERSION = 'pytorch/torchserve:0.5.0-gpu';
 
 function docker(tmp, model, tagged_model) {
     const exists = !!String(CP.execSync(`
-        docker images ${base}
+        docker images ${VERSION}
     `)).split('\n')[1];
 
 
     if (!exists) {
-        console.error(`ok - pulling ${base} docker image`);
+        console.error(`ok - pulling ${VERSION} docker image`);
 
         CP.execSync(`
-            docker pull ${base}
+            docker pull ${VERSION}
         `);
     }
 
