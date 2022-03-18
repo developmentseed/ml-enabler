@@ -244,6 +244,11 @@
         "query": false,
         "res": true
     },
+    "GET /project/:pid/iteration/latest": {
+        "body": false,
+        "query": false,
+        "res": true
+    },
     "GET /project/:pid/iteration/:iterationid": {
         "body": false,
         "query": false,
