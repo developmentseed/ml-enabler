@@ -93,6 +93,32 @@ async function router(schema, config) {
     });
 
     /**
+     * @api {get} /api/project/:pid/iteration/latest Latest Iteration
+     * @apiVersion 1.0.0
+     * @apiName LatestIteration
+     * @apiGroup Iterations
+     * @apiPermission user
+     *
+     * @apiDescription
+     *     Get the latest iteration by SemVer
+     *
+     * @apiSchema {jsonschema=../schema/res.Iteration.json} apiSuccess
+     */
+    await schema.get('/project/:pid/iteration/latest', {
+        ':pid': 'integer',
+        res: 'res.Iteration.json'
+    }, async (req, res) => {
+        try {
+            await User.is_auth(req);
+
+            const iter = await Iteration.latest(config.pool, req.params.pid);
+            return res.json(iter.serialize());
+        } catch (err) {
+            return Err.respond(err, res);
+        }
+    });
+
+    /**
      * @api {get} /api/project/:pid/iteration/:iterationid Get Iteration
      * @apiVersion 1.0.0
      * @apiName GetIteration

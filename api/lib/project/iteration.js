@@ -73,6 +73,32 @@ class ProjectIteration extends Generic {
         return ProjectIteration.deserialize(pgres.rows);
     }
 
+    /**
+     * Return the last iteration by SemVer
+     *
+     * @param {Pool} pool - Instantiated Postgres Pool
+     * @param {Number} pid - Project ID
+     */
+    static async latest(pool, pid) {
+        let pgres;
+        try {
+            pgres = await pool.query(sql`
+                SELECT
+                    *
+                FROM
+                    iterations
+                WHERE
+                    pid = ${pid}
+                ORDER BY
+                    string_to_array(version, '.')::int[] DESC
+            `);
+        } catch (err) {
+            throw new Err(500, err, 'Failed to load latest Iteration');
+        }
+
+        return ProjectIteration.deserialize(pgres.rows);
+    }
+
     async commit(pool) {
         try {
             await pool.query(sql`
