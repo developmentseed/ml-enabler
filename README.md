@@ -35,7 +35,7 @@ MLE uses AWS CloudFormation and is tightly integrated with AWS infrastructure at
 
 ### Framework
 
-MLE supports TFv2 models & uses TF Serving to host the model for large scale inferencing. We have plans to add support for PyTorch in the near future.
+MLE supports TFv2 models PyTorch Segmentation models for large scale inferencing.
 
 ### Continuous Learning
 
@@ -102,7 +102,7 @@ TODO: Update
   - Add `$(MAPBOX_TOKEN)` environment variable from your [mapbox account](https://account.mapbox.com/)
   - Install `jq` from [here](https://stedolan.github.io/jq/download/)
 
-2. Clone ml-enabler & install node-modules (*TODO: Replace these with scripts in the future*)  
+2. Clone ml-enabler & install node-modules (*TODO: Replace these with scripts in the future*)
   ```
     gh repo clone developmentseed/ml-enabler
     cd ml-enabler/api && npm install && npx knex migrate:latest
