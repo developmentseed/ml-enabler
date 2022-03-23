@@ -18,11 +18,12 @@
             <div class='col col--12 mt6'>
                 <label>AOI Name</label>
                 <template v-if='mode === "existing"'>
-                    <vSelect
-                        class='w-full'
-                        v-model='selected'
-                        :options='aois'
-                    />
+                    <div class='select-container w-full' style='width: 100px; height: 36px;'>
+                        <select v-model='selected' class='select select--stroke select--s'>
+                            <option v-for='a in aois' :key='a' :value='a' v-text='a.label || "Unnamed"'></option>
+                        </select>
+                        <div class='select-arrow'></div>
+                    </div>
                 </template>
                 <template v-else>
                     <input v-model='selected.label' type='text' class='input' placeholder='New York City, NY, USA'/>
@@ -43,9 +44,6 @@
 </template>
 
 <script>
-import vSelect from "vue-select";
-import "vue-select/dist/vue-select.css";
-
 export default {
     name: 'AOI',
     props: ['mapbounds'],
@@ -120,9 +118,6 @@ export default {
                 this.$emit('err', err);
             }
         }
-    },
-    components: {
-        vSelect
     }
 }
 </script>
