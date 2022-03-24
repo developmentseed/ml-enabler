@@ -41,7 +41,7 @@
         "wkx": "^0.5.0"
     },
     "devDependencies": {
-        "apidoc": "^0.50.0",
+        "apidoc": "^0.51.0",
         "apidoc-plugin-schema": "^0.1.8",
         "codecov": "^3.8.2",
         "eslint": "^8.3.0",

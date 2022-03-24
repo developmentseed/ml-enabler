@@ -28,12 +28,14 @@
                     <div class='bg-white round absolute top left z5 px12 py12 mx12 my12 w180'>
                         <div class='col col--12'>
                             <label>Submission #</label>
-                            <div class='select-container w-full'>
+                            <div class='select-container' style='width: 100px;'>
                                 <select v-model='submission' class='select select--stroke select--s'>
                                     <option v-for='s in submissions' v-bind:key='s.id' v-text='s.id'></option>
                                 </select>
                                 <div class='select-arrow'></div>
                             </div>
+
+                            <button @click='bboxzoom' class='btn round btn--stroke fr btn--gray' style='height: 30px;'><svg class='icon'><use xlink:href='#icon-viewport'/></svg></button>
                         </div>
                         <div v-if='iteration.inf_type !== "segmentation"' class='col col--12'>
                             <label>Inference Type</label>
@@ -43,21 +45,6 @@
                                 </select>
                                 <div class='select-arrow'></div>
                             </div>
-                        </div>
-                        <div class='col col--12 clearfix pt6'>
-                            <div class='select-container mr6' style='width: 100px;'>
-                                <select v-model='aoi' class='select select--stroke select--s'>
-                                    <option default value='aoi'>AOI</option>
-                                    <template v-for='aoi in aois'>
-                                        <template v-if='aoi.name.trim().length'>
-                                            <option v-bind:key='aoi.id' v-text='aoi.name'></option>
-                                        </template>
-                                    </template>
-                                </select>
-                                <div class='select-arrow'></div>
-                            </div>
-
-                            <button @click='bboxzoom' class='btn round btn--stroke fr btn--gray'><svg class='icon'><use xlink:href='#icon-viewport'/></svg></button>
                         </div>
 
                         <template v-if='!advanced'>
@@ -184,7 +171,6 @@ export default {
             opacity: 50,
             map: false,
             imagery: [],
-            aoi: 'aoi',
             aois: [],
             submission: false,
             submissions: [],
@@ -203,8 +189,6 @@ export default {
                     [bounds[2], bounds[3]]
                 ]);
             }
-
-            this.aoi = 'aoi';
         },
         submission: async function() {
             await this.getSubmissionTileJSON();
@@ -484,23 +468,6 @@ export default {
                     }
                 }]
             };
-
-            for (const aoi of this.aois) {
-                const bounds = aoi.bounds.bounds;
-                const aoipolyouter = buffer(bboxPolygon(bounds), 0.3);
-                const aoipolyinner = buffer(bboxPolygon(bounds), 0.1);
-                poly.features.push({
-                    type: 'Feature',
-                    properties: {},
-                    geometry: {
-                        type: 'Polygon',
-                        coordinates: [
-                            aoipolyouter.geometry.coordinates[0],
-                            aoipolyinner.geometry.coordinates[0]
-                        ]
-                    }
-                });
-            }
 
             if (!this.map.getSource('bbox')) {
                 this.map.addSource('bbox', {

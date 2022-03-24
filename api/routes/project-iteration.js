@@ -41,7 +41,7 @@ async function router(schema, config) {
                 i.stack = false;
 
                 for (const s of stacks) {
-                    if (s.includes(config.StackName + '-project-' + req.params.pid + '-iteration-' + i.id)) {
+                    if (new RegExp(config.StackName + '-project-' + req.params.pid + '-iteration-' + i.id + '$').test(s)) {
                         i.stack = true;
                     }
                 }

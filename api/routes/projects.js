@@ -42,7 +42,7 @@ async function router(schema, config) {
                 p.stacks = [];
 
                 for (const s of stacks) {
-                    if (s.includes(config.StackName + '-project-' + p.id)) {
+                    if (new RegExp(config.StackName + '-project-' + p.id + '-').test(s)) {
                         p.stacks.push(s);
                     }
                 }
