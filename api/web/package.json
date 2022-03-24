@@ -14,7 +14,7 @@
         "@mapbox/mapbox-gl-geocoder": "^5.0.0",
         "@turf/bbox": "^6.5.0",
         "@turf/bbox-polygon": "^6.5.0",
-        "@turf/buffer": "^5.1.5",
+        "@turf/buffer": "^6.5.0",
         "core-js": "^3.6.4",
         "filepond": "^4.30.3",
         "filepond-plugin-file-validate-type": "^1.2.4",
@@ -29,12 +29,12 @@
         "vue-select": "^4.0.0-beta.3"
     },
     "devDependencies": {
+        "@babel/eslint-parser": "^7.17.0",
         "@vue/cli-plugin-babel": "^5.0.3",
         "@vue/cli-plugin-eslint": "^5.0.3",
         "@vue/cli-service": "^5.0.3",
-        "babel-eslint": "^10.0.3",
-        "eslint": "^7.1.0",
-        "eslint-plugin-vue": "^7.0.1",
+        "eslint": "^8.11.0",
+        "eslint-plugin-vue": "^8.5.0",
         "vue-template-compiler": "^2.6.11"
     },
     "eslintConfig": {
@@ -50,9 +50,11 @@
             "eslint:recommended"
         ],
         "parserOptions": {
-            "parser": "babel-eslint"
+            "parser": "@babel/eslint-parser"
         },
-        "rules": {}
+        "rules": {
+            "vue/multi-word-component-names": 1
+        }
     },
     "browserslist": [
         "> 1%",

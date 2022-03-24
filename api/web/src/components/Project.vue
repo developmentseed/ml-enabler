@@ -218,11 +218,6 @@ export default {
             }
         }
     },
-    watch: {
-        '$route': function() {
-            this.refresh();
-        }
-    },
     components: {
         Loading,
         Integrations,
