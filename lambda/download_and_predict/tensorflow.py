@@ -78,7 +78,7 @@ class TFDownloadAndPredict(object):
         r = requests.get(self.prediction_endpoint + "/metadata")
         r.raise_for_status()
 
-        self.meta = ModelMeta(r.json(), inf_type)
+        self.meta = TFModelMeta(r.json(), inf_type)
 
     def listencode_image(self, image: bytes):
         img = Image.open(io.BytesIO(image))
