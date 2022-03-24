@@ -23,7 +23,7 @@
         "aws-sdk": "^2.1039.0",
         "fast-png": "^6.1.0",
         "image-js": "^0.33.1",
-        "minimist": "^1.2.5",
+        "minimist": "^1.2.6",
         "node-fetch": "^3.2.0",
         "randomcolor": "^0.6.2",
         "tilebase": "^3.0.0"
