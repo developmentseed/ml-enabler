@@ -91,12 +91,15 @@ class ProjectIteration extends Generic {
                     pid = ${pid}
                 ORDER BY
                     string_to_array(version, '.')::int[] DESC
+                LIMIT 1
             `);
         } catch (err) {
             throw new Err(500, err, 'Failed to load latest Iteration');
         }
 
-        return ProjectIteration.deserialize(pgres.rows);
+        if (!pgres.rows.length) throw new Err(400, null, 'Project does not contain iterations');
+
+        return ProjectIteration.deserialize(pgres.rows[0]);
     }
 
     async commit(pool) {
