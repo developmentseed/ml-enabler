@@ -67,14 +67,12 @@
                     </div>
 
                     <label class='ml12'>Add User to Project</label>
-                    <vSelect
-                        label='username'
-                        class='ml12 w-full'
-                        v-model='search.user'
-                        :options='search.users'
-                        @input='addUser'
-                    />
 
+                    <UserSelect
+                        :omitted='project.users'
+                        @err='$emit("err", $event)'
+                        @user='addUser($event)'
+                    />
                 </template>
 
                 <template v-if='!showAdvanced'>
@@ -133,8 +131,7 @@
 </template>
 
 <script>
-import vSelect from "vue-select";
-import "vue-select/dist/vue-select.css";
+import UserSelect from './util/UserSelect.vue';
 
 export default {
     name: 'EditProject',
@@ -143,10 +140,6 @@ export default {
         return {
             showUser: false,
             showAdvanced: false,
-            search: {
-                user: {},
-                users: []
-            },
             errors: {
                 repo: false
             },
@@ -162,8 +155,6 @@ export default {
         }
     },
     mounted: function() {
-        this.getUsers();
-
         this.project.users.push({
             uid: this.user.id,
             username: this.user.username,
@@ -171,21 +162,12 @@ export default {
         });
     },
     methods: {
-        addUser: function() {
-            for (const user of this.project.users) {
-                if (this.search.user.id === user.uid) {
-                    this.search.user = null;
-                    return;
-                }
-            }
-
+        addUser: function(user) {
             this.project.users.push({
-                uid: this.search.user.id,
-                username: this.search.user.username,
+                uid: user.id,
+                username: user.username,
                 access: 'read'
             });
-
-            this.search.user = null;
         },
         postProject: async function() {
             let error = false;
@@ -223,17 +205,10 @@ export default {
             } catch (err) {
                 this.$emit('err', err);
             }
-        },
-        getUsers: async function() {
-            try {
-                this.search.users = (await window.std('/api/user')).users;
-            } catch (err) {
-                this.$emit('err', err);
-            }
-        },
+        }
     },
     components: {
-        vSelect
+        UserSelect
     }
 }
 </script>
