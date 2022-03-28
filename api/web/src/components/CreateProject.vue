@@ -189,7 +189,7 @@ export default {
         },
         postProject: async function() {
             let error = false;
-            if (this.project.repo && !this.project.repo.match(/https:\/\/github.com\/[a-z-]+\/[a-z-]+/)) {
+            if (this.project.repo && !this.project.repo.match(/https:\/\/github.com\/[a-zA-Z-_]+\/[a-zA-Z-_]+/)) {
                 this.errors.repo = true;
                 error = true
             }
