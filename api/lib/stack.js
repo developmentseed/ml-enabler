@@ -110,6 +110,22 @@ class Stack {
                 memory_size = 1024;
             }
 
+            // Ensure Users can't fudge billing
+            let stacked = false;
+            for (const tag of options.tags) {
+                if (tag.Key === 'StackName') {
+                    tag.Value = stack_name;
+                    stacked = true;
+                }
+            }
+
+            if (!stacked) {
+                options.tags.push({
+                    Key: 'StackName',
+                    Value: stack_name
+                });
+            }
+
             await cf.createStack({
                 StackName: stack_name,
                 TemplateBody: JSON.stringify(template),
