@@ -197,23 +197,26 @@ export default {
             if (error) return;
 
             try {
+                const body = {
+                    name: this.project.name,
+                    notes: this.project.notes,
+                    access: this.project.access ? 'public' : 'private',
+                    source: this.project.source,
+                    project_url: this.project.project_url,
+                    tags: this.project.tags,
+                    users: this.project.users.map((u) => {
+                        return {
+                            uid: u.uid,
+                            access: u.access
+                        }
+                    })
+                };
+
+                if (this.project.repo) body.repo = this.project.repo;
+
                 const proj = await window.std('/api/project', {
                     method: 'POST',
-                    body: {
-                        name: this.project.name,
-                        notes: this.project.notes,
-                        access: this.project.access ? 'public' : 'private',
-                        source: this.project.source,
-                        project_url: this.project.project_url,
-                        tags: this.project.tags,
-                        users: this.project.users.map((u) => {
-                            return {
-                                uid: u.uid,
-                                access: u.access
-                            }
-                        }),
-                        repo: this.project.repo || null
-                    }
+                    body
                 });
 
                 this.$router.push({ path: `/project/${proj.id}` });
