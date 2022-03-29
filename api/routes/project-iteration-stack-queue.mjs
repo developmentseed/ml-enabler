@@ -1,4 +1,4 @@
-'use strict';
+
 import { Err } from '@openaddresses/batch-schema';
 import StackQueue from '../lib/stack/queue.js';
 import Task from '../lib/project/iteration/task.js';

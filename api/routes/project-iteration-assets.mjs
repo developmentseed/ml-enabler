@@ -1,4 +1,4 @@
-'use strict';
+
 import { Err } from '@openaddresses/batch-schema';
 import S3 from '../lib/s3.js';
 import Busboy from 'busboy';

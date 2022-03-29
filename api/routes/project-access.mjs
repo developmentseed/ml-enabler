@@ -1,4 +1,4 @@
-'use strict';
+
 import { Err } from '@openaddresses/batch-schema';
 import ProjectAccess from '../lib/project/access.js';
 import User from '../lib/user.js';

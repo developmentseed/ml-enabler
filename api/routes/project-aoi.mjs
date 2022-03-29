@@ -1,4 +1,4 @@
-'use strict';
+
 import { Err } from '@openaddresses/batch-schema';
 import AOI from '../lib/project/aoi.js';
 import User from '../lib/user.js';

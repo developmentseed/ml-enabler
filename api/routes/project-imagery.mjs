@@ -1,4 +1,4 @@
-'use strict';
+
 import { Err } from '@openaddresses/batch-schema';
 import Imagery from '../lib/project/imagery.js';
 import User from '../lib/user.js';

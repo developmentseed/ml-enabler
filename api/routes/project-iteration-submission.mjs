@@ -1,4 +1,4 @@
-'use strict';
+
 import { Err } from '@openaddresses/batch-schema';
 import Submission from '../lib/project/iteration/submission.js';
 import User from '../lib/user.js';

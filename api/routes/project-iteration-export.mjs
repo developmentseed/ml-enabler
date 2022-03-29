@@ -1,4 +1,4 @@
-'use strict';
+
 import { Err } from '@openaddresses/batch-schema';
 import Iteration from '../lib/project/iteration.js';
 import AWS from 'aws-sdk';

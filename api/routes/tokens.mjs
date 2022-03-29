@@ -1,4 +1,4 @@
-'use strict';
+
 import { Err } from '@openaddresses/batch-schema';
 import UserToken from '../lib/token.js';
 import User from '../lib/user.js';

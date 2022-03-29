@@ -4,6 +4,13 @@
     "env": {
         "node": true
     },
+    "overrides": [{
+        "files": [ "**.mjs" ],
+        "parserOptions": {
+            "sourceType": "module",
+            "allowImportExportEverywhere": true
+        }
+    }],
     "globals": {
         "Map": true,
         "Promise": true
