@@ -46,7 +46,9 @@
 <script>
 export default {
     name: 'AOI',
-    props: ['mapbounds'],
+    props: {
+        mapbounds: String
+    },
     data: function() {
         return {
             mode: 'new',
@@ -65,7 +67,7 @@ export default {
     },
     watch: {
         'selected.bounds': function() {
-            this.$emit('bounds', this.selected.bounds.join(','));
+            this.$emit('bounds', this.selected.bounds);
         },
         mode: function() {
             this.selected = {

@@ -141,18 +141,18 @@
                 <div class='col col--12'>
                     <template v-if='imagery.fmt === "wms" && mode === "bbox"'>
                         <StackQueueAOI
-                            v-on:queue='postQueue($event)'
+                            @queue='postQueue($event)'
                         />
                     </template>
                     <template v-else-if='imagery.fmt === "wms" && mode === "xyz"'>
                         <StackQueueXYZ
-                            v-on:queue='postQueue($event)'
+                            @queue='postQueue($event)'
                         />
                     </template>
                     <template v-else-if='imagery.fmt === "list"'>
                         <StackQueueList
                             :imagery='imagery'
-                            v-on:queue='postQueue($event)'
+                            @queue='postQueue($event)'
                         />
                     </template>
                     <template v-else>

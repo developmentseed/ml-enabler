@@ -72,7 +72,7 @@ class ProjectImagery extends Generic {
                 UPDATE imagery
                     SET
                         name        = ${this.name},
-                        url         = ${this.url},
+                        url         = ${this.url.trim()},
                         fmt         = ${this.fmt},
                         updated     = NOW()
                     WHERE
@@ -96,7 +96,7 @@ class ProjectImagery extends Generic {
                 ) VALUES (
                     ${imagery.pid},
                     ${imagery.name},
-                    ${imagery.url},
+                    ${imagery.url.trim()},
                     ${imagery.fmt}
                 ) RETURNING *
             `);
