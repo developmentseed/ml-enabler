@@ -1,7 +1,7 @@
 'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Submission = require('../lib/project/iteration/submission');
-const User = require('../lib/user');
+import { Err } from '@openaddresses/batch-schema';
+import Submission from '../lib/project/iteration/submission.js';
+import User from '../lib/user.js';
 
 async function router(schema, config) {
     const TileBase = (await import('tilebase')).default;
@@ -163,4 +163,4 @@ async function router(schema, config) {
     });
 }
 
-module.exports = router;
+export default router;

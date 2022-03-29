@@ -1,13 +1,13 @@
 'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Iteration = require('../lib/project/iteration');
-const AWS = require('aws-sdk');
-const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
-const Submission = require('../lib/project/iteration/submission');
-const createCsvStringifier = require('csv-writer').createObjectCsvStringifier;
-const RL = require('readline');
-const User = require('../lib/user');
+import { Err } from '@openaddresses/batch-schema';
+import Iteration from '../lib/project/iteration.js';
+import AWS from 'aws-sdk';
+import Submission from '../lib/project/iteration/submission.js';
+import { createObjectCsvStringifier } from 'csv-writer';
+import RL from 'readline';
+import User from '../lib/user.js';
 
+const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
 
 async function router(schema, config) {
     /**
@@ -56,7 +56,7 @@ async function router(schema, config) {
             if (req.query.format === 'geojson') {
                 res.write('{ "type": "FeatureCollection", "features": [\n');
             } else if (req.query.format === 'csv') {
-                req.query.csv = createCsvStringifier({
+                req.query.csv = createObjectCsvStringifier({
                     header: [{
                         id: 'submission_id',
                         title: 'Submission ID'
@@ -138,4 +138,4 @@ async function s3read(out, key, query) {
     });
 }
 
-module.exports = router;
+export default router;

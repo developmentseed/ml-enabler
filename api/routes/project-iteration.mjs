@@ -1,9 +1,9 @@
 'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Iteration = require('../lib/project/iteration');
-const Stack = require('../lib/stack');
-const User = require('../lib/user');
-const Imagery = require('../lib/project/imagery');
+import { Err } from '@openaddresses/batch-schema';
+import Iteration from '../lib/project/iteration.js';
+import Stack from '../lib/stack.js';
+import User from '../lib/user.js';
+import Imagery from '../lib/project/imagery.js';
 
 async function router(schema, config) {
     /**
@@ -177,4 +177,4 @@ async function router(schema, config) {
     });
 }
 
-module.exports = router;
+export default router;

@@ -198,13 +198,7 @@ async function server(args, config, cb) {
     for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
         if (!config.silent) console.error(`ok - loaded routes/${r}`);
 
-        const ext = path.parse(r).ext;
-
-        if (ext === '.js') {
-            await require('./routes/' + r)(schema, config);
-        } else if (ext === '.mjs') {
-            (await import('./routes/' + r)).default(schema, config);
-        }
+        (await import('./routes/' + r)).default(schema, config);
     }
 
     schema.error();

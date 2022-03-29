@@ -20,6 +20,7 @@ const Defaults = {
         default: []
     }
 
+    // Limit the total amount of time a stack can be kept running before it is automatically terminated
 };
 
 const Compiled = {};

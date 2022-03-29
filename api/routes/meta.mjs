@@ -1,8 +1,8 @@
 'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const User = require('../lib/user');
-const Meta = require('../lib/meta');
-const Settings = require('../lib/settings');
+import { Err } from '@openaddresses/batch-schema';
+import User from '../lib/user.js';
+import Meta from '../lib/meta.js';
+import Settings from '../lib/settings.js';
 
 async function router(schema, config) {
 
@@ -120,4 +120,4 @@ async function router(schema, config) {
     });
 }
 
-module.exports = router;
+export default router;
