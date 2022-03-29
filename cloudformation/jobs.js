@@ -184,7 +184,7 @@ const stack = {
                     Attempts: 1
                 },
                 Timeout: {
-                    AttemptDurationSeconds: 2 * 60 * 60 // 2hr timeout
+                    AttemptDurationSeconds: 12 * 60 * 60 // 12hr timeout
                 },
                 Parameters: { },
                 ContainerProperties: {
