@@ -18,19 +18,17 @@
     </div>
 
     <label class='ml12'>Add User to Project</label>
-    <vSelect
-        label='username'
-        class='ml12 w-full'
-        v-model='search.user'
-        :options='search.users'
-        @input='addUser'
+
+    <UserSelect
+        :omitted='users'
+        @user='addUser($event)'
+        @err='$emit("err", $event)'
     />
 </div>
 </template>
 
 <script>
-import vSelect from 'vue-select';
-import 'vue-select/dist/vue-select.css';
+import UserSelect from './util/UserSelect.vue';
 
 export default {
     name: 'UserAccess',
@@ -38,38 +36,24 @@ export default {
     data: function() {
         return {
             users: [],
-            search: {
-                user: {},
-                users: []
-            }
         }
     },
     mounted: function() {
-        this.getUsers();
         this.getProjectUsers();
     },
     methods: {
-        addUser: async function() {
-            for (const user of this.users) {
-                if (this.search.user.id === user.uid) {
-                    this.search.user = null;
-                    return;
-                }
-            }
-
+        addUser: async function(user) {
             try {
                 await window.std(`/api/project/${this.proj.id}/user`, {
                     method: 'POST',
                     body: {
-                        uid: this.search.user.id,
+                        uid: user.id,
                         access: 'read'
                     }
                 });
             } catch (err) {
                 this.$emit('err', err);
             }
-
-            this.search.user = null;
 
             this.getProjectUsers();
         },
@@ -92,18 +76,10 @@ export default {
             } catch (err) {
                 this.$emit('err', err);
             }
-        },
-        getUsers: async function() {
-            try {
-                const list = await window.std('/api/user');
-                this.search.users = list.users;
-            } catch (err) {
-                this.$emit('err', err);
-            }
-        },
+        }
     },
     components: {
-        vSelect
+        UserSelect
     }
 }
 </script>

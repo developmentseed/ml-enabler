@@ -152,18 +152,21 @@ export default {
             if (error) return;
 
             try {
+                const body = {
+                    name: this.project.name,
+                    archived: archive ? true : false,
+                    notes: this.project.notes,
+                    access: this.project.access ? 'public' : 'private',
+                    source: this.project.source,
+                    project_url: this.project.project_url,
+                    tags: this.project.tags,
+                }
+    
+                if (this.project.repo) body.repo = this.project.repo;
+
                 await window.std(`/api/project/${this.$route.params.projectid}`, {
                     method: 'PATCH',
-                    body: {
-                        name: this.project.name,
-                        archived: archive ? true : false,
-                        notes: this.project.notes,
-                        access: this.project.access ? 'public' : 'private',
-                        source: this.project.source,
-                        project_url: this.project.project_url,
-                        tags: this.project.tags,
-                        repo: this.project.repo || null
-                    }
+                    body
                 });
 
                 this.$router.push({ path: `/project/${this.$route.params.projectid}` });
