@@ -15,7 +15,7 @@
     "dependencies": {
         "ajv": "^8.6.2",
         "@mapbox/cloudfriend": "^5.1.0",
-        "@openaddresses/batch-generic": "^1.0.0",
+        "@openaddresses/batch-generic": "^2.0.0",
         "@openaddresses/batch-schema": "^2.3.3",
         "@turf/bbox": "^6.5.0",
         "@turf/bbox-polygon": "^6.5.0",
@@ -35,7 +35,7 @@
         "moment": "^2.27.1",
         "morgan": "^1.10.0",
         "pg": "^8.6.0",
-        "slonik": "^27.0.0",
+        "slonik": "^28.0.0",
         "sns-validator": "^0.3.4",
         "tilebase": "^3.0.0",
         "wkx": "^0.5.0"

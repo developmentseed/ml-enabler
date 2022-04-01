@@ -116,6 +116,10 @@ const router = new VueRouter.createRouter({
                     path: '/project/:projectid/iteration/:iterationid/map',
                     component: Map
                 },{
+                    name: 'submap',
+                    path: '/project/:projectid/iteration/:iterationid/map/:subid',
+                    component: Map
+                },{
                     name: 'export',
                     path: '/project/:projectid/iteration/:iterationid/export',
                     component: Export

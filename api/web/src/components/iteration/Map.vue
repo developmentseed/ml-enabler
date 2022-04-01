@@ -193,6 +193,10 @@ export default {
         submission: async function() {
             await this.getSubmissionTileJSON();
 
+            if (this.submission !== this.$route.params.subid) {
+                this.$router.push(`/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/map/${this.submission}`);
+            }
+
             if (!this.map) await this.init();
             this.styles();
         },
@@ -233,8 +237,11 @@ export default {
         this.inf = this.iteration.inf_list[0];
 
         this.loading = false;
-        if (this.submissions.length) {
+
+        if (this.submissions.length && !this.$route.params.subid) {
             this.submission = this.submissions[0].id;
+        } else if (this.$route.params.subid) {
+            this.submission = this.$route.params.subid;
         }
     },
     methods: {
