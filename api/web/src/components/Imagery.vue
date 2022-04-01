@@ -35,6 +35,9 @@
                 <div class='col col--12 py6'>
                     <label>Imagery Url</label>
                     <input v-model='imagery.url' class='input' placeholder='Imagery Name'/>
+
+                    <InputError v-if='errors.url' desc='Invalid URL'/>
+                    <InputError v-if='errors.wms' desc='WMS Endpoint must have {z}, {x}, {y} variables'/>
                 </div>
 
                 <div class='col col--12 py12'>
@@ -52,6 +55,8 @@
 </template>
 
 <script>
+import InputError from './util/InputError.vue';
+
 export default {
     name: 'Imagery',
     mounted: function() {
@@ -61,6 +66,10 @@ export default {
     },
     data: function() {
         return {
+            errors: {
+                url: false,
+                wms: false
+            },
             imagery: {
                 pid: this.$route.params.projectid,
                 name: '',
@@ -90,6 +99,21 @@ export default {
         },
         postImagery: async function() {
             try {
+                new URL(this.imagery.url);
+                this.errors.url = false;
+            } catch (err) {
+                this.errors.url = true;
+                return;
+            }
+
+            if (!this.imagery.url.includes('{z}') || !this.imagery.url.includes('{x}') || !this.imagery.url.includes('{y}')) {
+                this.errors.wms = true;
+                return;
+            } else {
+                this.errors.wms = false;
+            }
+
+            try {
                 await window.std(window.api + `/api/project/${this.$route.params.projectid}/imagery${this.$route.params.imageryid ? '/' + this.$route.params.imageryid : ''}`, {
                     method: this.$route.params.imageryid ? 'PATCH' : 'POST',
                     body: {
@@ -105,6 +129,9 @@ export default {
                 this.$emit('err', err);
             }
         }
+    },
+    components: {
+        InputError
     }
 }
 </script>

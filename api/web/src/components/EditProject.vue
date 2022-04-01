@@ -77,10 +77,7 @@
                             "border": errors.repo,
                             "border--red": errors.repo
                         }'/>
-
-                        <div v-if='errors.repo' class='col col--12 round py3 bg-red mt6 align-center color-white'>
-                            Repo must follow the format: https://github.com/&lt;user&gt;/&lt;repo&gt;
-                        </div>
+                        <InputError v-if='errors.repo' desc='Repo must follow the format: https://github.com/&lt;user&gt;/&lt;repo&gt;'/>
                     </div>
 
                     <div class='col col--12'>
@@ -115,6 +112,7 @@
 </template>
 
 <script>
+import InputError from './util/InputError.vue';
 import UserAccess from './UserAccess.vue';
 
 export default {
@@ -161,7 +159,7 @@ export default {
                     project_url: this.project.project_url,
                     tags: this.project.tags,
                 }
-    
+
                 if (this.project.repo) body.repo = this.project.repo;
 
                 await window.std(`/api/project/${this.$route.params.projectid}`, {
@@ -194,6 +192,7 @@ export default {
         },
     },
     components: {
+        InputError,
         UserAccess
     }
 }

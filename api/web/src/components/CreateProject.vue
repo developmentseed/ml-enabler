@@ -95,10 +95,7 @@
                             "border": errors.repo,
                             "border--red": errors.repo
                         }'/>
-
-                        <div v-if='errors.repo' class='col col--12 round py3 bg-red mt6 align-center color-white'>
-                            Repo must follow the format: https://github.com/&lt;user&gt;/&lt;repo&gt;
-                        </div>
+                        <InputError v-if='errors.repo' desc='Repo must follow the format: https://github.com/&lt;user&gt;/&lt;repo&gt;'/>
                     </div>
 
                     <div class='col col--12 py12'>
@@ -132,6 +129,7 @@
 
 <script>
 import UserSelect from './util/UserSelect.vue';
+import InputError from './util/InputError.vue';
 
 export default {
     name: 'EditProject',
@@ -208,6 +206,7 @@ export default {
         }
     },
     components: {
+        InputError,
         UserSelect
     }
 }
