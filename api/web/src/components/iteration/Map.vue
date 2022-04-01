@@ -193,6 +193,8 @@ export default {
         submission: async function() {
             await this.getSubmissionTileJSON();
 
+            this.$router.push(`/project/${this.$route.params.porjectid}/iteration/${this.$route.params.iterationid}/map/${this.submission}`);
+
             if (!this.map) await this.init();
             this.styles();
         },
