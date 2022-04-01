@@ -194,7 +194,7 @@ export default {
             await this.getSubmissionTileJSON();
 
             if (this.submission !== this.$route.params.subid) {
-                this.$router.push(`/project/${this.$route.params.porjectid}/iteration/${this.$route.params.iterationid}/map/${this.submission}`);
+                this.$router.push(`/project/${this.$route.params.projectid}/iteration/${this.$route.params.iterationid}/map/${this.submission}`);
             }
 
             if (!this.map) await this.init();
