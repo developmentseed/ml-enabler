@@ -22,7 +22,7 @@
         "mapbox-gl": "^2.7.0",
         "mapbox-gl-draw-rectangle-mode": "^1.0.4",
         "sass": "^1.49.7",
-        "sass-loader": "^10.0.0",
+        "sass-loader": "^12.0.0",
         "semver-sort": "^1.0.0",
         "vue": "^3.2.31",
         "vue-router": "^4.0.14"
