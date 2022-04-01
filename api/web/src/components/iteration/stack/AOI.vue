@@ -67,7 +67,7 @@ export default {
     },
     watch: {
         'selected.bounds': function() {
-            this.$emit('bounds', this.selected.bounds);
+            this.$emit('bounds', typeof this.selected.bounds === 'object' ? this.selected.bounds.join(',') : this.selected.bounds);
         },
         mode: function() {
             this.selected = {
