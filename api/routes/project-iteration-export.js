@@ -43,10 +43,10 @@ async function router(schema, config) {
             }
 
             const iter = await Iteration.from(config.pool, req.params.iterationid);
-            req.query.iterations = iter.inf_list.split(',');
+            req.query.iterations = iter.inf_list.map((i) => i.name);
 
             if (req.query.inferences !== 'all' && !req.query.iterations.includes(req.query.inferences)) {
-                throw new Err(400, null, `inferences must be one of ${iter.inf_list}`);
+                throw new Err(400, null, `inferences must be one of ${req.query.iterations}`);
             }
 
             res.writeHead(200, {
