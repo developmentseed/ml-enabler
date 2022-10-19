@@ -1,4 +1,3 @@
-'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const crypto = require('crypto');
 const { promisify } = require('util');

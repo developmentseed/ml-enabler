@@ -1,4 +1,3 @@
-'use strict';
 const CP = require('child_process');
 const { sql, createPool, createTypeParserPreset } = require('slonik');
 const { Err } = require('@openaddresses/batch-schema');

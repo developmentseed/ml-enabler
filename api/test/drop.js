@@ -1,4 +1,3 @@
-'use strict';
 const { Pool } = require('pg');
 const config = require('../knexfile');
 
