@@ -6,7 +6,7 @@ import Generic from '@openaddresses/batch-generic';
 /**
  * @class
  */
-class User extends Generic {
+export default class User extends Generic {
     static _table = 'users';
     static _patch = require('../schema/req.body.PatchUser.json');
     static _res = require('../schema/res.User.json');
@@ -159,5 +159,3 @@ class User extends Generic {
         }
     }
 }
-
-module.exports = User;

@@ -7,7 +7,7 @@ const S3 = require('../../s3');
 /**
  * @class
  */
-class Submission extends Generic {
+export default class Submission extends Generic {
     static _table = 'aoi_submission';
     static _res = require('../../../schema/res.Submission.json');
 
@@ -115,5 +115,3 @@ class Submission extends Generic {
         }
     }
 }
-
-module.exports = Submission;

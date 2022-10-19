@@ -5,7 +5,7 @@ import { sql } from 'slonik';
 /**
  * @class
  */
-class ProjectIteration extends Generic {
+export default class ProjectIteration extends Generic {
     static _table = 'iterations';
     static _patch = require('../../schema/req.body.PatchIteration.json');
     static _res = require('../../schema/res.Iteration.json');
@@ -163,5 +163,3 @@ class ProjectIteration extends Generic {
         }
     }
 }
-
-module.exports = ProjectIteration;

@@ -5,7 +5,7 @@ import { sql } from 'slonik';
 /**
  * @class
  */
-class ProjectAccess extends Generic {
+export default class ProjectAccess extends Generic {
     static _table = 'projects_access';
     static _patch = require('../../schema/req.body.PatchProjectAccess.json');
     static _res = require('../../schema/res.ProjectAccess.json');
@@ -136,5 +136,3 @@ class ProjectAccess extends Generic {
         }
     }
 }
-
-module.exports = ProjectAccess;

@@ -1,8 +1,8 @@
-const fs = require('fs');
-const path = require('path');
-const test = require('tape');
+import fs from 'fs';
+import path from 'path';
+import test from 'tape';
 
-const glob = require('glob');
+import glob from 'glob';
 
 glob.sync(path.resolve(__dirname, '../schema/**/*.json')).forEach((source) => {
     test(`schema/${path.parse(source).base}`, (t) => {

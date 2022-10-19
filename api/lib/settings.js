@@ -30,7 +30,7 @@ for (const key in Defaults) {
 /**
  * @class
  */
-class Settings {
+export default class Settings {
     static async generate(pool, params) {
         if (Defaults[params.key] !== undefined) {
             const valid = Compiled[params.key](params.value);
@@ -68,5 +68,3 @@ class Settings {
         }
     }
 }
-
-module.exports = Settings;

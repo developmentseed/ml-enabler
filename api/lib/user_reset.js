@@ -9,7 +9,7 @@ const randomBytes = promisify(crypto.randomBytes);
 /**
  * @class
  */
-class UserReset extends Generic {
+export default class UserReset extends Generic {
     static _table = 'users_reset';
     static _patch = null;
     static _res = require('../schema/res.UserReset.json');
@@ -81,5 +81,3 @@ class UserReset extends Generic {
         }
     }
 }
-
-module.exports = UserReset;

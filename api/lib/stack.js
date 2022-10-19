@@ -10,7 +10,7 @@ const cf = new AWS.CloudFormation({
 /**
  * @class
  */
-class Stack {
+export default class Stack {
     static async list(prefix) {
         let stacks = [];
 
@@ -163,5 +163,3 @@ class Stack {
         }
     }
 }
-
-module.exports = Stack;

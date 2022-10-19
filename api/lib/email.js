@@ -8,7 +8,7 @@ import AWS from 'aws-sdk';
  * @prop {Config} config Serverwide Config
  * @prop {Object} mailGenerator MailGen Generation API
  */
-class Email {
+export default class Email {
     constructor(config) {
         this.config = config;
         this.ses = new AWS.SES({
@@ -107,5 +107,3 @@ class Email {
         }).promise();
     }
 }
-
-module.exports = Email;

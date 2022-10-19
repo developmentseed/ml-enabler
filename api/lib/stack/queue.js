@@ -8,7 +8,7 @@ const sqs = new AWS.SQS({
 /**
  * @class
  */
-class StackQueue {
+export default class StackQueue {
     static async from(pid, iterationid) {
         let queues;
 
@@ -91,5 +91,3 @@ class StackQueue {
         return true;
     }
 }
-
-module.exports = StackQueue;

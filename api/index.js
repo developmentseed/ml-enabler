@@ -25,7 +25,7 @@ if (require.main === module) {
     configure(args);
 }
 
-async function configure(args, cb) {
+export default async function configure(args, cb) {
     try {
         const config = await Config.env(args);
 
@@ -228,5 +228,3 @@ async function server(args, config, cb) {
         if (cb) return cb(srv, config);
     });
 }
-
-module.exports = configure;

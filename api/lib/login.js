@@ -7,7 +7,7 @@ import UserReset from './user_reset.js';
 /**
  * @class
  */
-class Login {
+export default class Login {
     /**
      * Verify a password reset token
      *
@@ -90,5 +90,3 @@ class Login {
         };
     }
 }
-
-module.exports = Login;

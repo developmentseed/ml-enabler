@@ -3,7 +3,7 @@ import Err from '@openaddresses/batch-error';
 /**
  * @class
  */
-class Auth {
+export default class Auth {
     static async is_auth(req) {
         if (req.user === 'internal') return true;
 
@@ -31,5 +31,3 @@ class Auth {
     }
 
 }
-
-module.exports = Auth;

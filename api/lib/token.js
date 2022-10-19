@@ -9,7 +9,7 @@ const randomBytes = promisify(crypto.randomBytes);
 /**
  * @class
  */
-class Token extends Generic {
+export default class Token extends Generic {
     static _table = 'users_tokens';
     static _patch = require('../schema/req.body.PatchToken.json');
     static _res = require('../schema/res.Token.json');
@@ -150,5 +150,3 @@ class Token extends Generic {
         }
     }
 }
-
-module.exports = Token;

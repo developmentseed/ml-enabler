@@ -8,7 +8,7 @@ const CW = new AWS.CloudWatch({
  * @class
  * @param {Config} config
  */
-class CWAlarm {
+export default class CWAlarm {
     constructor(config) {
         this.config = config;
     }
@@ -55,5 +55,3 @@ class CWAlarm {
         }
     }
 }
-
-module.exports = CWAlarm;

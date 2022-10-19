@@ -15,7 +15,7 @@ const STS = new AWS.STS({
 /**
  * @class
  */
-class Config {
+export default class Config {
     static async env(args = {}) {
         const cnf = new Config();
 
@@ -155,5 +155,3 @@ function sleep(ms) {
         setTimeout(resolve, ms);
     });
 }
-
-module.exports = Config;

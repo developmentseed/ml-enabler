@@ -6,7 +6,7 @@ const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
 /**
  * @class
  */
-class S3 {
+export default class S3 {
     constructor(params) {
         this.params = params;
     }
@@ -87,5 +87,3 @@ class S3 {
         s3stream.pipe(res);
     }
 }
-
-module.exports = S3;

@@ -5,7 +5,7 @@ import { sql } from 'slonik';
 /**
  * @class
  */
-class ProjectImagery extends Generic {
+export default class ProjectImagery extends Generic {
     static _table = 'imagery';
     static _patch = require('../../schema/req.body.PatchImagery.json');
     static _res = require('../../schema/res.Imagery.json');
@@ -106,5 +106,3 @@ class ProjectImagery extends Generic {
         }
     }
 }
-
-module.exports = ProjectImagery;

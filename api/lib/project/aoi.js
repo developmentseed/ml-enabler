@@ -6,7 +6,7 @@ import bboxPolygon from '@turf/bbox-polygon';
 /**
  * @class
  */
-class ProjectAOI extends Generic {
+export default class ProjectAOI extends Generic {
     static _table = 'aois';
     static _patch = require('../../schema/req.body.PatchAOI.json');
     static _res = require('../../schema/res.AOI.json');
@@ -109,5 +109,3 @@ class ProjectAOI extends Generic {
         }
     }
 }
-
-module.exports = ProjectAOI;

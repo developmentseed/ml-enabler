@@ -11,7 +11,7 @@ const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
 /**
  * @class
  */
-class ProjectTask extends Generic {
+export default class ProjectTask extends Generic {
     static _table = 'tasks';
     static _patch = require('../../../schema/req.body.PatchTask.json');
     static _res = require('../../../schema/res.Task.json');
@@ -258,5 +258,3 @@ class ProjectTask extends Generic {
         }
     }
 }
-
-module.exports = ProjectTask;

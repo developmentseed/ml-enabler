@@ -5,7 +5,7 @@ import { sql } from 'slonik';
 /**
  * @class
  */
-class Meta extends Generic {
+export default class Meta extends Generic {
     static _table = 'meta';
     static _patch = require('../schema/req.body.PatchMeta.json');
     static _res = require('../schema/res.Meta.json');
@@ -147,5 +147,3 @@ class Meta extends Generic {
         }
     }
 }
-
-module.exports = Meta;

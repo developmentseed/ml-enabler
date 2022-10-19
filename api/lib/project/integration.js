@@ -5,7 +5,7 @@ import { sql } from 'slonik';
 /**
  * @class
  */
-class ProjectIntegration extends Generic {
+export default class ProjectIntegration extends Generic {
     static _table =  'integrations';
     static _patch = require('../../schema/req.body.PatchIntegration.json');
     static _res = require('../../schema/res.Integration.json');
@@ -111,5 +111,3 @@ class ProjectIntegration extends Generic {
         }
     }
 }
-
-module.exports = ProjectIntegration;
