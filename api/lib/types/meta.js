@@ -7,8 +7,6 @@ import { sql } from 'slonik';
  */
 export default class Meta extends Generic {
     static _table = 'meta';
-    static _patch = require('../schema/req.body.PatchMeta.json');
-    static _res = require('../schema/res.Meta.json');
 
     /**
      * List & Filter Meta
@@ -45,7 +43,7 @@ export default class Meta extends Generic {
                     ${query.limit * query.page}
             `);
 
-            return this.deserialize(pgres.rows);
+            return this.deserialize_list(pgres.rows);
         } catch (err) {
             throw new Err(500, err, 'Failed to list meta');
         }
@@ -68,34 +66,6 @@ export default class Meta extends Generic {
             `);
         } catch (err) {
             throw new Err(500, err, 'failed to save meta');
-        }
-    }
-
-    /**
-     * Create a new Meta
-     *
-     * @param {Pool} pool - Postgres Pool instance
-     * @param {Object} params - Create Params
-     * @param {String} params.key - Key of Meta
-     * @param {Object} params.value - Value of Meta
-     *
-     * @returns {Meta}
-     */
-    static async generate(pool, params = {}) {
-        try {
-            const pgres = await pool.query(sql`
-                INSERT INTO meta (
-                    key,
-                    value
-                ) VALUES (
-                    ${params.key},
-                    ${JSON.stringify(params.value)}
-                ) RETURNING *
-            `);
-
-            return this.deserialize(pgres.rows[0]);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to generate meta');
         }
     }
 
@@ -126,7 +96,7 @@ export default class Meta extends Generic {
             throw new Err(404, null, 'Meta not found');
         }
 
-        return this.deserialize(pgres.rows[0]);
+        return this.deserialize(pool, pgres.rows[0]);
     }
 
     /**

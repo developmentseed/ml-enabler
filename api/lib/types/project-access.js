@@ -7,8 +7,6 @@ import { sql } from 'slonik';
  */
 export default class ProjectAccess extends Generic {
     static _table = 'projects_access';
-    static _patch = require('../../schema/req.body.PatchProjectAccess.json');
-    static _res = require('../../schema/res.ProjectAccess.json');
 
     /**
      * Return a list of users that can access a given project

@@ -11,9 +11,6 @@ const randomBytes = promisify(crypto.randomBytes);
  */
 export default class UserReset extends Generic {
     static _table = 'users_reset';
-    static _patch = null;
-    static _res = require('../schema/res.UserReset.json');
-
 
     /**
      * Return a UserReset object given a token

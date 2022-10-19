@@ -1,9 +1,9 @@
-import { Err } from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
 import AWS from 'aws-sdk';
 import express from 'express';
-import Task from '../lib/project/iteration/task.js';
+import Task from '../lib/types/project-iteration-task.js';
+import Submission from '../lib/types/project-iteration-submission.js';
 import Stack from '../lib/stack.js';
-import Submission from '../lib/project/iteration/submission.js';
 import MessageValidator from 'sns-validator';
 
 const SNS = new AWS.SNS({

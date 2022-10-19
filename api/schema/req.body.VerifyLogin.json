@@ -1,6 +1,6 @@
 {
     "type": "object",
-    "additionalParameters": false,
+    "additionalProperties": false,
     "required": [
         "token"
     ],

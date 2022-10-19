@@ -1,5 +1,5 @@
 import Err from '@openaddresses/batch-error';
-import Iteration from '../lib/project/iteration.js';
+import Iteration from '../lib/types/project-iteration.js';
 import Stack from '../lib/stack.js';
 import Auth from '../lib/auth.js';
 

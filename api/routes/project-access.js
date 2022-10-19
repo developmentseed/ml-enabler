@@ -1,5 +1,5 @@
 import Err from '@openaddresses/batch-error';
-import ProjectAccess from '../lib/project/access.js';
+import ProjectAccess from '../lib/types/project-access.js';
 import Auth from '../lib/auth.js';
 
 export default async function router(schema, config) {

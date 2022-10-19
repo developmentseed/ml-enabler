@@ -1,5 +1,5 @@
 import Err from '@openaddresses/batch-error';
-import AOI from '../lib/project/aoi.js';
+import AOI from '../lib/types/project-aoi.js';
 import Auth from '../lib/auth.js';
 
 export default async function router(schema, config) {

@@ -1,9 +1,9 @@
 import Err from '@openaddresses/batch-error';
-import StackQueue from '../lib/stack/queue.js';
-import Task from '../lib/project/iteration/task.js';
-import Iteration from '../lib/project/iteration.js';
-import Imagery from '../lib/project/imagery.js';
-import Submission from '../lib/project/iteration/submission.js';
+import StackQueue from '../lib/queue.js';
+import Task from '../lib/types/project-iteration-task.js';
+import Iteration from '../lib/types/project-iteration.js';
+import Imagery from '../lib/types/project-imagery.js';
+import Submission from '../lib/types/project-iteration-submission.js';
 import CWAlarm from '../lib/cw-alarm.js';
 import Auth from '../lib/auth.js';
 

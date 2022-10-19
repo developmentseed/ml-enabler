@@ -1,7 +1,7 @@
 import Err from '@openaddresses/batch-error';
-import Iteration from '../lib/project/iteration.js';
+import Iteration from '../lib/types/project-iteration.js';
+import Submission from '../lib/types/project-iteration-submission.js';
 import AWS from 'aws-sdk';
-import Submission from '../lib/project/iteration/submission.js';
 import RL from 'readline';
 import Auth from '../lib/auth.js';
 import { createObjectCsvStringifier as createCsvStringifier } from 'csv-writer';

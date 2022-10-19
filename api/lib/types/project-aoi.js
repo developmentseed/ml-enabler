@@ -8,8 +8,6 @@ import bboxPolygon from '@turf/bbox-polygon';
  */
 export default class ProjectAOI extends Generic {
     static _table = 'aois';
-    static _patch = require('../../schema/req.body.PatchAOI.json');
-    static _res = require('../../schema/res.AOI.json');
 
     /**
      * Return a list of aois for a given project

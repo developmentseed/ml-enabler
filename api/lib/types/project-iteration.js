@@ -7,8 +7,6 @@ import { sql } from 'slonik';
  */
 export default class ProjectIteration extends Generic {
     static _table = 'iterations';
-    static _patch = require('../../schema/req.body.PatchIteration.json');
-    static _res = require('../../schema/res.Iteration.json');
 
     /**
      * Return a list of iterations for a given project

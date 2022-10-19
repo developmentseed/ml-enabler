@@ -7,8 +7,6 @@ import { sql } from 'slonik';
  */
 export default class ProjectImagery extends Generic {
     static _table = 'imagery';
-    static _patch = require('../../schema/req.body.PatchImagery.json');
-    static _res = require('../../schema/res.Imagery.json');
 
     /**
      * Return a list of imagery sources for a given project

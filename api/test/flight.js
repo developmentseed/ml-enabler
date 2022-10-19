@@ -41,7 +41,7 @@ export default class Flight {
                 t.error(err);
             }
 
-            this.schema = JSON.parse(fs.readFileSync(path.resolve(__dirname, './fixtures/get_schema.json')));
+            this.schema = JSON.parse(fs.readFileSync(new URL('./fixtures/get_schema.json', import.meta.url)));
             this.routes = {};
 
             for (const route of Object.keys(this.schema)) {
@@ -61,7 +61,7 @@ export default class Flight {
      */
     fixture(test, name, auth) {
         test(`Fixture: ${name}`, async (t) => {
-            const req = JSON.parse(fs.readFileSync(path.resolve(__dirname, './fixtures/', name)));
+            const req = JSON.parse(fs.readFileSync(new URL('./fixtures/' + name, import.meta.url)));
             if (auth) req.auth = {
                 bearer: this.token[auth]
             };

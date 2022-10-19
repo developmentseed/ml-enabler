@@ -7,8 +7,6 @@ import { sql } from 'slonik';
  */
 export default class ProjectIntegration extends Generic {
     static _table =  'integrations';
-    static _patch = require('../../schema/req.body.PatchIntegration.json');
-    static _res = require('../../schema/res.Integration.json');
 
     /**
      * Return a list of integrations for a given project

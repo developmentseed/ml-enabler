@@ -1,15 +1,13 @@
 import Err from '@openaddresses/batch-error';
 import Generic from '@openaddresses/batch-generic';
 import { sql } from 'slonik';
-
-const S3 = require('../../s3');
+import S3 from '../s3.js';
 
 /**
  * @class
  */
 export default class Submission extends Generic {
     static _table = 'aoi_submission';
-    static _res = require('../../../schema/res.Submission.json');
 
     /**
      * Return a list of aoi submissions for the given iteration

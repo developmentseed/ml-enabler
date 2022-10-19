@@ -1,11 +1,12 @@
 import Err from '@openaddresses/batch-error';
-import User from '../lib/user.js';
+import User from '../lib/types/user.js';
 import Auth from '../lib/auth.js';
 import Login from '../lib/login.js';
 import Settings from '../lib/settings.js';
+import Email from '../lib/email.js';
 
 export default async function router(schema, config) {
-    const email = new (require('../lib/email'))(config);
+    const email = new Email(config);
 
     /**
      * @api {get} /api/user List Users

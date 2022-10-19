@@ -1,6 +1,6 @@
 import Err from '@openaddresses/batch-error';
-import Project from '../lib/project.js';
-import ProjectAccess from '../lib/project/access.js';
+import Project from '../lib/types/project.js';
+import ProjectAccess from '../lib/types/project-access.js';
 import Stack from '../lib/stack.js';
 import Auth from '../lib/auth.js';
 

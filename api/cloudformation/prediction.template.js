@@ -1,6 +1,6 @@
-const cf = require('@mapbox/cloudfriend');
+import cf from '@mapbox/cloudfriend';
 
-module.exports = {
+export default {
     AWSTemplateFormatVersion : '2010-09-09',
     Parameters: {
         GitSha: {

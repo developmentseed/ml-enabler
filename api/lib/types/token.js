@@ -11,8 +11,6 @@ const randomBytes = promisify(crypto.randomBytes);
  */
 export default class Token extends Generic {
     static _table = 'users_tokens';
-    static _patch = require('../schema/req.body.PatchToken.json');
-    static _res = require('../schema/res.Token.json');
 
     /**
      * List & Filter Tokens

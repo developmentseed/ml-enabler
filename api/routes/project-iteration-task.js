@@ -1,5 +1,5 @@
 import Err from '@openaddresses/batch-error';
-import Task from '../lib/project/iteration/task.js';
+import Task from '../lib/types/project-iteration-task.js';
 import Auth from '../lib/auth.js';
 
 export default async function router(schema, config) {

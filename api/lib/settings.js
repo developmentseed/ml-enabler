@@ -1,5 +1,5 @@
 import Err from '@openaddresses/batch-error';
-import Meta from './meta.js';
+import Meta from './types/meta.js';
 import Ajv from 'ajv';
 
 const ajv = new Ajv({

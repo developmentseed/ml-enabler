@@ -9,8 +9,6 @@ import { sql } from 'slonik';
  */
 export default class Project extends Generic {
     static _table = 'projects';
-    static _patch = require('../schema/req.body.PatchProject.json');
-    static _res = require('../schema/res.Project.json');
 
     /**
      * Return a list of Projects

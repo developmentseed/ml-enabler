@@ -34,6 +34,7 @@
         "minimist": "^1.2.2",
         "moment": "^2.27.1",
         "pg": "^8.6.0",
+        "request": "^2.88.2",
         "slonik": "^31.0.0",
         "sns-validator": "^0.3.4",
         "tilebase": "^3.0.0"

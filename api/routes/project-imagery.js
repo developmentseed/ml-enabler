@@ -1,5 +1,5 @@
 import Err from '@openaddresses/batch-error';
-import Imagery from '../lib/project/imagery.js';
+import Imagery from '../lib/types/project-imagery.js';
 import Auth from '../lib/auth.js';
 
 export default async function router(schema, config) {

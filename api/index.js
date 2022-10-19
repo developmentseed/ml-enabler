@@ -8,18 +8,18 @@ import minimist from 'minimist';
 
 import Config from './lib/config.js';
 import Settings from './lib/settings.js';
-import User from './lib/user.js';
-import Project from './lib/project.js';
-import UserToken from './lib/token.js';
+import User from './lib/types/user.js';
+import Project from './lib/types/project.js';
+import UserToken from './lib/types/token.js';
 
 const args = minimist(process.argv, {
     boolean: ['help', 'populate', 'email', 'no-cache', 'silent', 'validate'],
     string: ['postgres']
 });
 
-const pkg = JSON.parse(fs.readFile(new URL('./package.json', import.meta.url)));
+const pkg = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url)));
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
     configure(args);
 }
 

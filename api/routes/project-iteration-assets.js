@@ -1,9 +1,9 @@
 import Err from '@openaddresses/batch-error';
 import S3 from '../lib/s3.js';
 import Busboy from 'busboy';
-import Iteration from '../lib/project/iteration.js';
+import Iteration from '../lib/types/project-iteration.js';
+import Task from '../lib/types/project-iteration-task.js';
 import path from 'path';
-import Task from '../lib/project/iteration/task.js';
 import Auth from '../lib/auth.js';
 
 export default async function router(schema, config) {

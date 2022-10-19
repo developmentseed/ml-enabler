@@ -8,8 +8,6 @@ import Generic from '@openaddresses/batch-generic';
  */
 export default class User extends Generic {
     static _table = 'users';
-    static _patch = require('../schema/req.body.PatchUser.json');
-    static _res = require('../schema/res.User.json');
 
     /**
      * Return a list of users
