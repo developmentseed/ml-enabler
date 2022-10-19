@@ -2,7 +2,6 @@ process.env.StackName = 'test';
 
 import { sql } from 'slonik';
 import fs from 'fs';
-import path from 'path';
 import { promisify } from 'util';
 import api from '../index.js';
 import Knex from 'knex';

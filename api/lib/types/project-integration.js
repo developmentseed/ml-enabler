@@ -64,48 +64,4 @@ export default class ProjectIntegration extends Generic {
 
         return ProjectIntegration.deserialize(pgres.rows);
     }
-
-    async commit(pool) {
-        try {
-            await pool.query(sql`
-                UPDATE integrations
-                    SET
-                        integration = ${this.integration},
-                        name        = ${this.name},
-                        url         = ${this.url},
-                        auth        = ${this.auth},
-                        updated     = NOW()
-                    WHERE
-                        id = ${this.id}
-            `);
-
-            return this;
-        } catch (err) {
-            throw new Err(500, err, 'Failed to save Integration');
-        }
-    }
-
-    static async generate(pool, iter) {
-        try {
-            const pgres = await pool.query(sql`
-                INSERT INTO integrations (
-                    pid,
-                    integration,
-                    name,
-                    url,
-                    auth
-                ) VALUES (
-                    ${iter.pid},
-                    ${iter.integration},
-                    ${iter.name},
-                    ${iter.url},
-                    ${iter.auth}
-                ) RETURNING *
-            `);
-
-            return ProjectIntegration.deserialize(pgres.rows[0]);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to generate Integration');
-        }
-    }
 }

@@ -1,0 +1,32 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./projects_access/id.json"
+        },
+        "pid": {
+            "$ref": "./projects_access/pid.json"
+        },
+        "uid": {
+            "$ref": "./projects_access/uid.json"
+        },
+        "access": {
+            "$ref": "./projects_access/access.json"
+        },
+        "created": {
+            "$ref": "./projects_access/created.json"
+        },
+        "updated": {
+            "$ref": "./projects_access/updated.json"
+        }
+    },
+    "required": [
+        "id",
+        "pid",
+        "uid",
+        "access",
+        "created",
+        "updated"
+    ]
+}

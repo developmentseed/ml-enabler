@@ -1,0 +1,24 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./aoi_submission/id.json"
+        },
+        "aoi_id": {
+            "$ref": "./aoi_submission/aoi_id.json"
+        },
+        "created": {
+            "$ref": "./aoi_submission/created.json"
+        },
+        "iter_id": {
+            "$ref": "./aoi_submission/iter_id.json"
+        }
+    },
+    "required": [
+        "id",
+        "aoi_id",
+        "created",
+        "iter_id"
+    ]
+}

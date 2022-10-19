@@ -63,8 +63,7 @@ export default async function router(schema, config) {
 
                 const body = {};
                 body[`${req.query.type}_link`] = key;
-                iter.patch(body);
-                await iter.commit(config.pool);
+                await iter.commit(body);
 
                 if (req.query.type === 'model') {
                     await Task.batch(config, {

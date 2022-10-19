@@ -83,38 +83,6 @@ export default class Project extends Generic {
     }
 
     /**
-     * Save a Project to the database
-     *
-     * @param {Pool}    pool    Instantiated Postgres Pool
-     *
-     * @returns {Project}
-     */
-    async commit(pool) {
-        if (this.id === false) throw new Err(500, null, 'Project.id must be populated');
-
-        try {
-            await pool.query(sql`
-                UPDATE projects
-                    SET
-                        source      = ${this.source},
-                        project_url = ${this.project_url},
-                        archived    = ${this.archived},
-                        tags        = ${JSON.stringify(this.tags)}::JSONB,
-                        access      = ${this.access},
-                        notes       = ${this.notes},
-                        repo        = ${this.repo || null},
-                        updated     = NOW()
-                    WHERE
-                        id = ${this.id}
-            `);
-
-            return this;
-        } catch (err) {
-            throw new Err(500, err, 'Failed to save Project');
-        }
-    }
-
-    /**
      * Return an individual Project and if an optional uid parameter is provided,
      * only return the project if the user has access to it
      *
@@ -164,50 +132,5 @@ export default class Project extends Generic {
         if (!pgres.rows.length) throw new Err(404, null, 'Project does not exist or user does not have access');
 
         return this.deserialize(pgres.rows[0]);
-    }
-
-    /**
-     * Generate a new Project and save it to the database
-     *
-     * @param {Pool}        pool                Instantiated Postgres Pool
-     * @param {object}      prj                 Project Body
-     * @param {string}      prj.name            Project Name
-     * @param {string}      prj.source          Project Developer Org
-     * @param {string}      prj.project_url     Project Reference URL
-     * @param {object[]}    prj.tags            Project Billing Tags
-     * @param {string}      prj.access          Project Access (public/private)
-     * @param {string}      prj.notes           Project Notes
-     * @param {string}      prj.repo            Project Git Repo
-     */
-    static async generate(pool, prj) {
-        try {
-            const pgres = await pool.query(sql`
-                INSERT INTO projects (
-                    name,
-                    source,
-                    project_url,
-                    tags,
-                    access,
-                    notes,
-                    repo
-                ) VALUES (
-                    ${prj.name},
-                    ${prj.source},
-                    ${prj.project_url},
-                    ${JSON.stringify(prj.tags)}::JSONB,
-                    ${prj.access},
-                    ${prj.notes},
-                    ${prj.repo || null}
-                ) RETURNING *
-            `);
-
-            return this.deserialize(pgres.rows[0]);
-        } catch (err) {
-            if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
-                throw new Err(400, null, 'Project by that name already exists');
-            }
-
-            throw new Err(500, err, 'Failed to generate Project');
-        }
     }
 }

@@ -111,9 +111,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_auth(req);
 
-            const img = await Imagery.from(config.pool, req.params.imageryid);
-            img.patch(req.body);
-            await img.commit(config.pool);
+            const img = await Imagery.commit(config.pool, req.params.imageryid, req.body);
 
             return res.json(img.serialize());
         } catch (err) {

@@ -1,0 +1,24 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "uid": {
+            "$ref": "./users_reset/uid.json"
+        },
+        "expires": {
+            "$ref": "./users_reset/expires.json"
+        },
+        "token": {
+            "$ref": "./users_reset/token.json"
+        },
+        "action": {
+            "$ref": "./users_reset/action.json"
+        }
+    },
+    "required": [
+        "uid",
+        "expires",
+        "token",
+        "action"
+    ]
+}

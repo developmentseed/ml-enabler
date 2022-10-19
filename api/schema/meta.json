@@ -1,0 +1,24 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "key": {
+            "$ref": "./meta/key.json"
+        },
+        "value": {
+            "$ref": "./meta/value.json"
+        },
+        "created": {
+            "$ref": "./meta/created.json"
+        },
+        "updated": {
+            "$ref": "./meta/updated.json"
+        }
+    },
+    "required": [
+        "key",
+        "value",
+        "created",
+        "updated"
+    ]
+}

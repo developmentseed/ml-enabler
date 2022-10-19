@@ -92,45 +92,4 @@ export default class ProjectAccess extends Generic {
 
         return ProjectAccess.serialize(pgres.rows[0]);
     }
-
-    async commit(pool) {
-        try {
-            await pool.query(sql`
-                UPDATE projects_access
-                    SET
-                        access      = ${this.access},
-                        updated     = NOW()
-                    WHERE
-                        id = ${this.id}
-            `);
-
-            return this;
-        } catch (err) {
-            throw new Err(500, err, 'Failed to save Project Access');
-        }
-    }
-
-    static async generate(pool, access) {
-        try {
-            const pgres = await pool.query(sql`
-                INSERT INTO projects_access (
-                    access,
-                    pid,
-                    uid
-                ) VALUES (
-                    ${access.access},
-                    ${access.pid},
-                    ${access.uid}
-                ) RETURNING *
-            `);
-
-            return ProjectAccess.deserialize(pgres.rows[0]);
-        } catch (err) {
-            if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
-                throw new Err(400, null, 'Project Access for that user already exists');
-            }
-
-            throw new Err(500, err, 'Failed to generate Project Access');
-        }
-    }
 }

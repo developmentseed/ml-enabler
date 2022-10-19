@@ -82,9 +82,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_auth(req);
 
-            const access = await ProjectAccess.from(config.pool, req.params.id);
-            access.patch(req.body);
-            await access.commit(config.pool);
+            const access = await ProjectAccess.commit(config.pool, req.params.id, req.body);
 
             return res.json(access.serialize());
         } catch (err) {

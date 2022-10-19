@@ -74,7 +74,7 @@ export default class Config {
                 geometry: true
             },
             schemas: {
-                dir: new URL('./schema', import.meta.url)
+                dir: new URL('../schema', import.meta.url)
             }
         });
 

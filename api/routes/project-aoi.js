@@ -1,6 +1,7 @@
 import Err from '@openaddresses/batch-error';
 import AOI from '../lib/types/project-aoi.js';
 import Auth from '../lib/auth.js';
+import bboxPolygon from '@turf/bbox-polygon';
 
 export default async function router(schema, config) {
 
@@ -54,6 +55,7 @@ export default async function router(schema, config) {
             await Auth.is_auth(req);
 
             req.body.pid = req.params.pid;
+            req.body.bounds = bboxPolygon(req.body.bounds).geometry;
             const img = await AOI.generate(config.pool, req.body);
 
             return res.json(img.serialize());
@@ -112,9 +114,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_auth(req);
 
-            const img = await AOI.from(config.pool, req.params.aoiid);
-            img.patch(req.body);
-            await img.commit(config.pool);
+            const img = await AOI.commit(config.pool, req.params.aoiid, req.body);
 
             return res.json(img.serialize());
         } catch (err) {

@@ -90,24 +90,6 @@ export default class User extends Generic {
         return this.deserialize(pgres.rows[0]);
     }
 
-    async commit(pool) {
-        try {
-            await pool.query(sql`
-                UPDATE users
-                    SET
-                        access = ${this.access},
-                        validated = ${this.validated}
-                    WHERE
-                        id = ${this.id}
-                    RETURNING *
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'Internal User Error');
-        }
-
-        return this;
-    }
-
     async set_password(pool, password) {
         const userhash = await bcrypt.hash(password, 10);
 
@@ -148,7 +130,7 @@ export default class User extends Generic {
                 ) RETURNING *
             `);
 
-            return this.deserialize(pgres.rows[0]);
+            return this.deserialize(pool, pgres.rows[0]);
         } catch (err) {
             if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
                 throw new Err(400, err, 'User already exists');

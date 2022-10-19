@@ -55,25 +55,6 @@ export default class Token extends Generic {
     }
 
     /**
-     * Commit a token to the database
-     *
-     * @param {Pool} pool - Postgres Pool instance
-     */
-    async commit(pool) {
-        try {
-            await pool.query(sql`
-                UPDATE users_tokens
-                    SET
-                        name = ${this.name}
-                    WHERE
-                        id = ${this.id}
-            `);
-        } catch (err) {
-            throw new Err(500, err, 'failed to save token');
-        }
-    }
-
-    /**
      * Validate a token
      *
      * @param {Pool} pool - Postgres Pool instance
@@ -142,7 +123,7 @@ export default class Token extends Generic {
                 ) RETURNING *
             `);
 
-            return this.deserialize(pgres.rows[0]);
+            return this.deserialize(pool, pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Failed to generate token');
         }

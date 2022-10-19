@@ -107,8 +107,9 @@ export default async function router(schema, config) {
             }
 
             if (!config.args.validate) {
-                usr.validated = true;
-                await usr.commit(config.pool);
+                await usr.commit({
+                    validated: true
+                });
             }
 
             return res.json(usr.serialize());
@@ -150,9 +151,7 @@ export default async function router(schema, config) {
                 delete req.body.validated;
             }
 
-            const user = await User.from(config.pool, req.params.uid);
-            user.patch(req.body);
-            await user.commit(config.pool);
+            const user = await User.commit(config.pool, req.params.uid, req.body);
 
             res.json(user.serialize());
         } catch (err) {

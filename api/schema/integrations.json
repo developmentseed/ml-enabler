@@ -1,0 +1,40 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./integrations/id.json"
+        },
+        "pid": {
+            "$ref": "./integrations/pid.json"
+        },
+        "created": {
+            "$ref": "./integrations/created.json"
+        },
+        "updated": {
+            "$ref": "./integrations/updated.json"
+        },
+        "integration": {
+            "$ref": "./integrations/integration.json"
+        },
+        "name": {
+            "$ref": "./integrations/name.json"
+        },
+        "url": {
+            "$ref": "./integrations/url.json"
+        },
+        "auth": {
+            "$ref": "./integrations/auth.json"
+        }
+    },
+    "required": [
+        "id",
+        "pid",
+        "created",
+        "updated",
+        "integration",
+        "name",
+        "url",
+        "auth"
+    ]
+}

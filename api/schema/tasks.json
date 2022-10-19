@@ -1,0 +1,36 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./tasks/id.json"
+        },
+        "iter_id": {
+            "$ref": "./tasks/iter_id.json"
+        },
+        "type": {
+            "$ref": "./tasks/type.json"
+        },
+        "created": {
+            "$ref": "./tasks/created.json"
+        },
+        "updated": {
+            "$ref": "./tasks/updated.json"
+        },
+        "batch_id": {
+            "$ref": "./tasks/batch_id.json"
+        },
+        "log_link": {
+            "$ref": "./tasks/log_link.json"
+        }
+    },
+    "required": [
+        "id",
+        "iter_id",
+        "type",
+        "created",
+        "updated",
+        "batch_id",
+        "log_link"
+    ]
+}

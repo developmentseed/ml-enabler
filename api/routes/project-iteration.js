@@ -165,9 +165,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_auth(req);
 
-            const iter = await Iteration.from(config.pool, req.params.iterationid);
-            iter.patch(req.body);
-            await iter.commit(config.pool);
+            const iter = await Iteration.commit(config.pool, req.params.iterationid, req.body);
 
             return res.json(iter.serialize());
         } catch (err) {

@@ -63,25 +63,6 @@ export default class ProjectImagery extends Generic {
         return ProjectImagery.deserialize(pgres.rows);
     }
 
-    async commit(pool) {
-        try {
-            await pool.query(sql`
-                UPDATE imagery
-                    SET
-                        name        = ${this.name},
-                        url         = ${this.url.trim()},
-                        fmt         = ${this.fmt},
-                        updated     = NOW()
-                    WHERE
-                        id = ${this.id}
-            `);
-
-            return this;
-        } catch (err) {
-            throw new Err(500, err, 'Failed to save Imagery');
-        }
-    }
-
     static async generate(pool, imagery) {
         try {
             const pgres = await pool.query(sql`

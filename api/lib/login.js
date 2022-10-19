@@ -20,9 +20,9 @@ export default class Login {
         const reset = await UserReset.from(pool, token, 'verify');
         await UserReset.delete_all(pool, reset.uid);
 
-        const user = await User.from(pool, reset.uid);
-        user.validated = true;
-        await user.commit(pool);
+        await User.commit(pool, reset.uid, {
+            validated: true
+        });
     }
 
     static async reset(pool, body) {

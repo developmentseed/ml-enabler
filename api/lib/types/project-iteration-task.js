@@ -96,24 +96,6 @@ export default class ProjectTask extends Generic {
         return ProjectTask.deserialize(pgres.rows);
     }
 
-    async commit(pool) {
-        try {
-            await pool.query(sql`
-                UPDATE tasks
-                    SET
-                        batch_id    = ${this.batch_id},
-                        log_link    = ${this.log_link},
-                        updated     = NOW()
-                    WHERE
-                        id = ${this.id}
-            `);
-
-            return this;
-        } catch (err) {
-            throw new Err(500, err, 'Failed to save Task');
-        }
-    }
-
     async logs() {
         if (!this.log_link) throw new Err(400, null, 'Task did not save log_link');
 
@@ -139,24 +121,6 @@ export default class ProjectTask extends Generic {
         return {
             logs: logs
         };
-    }
-
-    static async generate(pool, task) {
-        try {
-            const pgres = await pool.query(sql`
-                INSERT INTO tasks (
-                    iter_id,
-                    type
-                ) VALUES (
-                    ${task.iter_id},
-                    ${task.type}
-                ) RETURNING *
-            `);
-
-            return ProjectTask.deserialize(pgres.rows[0]);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to generate Task');
-        }
     }
 
     async delete(pool) {
@@ -249,8 +213,9 @@ export default class ProjectTask extends Generic {
                 }
             }).promise();
 
-            task.batch_id = job.jobId;
-            return await task.commit(config.pool);
+            return await task.commit({
+                batch_id: job.jobId
+            });
         } catch (err) {
             throw new Err(500, err, 'Failed to submit job');
         }

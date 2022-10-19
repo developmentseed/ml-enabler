@@ -136,8 +136,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_auth(req);
 
-            req.project.patch(req.body);
-            await req.project.commit(config.pool);
+            await req.project.commit(req.body);
 
             return res.json(req.project.serialize());
         } catch (err) {

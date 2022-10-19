@@ -159,9 +159,7 @@ export default async function router(schema, config) {
         try {
             await Auth.is_auth(req);
 
-            const task = await Task.from(config.pool, req.params.taskid);
-            task.patch(req.body);
-            await task.commit(config.pool);
+            const task = await Task.commit(config.pool, req.params.taskid, req.body);
 
             return res.json(task.serialize());
         } catch (err) {

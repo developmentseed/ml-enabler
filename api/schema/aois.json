@@ -1,0 +1,36 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./aois/id.json"
+        },
+        "created": {
+            "$ref": "./aois/created.json"
+        },
+        "updated": {
+            "$ref": "./aois/updated.json"
+        },
+        "pid": {
+            "$ref": "./aois/pid.json"
+        },
+        "iter_id": {
+            "$ref": "./aois/iter_id.json"
+        },
+        "bounds": {
+            "$ref": "./aois/bounds.json"
+        },
+        "name": {
+            "$ref": "./aois/name.json"
+        }
+    },
+    "required": [
+        "id",
+        "created",
+        "updated",
+        "pid",
+        "iter_id",
+        "bounds",
+        "name"
+    ]
+}

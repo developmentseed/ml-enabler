@@ -94,22 +94,4 @@ export default class Submission extends Generic {
 
         return list;
     }
-
-    static async generate(pool, submission) {
-        try {
-            const pgres = await pool.query(sql`
-                INSERT INTO aoi_submission (
-                    aoi_id,
-                    iter_id
-                ) VALUES (
-                    ${submission.aoi_id || null},
-                    ${submission.iter_id}
-                ) RETURNING *
-            `);
-
-            return this.deserialize(pgres.rows[0]);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to generate Task');
-        }
-    }
 }

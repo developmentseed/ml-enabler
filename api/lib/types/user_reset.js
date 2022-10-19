@@ -72,7 +72,7 @@ export default class UserReset extends Generic {
                 RETURNING *
             `);
 
-            return this.deserialize(pgres.rows[0]);
+            return this.deserialize(pool, pgres.rows[0]);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }

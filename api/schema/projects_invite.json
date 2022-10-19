@@ -1,0 +1,28 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./projects_invite/id.json"
+        },
+        "pid": {
+            "$ref": "./projects_invite/pid.json"
+        },
+        "created": {
+            "$ref": "./projects_invite/created.json"
+        },
+        "email": {
+            "$ref": "./projects_invite/email.json"
+        },
+        "token": {
+            "$ref": "./projects_invite/token.json"
+        }
+    },
+    "required": [
+        "id",
+        "pid",
+        "created",
+        "email",
+        "token"
+    ]
+}

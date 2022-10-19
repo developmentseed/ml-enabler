@@ -1,7 +1,6 @@
 import Err from '@openaddresses/batch-error';
 import Generic from '@openaddresses/batch-generic';
 import { sql } from 'slonik';
-import bboxPolygon from '@turf/bbox-polygon';
 
 /**
  * @class
@@ -64,46 +63,5 @@ export default class ProjectAOI extends Generic {
         }
 
         return ProjectAOI.deserialize(pgres.rows);
-    }
-
-    async commit(pool) {
-        try {
-            await pool.query(sql`
-                UPDATE aois
-                    SET
-                        name        = ${this.name},
-                        updated     = NOW()
-                    WHERE
-                        id = ${this.id}
-            `);
-
-            return this;
-        } catch (err) {
-            throw new Err(500, err, 'Failed to save AOI');
-        }
-    }
-
-    static async generate(pool, aoi) {
-        try {
-            aoi.bounds = bboxPolygon(aoi.bounds).geometry;
-
-            const pgres = await pool.query(sql`
-                INSERT INTO aois (
-                    pid,
-                    iter_id,
-                    name,
-                    bounds
-                ) VALUES (
-                    ${aoi.pid},
-                    ${aoi.iter_id || null},
-                    ${aoi.name},
-                    ST_GeomFromGeoJSON(${JSON.stringify(aoi.bounds)})
-                ) RETURNING *
-            `);
-
-            return ProjectAOI.deserialize(pgres.rows[0]);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to generate AOI');
-        }
     }
 }

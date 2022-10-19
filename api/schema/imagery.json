@@ -1,0 +1,36 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./imagery/id.json"
+        },
+        "pid": {
+            "$ref": "./imagery/pid.json"
+        },
+        "name": {
+            "$ref": "./imagery/name.json"
+        },
+        "url": {
+            "$ref": "./imagery/url.json"
+        },
+        "fmt": {
+            "$ref": "./imagery/fmt.json"
+        },
+        "created": {
+            "$ref": "./imagery/created.json"
+        },
+        "updated": {
+            "$ref": "./imagery/updated.json"
+        }
+    },
+    "required": [
+        "id",
+        "pid",
+        "name",
+        "url",
+        "fmt",
+        "created",
+        "updated"
+    ]
+}
