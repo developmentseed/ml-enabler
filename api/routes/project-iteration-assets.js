@@ -5,7 +5,7 @@ const Busboy = require('busboy');
 const Iteration = require('../lib/project/iteration');
 const path = require('path');
 const Task = require('../lib/project/iteration/task');
-const User = require('../lib/user');
+const Auth = require('../lib/auth');
 
 async function router(schema, config) {
     /**
@@ -28,7 +28,7 @@ async function router(schema, config) {
         res: 'res.Iteration.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             config.is_aws();
         } catch (err) {
@@ -107,7 +107,7 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             req.user = req.token;
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             config.is_aws();
 

@@ -1,6 +1,7 @@
 'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const User = require('../lib/user');
+const Auth = require('../lib/auth');
 const Login = require('../lib/login');
 const Settings = require('../lib/settings');
 
@@ -24,7 +25,7 @@ async function router(schema, config) {
         res: 'res.ListUsers.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             const list = await User.list(config.pool, req.query);
 
@@ -67,6 +68,10 @@ async function router(schema, config) {
                 }
 
                 if (!matched) throw new Err(400, null, 'User Registration is restricted by email domain');
+            }
+
+            if (req.user.access !== 'admin') {
+                delete req.body.access;
             }
 
             const usr = await User.generate(config.pool, {
@@ -133,7 +138,7 @@ async function router(schema, config) {
         res: 'res.User.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             if (req.user.access !== 'admin' && req.user.id !== req.params.uid) {
                 throw new Err(401, null, 'You can only edit your own user account');

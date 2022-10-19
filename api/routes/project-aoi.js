@@ -1,7 +1,7 @@
 'use strict';
 const { Err } = require('@openaddresses/batch-schema');
 const AOI = require('../lib/project/aoi');
-const User = require('../lib/user');
+const Auth = require('../lib/auth');
 
 async function router(schema, config) {
 
@@ -24,7 +24,7 @@ async function router(schema, config) {
         res: 'res.ListAOI.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             req.query.pid = req.params.pid;
             res.json(await AOI.list(config.pool, req.params.pid, req.query));
@@ -52,7 +52,7 @@ async function router(schema, config) {
         res: 'res.AOI.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             req.body.pid = req.params.pid;
             const img = await AOI.generate(config.pool, req.body);
@@ -81,7 +81,7 @@ async function router(schema, config) {
         res: 'res.AOI.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             const img = await AOI.from(config.pool, req.params.aoiid);
 
@@ -111,7 +111,7 @@ async function router(schema, config) {
         res: 'res.AOI.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             const img = await AOI.from(config.pool, req.params.aoiid);
             img.patch(req.body);
@@ -141,7 +141,7 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             const img = await AOI.from(config.pool, req.params.aoiid);
             await img.delete(config.pool);

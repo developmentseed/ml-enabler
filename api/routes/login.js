@@ -1,6 +1,6 @@
 'use strict';
 const { Err } = require('@openaddresses/batch-schema');
-const User = require('../lib/user');
+const Auth = require('../lib/auth');
 const Login = require('../lib/login');
 
 async function router(schema, config) {
@@ -22,7 +22,7 @@ async function router(schema, config) {
         res: 'res.Login.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             res.json({
                 id: req.user.id,

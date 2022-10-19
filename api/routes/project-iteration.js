@@ -2,7 +2,7 @@
 const { Err } = require('@openaddresses/batch-schema');
 const Iteration = require('../lib/project/iteration');
 const Stack = require('../lib/stack');
-const User = require('../lib/user');
+const Auth = require('../lib/auth');
 const Imagery = require('../lib/project/imagery');
 
 async function router(schema, config) {
@@ -25,7 +25,7 @@ async function router(schema, config) {
         res: 'res.ListIterations.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             req.query.pid = req.params.pid;
             const list = await Iteration.list(config.pool, req.params.pid, req.query);
@@ -74,7 +74,7 @@ async function router(schema, config) {
         res: 'res.Iteration.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             req.body.pid = req.params.pid;
 
@@ -109,7 +109,7 @@ async function router(schema, config) {
         res: 'res.Iteration.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             const iter = await Iteration.latest(config.pool, req.params.pid);
             return res.json(iter.serialize());
@@ -136,7 +136,7 @@ async function router(schema, config) {
         res: 'res.Iteration.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             const iter = await Iteration.from(config.pool, req.params.iterationid);
             return res.json(iter.serialize());
@@ -164,7 +164,7 @@ async function router(schema, config) {
         res: 'res.Iteration.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             const iter = await Iteration.from(config.pool, req.params.iterationid);
             iter.patch(req.body);

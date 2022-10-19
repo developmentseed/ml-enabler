@@ -3,7 +3,7 @@ const { Err } = require('@openaddresses/batch-schema');
 const Project = require('../lib/project');
 const ProjectAccess = require('../lib/project/access');
 const Stack = require('../lib/stack');
-const User = require('../lib/user');
+const Auth = require('../lib/auth');
 
 async function router(schema, config) {
 
@@ -25,7 +25,7 @@ async function router(schema, config) {
         res: 'res.ListProjects.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             req.query.uid = req.user.id;
 
@@ -74,7 +74,7 @@ async function router(schema, config) {
         res: 'res.Project.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             if (!req.body.users.length) throw new Err(400, null, 'Users list cannot be empty');
 
@@ -108,7 +108,7 @@ async function router(schema, config) {
         res: 'res.Project.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             return res.json(req.project.serialize());
         } catch (err) {
@@ -135,7 +135,7 @@ async function router(schema, config) {
         res: 'res.Project.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             req.project.patch(req.body);
             await req.project.commit(config.pool);
@@ -163,7 +163,7 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             await req.project.delete(config.pool);
 
