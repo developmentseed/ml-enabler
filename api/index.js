@@ -1,25 +1,23 @@
 import fs from 'fs';
-import path from 'path';
-import { Schema } from '@openaddresses/batch-schema';
+import Schema from '@openaddresses/batch-schema';
 import Err from '@openaddresses/batch-error';
 import jwt from 'jsonwebtoken';
-import morgan from 'morgan';
 import express from 'express';
-import pkg from './package.json';
 import minify from 'express-minify';
-import bodyparser from 'body-parser';
 import minimist from 'minimist';
 
-import Config from './lib/config';
-import Settings from './lib/settings';
-import User from './lib/user';
-import Project from './lib/project';
-import UserToken from './lib/token';
+import Config from './lib/config.js';
+import Settings from './lib/settings.js';
+import User from './lib/user.js';
+import Project from './lib/project.js';
+import UserToken from './lib/token.js';
 
 const args = minimist(process.argv, {
     boolean: ['help', 'populate', 'email', 'no-cache', 'silent', 'validate'],
     string: ['postgres']
 });
+
+const pkg = JSON.parse(fs.readFile(new URL('./package.json', import.meta.url)));
 
 if (require.main === module) {
     configure(args);
@@ -114,10 +112,6 @@ async function server(args, config, cb) {
     app.use('/docs', express.static('./doc'));
     app.use('/*', express.static('web/dist'));
 
-    schema.router.use(bodyparser.urlencoded({ extended: true }));
-    schema.router.use(morgan('combined'));
-    schema.router.use(bodyparser.json({ limit: '50mb' }));
-
     schema.router.use(async (req, res, next) => {
         if (req.header('authorization')) {
             const authorization = req.header('authorization').split(' ');
@@ -173,8 +167,6 @@ async function server(args, config, cb) {
         return next();
     });
 
-    await schema.api();
-
     schema.router.param('pid', async (req, res, next, pid) => {
         try {
             if ((req.user && req.user.access === 'admin') || (req.token && req.token.access === 'admin'))  {
@@ -196,27 +188,19 @@ async function server(args, config, cb) {
         return next();
     });
 
-    // Load dynamic routes directory
-    for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
-        if (!config.silent) console.error(`ok - loaded routes/${r}`);
-
-        const ext = path.parse(r).ext;
-
-        if (ext === '.js') {
-            await require('./routes/' + r)(schema, config);
-        } else if (ext === '.mjs') {
-            (await import('./routes/' + r)).default(schema, config);
+    await schema.api();
+    await schema.load(
+        new URL('./routes/', import.meta.url),
+        config,
+        {
+            silent: !!config.silent
         }
-    }
+    );
 
+    schema.not_found();
     schema.error();
 
-    schema.router.all('*', (req, res) => {
-        return res.status(404).json({
-            status: 404,
-            message: 'API endpoint does not exist!'
-        });
-    });
+    fs.writeFileSync(new URL('./doc/api.js', import.meta.url), schema.docs.join('\n'));
 
     config.confirm_sns();
 

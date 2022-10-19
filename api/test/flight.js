@@ -9,9 +9,10 @@ import Knex from 'knex';
 import KnexConfig from '../knexfile.js';
 import drop from './drop.js';
 import { pathToRegexp } from 'path-to-regexp';
+import request from 'request';
 import Ajv from 'ajv';
 
-const prequest = promisify(require('request'));
+const prequest = promisify(request);
 const ajv = new Ajv({
     allErrors: true
 });
