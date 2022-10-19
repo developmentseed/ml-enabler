@@ -1,13 +1,12 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const S3 = require('../lib/s3');
-const Busboy = require('busboy');
-const Iteration = require('../lib/project/iteration');
-const path = require('path');
-const Task = require('../lib/project/iteration/task');
-const Auth = require('../lib/auth');
+import Err from '@openaddresses/batch-error';
+import S3 from '../lib/s3.js';
+import Busboy from 'busboy';
+import Iteration from '../lib/project/iteration.js';
+import path from 'path';
+import Task from '../lib/project/iteration/task.js';
+import Auth from '../lib/auth.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
     /**
      * @api {post} /api/project/:pid/iteration/:iterationid/asset Upload
      * @apiVersion 1.0.0
@@ -127,5 +126,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

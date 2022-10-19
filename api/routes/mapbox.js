@@ -1,8 +1,7 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Auth = require('../lib/auth');
+import Err from '@openaddresses/batch-error';
+import Auth from '../lib/auth.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
 
     /**
      * @api {get} /api/mapbox Mapbox Settings
@@ -30,5 +29,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

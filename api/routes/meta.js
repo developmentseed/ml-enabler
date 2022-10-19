@@ -1,10 +1,9 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Auth = require('../lib/auth');
-const Meta = require('../lib/meta');
-const Settings = require('../lib/settings');
+import Err from '@openaddresses/batch-error';
+import Auth from '../lib/auth.js';
+import Meta from '../lib/meta.js';
+import Settings from '../lib/settings.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
 
     /**
      * @api {get} /api/meta List Meta
@@ -119,5 +118,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

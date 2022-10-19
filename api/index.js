@@ -1,23 +1,25 @@
-'use strict';
-const fs = require('fs');
-const path = require('path');
-const { Schema, Err } = require('@openaddresses/batch-schema');
-const jwt = require('jsonwebtoken');
-const morgan = require('morgan');
-const express = require('express');
-const pkg = require('./package.json');
-const minify = require('express-minify');
-const bodyparser = require('body-parser');
-const args = require('minimist')(process.argv, {
+import fs from 'fs';
+import path from 'path';
+import { Schema, Err } from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
+import jwt from 'jsonwebtoken';
+import morgan from 'morgan';
+import express from 'express';
+import pkg from './package.json';
+import minify from 'express-minify';
+import bodyparser from 'body-parser';
+import minimist from 'minimist';
+
+import Config from './lib/config';
+import Settings from './lib/settings';
+import User from './lib/user';
+import Project from './lib/project';
+import UserToken from './lib/token';
+
+const args = minimist(process.argv, {
     boolean: ['help', 'populate', 'email', 'no-cache', 'silent', 'validate'],
     string: ['postgres']
 });
-
-const Config = require('./lib/config');
-const Settings = require('./lib/settings');
-const User = new require('./lib/user');
-const Project = new require('./lib/project');
-const UserToken = new require('./lib/token');
 
 if (require.main === module) {
     configure(args);
@@ -60,7 +62,7 @@ async function server(args, config, cb) {
     const app = express();
 
     const schema = new Schema(express.Router(), {
-        schemas: path.resolve(__dirname, 'schema')
+        schemas: new URL('./schema', import.meta.url)
     });
 
     app.disable('x-powered-by');

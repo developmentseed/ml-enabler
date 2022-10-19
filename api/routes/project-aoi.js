@@ -1,9 +1,8 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const AOI = require('../lib/project/aoi');
-const Auth = require('../lib/auth');
+import Err from '@openaddresses/batch-error';
+import AOI from '../lib/project/aoi.js';
+import Auth from '../lib/auth.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
 
     /**
      * @api {get} /api/project/:pid/aoi List AOI
@@ -155,5 +154,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

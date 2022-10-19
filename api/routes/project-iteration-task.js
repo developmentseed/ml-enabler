@@ -1,9 +1,8 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Task = require('../lib/project/iteration/task');
-const Auth = require('../lib/auth');
+import Err from '@openaddresses/batch-error';
+import Task from '../lib/project/iteration/task.js';
+import Auth from '../lib/auth.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
 
     /**
      * @api {post} /api/project/:pid/iteration/:iterationid/task Create Task
@@ -203,5 +202,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

@@ -1,9 +1,8 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Imagery = require('../lib/project/imagery');
-const Auth = require('../lib/auth');
+import Err from '@openaddresses/batch-error';
+import Imagery from '../lib/project/imagery.js';
+import Auth from '../lib/auth.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
     /**
      * @api {get} /api/project/:pid/imagery List Imagery
      * @apiVersion 1.0.0
@@ -154,5 +153,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

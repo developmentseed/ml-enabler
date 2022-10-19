@@ -1,14 +1,13 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const StackQueue = require('../lib/stack/queue');
-const Task = require('../lib/project/iteration/task');
-const Iteration = require('../lib/project/iteration');
-const Imagery = require('../lib/project/imagery');
-const Submission = require('../lib/project/iteration/submission');
-const CWAlarm = require('../lib/cw-alarm');
-const Auth = require('../lib/auth');
+import Err from '@openaddresses/batch-error';
+import StackQueue from '../lib/stack/queue.js';
+import Task from '../lib/project/iteration/task.js';
+import Iteration from '../lib/project/iteration.js';
+import Imagery from '../lib/project/imagery.js';
+import Submission from '../lib/project/iteration/submission.js';
+import CWAlarm from '../lib/cw-alarm.js';
+import Auth from '../lib/auth.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
     const alarm = new CWAlarm(config);
 
     /**
@@ -148,5 +147,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

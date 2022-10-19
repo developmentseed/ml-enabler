@@ -1,9 +1,8 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Integration = require('../lib/project/integration');
-const Auth = require('../lib/auth');
+import Err from '@openaddresses/batch-error';
+import Integration from '../lib/project/integration.js';
+import Auth from '../lib/auth.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
     /**
      * @api {get} /api/project/:pid/integration List Integration
      * @apiVersion 1.0.0
@@ -120,5 +119,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

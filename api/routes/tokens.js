@@ -1,9 +1,8 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const UserToken = new require('../lib/token');
-const Auth = require('../lib/auth');
+import Err from '@openaddresses/batch-error';
+import UserToken from '../lib/token.js';
+import Auth from '../lib/auth.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
 
     /**
      * @api {get} /api/token List Tokens
@@ -122,5 +121,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

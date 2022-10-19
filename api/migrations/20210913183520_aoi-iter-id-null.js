@@ -1,11 +1,11 @@
-exports.up = function(knex) {
+export function up(knex) {
     return knex.schema.raw(`
         ALTER TABLE aois
             ALTER COLUMN iter_id DROP NOT NULL;
     `);
 }
 
-exports.down = function(knex) {
+export function down(knex) {
     return knex.schema.raw(`
         ALTER TABLE aois
             ALTER COLUMN iter_id SET NOT NULL;

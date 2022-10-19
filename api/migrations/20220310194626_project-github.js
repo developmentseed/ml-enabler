@@ -1,11 +1,11 @@
-exports.up = function(knex) {
+export function up(knex) {
     return knex.schema.raw(`
         ALTER TABLE projects
             ADD COLUMN github_repo TEXT;
     `);
 }
 
-exports.down = function(knex) {
+export function down(knex) {
     return knex.schema.raw(`
         ALTER TABLE projects    
             DROP COLUMN github_repo;

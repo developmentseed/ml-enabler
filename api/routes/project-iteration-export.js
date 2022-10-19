@@ -1,14 +1,14 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Iteration = require('../lib/project/iteration');
-const AWS = require('aws-sdk');
-const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
-const Submission = require('../lib/project/iteration/submission');
-const createCsvStringifier = require('csv-writer').createObjectCsvStringifier;
-const RL = require('readline');
-const Auth = require('../lib/auth');
+import Err from '@openaddresses/batch-error';
+import Iteration from '../lib/project/iteration.js';
+import AWS from 'aws-sdk';
+import Submission from '../lib/project/iteration/submission.js';
+import RL from 'readline';
+import Auth from '../lib/auth.js';
+import { createObjectCsvStringifier as createCsvStringifier } from 'csv-writer';
 
-async function router(schema, config) {
+const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
+
+export default async function router(schema, config) {
     /**
      * @api {get} /api/project/:pid/iteration/:iterationid/export
      * @apiVersion 1.0.0
@@ -136,5 +136,3 @@ async function s3read(out, key, query) {
         });
     });
 }
-
-module.exports = router;
