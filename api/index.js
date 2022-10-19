@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { Schema, Err } from '@openaddresses/batch-schema';
+import { Schema } from '@openaddresses/batch-schema';
 import Err from '@openaddresses/batch-error';
 import jwt from 'jsonwebtoken';
 import morgan from 'morgan';

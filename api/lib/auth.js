@@ -1,4 +1,4 @@
-const { Err } = require('@openaddresses/batch-schema');
+import Err from '@openaddresses/batch-error';
 
 /**
  * @class

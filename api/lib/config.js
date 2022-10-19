@@ -1,6 +1,6 @@
+import Err from '@openaddresses/batch-error';
 const CP = require('child_process');
 const { sql, createPool, createTypeParserPreset } = require('slonik');
-const { Err } = require('@openaddresses/batch-schema');
 const wkx = require('wkx');
 const bbox = require('@turf/bbox').default;
 const AWS = require('aws-sdk');

@@ -1,5 +1,5 @@
+import Err from '@openaddresses/batch-error';
 const Mailgen = require('mailgen');
-const { Err } = require('@openaddresses/batch-schema');
 const AWS = require('aws-sdk');
 
 /**

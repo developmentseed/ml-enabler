@@ -1,4 +1,4 @@
-const { Err } = require('@openaddresses/batch-schema');
+import Err from '@openaddresses/batch-error';
 const AWS = require('aws-sdk');
 const cf = new AWS.CloudFormation({
     region: process.env.AWS_DEFAULT_REGION
