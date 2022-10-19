@@ -1,7 +1,7 @@
 import Err from '@openaddresses/batch-error';
-const bcrypt = require('bcrypt');
-const { sql } = require('slonik');
-const Generic = require('@openaddresses/batch-generic');
+import bcrypt from 'bcrypt';
+import { sql } from 'slonik';
+import Generic from '@openaddresses/batch-generic';
 
 /**
  * @class

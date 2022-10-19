@@ -1,4 +1,4 @@
-const AWS = require('aws-sdk');
+import AWS from 'aws-sdk';
 
 const CW = new AWS.CloudWatch({
     region: process.env.AWS_DEFAULT_REGION || 'us-east-1'

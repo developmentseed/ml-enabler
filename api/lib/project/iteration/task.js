@@ -1,11 +1,12 @@
 import Err from '@openaddresses/batch-error';
-const Generic = require('@openaddresses/batch-generic');
-const { sql } = require('slonik');
-const AWS = require('aws-sdk');
+import Generic from '@openaddresses/batch-generic';
+import { sql } from 'slonik';
+import AWS from 'aws-sdk';
+import jwt from 'jsonwebtoken';
+import moment from 'moment';
+
 const batch = new AWS.Batch({ region: process.env.AWS_DEFAULT_REGION });
 const cwl = new AWS.CloudWatchLogs({ region: process.env.AWS_DEFAULT_REGION });
-const jwt = require('jsonwebtoken');
-const moment = require('moment');
 
 /**
  * @class

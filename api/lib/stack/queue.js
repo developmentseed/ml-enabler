@@ -1,5 +1,6 @@
 import Err from '@openaddresses/batch-error';
-const AWS = require('aws-sdk');
+import AWS from 'aws-sdk';
+
 const sqs = new AWS.SQS({
     region: process.env.AWS_DEFAULT_REGION
 });

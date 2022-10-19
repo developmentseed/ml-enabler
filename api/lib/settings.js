@@ -1,6 +1,7 @@
 import Err from '@openaddresses/batch-error';
-const Meta = require('./meta');
-const Ajv = require('ajv');
+import Meta from './meta.js';
+import Ajv from 'ajv';
+
 const ajv = new Ajv({
     allErrors: true
 });

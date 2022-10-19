@@ -1,9 +1,10 @@
 import Err from '@openaddresses/batch-error';
-const Generic = require('@openaddresses/batch-generic');
-const crypto = require('crypto');
-const { promisify } = require('util');
+import Generic from '@openaddresses/batch-generic';
+import crypto from 'crypto';
+import { promisify } from 'util';
+import { sql } from 'slonik';
+
 const randomBytes = promisify(crypto.randomBytes);
-const { sql } = require('slonik');
 
 /**
  * @class

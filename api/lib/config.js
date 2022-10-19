@@ -1,9 +1,10 @@
 import Err from '@openaddresses/batch-error';
-const CP = require('child_process');
-const { sql, createPool, createTypeParserPreset } = require('slonik');
-const wkx = require('wkx');
-const bbox = require('@turf/bbox').default;
-const AWS = require('aws-sdk');
+import CP from 'child_process';
+import { sql, createPool, createTypeParserPreset } from 'slonik';
+import wkx from 'wkx';
+import bbox from '@turf/bbox';
+import AWS from 'aws-sdk';
+
 const SNS = new AWS.SNS({
     region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
 });

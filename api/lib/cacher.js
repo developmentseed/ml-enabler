@@ -1,4 +1,4 @@
-const memjs = require('memjs');
+import memjs from 'memjs';
 
 /**
  * @class Cacher

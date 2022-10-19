@@ -1,6 +1,6 @@
 import Err from '@openaddresses/batch-error';
-const Generic = require('@openaddresses/batch-generic');
-const { sql } = require('slonik');
+import Generic from '@openaddresses/batch-generic';
+import { sql } from 'slonik';
 
 /**
  * Class representing rows in projects table

@@ -1,7 +1,7 @@
 import Err from '@openaddresses/batch-error';
-const Generic = require('@openaddresses/batch-generic');
-const { sql } = require('slonik');
-const bboxPolygon = require('@turf/bbox-polygon').default;
+import Generic from '@openaddresses/batch-generic';
+import { sql } from 'slonik';
+import bboxPolygon from '@turf/bbox-polygon';
 
 /**
  * @class

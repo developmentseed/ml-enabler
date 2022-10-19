@@ -1,10 +1,11 @@
 import Err from '@openaddresses/batch-error';
-const AWS = require('aws-sdk');
+import AWS from 'aws-sdk';
+import template from '../cloudformation/prediction.template.js';
+
 const cf = new AWS.CloudFormation({
     region: process.env.AWS_DEFAULT_REGION
 });
 
-const template = require('../cloudformation/prediction.template.js');
 
 /**
  * @class

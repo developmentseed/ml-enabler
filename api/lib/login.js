@@ -1,8 +1,8 @@
 import Err from '@openaddresses/batch-error';
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const User = require('./user');
-const UserReset = require('./user_reset');
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import User from './user.js';
+import UserReset from './user_reset.js';
 
 /**
  * @class

@@ -1,6 +1,6 @@
 import Err from '@openaddresses/batch-error';
-const Mailgen = require('mailgen');
-const AWS = require('aws-sdk');
+import Mailgen from 'mailgen';
+import AWS from 'aws-sdk';
 
 /**
  * @class
