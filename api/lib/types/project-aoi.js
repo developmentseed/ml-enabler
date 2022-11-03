@@ -62,6 +62,6 @@ export default class ProjectAOI extends Generic {
             throw new Err(500, err, 'Internal AOI Error');
         }
 
-        return ProjectAOI.deserialize(pgres.rows);
+        return this.deserialize_list(pgres);
     }
 }

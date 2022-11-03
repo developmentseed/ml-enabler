@@ -67,7 +67,7 @@ export default class ProjectIteration extends Generic {
             throw new Err(500, err, 'Internal Integration Error');
         }
 
-        return ProjectIteration.deserialize(pgres.rows);
+        return this.deserialize_list(pgres);
     }
 
     /**
@@ -96,6 +96,6 @@ export default class ProjectIteration extends Generic {
 
         if (!pgres.rows.length) throw new Err(400, null, 'Project does not contain iterations');
 
-        return ProjectIteration.deserialize(pgres.rows[0]);
+        return ProjectIteration.deserialize(pool, pgres);
     }
 }

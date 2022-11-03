@@ -61,7 +61,7 @@ export default class Submission extends Generic {
             throw new Err(500, err, 'Internal Tasks Error');
         }
 
-        return await this.list_s3(this.deserialize(pgres.rows, 'submissions'));
+        return await this.list_s3(this.deserialize_list(pgres, 'submissions'));
     }
 
     static async from(pool, id, pid) {

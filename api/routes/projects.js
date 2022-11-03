@@ -77,9 +77,12 @@ export default async function router(schema, config) {
 
             if (!req.body.users.length) throw new Err(400, null, 'Users list cannot be empty');
 
+            const users = req.body.users;
+
+            delete req.body.users;
             const project = await Project.generate(config.pool, req.body);
 
-            for (const user of req.body.users) {
+            for (const user of users) {
                 user.pid = project.id;
                 await ProjectAccess.generate(config.pool, user);
             }

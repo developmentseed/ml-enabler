@@ -42,7 +42,7 @@ export default class UserReset extends Generic {
             throw new Err(401, null, 'Invalid or Expired Reset Token');
         }
 
-        return this.deserialize(pgres.rows[0]);
+        return this.deserialize(pool, pgres);
     }
 
     static async delete_all(pool, uid) {
@@ -72,7 +72,7 @@ export default class UserReset extends Generic {
                 RETURNING *
             `);
 
-            return this.deserialize(pool, pgres.rows[0]);
+            return this.deserialize(pool, pgres);
         } catch (err) {
             throw new Err(500, err, 'Internal User Error');
         }

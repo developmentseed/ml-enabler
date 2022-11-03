@@ -43,7 +43,7 @@ export default class Meta extends Generic {
                     ${query.limit * query.page}
             `);
 
-            return this.deserialize_list(pgres.rows);
+            return this.deserialize_list(pgres);
         } catch (err) {
             throw new Err(500, err, 'Failed to list meta');
         }
@@ -96,7 +96,7 @@ export default class Meta extends Generic {
             throw new Err(404, null, 'Meta not found');
         }
 
-        return this.deserialize(pool, pgres.rows[0]);
+        return this.deserialize(pool, pgres);
     }
 
     /**

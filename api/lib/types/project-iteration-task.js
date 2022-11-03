@@ -93,7 +93,7 @@ export default class ProjectTask extends Generic {
             throw new Err(500, err, 'Internal Tasks Error');
         }
 
-        return ProjectTask.deserialize(pgres.rows);
+        return this.deserialize_list(pgres);
     }
 
     async logs() {

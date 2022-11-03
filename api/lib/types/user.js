@@ -64,7 +64,7 @@ export default class User extends Generic {
             throw new Err(500, err, 'Internal User Error');
         }
 
-        return this.deserialize(pgres.rows);
+        return this.deserialize_list(pgres);
     }
 
     static async from_username(pool, username) {
@@ -87,7 +87,7 @@ export default class User extends Generic {
             throw new Err(403, null, 'Invalid Username or Pass');
         }
 
-        return this.deserialize(pgres.rows[0]);
+        return this.deserialize(pool, pgres);
     }
 
     async set_password(pool, password) {
@@ -130,7 +130,7 @@ export default class User extends Generic {
                 ) RETURNING *
             `);
 
-            return this.deserialize(pool, pgres.rows[0]);
+            return this.deserialize(pool, pgres);
         } catch (err) {
             if (err.originalError && err.originalError.code && err.originalError.code === '23505') {
                 throw new Err(400, err, 'User already exists');

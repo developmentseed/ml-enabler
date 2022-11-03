@@ -79,7 +79,7 @@ export default class Project extends Generic {
             throw new Err(500, err, 'Internal User Error');
         }
 
-        return this.deserialize(pgres.rows);
+        return this.deserialize_list(pgres);
     }
 
     /**
@@ -131,6 +131,6 @@ export default class Project extends Generic {
 
         if (!pgres.rows.length) throw new Err(404, null, 'Project does not exist or user does not have access');
 
-        return this.deserialize(pgres.rows[0]);
+        return this.deserialize(pool, pgres);
     }
 }

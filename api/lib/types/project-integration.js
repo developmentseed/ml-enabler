@@ -62,6 +62,6 @@ export default class ProjectIntegration extends Generic {
             throw new Err(500, err, 'Internal Integration Error');
         }
 
-        return ProjectIntegration.deserialize(pgres.rows);
+        return this.deserialize_list(pgres);
     }
 }

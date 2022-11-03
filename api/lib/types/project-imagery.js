@@ -60,28 +60,6 @@ export default class ProjectImagery extends Generic {
             throw new Err(500, err, 'Internal Imagery Error');
         }
 
-        return ProjectImagery.deserialize(pgres.rows);
-    }
-
-    static async generate(pool, imagery) {
-        try {
-            const pgres = await pool.query(sql`
-                INSERT INTO imagery (
-                    pid,
-                    name,
-                    url,
-                    fmt
-                ) VALUES (
-                    ${imagery.pid},
-                    ${imagery.name},
-                    ${imagery.url.trim()},
-                    ${imagery.fmt}
-                ) RETURNING *
-            `);
-
-            return ProjectImagery.deserialize(pgres.rows[0]);
-        } catch (err) {
-            throw new Err(500, err, 'Failed to generate Imagery');
-        }
+        return this.deserialize_list(pgres);
     }
 }

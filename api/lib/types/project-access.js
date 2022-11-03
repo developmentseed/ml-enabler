@@ -67,7 +67,7 @@ export default class ProjectAccess extends Generic {
             throw new Err(500, err, 'Internal Project Access Error');
         }
 
-        return ProjectAccess.deserialize(pgres.rows);
+        return this.deserialize_list(pgres);
     }
 
     static async from_alt(pool, pid, uid) {
