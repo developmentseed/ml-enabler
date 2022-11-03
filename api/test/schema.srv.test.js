@@ -28,7 +28,7 @@ test('GET: api/schema', async (t) => {
         t.error(err, 'no error');
     }
 
-    t.end()
+    t.end();
 });
 
 test('GET: api/schema?method=FAKE', async (t) => {
@@ -58,7 +58,7 @@ test('GET: api/schema?method=FAKE', async (t) => {
         t.error(err, 'no error');
     }
 
-    t.end()
+    t.end();
 });
 
 test('GET: api/schema?method=GET', async (t) => {
