@@ -1,12 +1,12 @@
-'use strict';
-const AWS = require('aws-sdk');
+import Err from '@openaddresses/batch-error';
+import AWS from 'aws-sdk';
+
 const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
-const { Err } = require('@openaddresses/batch-schema');
 
 /**
  * @class
  */
-class S3 {
+export default class S3 {
     constructor(params) {
         this.params = params;
     }
@@ -87,5 +87,3 @@ class S3 {
         s3stream.pipe(res);
     }
 }
-
-module.exports = S3;

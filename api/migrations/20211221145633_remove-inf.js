@@ -1,9 +1,9 @@
-exports.up = function(knex) {
+export function up(knex) {
     return knex.schema.raw(`
         DROP TABLE iteration_tiles;
     `);
 }
 
-exports.down = function(knex) {
+export function down(knex) {
     return knex.schema.raw(``);
 }

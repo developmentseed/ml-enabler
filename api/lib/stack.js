@@ -1,16 +1,16 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const AWS = require('aws-sdk');
+import Err from '@openaddresses/batch-error';
+import AWS from 'aws-sdk';
+import template from '../cloudformation/prediction.template.js';
+
 const cf = new AWS.CloudFormation({
     region: process.env.AWS_DEFAULT_REGION
 });
 
-const template = require('../cloudformation/prediction.template.js');
 
 /**
  * @class
  */
-class Stack {
+export default class Stack {
     static async list(prefix) {
         let stacks = [];
 
@@ -163,5 +163,3 @@ class Stack {
         }
     }
 }
-
-module.exports = Stack;

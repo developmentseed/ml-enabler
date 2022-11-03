@@ -1,0 +1,63 @@
+{
+    "query": null,
+    "body": {
+        "type": "object",
+        "required": [
+            "username",
+            "password"
+        ],
+        "additionalProperties": false,
+        "properties": {
+            "username": {
+                "type": "string",
+                "minLength": 2,
+                "maxLength": 40,
+                "description": "username"
+            },
+            "password": {
+                "type": "string",
+                "minLength": 8,
+                "description": "password"
+            }
+        }
+    },
+    "res": {
+        "type": "object",
+        "required": [
+            "id",
+            "username",
+            "email",
+            "access"
+        ],
+        "additionalProperties": false,
+        "properties": {
+            "id": {
+                "type": "integer"
+            },
+            "username": {
+                "type": "string"
+            },
+            "email": {
+                "type": "string"
+            },
+            "access": {
+                "type": "string",
+                "enum": [
+                    "user",
+                    "read",
+                    "disabled",
+                    "admin"
+                ],
+                "description": "The access level of a given user"
+            },
+            "validated": {
+                "type": "boolean",
+                "description": "Has the user's email address been validated"
+            },
+            "token": {
+                "type": "string",
+                "description": "JSON Web Token to use for subsequent auth"
+            }
+        }
+    }
+}

@@ -1,13 +1,12 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const S3 = require('../lib/s3');
-const Busboy = require('busboy');
-const Iteration = require('../lib/project/iteration');
-const path = require('path');
-const Task = require('../lib/project/iteration/task');
-const User = require('../lib/user');
+import Err from '@openaddresses/batch-error';
+import S3 from '../lib/s3.js';
+import Busboy from 'busboy';
+import Iteration from '../lib/types/project-iteration.js';
+import Task from '../lib/types/project-iteration-task.js';
+import path from 'path';
+import Auth from '../lib/auth.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
     /**
      * @api {post} /api/project/:pid/iteration/:iterationid/asset Upload
      * @apiVersion 1.0.0
@@ -28,7 +27,7 @@ async function router(schema, config) {
         res: 'res.Iteration.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             config.is_aws();
         } catch (err) {
@@ -64,8 +63,7 @@ async function router(schema, config) {
 
                 const body = {};
                 body[`${req.query.type}_link`] = key;
-                iter.patch(body);
-                await iter.commit(config.pool);
+                await iter.commit(body);
 
                 if (req.query.type === 'model') {
                     await Task.batch(config, {
@@ -107,7 +105,7 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             req.user = req.token;
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             config.is_aws();
 
@@ -127,5 +125,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

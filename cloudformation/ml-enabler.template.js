@@ -1,9 +1,9 @@
-const cf = require('@mapbox/cloudfriend');
-const alarms = require('batch-alarms');
+import cf from '@mapbox/cloudfriend';
+import alarms from 'batch-alarms';
 
-const jobs = require('./jobs');
-const batch = require('./batch');
-const perms = require('./perms');
+import jobs from './jobs';
+import batch from './batch';
+import perms from './perms';
 
 const Parameters = {
     GitSha: {
@@ -66,7 +66,7 @@ const Resources = {
             TopicName: cf.join([cf.stackName, '-vectorize']),
             Subscription: [{
                 Protocol: 'http',
-                Endpoint: cf.join(['http://', cf.getAtt('MLEnablerELB', 'DNSName'), '/api/sns']),
+                Endpoint: cf.join(['http://', cf.getAtt('MLEnablerELB', 'DNSName'), '/api/sns'])
             }]
         }
     },
@@ -76,7 +76,7 @@ const Resources = {
             TopicName: cf.join([cf.stackName, '-delete']),
             Subscription: [{
                 Protocol: 'http',
-                Endpoint: cf.join(['http://', cf.getAtt('MLEnablerELB', 'DNSName'), '/api/sns']),
+                Endpoint: cf.join(['http://', cf.getAtt('MLEnablerELB', 'DNSName'), '/api/sns'])
             }]
         }
     },
@@ -214,7 +214,7 @@ const Resources = {
                             'logs:PutLogEvents',
                             'logs:DescribeLogStreams'
                         ],
-                        Resource: [ 'arn:aws:logs:*:*:*' ]
+                        Resource: ['arn:aws:logs:*:*:*']
                     }]
                 }
             }],
@@ -335,7 +335,7 @@ const Resources = {
             NetworkConfiguration: {
                 AwsvpcConfiguration: {
                     AssignPublicIp: 'ENABLED',
-                    SecurityGroups: [ cf.ref('MLEnablerServiceSecurityGroup') ],
+                    SecurityGroups: [cf.ref('MLEnablerServiceSecurityGroup')],
                     Subnets: [
                         cf.ref('MLEnablerSubA'),
                         cf.ref('MLEnablerSubB')
@@ -403,7 +403,7 @@ const Resources = {
         Properties: {
             Name: cf.stackName,
             Type: 'application',
-            SecurityGroups: [ cf.ref('MLEnablerELBSecurityGroup') ],
+            SecurityGroups: [cf.ref('MLEnablerELBSecurityGroup')],
             Subnets: [
                 cf.ref('MLEnablerSubA'),
                 cf.ref('MLEnablerSubB')
@@ -432,7 +432,7 @@ const Resources = {
         Type: 'AWS::ElasticLoadBalancingV2::Listener',
         Condition: 'HasSSL',
         Properties: {
-            Certificates: [ {
+            Certificates: [{
                 CertificateArn: cf.arn('acm', cf.ref('SSLCertificateIdentifier'))
             }],
             DefaultActions: [{
@@ -490,7 +490,7 @@ const Resources = {
             BackupRetentionPeriod: 10,
             StorageType: 'gp2',
             DBInstanceClass: cf.ref('DatabaseType'),
-            DBSecurityGroups: [ cf.ref('MLEnablerRDSSecurityGroup') ],
+            DBSecurityGroups: [cf.ref('MLEnablerRDSSecurityGroup')],
             DBSubnetGroupName: cf.ref('MLEnablerRDSSubnet'),
             PubliclyAccessible: true
         }
@@ -513,14 +513,14 @@ const Resources = {
             DBSecurityGroupIngress: [{
                 EC2SecurityGroupId: cf.getAtt('MLEnablerServiceSecurityGroup', 'GroupId')
             },{
-                  CIDRIP: '0.0.0.0/0'
+                CIDRIP: '0.0.0.0/0'
             }]
         }
     },
     PredLambdaFunctionRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
-            RoleName: cf.join([ cf.stackName, '-queue-role' ]),
+            RoleName: cf.join([cf.stackName, '-queue-role']),
             AssumeRolePolicyDocument: {
                 Version: '2012-10-17',
                 Statement: [{
@@ -533,7 +533,7 @@ const Resources = {
             },
             Path: '/',
             Policies: [{
-                PolicyName: cf.join([ cf.stackName, '-queue-policy' ]),
+                PolicyName: cf.join([cf.stackName, '-queue-policy']),
                 PolicyDocument: {
                     Version: '2012-10-17',
                     Statement: [{
@@ -630,7 +630,7 @@ const Resources = {
                             'logs:PutLogEvents',
                             'logs:DescribeLogStreams'
                         ],
-                        Resource: [ 'arn:aws:logs:*:*:*' ]
+                        Resource: ['arn:aws:logs:*:*:*']
                     },{
                         Effect: 'Allow',
                         Action: [
@@ -653,7 +653,7 @@ const Resources = {
         Properties: {
             AssumeRolePolicyDocument: {
                 Version: '2012-10-17',
-                Statement: [ {
+                Statement: [{
                     Effect: 'Allow',
                     Principal: {
                         Service: 'firehose.amazonaws.com'
@@ -666,7 +666,7 @@ const Resources = {
     PredFirehoseRolePolicy: {
         Type: 'AWS::IAM::Policy',
         Properties: {
-            PolicyName: cf.join('', [ cf.stackName, "-firehose" ]),
+            PolicyName: cf.join('', [cf.stackName, '-firehose']),
             PolicyDocument: {
                 Version: '2012-10-17',
                 Statement: [{
@@ -679,13 +679,13 @@ const Resources = {
                         's3:ListBucketMultipartUploads',
                         's3:PutObject'
                     ],
-                    Resource: [ cf.join([
-                        'arn:aws:s3:::', cf.stackName, '-', cf.accountId, '-', cf.region, '/*',
-                    ]) ],
+                    Resource: [cf.join([
+                        'arn:aws:s3:::', cf.stackName, '-', cf.accountId, '-', cf.region, '/*'
+                    ])]
                 }]
             },
-            Roles: [ cf.ref('PredFirehoseRole') ]
-        },
+            Roles: [cf.ref('PredFirehoseRole')]
+        }
     },
     PredTaskRole: {
         Type: 'AWS::IAM::Role',
@@ -724,12 +724,12 @@ const Mappings = {
         'us-west-1': { '1': 'us-west-1b', '2': 'us-west-1c' },
         'us-west-2': { '1': 'us-west-2a', '2': 'us-west-2b', '3': 'us-west-2c'  }
     }
-}
+};
 
 const Conditions = {
     HasSSL: cf.notEquals(cf.ref('SSLCertificateIdentifier'), ''),
     HasNoSSL: cf.equals(cf.ref('SSLCertificateIdentifier'), '')
-}
+};
 
 const Outputs = {
     InternalServiceSG: {
@@ -838,13 +838,13 @@ const Outputs = {
     }
 };
 
-module.exports = cf.merge(
+export default cf.merge(
     {
         Parameters,
         Resources,
         Mappings,
         Conditions,
-        Outputs,
+        Outputs
     },
     alarms({
         prefix: 'MLEnabler',

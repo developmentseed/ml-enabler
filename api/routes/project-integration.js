@@ -1,9 +1,8 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Integration = require('../lib/project/integration');
-const User = require('../lib/user');
+import Err from '@openaddresses/batch-error';
+import Integration from '../lib/types/project-integration.js';
+import Auth from '../lib/auth.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
     /**
      * @api {get} /api/project/:pid/integration List Integration
      * @apiVersion 1.0.0
@@ -23,7 +22,7 @@ async function router(schema, config) {
         res: 'res.ListIntegrations.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             req.query.pid = req.params.pid;
             res.json(await Integration.list(config.pool, req.params.pid, req.query));
@@ -51,7 +50,7 @@ async function router(schema, config) {
         res: 'res.Integration.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             req.body.pid = req.params.pid;
             const integ = await Integration.generate(config.pool, req.body);
@@ -80,7 +79,7 @@ async function router(schema, config) {
         res: 'res.Integration.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             const integ = await Integration.from(config.pool, req.params.integrationid);
             return res.json(integ.serialize());
@@ -107,7 +106,7 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             const integ = await Integration.from(config.pool, req.params.integrationid);
             await integ.delete(config.pool);
@@ -120,5 +119,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

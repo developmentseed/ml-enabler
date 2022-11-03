@@ -1,11 +1,12 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const User = require('../lib/user');
-const Login = require('../lib/login');
-const Settings = require('../lib/settings');
+import Err from '@openaddresses/batch-error';
+import User from '../lib/types/user.js';
+import Auth from '../lib/auth.js';
+import Login from '../lib/login.js';
+import Settings from '../lib/settings.js';
+import Email from '../lib/email.js';
 
-async function router(schema, config) {
-    const email = new (require('../lib/email'))(config);
+export default async function router(schema, config) {
+    const email = new Email(config);
 
     /**
      * @api {get} /api/user List Users
@@ -24,7 +25,7 @@ async function router(schema, config) {
         res: 'res.ListUsers.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             const list = await User.list(config.pool, req.query);
 
@@ -69,6 +70,10 @@ async function router(schema, config) {
                 if (!matched) throw new Err(400, null, 'User Registration is restricted by email domain');
             }
 
+            if (req.user.access !== 'admin') {
+                delete req.body.access;
+            }
+
             const usr = await User.generate(config.pool, {
                 ...req.body,
                 // Generate a temporary random password - can't actually be used as the user still has
@@ -102,8 +107,9 @@ async function router(schema, config) {
             }
 
             if (!config.args.validate) {
-                usr.validated = true;
-                await usr.commit(config.pool);
+                await usr.commit({
+                    validated: true
+                });
             }
 
             return res.json(usr.serialize());
@@ -133,7 +139,7 @@ async function router(schema, config) {
         res: 'res.User.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             if (req.user.access !== 'admin' && req.user.id !== req.params.uid) {
                 throw new Err(401, null, 'You can only edit your own user account');
@@ -145,9 +151,7 @@ async function router(schema, config) {
                 delete req.body.validated;
             }
 
-            const user = await User.from(config.pool, req.params.uid);
-            user.patch(req.body);
-            await user.commit(config.pool);
+            const user = await User.commit(config.pool, req.params.uid, req.body);
 
             res.json(user.serialize());
         } catch (err) {
@@ -155,5 +159,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

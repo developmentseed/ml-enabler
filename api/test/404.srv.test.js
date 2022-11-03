@@ -1,6 +1,5 @@
-'use strict';
-const test = require('tape');
-const Flight = require('./flight');
+import test from 'tape';
+import Flight from './flight.js';
 
 const flight = new Flight();
 
@@ -18,7 +17,8 @@ test('GET: api/fake', async (t) => {
         t.equals(res.statusCode, 404, 'http: 404');
         t.deepEquals(res.body, {
             status: 404,
-            message: 'API endpoint does not exist!'
+            message: 'API endpoint does not exist!',
+            messages: []
         });
     } catch (err) {
         t.error(err, 'no error');

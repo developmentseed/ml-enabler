@@ -1,10 +1,10 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const User = require('../lib/user');
-const Login = require('../lib/login');
+import Err from '@openaddresses/batch-error';
+import Auth from '../lib/auth.js';
+import Login from '../lib/login.js';
+import Email from '../lib/email.js';
 
-async function router(schema, config) {
-    const email = new (require('../lib/email'))(config);
+export default async function router(schema, config) {
+    const email = new Email(config);
 
     /**
      * @api {get} /api/login Session Info
@@ -22,7 +22,7 @@ async function router(schema, config) {
         res: 'res.Login.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             res.json({
                 id: req.user.id,
@@ -168,5 +168,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

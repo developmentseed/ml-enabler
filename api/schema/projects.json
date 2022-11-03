@@ -1,0 +1,52 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./projects/id.json"
+        },
+        "created": {
+            "$ref": "./projects/created.json"
+        },
+        "updated": {
+            "$ref": "./projects/updated.json"
+        },
+        "name": {
+            "$ref": "./projects/name.json"
+        },
+        "source": {
+            "$ref": "./projects/source.json"
+        },
+        "project_url": {
+            "$ref": "./projects/project_url.json"
+        },
+        "archived": {
+            "$ref": "./projects/archived.json"
+        },
+        "tags": {
+            "$ref": "./projects/tags.json"
+        },
+        "access": {
+            "$ref": "./projects/access.json"
+        },
+        "notes": {
+            "$ref": "./projects/notes.json"
+        },
+        "repo": {
+            "$ref": "./projects/repo.json"
+        }
+    },
+    "required": [
+        "id",
+        "created",
+        "updated",
+        "name",
+        "source",
+        "project_url",
+        "archived",
+        "tags",
+        "access",
+        "notes",
+        "repo"
+    ]
+}

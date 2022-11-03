@@ -1,6 +1,6 @@
-const cf = require('@mapbox/cloudfriend');
+import cf from '@mapbox/cloudfriend';
 
-module.exports = [{
+export default [{
     Effect: 'Allow',
     Action: [
         'ses:SendEmail',
@@ -18,7 +18,7 @@ module.exports = [{
         'cloudformation:DescribeStackResources'
     ],
     Resource: [
-        cf.join(['arn:aws:cloudformation:', cf.region, ':', cf.accountId,':stack/', cf.stackName, '-*' ])
+        cf.join(['arn:aws:cloudformation:', cf.region, ':', cf.accountId,':stack/', cf.stackName, '-*'])
     ]
 },{
     Effect: 'Allow',
@@ -139,7 +139,7 @@ module.exports = [{
 },{
     Effect: 'Allow',
     Action: [
-        'cloudwatch:DescribeAlarms',
+        'cloudwatch:DescribeAlarms'
     ],
     Resource: [
         cf.join(['arn:aws:cloudwatch:', cf.region, ':', cf.accountId, ':alarm:*'])
@@ -162,7 +162,7 @@ module.exports = [{
         'sqs:ChangeMessageVisibility',
         'sqs:ListQueues',
         'sqs:GetQueueUrl',
-        'sqs:GetQueueAttributes',
+        'sqs:GetQueueAttributes'
     ],
     Resource: [
         cf.join(['arn:aws:sqs:', cf.region, ':', cf.accountId, ':*'])
@@ -201,7 +201,7 @@ module.exports = [{
         's3:PutObjectAcl'
     ],
     Resource: [
-        cf.join(['arn:aws:s3:::', cf.ref('MLEnablerBucket') ]),
+        cf.join(['arn:aws:s3:::', cf.ref('MLEnablerBucket')]),
         cf.join(['arn:aws:s3:::', cf.ref('MLEnablerBucket'), '/*'])
     ]
 }];

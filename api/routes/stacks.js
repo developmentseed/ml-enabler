@@ -1,9 +1,8 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Stack = require('../lib/stack');
-const User = require('../lib/user');
+import Err from '@openaddresses/batch-error';
+import Stack from '../lib/stack.js';
+import Auth from '../lib/auth.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
 
     /**
      * @api {get} /api/stack List Stacks
@@ -23,7 +22,7 @@ async function router(schema, config) {
         res: 'res.ListStacks.json'
     }, async (req, res) => {
         try {
-            await User.is_admin(req);
+            await Auth.is_admin(req);
 
             if (config.Environment !== 'aws') {
                 return {
@@ -50,5 +49,3 @@ async function router(schema, config) {
     });
 
 }
-
-module.exports = router;

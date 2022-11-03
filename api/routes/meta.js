@@ -1,10 +1,9 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const User = require('../lib/user');
-const Meta = require('../lib/meta');
-const Settings = require('../lib/settings');
+import Err from '@openaddresses/batch-error';
+import Auth from '../lib/auth.js';
+import Meta from '../lib/types/meta.js';
+import Settings from '../lib/settings.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
 
     /**
      * @api {get} /api/meta List Meta
@@ -21,7 +20,7 @@ async function router(schema, config) {
         res: 'res.ListMeta.json'
     }, async (req, res) => {
         try {
-            await User.is_admin(req);
+            await Auth.is_admin(req);
 
             res.json(await Meta.list(config.pool, req.query));
         } catch (err) {
@@ -44,7 +43,7 @@ async function router(schema, config) {
         res: 'res.Meta.json'
     }, async (req, res) => {
         try {
-            await User.is_admin(req);
+            await Auth.is_admin(req);
 
             const meta = await Settings.generate(config.pool, req.body);
 
@@ -72,7 +71,7 @@ async function router(schema, config) {
         res: 'res.Meta.json'
     }, async (req, res) => {
         try {
-            await User.is_admin(req);
+            await Auth.is_admin(req);
 
             const meta = await Settings.from(config.pool, req.params.key);
             if (!(meta instanceof Meta)) throw new Err(400, null, 'Meta not found');
@@ -105,7 +104,7 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await User.is_admin(req);
+            await Auth.is_admin(req);
 
             const meta = await Meta.from(config.pool, req.params.key);
             await meta.delete(config.pool);
@@ -119,5 +118,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

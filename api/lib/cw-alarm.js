@@ -1,5 +1,4 @@
-'use strict';
-const AWS = require('aws-sdk');
+import AWS from 'aws-sdk';
 
 const CW = new AWS.CloudWatch({
     region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
@@ -9,7 +8,7 @@ const CW = new AWS.CloudWatch({
  * @class
  * @param {Config} config
  */
-class CWAlarm {
+export default class CWAlarm {
     constructor(config) {
         this.config = config;
     }
@@ -56,5 +55,3 @@ class CWAlarm {
         }
     }
 }
-
-module.exports = CWAlarm;

@@ -1,14 +1,13 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const User = require('./user');
-const UserReset = require('./user_reset');
+import Err from '@openaddresses/batch-error';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import User from './types/user.js';
+import UserReset from './types/user_reset.js';
 
 /**
  * @class
  */
-class Login {
+export default class Login {
     /**
      * Verify a password reset token
      *
@@ -21,9 +20,9 @@ class Login {
         const reset = await UserReset.from(pool, token, 'verify');
         await UserReset.delete_all(pool, reset.uid);
 
-        const user = await User.from(pool, reset.uid);
-        user.validated = true;
-        await user.commit(pool);
+        await User.commit(pool, reset.uid, {
+            validated: true
+        });
     }
 
     static async reset(pool, body) {
@@ -91,5 +90,3 @@ class Login {
         };
     }
 }
-
-module.exports = Login;

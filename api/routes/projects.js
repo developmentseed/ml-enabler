@@ -1,11 +1,10 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Project = require('../lib/project');
-const ProjectAccess = require('../lib/project/access');
-const Stack = require('../lib/stack');
-const User = require('../lib/user');
+import Err from '@openaddresses/batch-error';
+import Project from '../lib/types/project.js';
+import ProjectAccess from '../lib/types/project-access.js';
+import Stack from '../lib/stack.js';
+import Auth from '../lib/auth.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
 
     /**
      * @api {get} /api/project List Projects
@@ -25,7 +24,7 @@ async function router(schema, config) {
         res: 'res.ListProjects.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             req.query.uid = req.user.id;
 
@@ -74,13 +73,16 @@ async function router(schema, config) {
         res: 'res.Project.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             if (!req.body.users.length) throw new Err(400, null, 'Users list cannot be empty');
 
+            const users = req.body.users;
+
+            delete req.body.users;
             const project = await Project.generate(config.pool, req.body);
 
-            for (const user of req.body.users) {
+            for (const user of users) {
                 user.pid = project.id;
                 await ProjectAccess.generate(config.pool, user);
             }
@@ -108,7 +110,7 @@ async function router(schema, config) {
         res: 'res.Project.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             return res.json(req.project.serialize());
         } catch (err) {
@@ -135,10 +137,9 @@ async function router(schema, config) {
         res: 'res.Project.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
-            req.project.patch(req.body);
-            await req.project.commit(config.pool);
+            await req.project.commit(req.body);
 
             return res.json(req.project.serialize());
         } catch (err) {
@@ -163,7 +164,7 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             await req.project.delete(config.pool);
 
@@ -176,5 +177,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

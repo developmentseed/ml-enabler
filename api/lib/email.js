@@ -1,7 +1,6 @@
-'use strict';
-const Mailgen = require('mailgen');
-const { Err } = require('@openaddresses/batch-schema');
-const AWS = require('aws-sdk');
+import Err from '@openaddresses/batch-error';
+import Mailgen from 'mailgen';
+import AWS from 'aws-sdk';
 
 /**
  * @class
@@ -9,7 +8,7 @@ const AWS = require('aws-sdk');
  * @prop {Config} config Serverwide Config
  * @prop {Object} mailGenerator MailGen Generation API
  */
-class Email {
+export default class Email {
     constructor(config) {
         this.config = config;
         this.ses = new AWS.SES({
@@ -108,5 +107,3 @@ class Email {
         }).promise();
     }
 }
-
-module.exports = Email;

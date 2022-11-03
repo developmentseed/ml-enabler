@@ -1,9 +1,8 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const ProjectAccess = require('../lib/project/access');
-const User = require('../lib/user');
+import Err from '@openaddresses/batch-error';
+import ProjectAccess from '../lib/types/project-access.js';
+import Auth from '../lib/auth.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
     /**
      * @api {get} /api/project/:pid/user List Users
      * @apiVersion 1.0.0
@@ -23,7 +22,7 @@ async function router(schema, config) {
         res: 'res.ListProjectAccess.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             res.json(await ProjectAccess.list(config.pool, req.params.pid, req.query));
         } catch (err) {
@@ -51,7 +50,7 @@ async function router(schema, config) {
         res: 'res.ListProjectAccess.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             req.body.pid = req.params.pid;
             const access = await ProjectAccess.generate(config.pool, req.body);
@@ -81,11 +80,9 @@ async function router(schema, config) {
         res: 'res.ProjectAccess.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
-            const access = await ProjectAccess.from(config.pool, req.params.id);
-            access.patch(req.body);
-            await access.commit(config.pool);
+            const access = await ProjectAccess.commit(config.pool, req.params.id, req.body);
 
             return res.json(access.serialize());
         } catch (err) {
@@ -93,5 +90,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

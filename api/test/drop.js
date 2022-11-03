@@ -1,8 +1,9 @@
-'use strict';
-const { Pool } = require('pg');
-const config = require('../knexfile');
+import PG from 'pg';
+const Pool = PG.Pool;
 
-async function drop() {
+import config from '../knexfile.js';
+
+export default async function drop() {
     const pool = new Pool({
         connectionString: config.connection
     });
@@ -23,5 +24,3 @@ async function drop() {
 
     await pool.end();
 }
-
-module.exports = drop;

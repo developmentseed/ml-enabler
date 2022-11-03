@@ -1,8 +1,6 @@
-'use strict';
+import cf from '@mapbox/cloudfriend';
 
-const cf = require('@mapbox/cloudfriend');
-
-const stack = {
+export default {
     Resources: {
         BatchJobRole: {
             Type: 'AWS::IAM::Role',
@@ -33,7 +31,7 @@ const stack = {
                                 'ecr:UploadLayerPart',
                                 'ecr:CompleteLayerUpload'
                             ],
-                            Resource: [ '*' ]
+                            Resource: ['*']
                         },{
                             Effect: 'Allow',
                             Action: [
@@ -53,7 +51,7 @@ const stack = {
                                 's3:PutObjectAcl'
                             ],
                             Resource: [
-                                cf.join(['arn:aws:s3:::', cf.ref('MLEnablerBucket') ]),
+                                cf.join(['arn:aws:s3:::', cf.ref('MLEnablerBucket')]),
                                 cf.join(['arn:aws:s3:::', cf.ref('MLEnablerBucket'), '/*'])
                             ]
                         },{
@@ -205,8 +203,6 @@ const stack = {
                     Image: cf.join([cf.ref('AWS::AccountId'), '.dkr.ecr.', cf.ref('AWS::Region'), '.amazonaws.com/ml-enabler:task-vectorize-', cf.ref('GitSha')])
                 }
             }
-        },
+        }
     }
 };
-
-module.exports = stack;

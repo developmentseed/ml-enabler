@@ -1,4 +1,4 @@
-exports.up = function(knex) {
+export function up(knex) {
     return knex.schema.raw(`
         CREATE TABLE tmp AS
             SELECT
@@ -32,6 +32,6 @@ exports.up = function(knex) {
     `);
 }
 
-exports.down = function(knex) {
+export function down(knex) {
     return knex.schema.raw(``);
 }

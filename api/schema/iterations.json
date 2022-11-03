@@ -1,0 +1,84 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "id": {
+            "$ref": "./iterations/id.json"
+        },
+        "created": {
+            "$ref": "./iterations/created.json"
+        },
+        "updated": {
+            "$ref": "./iterations/updated.json"
+        },
+        "pid": {
+            "$ref": "./iterations/pid.json"
+        },
+        "tile_zoom": {
+            "$ref": "./iterations/tile_zoom.json"
+        },
+        "docker_link": {
+            "$ref": "./iterations/docker_link.json"
+        },
+        "model_link": {
+            "$ref": "./iterations/model_link.json"
+        },
+        "checkpoint_link": {
+            "$ref": "./iterations/checkpoint_link.json"
+        },
+        "tfrecord_link": {
+            "$ref": "./iterations/tfrecord_link.json"
+        },
+        "save_link": {
+            "$ref": "./iterations/save_link.json"
+        },
+        "inf_list": {
+            "$ref": "./iterations/inf_list.json"
+        },
+        "inf_type": {
+            "$ref": "./iterations/inf_type.json"
+        },
+        "inf_binary": {
+            "$ref": "./iterations/inf_binary.json"
+        },
+        "inf_supertile": {
+            "$ref": "./iterations/inf_supertile.json"
+        },
+        "version": {
+            "$ref": "./iterations/version.json"
+        },
+        "hint": {
+            "$ref": "./iterations/hint.json"
+        },
+        "imagery_id": {
+            "$ref": "./iterations/imagery_id.json"
+        },
+        "model_type": {
+            "$ref": "./iterations/model_type.json"
+        },
+        "gitsha": {
+            "$ref": "./iterations/gitsha.json"
+        }
+    },
+    "required": [
+        "id",
+        "created",
+        "updated",
+        "pid",
+        "tile_zoom",
+        "docker_link",
+        "model_link",
+        "checkpoint_link",
+        "tfrecord_link",
+        "save_link",
+        "inf_list",
+        "inf_type",
+        "inf_binary",
+        "inf_supertile",
+        "version",
+        "hint",
+        "imagery_id",
+        "model_type",
+        "gitsha"
+    ]
+}

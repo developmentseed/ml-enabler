@@ -1,10 +1,8 @@
-'use strict';
-const CP = require('child_process');
-const { sql, createPool, createTypeParserPreset } = require('slonik');
-const { Err } = require('@openaddresses/batch-schema');
-const wkx = require('wkx');
-const bbox = require('@turf/bbox').default;
-const AWS = require('aws-sdk');
+import Err from '@openaddresses/batch-error';
+import { Pool }  from '@openaddresses/batch-generic';
+import CP from 'child_process';
+import AWS from 'aws-sdk';
+
 const SNS = new AWS.SNS({
     region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
 });
@@ -15,7 +13,7 @@ const STS = new AWS.STS({
 /**
  * @class
  */
-class Config {
+export default class Config {
     static async env(args = {}) {
         const cnf = new Config();
 
@@ -71,40 +69,16 @@ class Config {
             throw new Error(err);
         }
 
-        cnf.pool = false;
-        let retry = 5;
-        do {
-            try {
-                cnf.pool = createPool(cnf.postgres, {
-                    typeParsers: [
-                        ...createTypeParserPreset(), {
-                            name: 'geometry',
-                            parse: (value) => {
-                                const geom = wkx.Geometry.parse(Buffer.from(value, 'hex')).toGeoJSON();
-
-                                geom.bounds = bbox(geom);
-
-                                return geom;
-                            }
-                        }
-                    ]
-                });
-
-                await cnf.pool.query(sql`SELECT NOW()`);
-            } catch (err) {
-                cnf.pool = false;
-
-                if (retry === 0) {
-                    console.error('not ok - terminating due to lack of postgres connection');
-                    return process.exit(1);
-                }
-
-                retry--;
-                console.error('not ok - unable to get postgres connection');
-                console.error(`ok - retrying... (${5 - retry}/5)`);
-                await sleep(5000);
+        cnf.pool = await Pool.connect(cnf.postgres, {
+            parsing: {
+                geometry: true
+            },
+            schemas: {
+                dir: new URL('../schema', import.meta.url)
             }
-        } while (!cnf.pool);
+        });
+
+
 
         if (cnf.Environment === 'aws') {
             try {
@@ -149,11 +123,3 @@ class Config {
         }
     }
 }
-
-function sleep(ms) {
-    return new Promise((resolve) => {
-        setTimeout(resolve, ms);
-    });
-}
-
-module.exports = Config;

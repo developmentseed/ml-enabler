@@ -1,7 +1,13 @@
 {
     "version": "3.0.0",
+    "type": "module",
+    "scripts": {
+        "lint": "eslint cloudformation/*.js"
+    },
     "dependencies": {
-        "@mapbox/cloudfriend": "^5.1.0",
-        "batch-alarms": "^2.0.0"
+        "@mapbox/cloudfriend": "^6.0.0",
+        "batch-alarms": "^2.0.0",
+        "eslint": "^8.25.0",
+        "eslint-plugin-node": "^11.1.0"
     }
 }

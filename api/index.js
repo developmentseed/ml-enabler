@@ -1,29 +1,29 @@
-'use strict';
-const fs = require('fs');
-const path = require('path');
-const { Schema, Err } = require('@openaddresses/batch-schema');
-const jwt = require('jsonwebtoken');
-const morgan = require('morgan');
-const express = require('express');
-const pkg = require('./package.json');
-const minify = require('express-minify');
-const bodyparser = require('body-parser');
-const args = require('minimist')(process.argv, {
+import fs from 'fs';
+import Schema from '@openaddresses/batch-schema';
+import Err from '@openaddresses/batch-error';
+import jwt from 'jsonwebtoken';
+import express from 'express';
+import minify from 'express-minify';
+import minimist from 'minimist';
+
+import Config from './lib/config.js';
+import Settings from './lib/settings.js';
+import User from './lib/types/user.js';
+import Project from './lib/types/project.js';
+import UserToken from './lib/types/token.js';
+
+const args = minimist(process.argv, {
     boolean: ['help', 'populate', 'email', 'no-cache', 'silent', 'validate'],
     string: ['postgres']
 });
 
-const Config = require('./lib/config');
-const Settings = require('./lib/settings');
-const User = new require('./lib/user');
-const Project = new require('./lib/project');
-const UserToken = new require('./lib/token');
+const pkg = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url)));
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
     configure(args);
 }
 
-async function configure(args, cb) {
+export default async function configure(args, cb) {
     try {
         const config = await Config.env(args);
 
@@ -60,7 +60,7 @@ async function server(args, config, cb) {
     const app = express();
 
     const schema = new Schema(express.Router(), {
-        schemas: path.resolve(__dirname, 'schema')
+        schemas: new URL('./schema', import.meta.url)
     });
 
     app.disable('x-powered-by');
@@ -111,10 +111,6 @@ async function server(args, config, cb) {
     app.use('/api', schema.router);
     app.use('/docs', express.static('./doc'));
     app.use('/*', express.static('web/dist'));
-
-    schema.router.use(bodyparser.urlencoded({ extended: true }));
-    schema.router.use(morgan('combined'));
-    schema.router.use(bodyparser.json({ limit: '50mb' }));
 
     schema.router.use(async (req, res, next) => {
         if (req.header('authorization')) {
@@ -171,8 +167,6 @@ async function server(args, config, cb) {
         return next();
     });
 
-    await schema.api();
-
     schema.router.param('pid', async (req, res, next, pid) => {
         try {
             if ((req.user && req.user.access === 'admin') || (req.token && req.token.access === 'admin'))  {
@@ -194,27 +188,19 @@ async function server(args, config, cb) {
         return next();
     });
 
-    // Load dynamic routes directory
-    for (const r of fs.readdirSync(path.resolve(__dirname, './routes'))) {
-        if (!config.silent) console.error(`ok - loaded routes/${r}`);
-
-        const ext = path.parse(r).ext;
-
-        if (ext === '.js') {
-            await require('./routes/' + r)(schema, config);
-        } else if (ext === '.mjs') {
-            (await import('./routes/' + r)).default(schema, config);
+    await schema.api();
+    await schema.load(
+        new URL('./routes/', import.meta.url),
+        config,
+        {
+            silent: !!config.silent
         }
-    }
+    );
 
+    schema.not_found();
     schema.error();
 
-    schema.router.all('*', (req, res) => {
-        return res.status(404).json({
-            status: 404,
-            message: 'API endpoint does not exist!'
-        });
-    });
+    fs.writeFileSync(new URL('./doc/api.js', import.meta.url), schema.docs.join('\n'));
 
     config.confirm_sns();
 
@@ -226,5 +212,3 @@ async function server(args, config, cb) {
         if (cb) return cb(srv, config);
     });
 }
-
-module.exports = configure;

@@ -1,15 +1,14 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Iteration = require('../lib/project/iteration');
-const AWS = require('aws-sdk');
+import Err from '@openaddresses/batch-error';
+import Iteration from '../lib/types/project-iteration.js';
+import Submission from '../lib/types/project-iteration-submission.js';
+import AWS from 'aws-sdk';
+import RL from 'readline';
+import Auth from '../lib/auth.js';
+import { createObjectCsvStringifier as createCsvStringifier } from 'csv-writer';
+
 const s3 = new AWS.S3({ region: process.env.AWS_DEFAULT_REGION });
-const Submission = require('../lib/project/iteration/submission');
-const createCsvStringifier = require('csv-writer').createObjectCsvStringifier;
-const RL = require('readline');
-const User = require('../lib/user');
 
-
-async function router(schema, config) {
+export default async function router(schema, config) {
     /**
      * @api {get} /api/project/:pid/iteration/:iterationid/export
      * @apiVersion 1.0.0
@@ -29,7 +28,7 @@ async function router(schema, config) {
     }, async (req, res) => {
         try {
             req.user = req.token;
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             if (req.query.threshold && req.query.inferences === 'all') throw new Err(400, null, 'Threshold can only set if inferences is not "all"');
 
@@ -137,5 +136,3 @@ async function s3read(out, key, query) {
         });
     });
 }
-
-module.exports = router;

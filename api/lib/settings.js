@@ -1,7 +1,7 @@
-'use strict';
-const Meta = require('./meta');
-const { Err } = require('@openaddresses/batch-schema');
-const Ajv = require('ajv');
+import Err from '@openaddresses/batch-error';
+import Meta from './types/meta.js';
+import Ajv from 'ajv';
+
 const ajv = new Ajv({
     allErrors: true
 });
@@ -30,7 +30,7 @@ for (const key in Defaults) {
 /**
  * @class
  */
-class Settings {
+export default class Settings {
     static async generate(pool, params) {
         if (Defaults[params.key] !== undefined) {
             const valid = Compiled[params.key](params.value);
@@ -68,5 +68,3 @@ class Settings {
         }
     }
 }
-
-module.exports = Settings;

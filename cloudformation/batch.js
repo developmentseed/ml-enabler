@@ -1,8 +1,6 @@
-'use strict';
+import cf from '@mapbox/cloudfriend';
 
-const cf = require('@mapbox/cloudfriend');
-
-const stack = {
+export default {
     Resources: {
         BatchECR: {
             Type: 'AWS::ECR::Repository',
@@ -158,5 +156,3 @@ const stack = {
         }
     }
 };
-
-module.exports = stack;

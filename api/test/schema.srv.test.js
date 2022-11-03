@@ -1,8 +1,6 @@
-'use strict';
-const fs = require('fs');
-const path = require('path');
-const test = require('tape');
-const Flight = require('./flight');
+import fs from 'fs';
+import test from 'tape';
+import Flight from './flight.js';
 
 const flight = new Flight();
 
@@ -15,18 +13,17 @@ test('GET: api/schema', async (t) => {
     try {
         const res = await flight.request({
             url: '/api/schema',
-            method: 'GET',
-            json: true
-        });
+            json: true,
+            method: 'GET'
+        }, t);
 
-        t.equals(res.statusCode, 200, 'http: 200');
+        const fixture = new URL('./fixtures/get_schema.json', import.meta.url);
 
-        const fixture = path.resolve(__dirname, './fixtures/get_schema.json');
         if (UPDATE) {
             fs.writeFileSync(fixture, JSON.stringify(res.body, null, 4));
         }
 
-        t.deepEquals(res.body, JSON.parse(fs.readFileSync(fixture)));
+        t.deepEqual(res.body, JSON.parse(fs.readFileSync(fixture)));
     } catch (err) {
         t.error(err, 'no error');
     }
@@ -38,20 +35,23 @@ test('GET: api/schema?method=FAKE', async (t) => {
     try {
         const res = await flight.request({
             url: '/api/schema?method=fake',
-            method: 'GET',
-            json: true
-        });
+            json: true,
+            method: 'GET'
+        }, false);
 
-        t.equals(res.statusCode, 400, 'http: 400');
-        t.deepEquals(res.body, {
+        t.equal(res.statusCode, 400, 'http: 400');
+
+        t.deepEqual(res.body, {
             status: 400,
             message: 'validation error',
             messages: [{
                 keyword: 'enum',
-                dataPath: '.method',
+                instancePath: '/method',
                 schemaPath: '#/properties/method/enum',
-                params: { allowedValues: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH'] },
-                message: 'should be equal to one of the allowed values'
+                params: {
+                    allowedValues: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH']
+                },
+                message: 'must be equal to one of the allowed values'
             }]
         });
     } catch (err) {
@@ -65,12 +65,12 @@ test('GET: api/schema?method=GET', async (t) => {
     try {
         const res = await flight.request({
             url: '/api/schema?method=GET',
-            method: 'GET',
-            json: true
-        });
+            json: true,
+            method: 'GET'
+        }, false);
 
-        t.equals(res.statusCode, 400, 'http: 400');
-        t.deepEquals(res.body, {
+        t.equal(res.statusCode, 400, 'http: 400');
+        t.deepEqual(res.body, {
             status: 400,
             message: 'url & method params must be used together',
             messages: []
@@ -79,20 +79,18 @@ test('GET: api/schema?method=GET', async (t) => {
     } catch (err) {
         t.error(err, 'no error');
     }
-
-    t.end();
 });
 
 test('GET: api/schema?url=123', async (t) => {
     try {
         const res = await flight.request({
             url: '/api/schema?url=123',
-            method: 'GET',
-            json: true
-        });
+            json: true,
+            method: 'GET'
+        }, false);
 
-        t.equals(res.statusCode, 400, 'http: 400');
-        t.deepEquals(res.body, {
+        t.equal(res.statusCode, 400, 'http: 400');
+        t.deepEqual(res.body, {
             status: 400,
             message: 'url & method params must be used together',
             messages: []
@@ -108,62 +106,17 @@ test('GET: api/schema?method=POST&url=/login', async (t) => {
     try {
         const res = await flight.request({
             url: '/api/schema?method=POST&url=/login',
-            method: 'GET',
-            json: true
-        });
+            json: true,
+            method: 'GET'
+        }, t);
 
-        t.equals(res.statusCode, 200, 'http: 200');
-        t.deepEquals(res.body, {
-            body: {
-                type: 'object',
-                required: ['username', 'password'],
-                additionalProperties: false,
-                properties: {
-                    username: {
-                        type: 'string',
-                        description: 'username',
-                        minLength: 2,
-                        maxLength: 40
-                    },
-                    password: {
-                        type: 'string',
-                        description: 'password',
-                        minLength: 8
-                    }
-                }
-            },
-            res: {
-                type: 'object',
-                required: ['id', 'username', 'email', 'access'],
-                additionalProperties: false,
-                properties: {
-                    id: {
-                        type: 'integer'
-                    },
-                    username: {
-                        type: 'string'
-                    },
-                    email: {
-                        type: 'string'
-                    },
-                    access: {
-                        type: 'string',
-                        enum: ['user', 'read', 'disabled', 'admin'],
-                        description: 'The access level of a given user'
-                    },
-                    validated: {
-                        type: 'boolean',
-                        description: 'Has the user\'s email address been validated'
-                    },
-                    token: {
-                        type: 'string',
-                        description: 'JSON Web Token to use for subsequent auth'
-                    }
-                }
-            },
-            query: null
-        });
+        const fixture = new URL('./fixtures/login_schema.json', import.meta.url);
 
+        if (UPDATE) {
+            fs.writeFileSync(fixture, JSON.stringify(res.body, null, 4));
+        }
+
+        t.deepEqual(res.body, JSON.parse(fs.readFileSync(fixture)));
     } catch (err) {
         t.error(err, 'no error');
     }
@@ -175,22 +128,33 @@ test('POST: api/login', async (t) => {
     try {
         const res = await flight.request({
             url: '/api/login',
-            method: 'POST',
             json: true,
+            method: 'POST',
             body: {
                 fake: 123,
                 username: 123
             }
-        });
+        }, false);
 
-        t.equals(res.statusCode, 400, 'http: 400');
-        t.deepEquals(res.body, {
+        t.equal(res.statusCode, 400, 'http: 400');
+        t.deepEqual(res.body, {
             status: 400,
             message: 'validation error',
-            messages: [
-                { keyword: 'type', dataPath: '.username', schemaPath: '#/properties/username/type', params: { type: 'string' }, message: 'should be string' },
-                { keyword: 'required', dataPath: '', schemaPath: '#/required', params: { missingProperty: 'password' }, message: 'should have required property \'password\'' }
-            ]
+            messages: [{
+                keyword: 'required',
+                instancePath: '',
+                schemaPath: '#/required',
+                params: {
+                    missingProperty: 'password'
+                },
+                message: 'must have required property \'password\''
+            },{
+                keyword: 'type',
+                instancePath: '/username',
+                schemaPath: '#/properties/username/type',
+                params: { type: 'string' },
+                message: 'must be string'
+            }]
         });
     } catch (err) {
         t.error(err, 'no error');

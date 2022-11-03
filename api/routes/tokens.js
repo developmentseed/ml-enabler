@@ -1,9 +1,8 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const UserToken = new require('../lib/token');
-const User = require('../lib/user');
+import Err from '@openaddresses/batch-error';
+import UserToken from '../lib/types/token.js';
+import Auth from '../lib/auth.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
 
     /**
      * @api {get} /api/token List Tokens
@@ -23,7 +22,7 @@ async function router(schema, config) {
         res: 'res.ListTokens.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             req.query.uid = req.user.id;
             return res.json(await UserToken.list(config.pool, req.query));
@@ -50,7 +49,7 @@ async function router(schema, config) {
         res: 'res.CreateToken.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             req.body.uid = req.user.id;
             return res.json((await UserToken.generate(config.pool, req.body)).serialize(true));
@@ -76,7 +75,7 @@ async function router(schema, config) {
         res: 'res.Token.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             let token = await UserToken.from(config.pool, req.params.token_id);
             if (token.uid !== req.user.id) throw new Err(401, null, 'Cannot get a token you did not create');
@@ -106,7 +105,7 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             const token = await UserToken.from(config.pool, req.params.token_id);
             if (token.uid !== req.user.id) throw new Err(401, null, 'Cannot delete a token you did not create');
@@ -122,5 +121,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

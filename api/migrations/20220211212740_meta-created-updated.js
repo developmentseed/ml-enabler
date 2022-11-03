@@ -1,4 +1,4 @@
-exports.up = function(knex) {
+export function up(knex) {
     return knex.schema.raw(`
         ALTER TABLE meta
             ADD COLUMN created TIMESTAMP NOT NULL DEFAULT NOW();
@@ -8,6 +8,6 @@ exports.up = function(knex) {
     `);
 }
 
-exports.down = function(knex) {
+export function down(knex) {
     return knex.schema.raw(``);
 }

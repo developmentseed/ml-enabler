@@ -1,10 +1,9 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Iteration = require('../lib/project/iteration');
-const Stack = require('../lib/stack');
-const User = require('../lib/user');
+import Err from '@openaddresses/batch-error';
+import Iteration from '../lib/types/project-iteration.js';
+import Stack from '../lib/stack.js';
+import Auth from '../lib/auth.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
 
     /**
      * @api {get} /api/project/:pid/iteration/:iterationid/stack Get Stack
@@ -24,7 +23,7 @@ async function router(schema, config) {
         res: 'res.Stack.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
             config.is_aws();
 
             const stack = await Stack.from(req.params.pid, req.params.iterationid);
@@ -54,7 +53,7 @@ async function router(schema, config) {
         res: 'res.Stack.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
             config.is_aws();
 
             const iter = await Iteration.from(config.pool, req.params.iterationid);
@@ -102,7 +101,7 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
             config.is_aws();
 
             const stack = await Stack.from(req.params.pid, req.params.iterationid);
@@ -117,5 +116,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

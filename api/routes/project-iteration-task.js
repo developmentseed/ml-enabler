@@ -1,9 +1,8 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const Task = require('../lib/project/iteration/task');
-const User = require('../lib/user');
+import Err from '@openaddresses/batch-error';
+import Task from '../lib/types/project-iteration-task.js';
+import Auth from '../lib/auth.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
 
     /**
      * @api {post} /api/project/:pid/iteration/:iterationid/task Create Task
@@ -25,7 +24,7 @@ async function router(schema, config) {
         res: 'res.Task.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             let task;
             if (req.body.type === 'vectorize') {
@@ -71,7 +70,7 @@ async function router(schema, config) {
         res: 'res.ListTasks.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             res.json(await Task.list(config.pool, req.params.iterationid, req.query));
         } catch (err) {
@@ -98,7 +97,7 @@ async function router(schema, config) {
         res: 'res.Task.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             const task = await Task.from(config.pool, req.params.taskid);
 
@@ -127,7 +126,7 @@ async function router(schema, config) {
         res: 'res.Task.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             const task = await Task.from(config.pool, req.params.taskid);
 
@@ -158,11 +157,9 @@ async function router(schema, config) {
         res: 'res.Task.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
-            const task = await Task.from(config.pool, req.params.taskid);
-            task.patch(req.body);
-            await task.commit(config.pool);
+            const task = await Task.commit(config.pool, req.params.taskid, req.body);
 
             return res.json(task.serialize());
         } catch (err) {
@@ -189,7 +186,7 @@ async function router(schema, config) {
         res: 'res.Standard.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
 
             const task = await Task.from(config.pool, req.params.taskid);
             await task.delete(config.pool);
@@ -203,5 +200,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

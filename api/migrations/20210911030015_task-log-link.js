@@ -1,4 +1,4 @@
-exports.up = function(knex) {
+export function up(knex) {
     return knex.schema.raw(`
         ALTER TABLE tasks
             ADD COLUMN log_link TEXT;
@@ -8,7 +8,7 @@ exports.up = function(knex) {
     `);
 }
 
-exports.down = function(knex) {
+export function down(knex) {
     return knex.schema.raw(`
         ALTER TABLE tasks
             DROP COLUMN log_link;

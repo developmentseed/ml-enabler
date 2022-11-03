@@ -1,6 +1,5 @@
-'use strict';
-const test = require('tape');
-const Flight = require('./flight');
+import test from 'tape';
+import Flight from './flight.js';
 
 const flight = new Flight();
 
@@ -148,7 +147,7 @@ test('POST /project/1/iteration - duplicate version', async (t) => {
 
         t.deepEquals(res.body, {
             status: 400,
-            message:'Iteration by that version already exists',
+            message: 'iterations already exists',
             messages: []
         });
     } catch (err) {

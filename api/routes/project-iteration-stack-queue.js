@@ -1,14 +1,13 @@
-'use strict';
-const { Err } = require('@openaddresses/batch-schema');
-const StackQueue = require('../lib/stack/queue');
-const Task = require('../lib/project/iteration/task');
-const Iteration = require('../lib/project/iteration');
-const Imagery = require('../lib/project/imagery');
-const Submission = require('../lib/project/iteration/submission');
-const CWAlarm = require('../lib/cw-alarm');
-const User = require('../lib/user');
+import Err from '@openaddresses/batch-error';
+import StackQueue from '../lib/queue.js';
+import Task from '../lib/types/project-iteration-task.js';
+import Iteration from '../lib/types/project-iteration.js';
+import Imagery from '../lib/types/project-imagery.js';
+import Submission from '../lib/types/project-iteration-submission.js';
+import CWAlarm from '../lib/cw-alarm.js';
+import Auth from '../lib/auth.js';
 
-async function router(schema, config) {
+export default async function router(schema, config) {
     const alarm = new CWAlarm(config);
 
     /**
@@ -29,7 +28,7 @@ async function router(schema, config) {
         res: 'res.StackQueue.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
             config.is_aws();
 
             const queue = await StackQueue.from(req.params.pid, req.params.iterationid);
@@ -57,7 +56,7 @@ async function router(schema, config) {
         res: 'res.StackQueue.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
             config.is_aws();
 
             await StackQueue.delete(req.params.pid, req.params.iterationid);
@@ -89,7 +88,7 @@ async function router(schema, config) {
         res: 'res.StackQueue.json'
     }, async (req, res) => {
         try {
-            await User.is_auth(req);
+            await Auth.is_auth(req);
             config.is_aws();
 
             const iter = await Iteration.from(config.pool, req.params.iterationid);
@@ -148,5 +147,3 @@ async function router(schema, config) {
         }
     });
 }
-
-module.exports = router;

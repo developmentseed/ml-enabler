@@ -1,22 +1,22 @@
-'use strict';
 process.env.StackName = 'test';
 
-const { sql } = require('slonik');
-const fs = require('fs');
-const path = require('path');
-const { promisify } = require('util');
-const prequest = promisify(require('request'));
-const api = require('../index');
-const Knex = require('knex');
-const KnexConfig = require('../knexfile');
-const drop = require('./drop');
-const { pathToRegexp } = require('path-to-regexp');
-const Ajv = require('ajv');
+import { sql } from 'slonik';
+import fs from 'fs';
+import { promisify } from 'util';
+import api from '../index.js';
+import Knex from 'knex';
+import KnexConfig from '../knexfile.js';
+import drop from './drop.js';
+import { pathToRegexp } from 'path-to-regexp';
+import request from 'request';
+import Ajv from 'ajv';
+
+const prequest = promisify(request);
 const ajv = new Ajv({
     allErrors: true
 });
 
-class Flight {
+export default class Flight {
 
     constructor() {
         this.srv;
@@ -40,7 +40,7 @@ class Flight {
                 t.error(err);
             }
 
-            this.schema = JSON.parse(fs.readFileSync(path.resolve(__dirname, './fixtures/get_schema.json')));
+            this.schema = JSON.parse(fs.readFileSync(new URL('./fixtures/get_schema.json', import.meta.url)));
             this.routes = {};
 
             for (const route of Object.keys(this.schema)) {
@@ -60,7 +60,7 @@ class Flight {
      */
     fixture(test, name, auth) {
         test(`Fixture: ${name}`, async (t) => {
-            const req = JSON.parse(fs.readFileSync(path.resolve(__dirname, './fixtures/', name)));
+            const req = JSON.parse(fs.readFileSync(new URL('./fixtures/' + name, import.meta.url)));
             if (auth) req.auth = {
                 bearer: this.token[auth]
             };
@@ -223,5 +223,3 @@ class Flight {
         });
     }
 }
-
-module.exports = Flight;

@@ -1,6 +1,5 @@
-'use strict';
-const test = require('tape');
-const Flight = require('./flight');
+import test from 'tape';
+import Flight from './flight.js';
 
 const flight = new Flight();
 
@@ -127,7 +126,7 @@ test('POST: /project - no duplicate projects', async (t) => {
 
         t.deepEquals(res.body, {
             status: 400,
-            message: 'Project by that name already exists',
+            message: 'projects already exists',
             messages: []
         });
 
