@@ -1,9 +1,9 @@
 import cf from '@mapbox/cloudfriend';
 import alarms from 'batch-alarms';
 
-import jobs from './jobs';
-import batch from './batch';
-import perms from './perms';
+import jobs from './jobs.js';
+import batch from './batch.js';
+import perms from './perms.js';
 
 const Parameters = {
     GitSha: {
