@@ -1,6 +1,5 @@
 import fs from 'fs';
 import test from 'tape';
-import assert from 'assert';
 import Flight from './flight.js';
 
 const flight = new Flight();
@@ -10,11 +9,13 @@ flight.takeoff(test);
 
 const UPDATE = process.env.UPDATE;
 
-test('GET: api/schema', async () => {
+test('GET: api/schema', async (t) => {
     try {
-        const res = await flight.fetch('/api/schema', {
+        const res = await flight.request({
+            url: '/api/schema',
+            json: true,
             method: 'GET'
-        }, true);
+        }, t);
 
         const fixture = new URL('./fixtures/get_schema.json', import.meta.url);
 
@@ -22,21 +23,25 @@ test('GET: api/schema', async () => {
             fs.writeFileSync(fixture, JSON.stringify(res.body, null, 4));
         }
 
-        assert.deepEqual(res.body, JSON.parse(fs.readFileSync(fixture)));
+        t.deepEqual(res.body, JSON.parse(fs.readFileSync(fixture)));
     } catch (err) {
-        assert.ifError(err, 'no error');
+        t.error(err, 'no error');
     }
+
+    t.end()
 });
 
-test('GET: api/schema?method=FAKE', async () => {
+test('GET: api/schema?method=FAKE', async (t) => {
     try {
-        const res = await flight.fetch('/api/schema?method=fake', {
+        const res = await flight.request({
+            url: '/api/schema?method=fake',
+            json: true,
             method: 'GET'
         }, false);
 
-        assert.equal(res.status, 400, 'http: 400');
+        t.equal(res.statusCode, 400, 'http: 400');
 
-        assert.deepEqual(res.body, {
+        t.deepEqual(res.body, {
             status: 400,
             message: 'validation error',
             messages: [{
@@ -50,50 +55,60 @@ test('GET: api/schema?method=FAKE', async () => {
             }]
         });
     } catch (err) {
-        assert.ifError(err, 'no error');
+        t.error(err, 'no error');
     }
+
+    t.end()
 });
 
-test('GET: api/schema?method=GET', async () => {
+test('GET: api/schema?method=GET', async (t) => {
     try {
-        const res = await flight.fetch('/api/schema?method=GET', {
+        const res = await flight.request({
+            url: '/api/schema?method=GET',
+            json: true,
             method: 'GET'
         }, false);
 
-        assert.equal(res.status, 400, 'http: 400');
-        assert.deepEqual(res.body, {
+        t.equal(res.statusCode, 400, 'http: 400');
+        t.deepEqual(res.body, {
             status: 400,
             message: 'url & method params must be used together',
             messages: []
         });
 
     } catch (err) {
-        assert.ifError(err, 'no error');
+        t.error(err, 'no error');
     }
 });
 
-test('GET: api/schema?url=123', async () => {
+test('GET: api/schema?url=123', async (t) => {
     try {
-        const res = await flight.fetch('/api/schema?url=123', {
+        const res = await flight.request({
+            url: '/api/schema?url=123',
+            json: true,
             method: 'GET'
         }, false);
 
-        assert.equal(res.status, 400, 'http: 400');
-        assert.deepEqual(res.body, {
+        t.equal(res.statusCode, 400, 'http: 400');
+        t.deepEqual(res.body, {
             status: 400,
             message: 'url & method params must be used together',
             messages: []
         });
     } catch (err) {
-        assert.ifError(err, 'no error');
+        t.error(err, 'no error');
     }
+
+    t.end();
 });
 
-test('GET: api/schema?method=POST&url=/login', async () => {
+test('GET: api/schema?method=POST&url=/login', async (t) => {
     try {
-        const res = await flight.fetch('/api/schema?method=POST&url=/login', {
+        const res = await flight.request({
+            url: '/api/schema?method=POST&url=/login',
+            json: true,
             method: 'GET'
-        }, true);
+        }, t);
 
         const fixture = new URL('./fixtures/login_schema.json', import.meta.url);
 
@@ -101,15 +116,19 @@ test('GET: api/schema?method=POST&url=/login', async () => {
             fs.writeFileSync(fixture, JSON.stringify(res.body, null, 4));
         }
 
-        assert.deepEqual(res.body, JSON.parse(fs.readFileSync(fixture)));
+        t.deepEqual(res.body, JSON.parse(fs.readFileSync(fixture)));
     } catch (err) {
-        assert.ifError(err, 'no error');
+        t.error(err, 'no error');
     }
+
+    t.end();
 });
 
-test('POST: api/login', async () => {
+test('POST: api/login', async (t) => {
     try {
-        const res = await flight.fetch('/api/login', {
+        const res = await flight.request({
+            url: '/api/login',
+            json: true,
             method: 'POST',
             body: {
                 fake: 123,
@@ -117,8 +136,8 @@ test('POST: api/login', async () => {
             }
         }, false);
 
-        assert.equal(res.status, 400, 'http: 400');
-        assert.deepEqual(res.body, {
+        t.equal(res.statusCode, 400, 'http: 400');
+        t.deepEqual(res.body, {
             status: 400,
             message: 'validation error',
             messages: [{
@@ -138,8 +157,10 @@ test('POST: api/login', async () => {
             }]
         });
     } catch (err) {
-        assert.ifError(err, 'no error');
+        t.error(err, 'no error');
     }
+
+    t.end();
 });
 
 flight.landing(test);
