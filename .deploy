@@ -10,5 +10,12 @@
         "lambda": [
             "devseed-artifacts/ml-enabler/lambda-{{gitsha}}.zip"
         ]
-    }
+    },
+    "tags": [{
+        "Key": "Project",
+        "Value": "ml-enabler"
+    },{
+        "Key": "Client",
+        "Value": "labs"
+    }]
 }
