@@ -2,7 +2,7 @@
     "version": "3.0.0",
     "type": "module",
     "scripts": {
-        "lint": "eslint cloudformation/*.js"
+        "lint": "eslint cloudformation/*.js cloudformation/lib/*.js"
     },
     "dependencies": {
         "@mapbox/cloudfriend": "^6.0.0",
