@@ -10,10 +10,10 @@ WORKDIR $HOME/api
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y nginx curl git
 
-RUN export NODEV='18.7.0' \
+RUN export NODEV='19.0.1' \
     && curl "https://nodejs.org/dist/v${NODEV}/node-v${NODEV}-linux-x64.tar.gz" | tar -xzv \
     && cp ./node-v${NODEV}-linux-x64/bin/node /usr/bin/ \
-    && ./node-v${NODEV}-linux-x64/bin/npm install -g npm@7
+    && ./node-v${NODEV}-linux-x64/bin/npm install -g npm
 
 RUN npm install \
     && npm run doc \
