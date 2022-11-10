@@ -37,14 +37,14 @@
         </template>
 
         <template v-if='newMeta'>
-            <Metadata
+            <CommonMetadata
                 :existing='false'
                 @err='$emit("err", $event)'
                 @close='getMetas'
             />
         </template>
         <template v-else-if='editMeta'>
-            <Metadata
+            <CommonMetadata
                 :existing=editMeta
                 @err='$emit("err", $event)'
                 @close='getMetas'
@@ -86,7 +86,7 @@
 <script>
 import Pager from '../util/Pager.vue';
 import Loading from '../util/Loading.vue';
-import Metadata from './Metadata.vue';
+import CommonMetadata from './Metadata.vue';
 
 export default {
     name: 'AdminMeta',
@@ -146,7 +146,7 @@ export default {
         }
     },
     components: {
-        Metadata,
+        CommonMetadata,
         Loading,
         Pager
     }

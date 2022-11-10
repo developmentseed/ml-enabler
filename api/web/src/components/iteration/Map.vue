@@ -154,7 +154,7 @@ import bboxPolygon from '@turf/bbox-polygon';
 import IterationHeader from './IterationHeader.vue';
 
 export default {
-    name: 'Map',
+    name: 'CommonMap',
     props: ['meta', 'iteration'],
     data: function() {
         return {

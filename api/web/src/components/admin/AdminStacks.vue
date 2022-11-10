@@ -43,7 +43,7 @@
             <div class='w-full align-center txt-bold'>No Stacks Found</div>
         </template>
         <template v-else>
-            <Table
+            <CommonTable
                 headers='_id,_project,_iteration,Stack Name,Status,Runtime (Hrs)'
                 :data='stacks'
                 @click='stackNav($event)'
@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import Table from '../util/Table.vue';
+import CommonTable from '../util/Table.vue';
 import moment from 'moment';
 import Loading from '../util/Loading.vue';
 
@@ -112,7 +112,7 @@ export default {
     },
     components: {
         Loading,
-        Table
+        CommonTable
     }
 }
 </script>

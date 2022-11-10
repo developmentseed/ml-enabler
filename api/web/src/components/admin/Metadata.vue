@@ -52,7 +52,7 @@
 import Loading from '../util/Loading.vue';
 
 export default {
-    name: 'Metadata',
+    name: 'CommonMetadata',
     props: {
         existing: {
             type: [Boolean, Object],
