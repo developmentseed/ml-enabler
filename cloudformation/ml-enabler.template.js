@@ -1,6 +1,7 @@
 import cf from '@mapbox/cloudfriend';
 import alarms from 'batch-alarms';
 
+import s3 from './lib/s3.js';
 import jobs from './lib/jobs.js';
 import vpc from './lib/vpc.js';
 import batch from './lib/batch.js';
@@ -128,12 +129,6 @@ const Resources = {
                 'arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly'
             ],
             Path: '/service-role/'
-        }
-    },
-    MLEnablerBucket: {
-        Type: 'AWS::S3::Bucket',
-        Properties: {
-            BucketName: cf.join('-', [cf.stackName, cf.accountId, cf.region])
         }
     },
     MLEnablerTaskRole: {
@@ -334,7 +329,6 @@ const Resources = {
     },
     MLEnablerHTTPSListener: {
         Type: 'AWS::ElasticLoadBalancingV2::Listener',
-        Condition: 'HasSSL',
         Properties: {
             Certificates: [{
                 CertificateArn: cf.arn('acm', cf.ref('SSLCertificateIdentifier'))
@@ -350,7 +344,6 @@ const Resources = {
     },
     MLEnablerHTTPListenerRedirect: {
         Type: 'AWS::ElasticLoadBalancingV2::Listener',
-        Condition: 'HasSSL',
         Properties: {
             DefaultActions: [{
                 Type: 'redirect',
@@ -612,11 +605,6 @@ const Mappings = {
         'us-west-1': { '1': 'us-west-1b', '2': 'us-west-1c' },
         'us-west-2': { '1': 'us-west-2a', '2': 'us-west-2b', '3': 'us-west-2c'  }
     }
-};
-
-const Conditions = {
-    HasSSL: cf.notEquals(cf.ref('SSLCertificateIdentifier'), ''),
-    HasNoSSL: cf.equals(cf.ref('SSLCertificateIdentifier'), '')
 };
 
 const Outputs = {
