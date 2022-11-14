@@ -2,7 +2,7 @@ import cf from '@mapbox/cloudfriend';
 
 export default {
     Resources: {
-        VPC: {
+        MLEnablerVPC: {
             Type: 'AWS::EC2::VPC',
             Properties: {
                 EnableDnsHostnames: true,
@@ -14,25 +14,25 @@ export default {
                 }]
             }
         },
-        SubA: {
+        MLEnablerSubA: {
             Type: 'AWS::EC2::Subnet',
             Properties: {
                 AvailabilityZone: cf.findInMap('AWSRegion2AZ', cf.region, '1'),
-                VpcId: cf.ref('VPC'),
+                VpcId: cf.ref('MLEnablerVPC'),
                 CidrBlock: '172.31.1.0/24',
                 MapPublicIpOnLaunch: true
             }
         },
-        SubB: {
+        MLEnablerSubB: {
             Type: 'AWS::EC2::Subnet',
             Properties: {
                 AvailabilityZone: cf.findInMap('AWSRegion2AZ', cf.region, '2'),
-                VpcId: cf.ref('VPC'),
+                VpcId: cf.ref('MLEnablerVPC'),
                 CidrBlock: '172.31.2.0/24',
                 MapPublicIpOnLaunch: true
             }
         },
-        InternetGateway: {
+        MLEnablerInternetGateway: {
             Type: 'AWS::EC2::InternetGateway',
             Properties: {
                 Tags: [{
@@ -44,17 +44,17 @@ export default {
                 }]
             }
         },
-        VPCIG: {
+        MLEnablerVPCIG: {
             Type: 'AWS::EC2::VPCGatewayAttachment',
             Properties: {
-                InternetGatewayId: cf.ref('InternetGateway'),
-                VpcId: cf.ref('VPC')
+                InternetGatewayId: cf.ref('MLEnablerInternetGateway'),
+                VpcId: cf.ref('MLEnablerVPC')
             }
         },
         RouteTable: {
             Type: 'AWS::EC2::RouteTable',
             Properties: {
-                VpcId: cf.ref('VPC'),
+                VpcId: cf.ref('MLEnablerVPC'),
                 Tags: [{
                     Key: 'Network',
                     Value: 'Public'
@@ -63,25 +63,25 @@ export default {
         },
         PublicRoute: {
             Type: 'AWS::EC2::Route',
-            DependsOn:  'VPCIG',
+            DependsOn:  'MLEnablerVPCIG',
             Properties: {
                 RouteTableId: cf.ref('RouteTable'),
                 DestinationCidrBlock: '0.0.0.0/0',
-                GatewayId: cf.ref('InternetGateway')
+                GatewayId: cf.ref('MLEnablerInternetGateway')
             }
         },
         SubAAssoc: {
             Type: 'AWS::EC2::SubnetRouteTableAssociation',
             Properties: {
                 RouteTableId: cf.ref('RouteTable'),
-                SubnetId: cf.ref('SubA')
+                SubnetId: cf.ref('MLEnablerSubA')
             }
         },
         SubBAssoc: {
             Type: 'AWS::EC2::SubnetRouteTableAssociation',
             Properties: {
                 RouteTableId: cf.ref('RouteTable'),
-                SubnetId: cf.ref('SubB')
+                SubnetId: cf.ref('MLEnablerSubB')
             }
         },
         NatGateway: {
@@ -89,12 +89,12 @@ export default {
             DependsOn: 'NatPublicIP',
             Properties:  {
                 AllocationId: cf.getAtt('NatPublicIP', 'AllocationId'),
-                SubnetId: cf.ref('SubA')
+                SubnetId: cf.ref('MLEnablerSubA')
             }
         },
         NatPublicIP: {
             Type: 'AWS::EC2::EIP',
-            DependsOn: 'VPC',
+            DependsOn: 'MLEnablerVPC',
             Properties: {
                 Domain: 'vpc'
             }

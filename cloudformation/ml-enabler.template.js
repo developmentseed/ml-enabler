@@ -241,8 +241,8 @@ const Resources = {
                     AssignPublicIp: 'ENABLED',
                     SecurityGroups: [cf.ref('MLEnablerServiceSecurityGroup')],
                     Subnets: [
-                        cf.ref('SubA'),
-                        cf.ref('SubB')
+                        cf.ref('MLEnablerSubA'),
+                        cf.ref('MLEnablerSubB')
                     ]
                 }
             },
@@ -257,7 +257,7 @@ const Resources = {
         Type: 'AWS::EC2::SecurityGroup',
         Properties: {
             GroupDescription: cf.join([cf.stackName, '-ec2-sg']),
-            VpcId: cf.ref('VPC'),
+            VpcId: cf.ref('MLEnablerVPC'),
             SecurityGroupIngress: [{
                 CidrIp: '0.0.0.0/0',
                 IpProtocol: 'tcp',
@@ -295,7 +295,7 @@ const Resources = {
             HealthCheckPath: '/health',
             Port: 2000,
             Protocol: 'HTTP',
-            VpcId: cf.ref('VPC'),
+            VpcId: cf.ref('MLEnablerVPC'),
             TargetType: 'ip',
             Matcher: {
                 HttpCode: '200,202,302,304'
@@ -309,8 +309,8 @@ const Resources = {
             Type: 'application',
             SecurityGroups: [cf.ref('MLEnablerELBSecurityGroup')],
             Subnets: [
-                cf.ref('SubA'),
-                cf.ref('SubB')
+                cf.ref('MLEnablerSubA'),
+                cf.ref('MLEnablerSubB')
             ]
         }
     },
@@ -329,7 +329,7 @@ const Resources = {
                 FromPort: 443,
                 ToPort: 443
             }],
-            VpcId: cf.ref('VPC')
+            VpcId: cf.ref('MLEnablerVPC')
         }
     },
     MLEnablerHTTPSListener: {
@@ -404,8 +404,8 @@ const Resources = {
         Properties: {
             DBSubnetGroupDescription: cf.join([cf.stackName, '-rds-subnets']),
             SubnetIds: [
-                cf.ref('SubA'),
-                cf.ref('SubB')
+                cf.ref('MLEnablerSubA'),
+                cf.ref('MLEnablerSubB')
             ]
         }
     },
@@ -413,7 +413,7 @@ const Resources = {
         Type: 'AWS::RDS::DBSecurityGroup',
         Properties: {
             GroupDescription: cf.join([cf.stackName, '-rds-sg']),
-            EC2VpcId: cf.ref('VPC'),
+            EC2VpcId: cf.ref('MLEnablerVPC'),
             DBSecurityGroupIngress: [{
                 EC2SecurityGroupId: cf.getAtt('MLEnablerServiceSecurityGroup', 'GroupId')
             },{
@@ -611,7 +611,7 @@ const Resources = {
         Type : 'AWS::EC2::SecurityGroup',
         Properties: {
             GroupDescription: cf.join([cf.stackName, '-pred-ec2-sg']),
-            VpcId: cf.ref('VPC'),
+            VpcId: cf.ref('MLEnablerVPC'),
             SecurityGroupIngress: [{
                 CidrIp: '0.0.0.0/0',
                 IpProtocol: 'tcp',
@@ -687,7 +687,7 @@ const Outputs = {
     },
     InternalVPC: {
         Description: 'The ARN of the VPC',
-        Value: cf.ref('VPC'),
+        Value: cf.ref('MLEnablerVPC'),
         Export: {
             Name: cf.join([cf.stackName, '-vpc'])
         }
@@ -701,14 +701,14 @@ const Outputs = {
     },
     InternalSubA: {
         Description: 'SubnetA',
-        Value: cf.ref('SubA'),
+        Value: cf.ref('MLEnablerSubA'),
         Export: {
             Name: cf.join([cf.stackName, '-suba'])
         }
     },
     InternalSubB: {
         Description: 'SubnetA',
-        Value: cf.ref('SubB'),
+        Value: cf.ref('MLEnablerSubB'),
         Export: {
             Name: cf.join([cf.stackName, '-subb'])
         }

@@ -62,8 +62,8 @@ export default {
                     MinvCpus: 0,
                     SecurityGroupIds: [cf.ref('BatchSecurityGroup')],
                     Subnets:  [
-                        cf.ref('SubA'),
-                        cf.ref('SubB')
+                        cf.ref('MLEnablerSubA'),
+                        cf.ref('MLEnablerSubB')
                     ],
                     Type : 'EC2',
                     InstanceRole : cf.getAtt('BatchInstanceProfile', 'Arn'),
@@ -85,8 +85,8 @@ export default {
                     MinvCpus: 0,
                     SecurityGroupIds: [cf.ref('BatchSecurityGroup')],
                     Subnets:  [
-                        cf.ref('SubA'),
-                        cf.ref('SubB')
+                        cf.ref('MLEnablerSubA'),
+                        cf.ref('MLEnablerSubB')
                     ],
                     Type : 'EC2',
                     InstanceRole : cf.getAtt('BatchInstanceProfile', 'Arn'),
@@ -137,7 +137,7 @@ export default {
         BatchSecurityGroup: {
             'Type': 'AWS::EC2::SecurityGroup',
             'Properties': {
-                'VpcId': cf.ref('VPC'),
+                'VpcId': cf.ref('MLEnablerVPC'),
                 'GroupDescription': 'Batch Security Group',
                 SecurityGroupIngress: []
             }
