@@ -356,25 +356,9 @@ const Resources = {
                 Type: 'redirect',
                 RedirectConfig: {
                     Protocol: 'HTTPS',
-                    Port: '443',
-                    Host: '#{host}',
-                    Path: '/#{path}',
-                    Query: '#{query}',
-                    StatusCode: 'HTTP_301'
+                    StatusCode: 'HTTP_301',
+                    Port: 443
                 }
-            }],
-            LoadBalancerArn: cf.ref('MLEnablerELB'),
-            Port: 80,
-            Protocol: 'HTTP'
-        }
-    },
-    MLEnablerHTTPListener: {
-        Type: 'AWS::ElasticLoadBalancingV2::Listener',
-        Condition: 'HasNoSSL',
-        Properties: {
-            DefaultActions: [{
-                Type: 'forward',
-                TargetGroupArn: cf.ref('MLEnablerTargetGroup')
             }],
             LoadBalancerArn: cf.ref('MLEnablerELB'),
             Port: 80,
