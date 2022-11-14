@@ -10,7 +10,7 @@
             "type": "integer",
             "description": "Total number of items with the service"
         },
-        "tokens": {
+        "meta": {
             "type": "array",
             "items": {
                 "type": "object",

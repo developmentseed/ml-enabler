@@ -10,7 +10,7 @@
             "type": "integer",
             "description": "Total number of items"
         },
-        "projects": {
+        "imagery": {
             "type": "array",
             "items": {
                 "type": "object",
