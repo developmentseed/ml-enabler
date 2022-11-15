@@ -331,7 +331,7 @@ const Resources = {
         Type: 'AWS::ElasticLoadBalancingV2::Listener',
         Properties: {
             Certificates: [{
-                CertificateArn: cf.arn('acm', cf.ref('SSLCertificateIdentifier'))
+                CertificateArn: cf.join(['arn:aws:acm:', cf.region, ':', cf.accountId, ':certificate/', cf.ref('SSLCertificateIdentifier')])
             }],
             DefaultActions: [{
                 Type: 'forward',
@@ -719,7 +719,6 @@ export default cf.merge(
         Parameters,
         Resources,
         Mappings,
-        Conditions,
         Outputs
     },
     alarms({
@@ -731,6 +730,7 @@ export default cf.merge(
         loadbalancer: cf.getAtt('MLEnablerELB', 'LoadBalancerFullName'),
         targetgroup: cf.getAtt('MLEnablerTargetGroup', 'TargetGroupFullName')
     }),
+    s3,
     vpc,
     batch,
     jobs
