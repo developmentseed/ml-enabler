@@ -155,7 +155,7 @@ const Resources = {
         Properties: {
             Family: cf.stackName,
             Cpu: 1024,
-            Memory: 1024,
+            Memory: 4096,
             NetworkMode: 'awsvpc',
             RequiresCompatibilities: ['FARGATE'],
             Tags: [{
@@ -186,7 +186,7 @@ const Resources = {
                     Value: 'aws'
                 },{
                     Name: 'FRONTEND_URL',
-                    Value: cf.get('Domain')
+                    Value: cf.ref('Domain')
                 },{
                     Name: 'SigningSecret',
                     Value: cf.ref('SigningSecret')
