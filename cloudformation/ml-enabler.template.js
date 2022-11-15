@@ -20,15 +20,10 @@ const Parameters = {
         Description: 'SES Domain to send emails via',
         Type: 'String'
     },
-    ContainerCpu: {
-        Description: 'How much CPU to give to the container. 1024 is 1 cpu. See aws docs for acceptable cpu/mem combinations',
-        Default: 1024,
-        Type: 'Number'
-    },
-    ContainerMemory: {
-        Description: 'How much memory in megabytes to give to the container. See aws docs for acceptable cpu/mem combinations',
-        Default: 1024,
-        Type: 'Number'
+    Domain: {
+        Description: 'SES Domain to send emails via',
+        Type: 'String',
+        Default: 'https://ml-enabler.ds.io'
     },
     SSLCertificateIdentifier: {
         Type: 'String',
@@ -159,8 +154,8 @@ const Resources = {
         DependsOn: 'MLEnablerBucket',
         Properties: {
             Family: cf.stackName,
-            Cpu: cf.ref('ContainerCpu'),
-            Memory: cf.ref('ContainerMemory'),
+            Cpu: 1024,
+            Memory: 1024,
             NetworkMode: 'awsvpc',
             RequiresCompatibilities: ['FARGATE'],
             Tags: [{
@@ -191,7 +186,7 @@ const Resources = {
                     Value: 'aws'
                 },{
                     Name: 'FRONTEND_URL',
-                    Value: cf.getAtt('MLEnablerELB', 'DNSName')
+                    Value: cf.get('Domain')
                 },{
                     Name: 'SigningSecret',
                     Value: cf.ref('SigningSecret')
