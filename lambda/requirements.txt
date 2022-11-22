@@ -4,6 +4,6 @@ rasterio==1.2.10
 mercantile==1.2.1
 requests==2.27.1
 geojson==2.5.0
-pillow==8.0.1
+pillow==9.3.0
 shapely==1.8.0
 affine==2.3.0
