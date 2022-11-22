@@ -7,7 +7,7 @@ pandas==1.1.0
 scikit-learn==0.23.2
 tqdm==4.48.2
 mercantile==1.1.5
-pillow==7.2.0
+pillow==9.3.0
 rasterio==1.1.5
 requests-toolbelt==0.9.1
 semver==2.10.2
