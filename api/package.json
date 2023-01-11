@@ -28,7 +28,7 @@
         "express": "^4.17.1",
         "express-minify": "^1.0.0",
         "jsonwebtoken": "^8.5.1",
-        "knex": "^2.3.0",
+        "knex": "^2.4.0",
         "mailgen": "^2.0.14",
         "memjs": "^1.3.0",
         "minimist": "^1.2.2",
